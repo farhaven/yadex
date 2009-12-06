@@ -1,0 +1,59 @@
+.TH FTIME 1
+.SH NAME
+ftime \- print access, change or modification time of files
+.SH SYNOPSIS
+\fBftime\fP [\fB-\fP{\fBa\fP|\fBc\fP|\fBm\fP}] [\fB\-f\fP \fIstring\fP] \fIfile\fP ...
+.SH DESCRIPTION
+Amazingly, there does not seem to exist any simple and portable way to
+retrieve the last modification time of a file from the shell. GNU awk, GNU
+find, perl and stat allow to do it but they're not part of the standard.
+Parsing the output of ls \-l could do, but it would be disgustingly complicated
+and the time of day is lost anyway. This program was written to plug that
+hole.
+
+If only one file is given, ftime prints just the time followed by a newline.
+If more than one file is given, ftime prints one line for each file with, on
+each line, the time and the name of the file, separated by a space.
+
+Note that if an argument is a directory, it is \fInot\fP treated specially.
+There is not sorting: files are printed in the same order in which they appear
+on the command line.
+
+.SH OPTIONS
+.SS Specifying the time to print
+.TP
+.B \-m
+Print the time of the last modification (\fBctime\fP). This is the default.
+.TP
+.B \-a
+Print the time of the last access (\fBatime\fP). By default the time printed
+is the time of the last modification (\fBmtime\fP). This option is similar to
+the \fB\-u\fP option in \fBls\fP(1).
+.TP
+.B \-c
+Print the time of the last status change (\fBctime\fP). By default the time
+printed is the time of the last modification (\fBmtime\fP). This option is
+similar to the \fB\-c\fP option in \fBls\fP(1).
+.SS Specifying the format for times
+.TP
+.BI "\-f " string
+Print the times using \fBstrftime\fP(3) and the format \fIstring\fP. By
+default, the times are printed with the format "\fB%Y\-%m\-%d %H:%M:%S\fP"
+(i.e. the ISO 8601 format \fIyyyy\fP\-\fImm\fP\-\fIdd\fP
+\fIhh\fP:\fImm\fP:\fIss\fP).
+.TP
+.B \-d
+Print the date only. This option is equivalent to "\fB\-f '%Y\-%m\-%d\fP'".
+.TP
+.B \-s
+Don't print the seconds. This option is equivalent to "\fB\-f '%Y\-%m\-%d
+%H:%M'\fP".
+.SH EXIT VALUE
+.ta 4
+\fBO\fP	OK.
+.br
+\fB1\fP	Syntax error.
+.br
+\fB2\fP	Runtime error.
+.SH SEE ALSO
+.BR strftime (3)

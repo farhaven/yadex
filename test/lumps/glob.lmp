@@ -1,0 +1,339 @@
+//compile target global.lmp
+#include "zcommon.acs"
+#library "global"
+#define mission 0
+#define saved_buddys 1
+#define button_number 5
+/* this script contains variables,functions and scripts
+ * common to all maps
+ */
+ 
+int enemy_count[19] = {0}; // number of enemys on the current map
+bool vending[8] = {false,false,false,false,false,false,false,false};
+bool clicked[8] = {false,false,false,false,false,false,false,false};
+int displaytime[8];
+/* buttons:
+ * X,Y,Width,Height,Action
+ */
+#define x_off 180
+#define y_off 160
+int buttons[button_number][5] = {{0  + x_off, 0   + y_off, 70, 39, 1}, // buy health  	-> STIM_1
+		     		 {83 + x_off, 0   + y_off, 66, 39, 2}, // buy shells  	-> SHELL_1
+		     		 {0  + x_off, 50  + y_off, 70, 48, 3}, // buy bullets 	-> ROUND_1
+		     		 {83 + x_off, 50  + y_off, 66, 48, 4}, // buy cells   	-> CELL_1
+		     		 {60 + x_off, 104 + y_off, 35, 13, 5}};// quit		-> DONE_1
+		     
+global int 2:money[];
+str nomoney = "You don't have enough UAC credits";
+str weapon[8];
+
+world int 1:progress[]; // game progress
+str missions[4] = {"Talk to Dr. Sunders",
+		"Retrieve the translocator",
+		"Talk to Dr. Sunders",
+		"Get inside"};
+
+function void say (int who,str what)
+{	sethudsize(640,480,0);
+	if (who != 0)
+	{	if (who == 1) SetFont("SUNDERS");
+		else if (who == 2) SetFont("GUARD");
+		else SetFont("YOU");
+		HudMessage(s:"A";HUDMSG_PLAIN,200,0,0.1,270.0,2);
+		SetFont("SPEECH");
+		HudMessage(s:"A";HUDMSG_PLAIN,300,0,0.1,301.0,2);
+		SetFont("CONFONT");
+		HudMessage(s:what;HUDMSG_PLAIN|HUDMSG_LOG,100,CR_TAN,2.1,302.0,2);
+	}else
+	{	HudMessage(s:"";HUDMSG_PLAIN,300,0,0,0,0);
+		HudMessage(s:"";HUDMSG_PLAIN,200,0,0,0,0);
+		HudMessage(s:"";HUDMSG_PLAIN,100,0,0,0,0);
+	}
+}
+
+function void update_monsters(void)
+{	enemy_count[0] = ThingCount(T_ZOMBIE,0);
+	enemy_count[1] = ThingCount(T_SHOTGUY,0);
+	enemy_count[2] = ThingCount(T_DEMON,0);
+	enemy_count[3] = ThingCount(T_IMP,0);
+	enemy_count[4] = ThingCount(T_CACODEMON,0);
+	enemy_count[5] = ThingCount(T_LOSTSOUL,0);
+	enemy_count[6] = ThingCount(T_CHAINGUY,0);
+	enemy_count[7] = ThingCount(T_HELLKNIGHT,0);
+	enemy_count[8] = ThingCount(T_BARON,0);
+	enemy_count[9] = ThingCount(T_ARACHNOTRON,0);
+	enemy_count[10] = ThingCount(T_SPECTRE,0);
+	enemy_count[11] = ThingCount(T_CYBERDEMON,0);
+	enemy_count[12] = ThingCount(T_SPIDERMASTERMIND,0);
+	enemy_count[13] = ThingCount(T_REVENANT,0);
+	enemy_count[14] = ThingCount(T_MANCUBUS,0);
+	enemy_count[15] = ThingCount(T_PAINELEMENTAL,0);
+	enemy_count[16] = ThingCount(T_VILE,0);
+	enemy_count[17] = ThingCount(T_BRAINS,0);
+	enemy_count[18] = ThingCount(T_WOLFSS,0);
+}
+
+function void takemoney (int amount)
+{	money[Playernumber()] -= amount;
+}
+
+function void do_action (int type)
+{	SetFont("CONFONT");
+	// ACS_Execute(995,0,type);
+	if (type == 1)
+	{	if (money[playernumber()] >= 4)
+		{	takemoney(4);
+			GiveInventory("Stimpack",10);
+		}else
+		{	print(s:nomoney);
+		}
+	}else if (type == 2)
+	{	if (money[playernumber()] >= 12)
+		{	takemoney(12);
+			GiveInventory("Shell",8);
+		}else
+		{	print(s:nomoney);
+		}
+	}else if (type == 3)
+	{	if (money[playernumber()] >= 10)
+		{	takemoney(10);
+			GiveInventory("Clip",25);
+		}else
+		{	print(s:nomoney);
+		}
+	}else if (type == 4)
+	{	if (money[playernumber()] >= 15)
+		{	takemoney(15);
+			GiveInventory("Cell",10);
+		}else
+		{	print(s:nomoney);
+		}
+	}else if (type == 5)
+	{	vending_close();
+	}
+}
+
+function void vending_close(void)
+{	for (int j = 0; j <= 1000;j++)
+	{	HudMessage(s:"";HUDMSG_PLAIN,9000-j,0,0,0,0);
+	}
+	print(s:"");
+	vending[Playernumber()] = false;
+	TakeInventory("clicker",1);
+	SetWeapon(weapon[playernumber()]);
+	SetPlayerProperty(0,0,0);
+}
+
+script 255 (void)
+{	SetPlayerProperty(0,1,0);
+	vending[Playernumber()] = true;
+	if (CheckWeapon ("Chainsaw"))
+		weapon[PlayerNumber ()] = "Chainsaw";
+	else if (CheckWeapon ("Pistol"))
+		weapon[PlayerNumber ()] = "Pistol";
+	else if (CheckWeapon ("Shotgun"))
+		weapon[PlayerNumber ()] = "Shotgun";
+	else if (CheckWeapon ("SuperShotgun"))
+		weapon[PlayerNumber ()] = "SuperShotgun";
+	else if (CheckWeapon ("Chaingun"))
+		weapon[PlayerNumber ()] = "Chaingun";
+	else if (CheckWeapon ("RocketLauncher"))
+		weapon[PlayerNumber ()] = "RocketLauncher";
+	else if (CheckWeapon ("BFG9000"))
+		weapon[PlayerNumber ()] = "BFG9000";
+	else if (CheckWeapon ("PlasmaRifle"))
+		weapon[PlayerNumber ()] = "PlasmaRifle";
+	else if (CheckWeapon ("Translocator"))
+		weapon[Playernumber ()] = "Translocator";
+	else	// Fist
+		weapon[PlayerNumber ()] = "Fist";
+	
+	int i;
+	
+	int base_x,base_y;
+	GiveInventory("clicker",1);
+	SetHudSize(640,480,1);
+	SetFont("SHOP");
+	base_x = ((buttons[0][0] + 10) * 1.0) + 0.1;
+	base_y = ((buttons[0][1] - 30) * 1.0) + 0.1;
+	HudMessage(s:"A";HUDMSG_PLAIN,9000,0,base_x,base_y,5);
+	base_y = ((buttons[0][1] - 7) * 1.0) + 0.1;
+	HudMessage(s:"C";HUDMSG_PLAIN,8894,0,base_x,base_y,5);
+	base_x = ((buttons[0][0] + 160) * 1.0) + 0.1;
+	HudMessage(s:"B";HUDMSG_PLAIN,8893,0,base_x,base_y,5);
+	for (i = 0;i < button_number;i++)
+	{	HudMessage(d:i;HUDMSG_PLAIN,8800-i,0,(buttons[i][0] * 1.0) + 10.1,(buttons[i][1] * 1.0 ) + 10.1,5);
+	}	
+	int cx, cy, cz;
+	int x, y, ang, pitch;
+	int mx, my;
+	int pid = 401+playernumber();
+	int id;
+	thing_changetid(0, pid);
+
+	int baseangle = getactorangle(0);
+	int basepitch = getactorpitch(0);
+	setactorpitch(pid, 2184);
+	pitch = getactorpitch(0);
+	ang = 0.25;
+	
+	if (ThingCount(T_NONE,255))
+		ChangeCamera(255,0,0);
+	
+	while (vending[Playernumber()])
+	{	if (!CheckWeapon("clicker"))
+			SetWeapon("clicker");
+		
+		SetHudSize(640,480,1);
+		SetFont("SMALLFONT");
+		base_x = ((buttons[0][0] + 88) * 1.0) + 0.1;
+		base_y = ((buttons[0][1] - 4) * 1.0) + 0.1;
+		HudMessage(d:money[Playernumber()];HUDMSG_PLAIN,8599,CR_RED,base_x,base_y,5);
+		base_x = ((buttons[0][0] + 210) * 1.0) + 0.1;
+		HudMessage(d:CheckInventory("Health");HUDMSG_PLAIN,8598,CR_RED,base_x,base_y,5);
+		base_y = ((buttons[0][1] + 5) * 1.0) + 0.1;
+		HudMessage(d:CheckInventory("Clip");HUDMSG_PLAIN,8597,CR_RED,base_x,base_y,5);
+		base_y = ((buttons[0][1] + 14) * 1.0) + 0.1;
+		HudMessage(d:CheckInventory("Shell");HUDMSG_PLAIN,8596,CR_RED,base_x,base_y,5);
+		base_y = ((buttons[0][1] + 23) * 1.0) + 0.1;
+		HudMessage(d:CheckInventory("Cell");HUDMSG_PLAIN,8595,CR_RED,base_x,base_y,5);
+		//turn mouse look into a cursor
+		// z range = -8010 - 8010
+		// x range = -10680 - 10680
+		if(ang != getactorangle(0))
+		{	if(ang - getactorangle(0) > 0.5) mx += ang - (getactorangle(0) + 1.0);
+			else if(ang - getactorangle(0) < -0.5) mx += ang - (getactorangle(0) - 1.0);
+			else mx += ang - getactorangle(0);
+			if(mx > 10680)
+				mx = 10680;
+			if(mx < -10680)
+				mx = -10680;
+			setactorangle(0, ang);
+		}
+		if(pitch != getactorpitch(0))
+		{	if(getcvar("invertmouse")) my += pitch - getactorpitch(0);
+			else my -= pitch - getactorpitch(0);
+			if(my > 8010)
+				my = 8010;
+			if(my < -8010)
+				my = -8010;
+			setactorpitch(pid, pitch);
+		}
+		x = (mx/33) + 320;
+		y = (my/33) + 240;
+		
+		sethudsize(640,480,1);
+	
+		setfont("cursor");
+		hudmessage (s:"A"; 0, 8000, -1, (x<<16)+11.0, (y<<16)+15.0, 1);
+
+		if(clicked[playernumber()])
+		{
+			clicked[playernumber()] = false;
+			for(i = 0; i < button_number; i++)
+			{	if (x >= buttons[i][0] && x <= buttons[i][0] + buttons[i][2])
+					if (y >= buttons[i][1] && y <= buttons[i][1] + buttons[i][3])
+					{	id = buttons[i][4] -1;
+								
+						SetFont("SHOP");
+						HudMessage(s:"";HUDMSG_PLAIN,8800-id,0,0,0,0);
+						HudMessage(d:id+5;HUDMSG_PLAIN,8800-id,0,(buttons[id][0] * 1.0) + 10.1,(buttons[id][1] * 1.0 ) + 10.1,5);
+						delay(5);
+						HudMessage(d:id;HUDMSG_PLAIN,8800-id,0,(buttons[id][0] * 1.0) + 10.1,(buttons[id][1] * 1.0 ) + 10.1,0);
+						do_action(buttons[i][4]);
+					}
+				
+			}
+		}
+		delay(1);
+	}
+	SetActorAngle(0,baseangle);
+	SetActorPitch(0,basepitch);
+	ChangeCamera(0,0,0);
+}
+
+script 998 ENTER
+{	int amount;
+	displaytime[Playernumber()] = 0;
+	while (1)
+	{	amount = 0;
+	
+		if (enemy_count[0] > ThingCount(T_ZOMBIE,0)) 	 
+			amount = enemy_count[0] - ThingCount(T_ZOMBIE,0);
+		if (enemy_count[1] > ThingCount(T_SHOTGUY,0)) 	 
+			amount += (enemy_count[1] - ThingCount(T_SHOTGUY,0)) * 2;
+		if (enemy_count[2] > ThingCount(T_DEMON,0)) 	 
+			amount += (enemy_count[2] - ThingCount(T_DEMON,0)) * 3;
+		if (enemy_count[3] > ThingCount(T_IMP,0)) 	 
+			amount += (enemy_count[3] - ThingCount(T_IMP,0)) * 3;
+		if (enemy_count[4] > ThingCount(T_CACODEMON,0))	 
+			amount += (enemy_count[4] - ThingCount(T_CACODEMON,0)) * 4;
+		if (enemy_count[5] > ThingCount(T_LOSTSOUL,0)) 	 
+			amount += (enemy_count[5] - ThingCount(T_LOSTSOUL,0)) * 2;
+		if (enemy_count[6] > ThingCount(T_CHAINGUY,0)) 	 
+			amount += (enemy_count[6] - ThingCount(T_CHAINGUY,0)) * 5;
+		if (enemy_count[7] > ThingCount(T_HELLKNIGHT,0)) 
+			amount += (enemy_count[7] - ThingCount(T_HELLKNIGHT,0)) * 5;
+		if (enemy_count[8] > ThingCount(T_BARON,0))	
+			amount += (enemy_count[8] - ThingCount(T_BARON,0)) * 6;
+		if (enemy_count[9] > ThingCount(T_ARACHNOTRON,0))
+			amount += (enemy_count[9] - ThingCount(T_ARACHNOTRON,0)) * 6;
+		if (enemy_count[10] > ThingCount(T_SPECTRE,0))
+			amount += (enemy_count[10] - ThingCount(T_SPECTRE,0)) * 4;
+		if (enemy_count[11] > ThingCount(T_CYBERDEMON,0))
+			amount += (enemy_count[11] - ThingCount(T_CYBERDEMON,0)) * 10;
+		if (enemy_count[12] > ThingCount(T_SPIDERMASTERMIND,0))
+			amount += (enemy_count[12] - ThingCount(T_SPIDERMASTERMIND,0)) * 11;
+		if (enemy_count[13] > ThingCount(T_REVENANT,0))
+			amount += (enemy_count[13] - ThingCount(T_REVENANT,0)) * 5;
+		if (enemy_count[14] > ThingCount(T_MANCUBUS,0))
+			amount += (enemy_count[14] - ThingCount(T_MANCUBUS,0)) * 6;
+		if (enemy_count[15] > ThingCount(T_PAINELEMENTAL,0))
+			amount += (enemy_count[15] - ThingCount(T_PAINELEMENTAL,0)) * 5;
+		if (enemy_count[16] > ThingCount(T_VILE,0))
+			amount += (enemy_count[16] - ThingCount(T_VILE,0)) * 9;			
+		if (enemy_count[17] > ThingCount(T_BRAINS,0))
+			amount += (enemy_count[17] - ThingCount(T_BRAINS,0)) * 2;
+		if (enemy_count[18] > ThingCount(T_WOLFSS,0))
+			amount += (enemy_count[18] - ThingCount(T_WOLFSS,0)) * 4;
+		
+		update_monsters();
+							
+		if (amount != 0)
+		{	money[Playernumber()] += amount;
+			ACS_ExecuteAlways(996,0,Playernumber());
+		}
+		
+		delay(10);
+	}
+}
+
+script 666 (int amount)
+{	money[Playernumber()] += amount;
+	ACS_Execute(996,0);
+}
+
+script 997 (void)
+{	clicked[Playernumber()] = true;
+}
+
+script 996 (int player)
+{	displaytime[Playernumber()] += 4*35;
+	SetHudSize(640,480,1);
+	SetFont("CREDITS");
+	HudMessage(s:"A";HUDMSG_PLAIN,999,0,305.1,10.0,7);
+	SetFont("CONFONT");
+	HudMessage(d:money[player];HUDMSG_PLAIN,998,CR_TAN,340.1,10.0,7);
+	while (displaytime[Playernumber()])
+	{	delay(1);
+		displaytime[Playernumber()]--;
+	}
+	HudMessage(s:"";HUDMSG_PLAIN,999,0,0,0,0);
+	HudMessage(s:"";HUDMSG_PLAIN,998,0,0,0,0);
+}
+script 999 (void)
+{	SetHudSize(640,480,1);
+	HudMessage(s:"Objective: ",s:missions[progress[mission]-1];HUDMSG_PLAIN,1000,CR_TAN,320.0,10.0,7);
+	delay(4*35);
+	HudMessage(s:"";HUDMSG_PLAIN,1000,0,0,0,1);
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+#
+#	youngest - print the date (yyyy-mm-dd) of the last modified file
+#	Usage : youngest <file> ...
+#
+
+$mtime_max = 0;
+foreach $fic (@ARGV)
+{
+   ($dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size,
+      $atime, $mtime, $ctime, $blksize, $blocks) = stat $fic;
+   $loc_ti = localtime $mtime;
+   $mtime_max = $mtime if $mtime_max < $mtime;
+}
+($ss, $mi, $hh, $jj, $mm, $aa) = localtime $mtime_max;
+printf "%04d-%02d-%02d", $aa + 1900, $mm + 1, $jj;

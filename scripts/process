@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+#	process - expand certain macro expressions in text files
+#	Usage: process <file>
+#	AYM 1999-08-13
+#
+
+# In <file>, replace occurrences of
+# - "$COPYRIGHT_MAN" by the contents of the file cache/copyright.man.
+# - "$COPYRIGHT_TXT" by the contents of the file cache/copyright.txt.
+# - "$DATE"          by the YYYY-MM-DD current time,
+# - "$FILES_ETC"     by the contents of the file obj/0/file_etc.man
+# - "$FILES_SHARE"   by the contents of the file obj/0/file_share.man
+# - "$SELF_DATE"     by the YYYY-MM-DD mtime of <file>,
+# - "$SOURCE_DATE"   by the contents of the file cache/srcdate,
+# - "$VERPREV"       by the contents of the file ./VERPREV.
+# - "$VERSION"       by the contents of the file ./VERSION.
+# Output is written on stdout.
+
+file=$1
+shift
+sed -e "/\$COPYRIGHT_MAN/ {
+	  r cache/copyright.man
+	  d
+	}
+	/\$COPYRIGHT_TXT/ {
+	  r cache/copyright.txt
+	  d
+	}
+	/\$FILES_ETC/ {
+	  r obj/0/files_etc.man
+	  d
+	}
+	/\$FILES_SHARE/ {
+	  r obj/0/files_share.man
+	  d
+	}
+	s/\$DATE/`date +%Y-%m-%d`/g
+	s/\$SELF_DATE/`obj/0/ftime -d $file`/g
+	s/\$SOURCE_DATE/`cat cache/srcdate`/g
+	s/\$VERPREV/`test -r VERPREV && cat VERPREV`/g
+	s/\$VERSION/`cat VERSION`/g" $file

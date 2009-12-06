@@ -1,0 +1,158 @@
+<html>
+<head>
+<title>Troubleshooting</title>
+</head>
+<body>
+
+<div align="center">
+<img src="logo_small.png" alt="Fancy logo">
+<br>Yadex $VERSION ($SOURCE_DATE)
+<h1>Troubleshooting</h1>
+</div>
+<br>
+<br>
+<br>
+
+	<h2>While compiling</h2>
+
+<dl>
+  <dt>
+    <strong>Compilation fails (errors during "<code>make</code>")</strong>
+
+  <dd>The most common causes are &nbsp;:
+    <dl>
+      <br>
+      <dt>You don't have GNU make.
+      <dd>If you type "<code>make&nbsp;--version</code>", you should see
+	something that starts with
+	"<code>GNU&nbsp;Make&nbsp;version&nbsp;something</code>".  Otherwise,
+	you don't have GNU make. Installing GNU make is not very difficult.
+	Fetch the archive <code>make-<var>version</var>.tar.gz</code> from
+	<code>ftp.gnu.org</code>, extract its contents, type
+	"<code>./configure; make; su -c 'make install'</code>" and you're set.
+	Don't worry, this is not going to overwrite your old make program. The
+	new make program is installed as <code>/usr/bin/local/make</code>. Use
+	that to compile and install Yadex.
+
+      <br>
+      <br>
+      <dt>"<code>cc/c++: command not found</code>"
+      <dd>You don't have a C or C++ compiler. You could install EGCS or GCC
+        (they're free).
+
+      <br>
+      <br>
+      <dt>"<code>-lX11</code>: no such file or directory"
+      <dd>The linker can't find the X11 libraries.  Make sure that you
+	have one or more files named "<code>libX11*</code>" on your system and
+	that they are in <code>/usr/X11R6/lib</code>. If they're somewhere
+	else, try typing "<code>make&nbsp;X11LIBDIR=/somewhere/else</code>"
+	instead.
+
+      <br>
+      <br>
+      <dt>"<code>no space left on device</code>".
+      <dd>Your disk is full :-).
+
+      <br>
+      <br>
+      <dt>Something else
+      <dd>Mail me the output of "<code>make showconf</code>", the command you
+        ran and the error messages you got.
+    </dl>
+</dl>
+
+	<h2>While installing</h2>
+
+<dl>
+  <dt><strong>Installation fails (errors during
+  "<code>make&nbsp;install</code>")</strong>
+
+  <dd>The most common causes are&nbsp;:
+    <dl>
+      <br>
+      <dt>"<code>permission denied</code>".
+      <dd>You don't have the necessary rights to copy the files to the
+	installation directories. Either try logging in as <code>root</code>
+	and running "<code>make install</code>" again or specifying another
+	target directory.
+
+      <br>
+      <br>
+      <dt>"<code>no space left on device</code>".
+      <dd>Your disk is full :-).
+      
+      <br>
+      <br>
+      <dt>Something else
+      <dd>Mail me the output of "<code>make showconf</code>", the command you
+        ran and the error messages you got.
+    </dl>
+</dl>
+
+	<h2>While running</h2>
+
+<dl>
+  <dt>
+    <strong>Error message "<code>Can't open ".../doom2.wad" (No such file or
+    directory)</code>"</strong>
+
+  <dd>
+    Yadex can't find your Doom II iwad. Either&nbsp;:
+    <ul>
+      <li>
+	copy it or symlink it to
+	<code>/usr/local/share/games/doom2/doom2.wad</code> or
+      <li>
+	change the <code>iwad2=</code> parameter in
+	<code>/usr/local/etc/yadex.cfg</code>.
+    </ul>
+
+  <br>
+  <dt>
+    <strong>Error message "<code>invalid option: "-something"</code>"</strong>
+
+  <dd>
+    Yadex wants a space between options and their argument. For example,
+    "<code>yadex&nbsp;-g&nbsp;doom</code>" is okay,
+    "<code>yadex&nbsp;-gdoom</code>" isn't.
+
+  <br>
+  <br>
+  <dt>
+    <strong>The display lags behind when I drag objects or scroll</strong>
+
+  <dd>
+    Yes. Yadex takes too much time to redraw its window. This kill be fixed in
+    another release. In the meantime, you can try to&nbsp;:
+    <ul>
+      <li>run Yadex with the <code>-P</code> option (but you'll get more
+	flicker),
+      <li>use a smaller window&nbsp;,
+      <li>use a lesser screen depth, such as 8 BPP,
+      <li>keep the grid step large or disable the grid completely,
+      <li>use more powerful hardware.
+    </ul>
+
+  <br>
+  <dt><strong>The window has turned black&nbsp;!</strong>
+
+  <dd>Don't panic. This is a known bug, and a totally harmless
+    one. Yadex is not crashed or hung. It just didn't realize that its window
+    has been erased and needs to be redrawn. It still accepts input, though the
+    display might look funny. If that disturbs you, you can back out by
+    pressing [<kbd>Esc</kbd>], several times if necessary, and everything will
+    return to normal.
+
+</dl>
+
+<p>If your problem is not listed here, you might have found a
+bug. Read on how to report bugs <a
+href="reporting.html">there</a>.
+
+<p>If the suggested remedies don't fix your problem, see <a
+href="help.html">there</a> how to get help.
+
+<p><hr>AYM $SELF_DATE
+</body>
+</html>

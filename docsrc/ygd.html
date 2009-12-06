@@ -1,0 +1,487 @@
+<html>
+<head>
+  <title>Yadex game definition files</title>
+  <style type="text/css">
+    var {
+      font-style: normal;
+      font-weight: normal;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<div align="center">
+<img src="logo_small.png" alt="Fancy logo">
+<br>Yadex $VERSION ($SOURCE_DATE)
+<h1>Yadex game definition files</h1>
+</div>
+<br>
+<br>
+<br>
+
+	<h2>Introduction</h2>
+
+<p>Yadex game definition files (conventional extension
+<code>.ygd</code>) are designed to contain all the information
+relative to a particular game. The syntax and the semantics are
+very simple&nbsp;; it's more like a database than a real script
+language. For normal use, you don't ever need to read, much less
+modify, ygd files.
+
+	<h2>General syntax</h2>
+
+<p>A file is a valid Yadex game definition file if its first
+line contains exactly the following magic string&nbsp;:
+"<code>#&nbsp;Yadex&nbsp;game&nbsp;definition&nbsp;file&nbsp;version&nbsp;4</code>"
+(without the double quotes).
+
+<p>The rest of the file is split in lines, each line separated
+from the following by a newline. White space at the beginning
+and end of a line is stripped. Each line is then split in
+tokens, separated by one or more white space characters. A
+double quote removes the special meaning of subsequent
+white space characters until the next double quote. A token
+formed of just two consecutive double quotes is an empty
+token&nbsp;: its value is the empty string. Double quotes are
+stripped from the token after the token splitting is done. There
+is no way to include a double quote in the contents of a token.
+
+<p>A hash mark ("<code>#</code>") at the beginning of a token
+marks the beginning of a comment. Everything from the hash to
+the end of the line is stripped. If no tokens remain, the line
+is ignored. If at least one token remains, the first token must
+be the name of a valid directive and the following form its
+arguments. If the first token is not the name of a valid
+directive or the number of arguments is wrong, the whole file is
+rejected.
+
+<p>Note that the following common features are <em>not</em>
+supported&nbsp;: breaking lines with "<code>;</code>", joining
+lines with "<code>\</code>" at the end of the first line,
+quoting with "<code>'</code>" or "<code>\</code>".
+
+<p>The following lines are equivalent&nbsp;:
+<pre>foo bar baz
+foo bar baz      # You too can wear a nose mitten
+foo bar  baz
+foo "bar" baz
+foo bar "b""a""z"""
+foo bar ba""z
+  foo bar baz</pre>
+
+<p>The following lines are <em>not</em> equivalent to the above&nbsp;:
+<pre>foo bar baz ""
+foo bar "baz "
+</pre>
+
+	<h2>Directives</h2>
+
+<dl>
+<p><dt><h3><code><strong>ldt</strong>
+		<var>type</var>
+		<var>group</var>
+		<var>shortdesc</var>
+		<var>longdesc</var></code></h3></p>
+
+<p><dd>Defines a linedef type. Takes exactly 4 arguments.</p>
+
+  <p><table>
+    <tr valign="top">
+      <td><code><var>type</var></code>
+      <td>&nbsp;
+      <td>The linedef type. Must be a decimal integer.
+
+    <tr valign="top">
+      <td><code><var>group</var></code>
+      <td>&nbsp;
+      <td>The linedef type group this linedef type belongs to.
+	This field is silently truncated to 1 character. The
+	group must have been prealably defined by an
+	<code>ldtgroup</code> directive.
+
+    <tr valign="top">
+      <td><code><var>shortdesc</var></code> 
+      <td>&nbsp;
+      <td>Description that will be displayed in the object info
+	window. There is no limit on the length of this field
+	but only the first 16 characters of it are shown in the
+	object info window.
+
+    <tr valign="top">
+      <td><code><var>longdesc</var></code>
+      <td>&nbsp;
+      <td>Description that will be displayed everywhere else.
+	There is no precise limit on the length of this field
+	but it's recommended to keep it within reasonable
+	limits.
+  </table></p>
+
+  <p>There should be at least one linedef type for each group
+    defined. There is no precise upper limit but defining more
+    than 30 in the same group will cause problems. You should
+    not define the same linedef type more than once.</p>
+
+<br>
+
+<p><dt><h3><code><strong>ldtgroup</strong>
+		<var>group</var>
+		<var>desc</var></code></h3></p>
+
+<p><dd>Defines a group of linedef types. Takes exactly 2
+  arguments.</p>
+
+  <p><table>
+    <tr valign="top">
+      <td><code><var>group</var></code>
+      <td>&nbsp;
+      <td>The identifier of the linedef types group. It is
+	silenty truncated to 1 character.
+
+    <tr valign="top">
+      <td><code><var>desc</var></code>
+      <td>&nbsp;
+      <td>Description. There is no precise limit on the length
+	of the this field but it's recommended to keep it within
+	reasonable limits.
+  </table></p>
+
+  <p>There is no upper or lower limit on the number of groups
+    but defining more than 20 will cause problems. You should
+    not define the same group more than once.</p>
+
+<br>
+
+<p><dt><h3><code><strong>level_format</strong>
+		<var>level_format</var></code></h3></p>
+
+<p><dd>Indicates the format in which levels are stored in the
+  wad. There is only one argument. It can have the following
+  values&nbsp;:</p>
+
+  <p><table border>
+  <tr>
+    <th>Value
+    <th>Meaning
+  <tr>
+    <td valign="top"><code>alpha</code>
+    <td>Doom alpha format, 7 directory entries per level (label,
+    <code>FLATNAME</code>, <code>POINTS</code>,
+    <code>LINES</code>, <code>SECTORS</code> and
+    <code>THINGS</code>).
+  <tr>
+    <td valign="top"><code>doom</code>
+    <td>Normal Doom format, 11 directory entries per level (label,
+    <code>THINGS</code>, <code>LINEDEFS</code>,
+    <code>SIDEDEFS</code>, <code>VERTEXES</code>,
+    <code>SEGS</code>, <code>SSECTORS</code>, <code>NODES</code>,
+    <code>SECTORS</code>, <code>REJECT</code> and
+    <code>BLOCKMAP</code>).
+  <tr>
+    <td valign="top"><code>hexen</code>
+    <td>Hexen format, 12 directory entries per level (same as for
+    <code>doom</code> then <code>BEHAVIOR</code>).
+  </table></p>
+
+  <p>Reading is supported for all formats but writing is not
+  supported for <code>hexen</code>. For <code>alpha</code>,
+  writing is done in <code>doom</code> format.</p>
+
+  <p>This directive is mandatory. If there are several
+  <code>level_format</code> directives, it's the last one that
+  counts.</p>
+
+  <br>
+
+<p><dt><h3><code><strong>level_name</strong>
+		<var>level_name</var></code></h3></p>
+
+<p><dd>Indicates whether the level names for that game are of
+the form <code>E<var>n</var>M<var>n</var></code> or of the form
+<code>MAP<var>nm</var></code>. There is only one argument. It
+can have the following values&nbsp;:</p>
+
+  <p><table border>
+  <tr>
+    <th>Value
+    <th>Meaning
+  <tr>
+    <td valign="top"><code>e1m1</code>
+    <td><code>E<var>n</var>M<var>m</var></code> (Doom, Doom
+    press release and Heretic).
+  <tr>
+    <td valign="top"><code>e1m10</code>
+    <td><code>E<var>n</var>M<var>m</var></code> or
+    <code>E<var>i</var>M<var>jk</var></code> (Doom alpha only)
+  <tr>
+    <td valign="top"><code>map01</code>
+    <td><code>MAP<var>nm</var></code> (Doom II, Hexen and
+    Strife).
+  </table></p>
+
+  <p>The influence of this directive on the behaviour of Yadex is
+  in the choice of the default name for new levels and the way
+  shorthand arguments to the <code>edit</code> and
+  <code>create</code> commands are interpreted.</p>
+
+  <p>This directive is mandatory. If there are several
+  <code>level_name</code> directives, it's the last one that
+  counts.</p>
+
+<br>
+
+<p><dt><h3><code><strong>picture_format</strong>
+		<var>picture_format</var></code></h3></p>
+
+<p><dd>Indicates in which format the pictures are stored in the
+  wads. There is only one argument. It can have the following
+  values&nbsp;:</p>
+
+  <p><table border>
+  <tr>
+    <th>Value
+    <th>Meaning
+  <tr>
+    <td valign="top"><code>alpha</code>
+    <td>The obsolete format used in Doom alpha 0.2, 0.4 and 0.5.
+  <tr>
+    <td valign="top"><code>pr</code>
+    <td>The obsolete format used in the Doom press release pre-beta.
+  <tr>
+    <td valign="top"><code>normal</code>
+    <td>The normal format used by all other iwads.
+  </table></p>
+
+  <p>This directive is optional. If it's missing, the default is
+  <code>normal</code>. If it's repeated, it's the last occurrence
+  that counts.</p>
+
+<br>
+
+<p><dt><h3><code><strong>sky_flat</strong>
+		<var>flat_name</var></code></h3></p>
+
+<p><dd>Specifies the name of the flat used for skies. This is
+    important to Yadex as far as upper and lower texture
+    checking is concerned (upper/lower textures are not rendered
+    if both sectors have a sky ceiling/floor). The argument is
+    matched against the sector's flat name in a case-insensitive
+    fashion where at most the 8 first characters matter. I
+    personally use lower case and recommend that you follow the
+    same convention.</p>
+
+  <p>This directive is optional. If it's missing, all flats will
+    be considered normal. If it's repeated, it's the last
+    occurrence that counts.</p>
+
+<br>
+
+<p><dt><h3><code><strong>st</strong>
+		<var>type</var>
+		<var>shortdesc</var>
+		<var>longdesc</var></code></h3></p>
+
+<p><dd>Defines a sector type. Takes exactly 3 arguments</p>
+
+  <p><table>
+    <tr valign="top">
+      <td><code><var>type</var></code>
+      <td>&nbsp;
+      <td>Must be a decimal integer.
+      
+    <tr valign="top">
+      <td><code><var>shortdesc</var></code>
+      <td>&nbsp;
+      <td>Short description that will be displayed in the object
+	info window. There is no limit on the length of the
+	short description but only the first 14 characters are
+	shown in the object info window.
+
+    <tr valign="top">
+      <td><code><var>longdesc</var></code>
+      <td>&nbsp;
+      <td>Long description that will be displayed everywhere
+	else. There is no precise limit on the length of this
+	field but it's recommended to keep it within
+	reasonable limits.
+  </table></p>
+
+  <p>There is no lower limit on the number of <code>st</code>
+  directives. If there are too many of them, the menu will not
+  fit in the window so don't do that. You should not define the
+  same sector type more than once.</p>
+
+<br>
+
+<p><dt><h3><code><strong>texture_format</strong>
+		<var>texture_format</var></code></h3></p>
+
+<p><dd>Indicates in which format the textures are stored in the
+  wads. There is only one argument. It can have the following
+  values&nbsp;:</p>
+
+  <p><table border>
+  <tr>
+    <th>Value
+    <th>Meaning
+  <tr>
+    <td valign="top"><code>nameless</code>
+    <td>The obsolete format used in Doom alpha 0.4 (no texture
+    names).
+  <tr>
+    <td valign="top"><code>strife11</code>
+    <td>The format used by Strife 1.1 and later. Note that
+    Strife 1.0 uses the regular format (<code>normal</code>).
+  <tr>
+    <td valign="top"><code>normal</code>
+    <td>The normal format used by all other iwads.
+  </table></p>
+
+  <p>This directive is optional. If it's missing, the default is
+    <code>normal</code>. If it's repeated, it's the last
+    occurrence that counts.</p>
+ 
+<br>
+
+<p><dt><h3><code><strong>texture_lumps</strong>
+		<var>texture_lumps</var></code></h3></p>
+
+<p><dd>Indicates in which lump(s) is the list of textures for
+  that game. There is only one argument. It can have the
+  following values&nbsp;:</p>
+
+  <p><table border>
+  <tr>
+    <th>Value
+    <th>Meaning
+  <tr>
+    <td valign="top"><code>textures</code>
+    <td>There is only one lump and it's called
+    <code>TEXTURES</code> (Doom alpha 0.4 and 0.5).
+  <tr>
+     <td valign="top"><code>none</code>
+     <td>There is no textures lump (Doom alpha 0.2)
+  <tr>
+    <td valign="top"><code>normal</code>
+    <td>There is <code>TEXTURE1</code> and optionally
+    <code>TEXTURE2</code> (all other iwads).
+  </table></p>
+
+  <p>This directive is optional. If it's missing, the default is
+    <code>normal</code>. If it's repeated, it's the last
+    occurrence that counts.</p>
+
+<br>
+
+<p><dt><h3><code><strong>thing</strong>
+		<var>type</var>
+		<var>group</var>
+		<var>flags</var>
+		<var>radius</var>
+		<var>desc</var>
+		</code>[<code><var>sprite</var></code>]</h3></p>
+
+<p><dd>Defines a thing type. Takes 5 or 6 arguments.</p>
+
+  <p><table>
+    <tr valign="top">
+      <td><code><var>type</var></code>
+      <td>&nbsp;
+      <td>Must be a decimal integer.
+
+    <tr valign="top">
+      <td><code><var>group</var></code>
+      <td>&nbsp;
+      <td>The thing type group this thing type belongs to. This
+	field is silently truncated to 1 character. The group
+	must have been prealably defined by a
+	<code>thinggroup</code> directive.
+
+    <tr valign="top">
+      <td><code><var>flags</var></code>
+      <td>&nbsp;
+      <td>Should be either "<code>s</code>" for things that have
+	a spectral or translucent look (like Doom's spectres and
+	Heretic's ghosts) or "<code>-</code>" for the others.
+
+    <tr valign="top">
+      <td><code><var>radius</var></code>
+      <td>&nbsp;
+      <td>Radius. Must be a strictly positive integer.
+
+    <tr valign="top">
+      <td><code><var>desc</var></code>
+      <td>&nbsp;
+      <td>Description. There is not
+	limit on the length of this field but only the first 19
+	characters of it are shown in the object info window.
+
+    <tr valign="top">
+      <td><code><var>sprite</var></code>
+      <td>&nbsp;
+      <td>The root of the name of the sprite associated with
+	the thing type. Yadex will display the first (in
+	alphabetical order) sprite whose name begins with those
+	characters. For example, if the root is
+	<code>CEYE</code> and the iwad contains sprites
+	<code>CEYEA0</code>, <code>CEYEB0</code> and
+	<code>CEYEC0</code>, the sprite displayed will be
+	<code>CEYEA0</code>. If this field is omitted, Yadex
+	will show no sprite for this thing type. This is
+	appropriate for things that have no visual
+	representation, like sound sources. The present
+	convention is to use upper case (and I've not tested
+	whether lower case works).
+
+  </table></p>
+
+  <p>There should be at least one thing type for each thing type
+    group defined. There is no precise upper limit but defining
+    more than 30 thing types in the same group will cause
+    problems. You should not define the same thing type more
+    than once.</p>
+
+<br>
+
+<p><dt><h3><code><strong>thinggroup</strong>
+		<var>group</var>
+		<var>colour</var>
+		<var>desc</var></code></h3></p>
+
+<p><dd>Defines a group of thing types. Takes exactly 3 arguments.</p>
+
+  <p><table>
+    <tr valign="top">
+      <td><code><var>group</var></code>
+      <td>&nbsp;
+      <td>The identifier of the thing types group. It is silenty
+	truncated to 1 character.
+
+    <tr valign="top">
+      <td><code><var>colour</var></code>
+      <td>&nbsp;
+      <td>The colour in which things pertaining to this group
+	will be displayed the editing window. It's an X11-style
+	colour specification. The syntax is
+	"<code>rgb:<var>r</var>/<var>g</var>/<var>b</var></code>"
+	where <code><var>r</var></code>,
+	<code><var>g</var></code> and <code><var>b</var></code>
+	are each one or more hexadecimal digits.
+
+    <tr valign="top">
+      <td><code><var>desc</var></code>
+      <td>&nbsp;
+      <td>Description. There is no precise limit on the length
+	of the this field but it's recommended to keep it within
+	reasonable limits.
+  </table></p>
+
+  <p>There is no upper or lower limit on the number of groups
+    but defining more than 20 will cause problems. You should
+    not define the same group more than once.</p>
+
+</dl>
+
+<p><hr>AYM $SELF_DATE
+</body>
+</html>

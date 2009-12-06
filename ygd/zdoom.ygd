@@ -1,0 +1,529 @@
+# Yadex game definition file version 4
+#
+#	zdoom.ygd
+#	Yadex Game Definitions for ZDoom
+#	See doc/ygd.html for the specs.
+#	GB 2007-02-21
+#
+
+level_format    hexen
+level_name      map01
+picture_format  normal 
+sky_flat        f_sky1
+texture_format  normal
+texture_lumps   normal
+
+#
+#	Definition of linedef type groups
+#	Format is : ldtgroup <ldtgroup> <description>
+#
+
+ldtgroup p "PolyObjects"
+ldtgroup d "Doors"
+ldtgroup c "Ceilings"
+ldtgroup f "Floors"
+ldtgroup F "Floors and Ceilings"
+ldtgroup s "Stairs"
+ldtgroup l "Lifts and Platforms"
+ldtgroup t "Teleporters"
+ldtgroup e "Exits"
+ldtgroup T "Things"
+ldtgroup a "ACS"
+ldtgroup L "Lines"
+ldtgroup S "Scrollers"
+ldtgroup A "Lightning"
+ldtgroup B "Sectors"
+ldtgroup b "Boom"
+ldtgroup r "Renderer"
+ldtgroup x "Slopes"
+ldtgroup o "Other"
+
+#
+#	Definition of linedef types
+#	Format is : ldt <number> <ldtgroup> <shortdesc> <longdesc> <arg1> <arg2> <arg3> <arg4> <arg5>
+#	<shortdesc> must not exceed 16 characters.
+#	<argn> shouldn't be longer than 16 characters
+#	for example look at this:
+#	ldt 1 d "D Open" "Door_Open" "Tag" "Speed" "Delay" "Argument 4" "Argument 5"
+ldt 1	p "P StartLine" "Polyobj_StartLine" "Object" "Mirror" "Sound" "Unused" "Unused"
+ldt 2	p "P RotateLeft" "Polyobj_RotateLeft" "Object" "Speed" "Angle" "Unused" "Unused"
+ldt 3	p "P RotateRight" "Polyobj_RotateRight" "Object" "Speed" "Angle" "Unused" "Unused"
+ldt 4	p "P Move" "Polyobj_Move" "Object" "Speed" "Angle" "Distance" "Unused"
+ldt 5	p "P ExplicitLine" "Polyobj_ExplicitLine" "Object" "Order" "Mirror" "Sound" "Unused"
+ldt 6	p "P MoveTimes8" "Polyobj_MoveTimes8" "Object" "Speed" "Angle" "Distance" "Unused"
+ldt 7	p "P DoorSwing" "Polyobj_DoorSwing" "Object" "Speed" "Angle" "Delay" "Unused"
+ldt 8	p "P DoorSlide" "Polyobj_DoorSlide" "Object" "Speed" "Angle" "Distance" "Delay"
+ldt 90	p "P OR_RotateLeft" "Polyobj_OR_RotateLeft" "Object" "Speed" "Angle" "Unused" "Unused"
+ldt 91 	p "P OR_RotateRight" "Polyobj_OR_RotateRight" "Object" "Speed" "Angle" "Unused" "Unused"
+ldt 92 	p "P OR_Move" "Polyobj_OR_Move" "Object" "Speed" "Angle" "Distance" "Unused"
+ldt 93 	p "P OR_MoveTimes8" "Polyobj_OR_MoveTimes8" "Object" "Speed" "Angle" "Distance" "Unused"
+
+ldt 10	d "D Close" "Close Door" "Tag" "Speed" "Lighttag" "Unused" "Unused"
+ldt 11 	d "D Open" "Open Door" "Tag" "Speed" "Lighttag" "Unused" "Unused"
+ldt 12 	d "D Raise" "Raise Door" "Tag" "Speed" "Delay" "Lighttag" "Unused"
+ldt 13 	d "D LockedRaise" "LockedRaise Door" "Tag" "Speed" "Delay" "Lock" "Lighttag"
+ldt 14 	d "D Animated" "Animated Door" "Tag" "Speed" "Delay" "Unused" "Unused"
+ldt 249 d "D CloseWaitOpen" "CloseWaitOpen Door" "Tag" "Speed" "Delay" "Lighttag" "Unused"
+
+ldt 38 	c "C Waggle" "Waggle Ceiling" "Tag" "Amplitude" "Frequency" "Offset" "Time"
+ldt 40 	c "C LowerByValue" "Lower Ceiling by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 41 	c "C RaiseByValue" "Raise Ceiling by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 42 	c "C CrushAndRaise" "Crush-and-Raise Ceiling" "Tag" "Speed" "Crush" "Unused" "Unused"
+ldt 43 	c "C LowerAndCrush" "Lower-and-Crush Ceiling" "Tag" "Speed" "Crush" "Unused" "Unused"
+ldt 44 	c "C CrushStop" "Stop Crushinh Ceiling" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 45 	c "C CrushRaiseAndStay" "Crush-Raise-and-Stay Ceiling" "Tag" "Speed" "Crush" "Unused" "Unused"
+ldt 69 	c "C MoveToValueTimes8" "Move Ceiling to Value times 8" "Tag" "Speed" "Height" "Negative height" "Unused"
+ldt 192 c "C LowerToHighestFloor" "Lower Ceiling to Highest Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 193 c "C LowerInstant" "Instant Lower Ceiling" "Tag" "Unused" "Height" "Unused" "Unused"
+ldt 194 c "C RaiseInstant" "Instant Raise Ceiling" "Tag" "Unused" "Height" "Unused" "Unused"
+ldt 195 c "C CrushRaiseAndStayA" "Crush-Raise-and-Stay-A Ceiling" "Tag" "Speed down" "Speed up" "Crush" "Unused"
+ldt 196 c "C CrushAndRaiseA" "Crush-and-Raise-A Ceiling" "Tag" "Speed down" "Speed up" "Crush" "Unused"
+ldt 197 c "C CrushAndRaiseSilentA" "Crush-and-Raise-silent-A Ceiling" "Tag" "Speed down" "Speed up" "Crush" "Unused"
+ldt 198 c "C RaiseByValueTimes8" "Raise Ceiling by Value times 8" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 199 c "C LowerByValueTimes8" "Lower Ceiling by Value times 8" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 252 c "C RaiseToNearest" "Raise Ceiling to nearest Ceiling" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 253 c "C LowerToLowest" "Lower Ceiling to lowest Ceiling" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 254 c "C LowerToFloor" "Lower Ceiling to Floor" "arg1" "arg2" "arg3" "arg4" "arg5"
+ldt 255 c "C CrushRaiseAndStaySilA" "Crush-Raise-and-Stay-silent-A Ceiling" "Tag" "Speed down" "Speed up" "Crush" "Unused"
+
+ldt 20 	f "F LowerByValue" "Lower Floor by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 21 	f "F LowerToLowest" "Lower Floor to lowest Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 22 	f "F LowerToNearest" "Lower Floor to nearest Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 23 	f "F RaiseByValue" "Raise Floor by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 24 	f "F RaiseToHighest" "Raise Floor to highest Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 25 	f "F RaiseToNearest" "Raise Floor to nearest Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 28 	f "F RaiseAndCrush" "Raise-and-Crush Floor" "Tag" "Speed" "Crush" "Unused" "Unused"
+ldt 35 	f "F RaiseByValueTimes8" "Raise Floor by Value times 8" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 36 	f "F LowerByValueTimes8" "Lower Floor by Value times 8" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 46 	f "F CrushStop" "Stop Crushing Floor" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 66 	f "F LowerInstant" "Lower-Instant Floor" "Tag" "Unused" "Height" "Unused" "Unused"
+ldt 67 	f "F RaiseInstant" "Raise-Instant Floor" "Tag" "Unused" "Height" "Unused" "Unused"
+ldt 68 	f "F MoveToValueTimes8" "Move Floor to Value times 8" "Tag" "Speed" "Height" "Negative height" "Unused"
+ldt 138	f "F Waggle" "Waggle Floor" "Tag" "Amplitude" "Frequency" "Offset" "Time"
+ldt 235 f "F TransferTrigger" "Transfer Floor (Trigger)" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 236 f "F TransferNumeric" "Transfer Floor (Numeric)" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 238 f "F RaiseToLowestCeiling" "Raise Floor to lowest Ceiling" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 239 f "F RaiseByValueTxTy" "Raise Floor by Tx and Ty Values" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 240 f "F RaiseByTexture" "Raise Floor by Texture" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 241 f "F LowerToLowestTxTy" "Lower floor to lowest Tx and Ty Values" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 242 f "F LowerToHighest" "Lower Floor to Highest Floor" "Tag" "Speed" "Adjustment" "Unused" "Unused"
+ldt 250 f "F Donut" "Donut Floor" "Pillar Tag" "Pillar Speed" "Pool Speed" "Unused" "Unused"
+
+ldt 29 	F "C&F Pillar_Build" "Build Pillar" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 30 	F "C&F Pillar_Open" "Open Pillar" "Tag" "Speed" "Floor Distance" "Ceiling distance" "Unused"
+ldt 94 	F "C&F Pillar_BuildAndCrush" "Build and Crush Pillar" "Tag" "Speed" "Height" "Damage" "Unused"
+ldt 95 	F "C&F LowerByValue" "Lower Floor and Ceiling by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 96 	F "C&F RaiseByValue" "Raise Floor and Ceiling by Value" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 245	F "C&F Elevator_RaiseToNearest" "Raise Elevator to nearest" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 246 F "C&F Elevator_MoveToFloor" "Move Elevator to Floor" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 247 F "C&F Elevator_LowerToNearest" "Lower Elevator to nearest" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 251 F "C&F LowerRaise" "Lower and Raise Floor and Ceiling" "Tag" "Floor Speed" "Ceiling Speed" "Unused" "Unused"
+
+ldt 26 	s "S BuildDown" "Build down Stairs" "Tag" "Speed" "Height" "Delay" "Delay(Reset)"
+ldt 27 	s "S BuildUp" "Build up Stairs" "Tag" "Speed" "Height" "Delay" "Delay(Reset)"
+ldt 31 	s "S BuildDownSync" "Build down Stairs synchronized" "Tag" "Speed" "Height" "Delay(Reset)" "Unused"
+ldt 32 	s "S BuildUpSync" "Build up Stairs synchronized" "Tag" "Speed" "Height" "Delay(Reset)" "Unused"
+ldt 217 s "S BuildUpDoom" "Build up Stairs DOOM style" "Tag" "Speed" "Height" "Delay" "Delay(Reset)"
+
+ldt 60 	l "L PerpetualRaise" "Raise Platform perpetual" "Tag" "Speed" "Delay" "Unused" "Unused"
+ldt 61 	l "L Stop" "Stop Platform" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 62 	l "L DownWaitUpStay" "Lower Platform,Wait,Raise,Stay" "Tag" "Speed" "Delay" "Unused" "Unused"
+ldt 63 	l "L DownByValue" "Lower Platform by Value" "Tag" "Speed" "Delay" "Height" "Unused"
+ldt 64 	l "L UpWaitDownStay" "Raise Platform,Wait,Lower,Stay" "Tag" "Speed" "Delay" "Unused" "Unused"
+ldt 65 	l "L UpByValue" "Raise Platform by Value" "Tag" "Speed" "Delay" "Height" "Unused"
+ldt 172	l "L UpNearestWaitDownStay" "Raise Platform to nearest,Wait,Lower,Stay" "Tag" "Speed" "Delay" "Unused" "Unused"
+ldt 206 l "L DownWaitUpStayLip" "Lower Platform,Wait,Raise,Stay at Lip" "Tag" "Speed" "Delay" "Lip" "Sound"
+ldt 207 l "L PerpetualRaiseLip" "Raise Platform to Lip perpetual" "Tag" "Speed" "Delay" "Lip" "Unused"
+ldt 228 l "L RaiseAndStayTx0" "Raise Platform and Stay at Tx0" "Tag" "Speed" "Unused" "Unused" "Unused"
+ldt 230 l "L UpByValueStayTx" "Raise Platform by Value Tx and Stay" "Tag" "Speed" "Height" "Unused" "Unused"
+ldt 231 l "L ToggleCeiling" "Toggle Platform Ceiling" "Tag" "Unused" "Unused" "Unused" "Unused"
+
+ldt 39 	t "t ZombieChanger" "Zombie Teleporter" "TID" "Tag" "Unused" "Unused" "Unused"
+ldt 70 	t "t Teleport" "Simple standart Teleport" "TID" "Tag" "NoSourceFog" "Unused" "Unused"
+ldt 71 	t "t NoFog" "Teleport without Fog" "TID" "UseAngle" "Tag" "Unused" "Unused"
+ldt 76 	t "t TeleportOther" "Teleport other" "TID" "Destination" "Fog?" "Unused" "Unused"
+ldt 77 	t "t TeleportGroup" "Teleport Group" "Group TID" "Source TID" "Target TID" "Move Source?" "Fog?"
+ldt 78 	t "t TeleportInSector" "Teleport into Sector" "Tag" "Source TID" "Target TID" "Fog?" "Group TID"
+ldt 215	t "t Line" "Teleport to Line" "Source LID" "Target LID" "Flip?" "Unused" "Unused"
+
+ldt 74 	e "E Teleport_NewMap" "Teleport to New Map" "Map" "Position" "Keep Angle?" "Unused" "Unused"
+ldt 75 	e "E Teleport_EndGame" "Teleport and End Game" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 243 e "E Normal" "Normal Level Exit" "Position" "Unused" "Unused" "Unused" "Unused"
+ldt 244 e "E Secret" "Exit to Secret Level" "Position" "Unused" "Unused" "Unused" "Unused"
+
+ldt 17 	T "T Raise" "Raise Thing" "TID" "Unused" "Unused" "Unused" "Unused"
+ldt 19 	T "T Stop" "Stop Thing" "TID" "Unused" "Unused" "Unused" "Unused"
+ldt 72 	T "T Thrust" "Thrust Thing" "Angle" "Force" "NoLimit" "TID" "Unused"
+ldt 73 	T "T Damage Activator" "Damage activating Thing" "Damage" "Unused" "Unused" "Unused" "Unused"
+ldt 119	T "T Damage by TID" "Inflict Damage to Thing by TID" "TID" "Damage" "MOD" "Unused" "Unused"
+ldt 125 T "T Move" "Move Thing" "TID" "Target TID" "NoFog" "Unused" "Unused"
+ldt 127 T "T SetSpecial" "Set Thing's Special" "TID" "Special" "Argument 1" "Argument 2" "Argument 3"
+ldt 128 T "T ThrustThingZ" "Thrust Thing on Z-Axis" "TID" "Speed" "Up (0)/Down (1)" "Add (0)/Set (1)" "Unused"
+ldt 130 T "T Activate" "Activate Thing" "TID" "Unused" "Unused" "Unused" "Unused"
+ldt 131 T "T Deactivate" "Deactivate Thing" "TID" "Unused" "Unused" "Unused" "Unused"
+ldt 132 T "T Remove" "Remove Thing" "TID" "Unused" "Unused" "Unused" "Unused"
+ldt 133 T "T Destroy" "Destroy Thing" "TID" "Extreme?" "Unused" "Unused" "Unused"
+ldt 134 T "T Projectile" "Spawn Projectile" "TID" "Type" "Angle" "Speed" "VSpeed"
+ldt 135 T "T Spawn" "Spawn Thing" "TID" "Type" "Angle" "New TID" "Unused"
+ldt 136 T "T ProjectileGravity" "Set Projectile Gravity" "TID" "Type" "Angle" "Speed" "VSpeed"
+ldt 137 T "T SpawnNoFog" "Spawn Thing without Fog" "TID" "Type" "Angle" "New TID" "Unused"
+ldt 139 T "T SpawnFacing" "Spawn Thing without Fog facing Spawnspot's Angle" "TID" "Type" "NoFog" "New TID" "Unused"
+ldt 175 T "T ProjectileIntercept" "Intercept Projectile" "TID" "Type" "Speed" "Target" "New TID"
+ldt 176 T "T ChangeTID" "Change a Thing's TID" "Old TID" "New TID" "Unused" "Unused" "Unused"
+ldt 177 T "T Hate" "Make Thing hate another Thing" "Hater" "Hatee" "Hate Type" "Unused" "Unused"
+ldt 178 T "T ProjectileAimed" "Spawn aimed Projectile" "TID" "Type" "Speed" "Target" "New TID"
+ldt 180 T "T SetTranslation" "Set Colorpalette of Thing" "TID" "Translation" "Unused" "Unused" "Unused"
+ldt 229 T "T SetGoal" "Set first Node of Path for Thing" "TID" "Goal" "Delay" "DontChase" "Unused"
+ldt 248 T "T Heal" "Heal a Thing"  "Amount" "Unused" "Unused" "Unused" "Unused"
+
+ldt 80 	a "A Execute" "Execute ACS Script" "Script" "Map" "Argument 1" "Argument 2" "Argument 3"
+ldt 81 	a "A Suspend" "Suspend ACS Script" "Script" "Map" "Unused" "Unused" "Unused"
+ldt 82 	a "A Terminate" "Terminate ACS Script" "Script" "Map" "Unused" "Unused" "Unused"
+ldt 83 	a "A LockedExecute" "Execute ACS Script if the right key is present (Object)" "Script" "Map" "Argument 1" "Argument 2" "Lock"
+ldt 84 	a "A ExecuteWithResult" "Execute ACS Script and return result" "Script" "Argument 1" "Argument 2" "Argument 3" "Unused"
+ldt 85 	a "A LockedExecuteDoor" "Execute ACS Script if the right key is present (Door)" "Script" "Map" "Argument 1" "Argument 2" "Lock"
+ldt 226 a "A ExecuteAlways" "Execute ACS Script multiple times" "Script" "Map" "Argument 1" "Argument 2" "Argument 3"
+
+ldt 121 L "l SetIdentification" "Set Line identification" "LID" "Flags" "Unused" "Unused" "LID (high byte)"
+ldt 208 L "l Translucent" "Make Line translucent"  "LID" "Amount" "Additive?" "Flags" "Unused"
+
+ldt 100 S "s Texture_Left" "Scroll Texture Left" "Speed" "Unused" "Unused" "Unused" "Unused"
+ldt 101 S "s Texture_Right" "Scroll Texture Right" "Speed" "Unused" "Unused" "Unused" "Unused"
+ldt 102 S "s Texture_Up" "Scroll Texture Up" "Speed" "Unused" "Unused" "Unused" "Unused"
+ldt 103 S "s Texture_Down" "Scroll Texture Down" "Speed" "Unused" "Unused" "Unused" "Unused"
+ldt 221 S "s Texture_Both" "Scroll Texture Vertically and Horizontally" "LID" "Left" "Right" "Down" "Up"
+ldt 222 S "s Texture_Model" "Scroll Texture as set by Argument 2" "LID" "Model" "Unused" "Unused" "Unused"
+ldt 223 S "s Floor" "Scroll Floor" "Tag" "Flags" "Type" "X-Movement" "Y-Movement"
+ldt 224 S "s Ceiling" "Scroll Ceiling" "Tag" "Flags" "Unused" "X-Movement" "Y-Movement"
+ldt 225 S "s Texture_Offsets" "Scroll Texture by Offset Manipulation" "Unused" "Unused" "Unused" "Unused" "Unused"
+
+ldt 109 A "Li ForceLightning" "Force Lightning" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 110 A "Li RaiseByValue" "Raise Light Level by Value" "Tag" "Value" "Unused" "Unused" "Unused"
+ldt 111 A "Li LowerByValue" "Lower Light Level by Value" "Tag" "Value" "Unused" "Unused" "Unused"
+ldt 112 A "Li ChangeToValue" "Change Light to Value" "Tag" "Value" "Unused" "Unused" "Unused"
+ldt 113 A "Li Fade" "Fade Light" "Tag" "Value" "Duration" "Unused" "Unused"
+ldt 114 A "Li Glow" "Glowing Light" "Tag" "High Value" "Low Value" "Duration" "Unused"
+ldt 115 A "Li Flicker" "Make Light flicker" "Tag" "High Value" "Low Value" "Unused" "Unused"
+ldt 116 A "Li Strobe" "Strobe Light" "Tag" "High Value" "Low Value" "High Duration" "Low Duration"
+ldt 117 A "Li Stop" "Stop Light Effects" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 232 A "Li StrobeDoom" "Strobe Light DOOM style" "Tag" "High Duration" "Low Duration" "Unused" "Unused"
+ldt 233 A "Li MinNeighbor" "Set Light Level to minimum Neighbor Light Level" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 234 A "Li MaxNeighbor" "Set Light Level to maximum Neighbor Light Level" "Tag" "Unused" "Unused" "Unused" "Unused"
+
+ldt 140 B "Se ChangeSound" "Change Sector Sound" "Tag" "New Sound" "Unused" "Unused" "Unused"
+ldt 185 B "Se SetRotation" "Set Sector Rotation" "Tag" "Floor Angle" "Ceiling Angle" "Unused" "Unused"
+ldt 186 B "Se SetCeilingPanning" "Set Sector Ceiling Panning" "Tag" "Hor Offset(int)" "Hor Offset(float)" "Vert Offset(int)" "Vert Offset(float)"
+ldt 187 B "Se SetFloorPanning" "Set Sector Floor Panning" "Tag" "Hor Offset(int)" "Hor Offset(float)" "Vert Offset(int)" "Vert Offset(float)"
+ldt 188 B "Se SetCeilingScale" "Set Sector Ceiling Scale" "Tag" "Hor Offset(int)" "Hor Offset(float)" "Vert Offset(int)" "Vert Offset(float)"
+ldt 189 B "Se SetFloorScale" "Set Sector Floor Scale" "Tag" "Hor Offset(int)" "Hor Offset(float)" "Vert Offset(int)" "Vert Offset(float)"
+ldt 190 B "Se Static_Init" "Set Sector Properties on Level Init" "Tag" "Property" "Flip Sky?" "Unused" "Unused"
+ldt 212 B "Se SetColor" "Set Sector Color" "Tag" "Red" "Green" "Blue" "Saturation"
+ldt 213 B "Se SetFade" "Set Sector Fade" "Tag" "Red" "Green" "Blue" "Unused"
+ldt 214 B "Se SetDamage" "Set Sector Damage" "Tag" "Amount" "MOD" "Unused" "Unused"
+ldt 216 B "Se SetGravity" "Set Sector Gravity" "Tag" "Gravity (int)" "Gravity (float)" "Unused" "Unused"
+ldt 218 B "Se SetWind" "Set Sector Wind" "Tag" "Amount" "Angle" "UseLine" "Unused"
+ldt 219 B "Se SetFriction" "Set Sector Friction" "Tag" "Amount" "Unused" "Unused" "Unused"
+ldt 220 B "Se SetCurrent" "Set Sector Current" "Tag" "Amount" "Angle" "UseLine" "Unused"
+
+ldt 200 b "B Floor" "Generic BOOM Floor" "Tag" "Speed" "Height" "Target" "Flags"
+ldt 201 b "B Ceiling" "Generic BOOM Ceiling" "Tag" "Speed" "Height" "Target" "Flags"
+ldt 202 b "B Door" "Generic BOOM Door" "Tag" "Speed" "Kind" "Delay" "Lock"
+ldt 203 b "B Lift" "Generic BOOM Lift" "Tag" "Speed" "Type" "Height" "Unused"
+ldt 204 b "B Stairs" "Generic BOOM Stairs" "Tag" "Speed" "Height" "Flags" "Reset Time"
+ldt 205 b "B Crusher" "Generic BOOM Crusher" "Tag" "Down Speed" "Up Speed" "Silent?" "Damage"
+
+ldt 9 	r "R Line_Horizon" "Set Horizon Line" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 16 	r "R Transfer_WallLight" "Transfer Sector Light to LineDef" "LID" "NoFakeContrast" "Unused" "Unused" "Unused"
+ldt 50 	r "R ExtraFloor_LightOnly" "Create Lighting Effect at a certain Height" "Tag" "Type" "Unused" "Unused" "Unused"
+ldt 159 r "R Sector_SetPlaneReflection (GZ)" "Sets floor / ceiling reflection (GZDoom)" "Tag" "Floor" "Ceiling" "Unused" "Unused"
+ldt 160 r "R Sector_Set3DFloor (GZ)" "Create a 3D floor (GZDoom)" "Tag" "Type" "Flags" "Alpha" "Hi-Tag/LineID"
+ldt 182 r "R Line_Mirror" "Create a mirror. Leave enough Void Space behind for the reflection!" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 183 r "R Line_AlignFloor" "Align Floor to LineDef" "LID" "Side" "Unused" "Unused" "Unused"
+ldt 184 r "R Line_AlignCeiling" "Align Ceiling to LineDef" "LID" "Side" "Unused" "Unused" "Unused"
+ldt 209 r "R Transfer_Heights" "Deep Water Effect as with BOOM's 242" "Tag" "Flags" "Unused" "Unused" "Unused"
+ldt 210 r "R Transfer_FloorLight" "Transfers Light level to Floor" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 211 r "R Transfer_CeilingLight" "Transfer Light level to Ceiling" "Tag" "Unused" "Unused" "Unused" "Unused"
+
+ldt 181 x "Sl Plane_Align" "Create a sloped Floor / Ceiling" "Floor" "Ceiling" "Unused" "Unused" "Unused"
+
+ldt 0 	o "-- Normal" "Normal" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 15 	o "O Autosave" "Create an Autosave at this Linedef" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 18 	o "O StartConversation" "Start a Conversation with an NPC" "TID" "Face?" "Unused" "Unused" "Unused"
+ldt 33 	o "O ForceField" "Create a Force Field" "Unused" "Unused" "Unused" "Unused" "Unused"
+ldt 34 	o "O ClearForceField" "Create an invisible Force Field" "Tag" "Unused" "Unused" "Unused" "Unused"
+ldt 49 	o "O GlassBreak" "Breakable Glass" "DontSpawnJunk" "Unused" "Unused" "Unused" "Unused"
+ldt 120 o "O Radius_Quake" "Create an Earthquake" "Intensity" "Duration" "Radius (Damage)" "Radius (Tremor)" "TID"
+ldt 129 o "O UsePuzzleItem" "Use a Puzzle-Item" "Item" "Script" "Unused" "Unused" "Unused"
+ldt 173 o "O NoiseAlert" "Alert non-deaf Monsters of Target's Presence" "Target TID" "Source TID" "Unused" "Unused" "Unused"
+ldt 174 o "O SendToCommunicator" "Use Strife's Communicator Item" "Unknown" "Unknown" "Unknown" "Unknown" "Unknown"
+ldt 179 o "O ChangeSkill" "Change Game Skill" "Skill" "Unused" "Unused" "Unused" "Unused"
+ldt 191 o "O SetPlayerProperty" "Set a Player's Property" "Who" "Set" "Which" "Unused" "Unused"
+ldt 227 o "O PointPush_SetForce" "Set a Point-Pushers force" "Tag" "TID" "Amount" "UseLine" "Unused"
+ldt 237 o "O ChangeCamera" "Change the POV" "TID" "Who" "Revert" "Unused" "Unused"
+
+#
+#	Definition of sector types
+#	Format is : st <number> <shortdesc> <longdesc>
+#	<shortdesc> must not exceed 14 characters.
+#
+
+st 0 "Normal" "Normal"
+st 1 "Light_Phased" "Phased Light"
+st 2 "LightSequenceStart" "Start Light Sequence"
+st 3 "LightSequenceSpecial1" "Light Sequence Special 1"
+st 4 "LightSequenceSpecial2" "Light Sequence Special 1"
+
+st 26 "Stairs_Special1" "Stair Step1"
+st 27 "Stairs_Special2" "Stair Step2"
+
+st  65 "  Blinks rand"  "  Light blinks randomly"
+st  66 "  Flashes 2 Hz" "  Light flashes 2 Hz"
+st  67 "  Flashes 1 Hz" "  Light flashes 1 Hz"
+st  68 "P -20% & 2Hz"   "P -10/20% health, flashes 2 Hz"
+st  69 "P -10% health"  "P -5/10% health"
+st  70 "P -5% health"   "P -2/5% health"
+st  71 "  Oscillates"   "  Light oscillates"
+st  72 "P Secret"       "P Secret"
+st 73 "  Closes 30 s"  "  30 s after level start, ceiling closes like a door"
+st 74 "P -20% & end"   "P -10/20% health and end level when health <= 10%"
+st 75 "  Flash1Hz syn" "  Light flashes 1 Hz, synchronized"
+st 76 "  Flash2Hz syn" "  Light flashes 2 Hz, synchronized"
+st 78 "  Opens 300 s"  "  300 s after level start, ceiling opens like a door"
+st 79 "P -20% health"  "P -10/20% health"
+st 90 "  Flicker rand" "  Light flickers on and off randomly [v1.6]"
+
+st 196 "Heal Player" "Slowly heal the Player up to 100% Health"
+
+st 200 "Sky2" "Use Sky2 if present"
+
+#
+#	Definition of thing groups
+#	Format is : thinggroup <thinggroup> <colour> <description>
+#
+
+thinggroup p rgb:4/f/4 "Player"
+thinggroup m rgb:f/0/0 "Monster"
+thinggroup M rgb:f/0/0 "Stealth Monster"
+thinggroup w rgb:f/a/0 "Weapon"
+thinggroup a rgb:8/5/0 "Ammunition"
+thinggroup h rgb:2/8/0 "Health & armour"
+thinggroup b rgb:2/8/0 "Misc. bonus"
+thinggroup k rgb:f/0/f "Key"
+thinggroup d rgb:6/6/c "Misc. decoration"
+thinggroup l rgb:6/6/c "Light source"
+thinggroup g rgb:6/6/c "Gory decoration"
+thinggroup c rgb:6/6/c "Corpse"
+thinggroup z rgb:0/b/d "Special"
+thinggroup x rgb:0/b/d "Scripted Marines"
+thinggroup P rgb:0/b/d "Particle Fountains"
+thinggroup B rgb:0/b/d "Bridges"
+thinggroup C rgb:0/b/d "Cameras and Skyboxes"
+
+#
+#	Definition of things
+#	Format is :
+#	thing <number> <thinggroup> <flags> <radius> <desc> [<sprite>]
+#	<desc> must not exceed 19 characters.
+#
+
+thing 2007 a -  20 "Clip"			CLIP
+thing 2048 a -  20 "Box of bullets"		AMMO
+thing 2008 a -  20 "4 shotgun shells"		SHEL
+thing 2049 a -  20 "Box shotgun shells"		SBOX
+thing 2010 a -  20 "Rocket"			ROCK
+thing 2046 a -  20 "Box of rockets"		BROK
+thing 2047 a -  20 "Energy cell"		CELL
+thing   17 a -  20 "Energy cell pack"		CELP
+thing    8 a -  20 "Backpack full ammo"		BPAK
+
+thing 2025 b -  20 "Rad. shielding suit"	SUIT
+thing 2026 b -  20 "Computer area map"		PMAP
+thing 2024 b -  20 "Partial invis."		PINS
+thing 2023 b -  20 "Berserk"			PSTR
+thing 2022 b -  20 "Invulnerability"		PINV
+thing 2045 b -  20 "Light amp. visor"		PVIS
+
+thing   15 c -  16 "Dead player (green)"	PLAYN
+thing   18 c -  20 "Dead trooper"		POSSL
+thing   19 c -  20 "Dead sergeant"		SPOSL
+thing   20 c -  20 "Dead imp"			TROOM
+thing   21 c -  16 "Dead demon"			SARGN
+thing   22 c -  16 "Dead cacodemon"		HEADL
+thing   23 c -  16 "Dead lost soul"		SKULK
+
+thing 2035 d -  10 "Barrel"			BAR1
+thing   72 d -  16 "Commander Keen"		KEEN
+thing   48 d -  16 "Technical column"		ELEC
+thing   30 d -  16 "Tall green pillar"		COL1
+thing   32 d -  16 "Tall red pillar"		COL3
+thing   31 d -  16 "Short green pillar"		COL2
+thing   33 d -  16 "Short red pillar"		COL4
+thing   36 d -  16 "Pillar w/heart"		COL5
+thing   37 d -  16 "Red pillar w/skull"		COL6
+thing   41 d -  16 "Evil eye"			CEYE
+thing   42 g -  16 "Floating skulls"		FSKU
+thing   47 d -  16 "Brown stub"			SMIT
+thing   54 d -  32 "Brown tree"			TRE2
+thing   43 d -  16 "Grey tree"			TRE1
+
+thing   10 g -  16 "Mushed player"		PLAYW
+thing   12 g -  16 "Mushed player 2"		PLAYW
+thing   24 g -  16 "Pool of blood"		POL5
+thing   79 g -  16 "Pool of blood 2"		POB1
+thing   80 g -  16 "Pool of blood 3"		POB2
+thing   81 g -  16 "Pool of brains"		BRS1
+thing   27 g -  16 "Pole with skull"		POL4
+thing   28 g -  16 "Skewer with heads"		POL2
+thing   29 g -  16 "Pile of skulls"		POL3
+thing   25 g -  16 "Impaled body"		POL1
+thing   26 g -  16 "Impaled twitching"		POL6
+thing   49 g -  16 "Swaying body O"		GOR1
+thing   63 g -  16 "Swaying body"		GOR1
+thing   50 g -  16 "Hanging arms out O"		GOR2
+thing   59 g -  16 "Hanging arms out"		GOR2
+thing   53 g -  16 "Hanging leg O"		GOR5
+thing   62 g -  16 "Hanging leg"		GOR5
+thing   61 g -  16 "Hanging one-legged"		GOR3
+thing   52 g -  16 "Hanging torso O"		GOR4
+thing   60 g -  16 "Hanging torso"		GOR4
+thing   73 g -  16 "Hanging no guts"		HDB1
+thing   74 g -  16 "Hanging no brain"		HDB2
+thing   75 g -  16 "H. torso looking down"	HDB3
+thing   76 g -  16 "H. torso open skull"	HDB4
+thing   77 g -  16 "H. torso looking up"	HDB5
+thing   78 g -  16 "H. torso w/o brain"		HDB6
+
+thing 2014 h -  20 "Health bonus"		BON1
+thing 2011 h -  20 "Stimpack"			STIM
+thing 2012 h -  20 "Medikit"			MEDI
+thing 2013 h -  20 "Supercharge"		SOUL
+thing 2015 h -  20 "Armor bonus"		BON2
+thing 2018 h -  20 "Armor"			ARM1
+thing 2019 h -  20 "Megaarmor"			ARM2
+thing   83 h -  20 "Megasphere"			MEGA
+
+thing    5 k -  20 "Blue keycard"		BKEY
+thing    6 k -  20 "Yellow keycard"		YKEY
+thing   13 k -  20 "Red keycard"		RKEY
+thing   40 k -  20 "Blue skull key"		BSKU
+thing   39 k -  20 "Yellow skull key"		YSKU
+thing   38 k -  20 "Red skull key"		RSKU
+
+thing 2028 l -  16 "Lamp"			COLU
+thing   85 l -  16 "Tall mercury lamp"		TLMP
+thing   86 l -  16 "Short mercury lamp"		TLP2
+thing   34 l -  16 "Candle"			CAND
+thing   35 l -  16 "Candelabra"			CBRA
+thing   44 l -  16 "Tall blue torch"		TBLU
+thing   45 l -  16 "Tall green torch"		TGRN
+thing   46 l -  16 "Tall red torch"		TRED
+thing   55 l -  16 "Short blue torch"		SMBT
+thing   56 l -  16 "Short green torch"		SMGT
+thing   57 l -  16 "Short red torch"		SMRT
+thing   70 l -  16 "Burning barrel"		FCAN
+
+thing 3004 m -  20 "Trooper"			POSS
+thing    9 m -  20 "Sergeant"			SPOS
+thing 3001 m -  20 "Imp"			TROO
+thing 3002 m -  30 "Demon"			SARG
+thing 3003 m -  24 "Baron of hell"		BOSS
+thing   58 m s  30 "Spectre"			SARG
+thing 3006 m -  16 "Lost soul"			SKUL
+thing 3005 m -  31 "Cacodemon"			HEAD
+thing    7 m - 128 "Spider mastermind"		SPID
+thing   16 m -  40 "Cyberdemon"			CYBR
+thing   84 m -  20 "Wolfenstein SS"		SSWV
+thing   65 m -  20 "Heavy weapon dude"		CPOS
+thing   69 m -  24 "Hell knight"		BOS2
+thing   68 m -  64 "Arachnotron"		BSPI
+thing   71 m -  31 "Pain elemental"		PAIN
+thing   66 m -  20 "Revenant"			SKEL
+thing   67 m -  48 "Mancubus"			FATT
+thing   64 m -  20 "Arch vile"			VILE
+thing   88 m -  16 "Boss brain"			BBRN
+thing   89 m -  16 "Boss shooter"		BOSFB
+thing   87 m -  16 "Spawn spot"			FIREF
+
+thing 9061 M -	20 "Trooper (Stealth)"		POSS
+thing 9060 M -	20 "Seargeant (Stealth)"	SPOS
+thing 9057 M -	20 "Imp (Stealth)"		TROO
+thing 9055 M -	30 "Deamon (Stealth)"		SARG
+thing 9052 M -	24 "Baron of hell (Stealth)"	BOSS
+thing 9053 M -	31 "Cacodemon (Stealth)"	HEAD
+thing 9054 M -	20 "Heavy Weapon Dude (Stealth)" CPOS
+thing 9056 M -	24 "Hell knight"		BOS2
+thing 9050 M -	64 "Arachnotron (Stealth)"	BSPI
+thing 9059 M -	20 "Revenant (Stealth)"		SKEL
+thing 9058 M -	48 "Mancubus (Stealth)"		FATT
+thing 9051 M -	20 "Arch vile (Stealth)"	VILE
+
+thing    1 p -  16 "Player 1 start"		PLAY
+thing    2 p -  16 "Player 2 start"		PLAY
+thing    3 p -  16 "Player 3 start"		PLAY
+thing    4 p -  16 "Player 4 start"		PLAY
+thing   11 p -  16 "Deathmatch start"		PLAYF1
+thing   14 p -  16 "Teleport exit"		TFOG
+thing 9044 p -	16 "Teleport exit (with z-height)" TFOG
+thing 4001 p -  16 "Player 5 start"		PLAY
+thing 4002 p -  16 "Player 6 start"		PLAY
+thing 4003 p - 	16 "Player 7 start"		PLAY
+thing 4004 p -	16 "Player 8 start"		PLAY
+
+thing 2005 w -  20 "Chainsaw"			CSAW
+thing 2001 w -  20 "Shotgun"			SHOT
+thing   82 w -  20 "Super shotgun"		SGN2
+thing 2002 w -  20 "Chaingun"			MGUN
+thing 2003 w -  20 "Rocket launcher"		LAUN
+thing 2004 w -  20 "Plasma gun"			PLAS
+thing 2006 w -  20 "BFG9000"			BFUG
+# thing 30034 w - 20 "Portal Gun [PWAD]" APBXC0 # <-- the infamous portal gun by cutmanmike
+
+thing 5001 z -  20 "Point pusher"		IFOGA0
+thing 5002 z -  20 "Point puller"		IFOGB0
+thing 9001 z -	20 "Map Spot"			APBXA0
+thing 9013 z -	20 "Map Spot with Gravity"	APBXA0
+thing 9024 z -	20 "Patrol Point"		PLSSA0
+thing 9300 z -	20 "Polyobj Anchor"		PLSSB0
+thing 9301 z -	20 "Polyobj Start Spot"		TFOGJ0
+thing 9302 z -	20 "Polyobj Start Spot (Crushing)"	TFOGJ0
+thing 9045 z -	20 "Deep Water"			
+thing 9046 z -	20 "Secret Trigger"
+thing 9200 z -	20 "Decal"
+thing 9077 z -	32 "Stacked Upper Sector"
+thing 9078 z -	32 "Stacked Lower Sector"
+
+thing 9990 B -	20 "Invisible Bridge"
+thing 5061 B -	32 "Invisible Bridge (r=32)"
+thing 5064 B -	16 "Invisible Bridge (r=16)"
+thing 5065 B -	8  "Invisible Bridge (r=8)"
+
+thing 9032 P -	20 "Black Fountain"	FOUNT1
+thing 9033 P -	20 "White Fountain"	FOUNT2
+thing 9029 P -	20 "Blue Fountain"	FOUNT3
+thing 9028 P -	20 "Green Fountain"	FOUNT4
+thing 9031 P -	20 "Purple Fountain"	FOUNT5
+thing 9027 P -	20 "Red Fountain"	FOUNT6
+thing 9030 P -	20 "Yellow Fountain"	FOUNT7
+
+thing 9025 C -	20 "Security Camera"
+thing 9073 C -	20 "Aiming Camera"
+thing 9070 C -	20 "Interpolation Point"
+thing 9075 C -	20 "Interpolation Special"
+thing 9071 C -	20 "Path Follower"
+thing 9072 C -	20 "Moving Camera"
+thing 9074 C -	20 "Actor Mover"
+thing 9080 C -	20 "Skybox Viewpoint"
+thing 9081 C -	20 "Skybox Picker"
+
+thing 9100 x -	32 "Unequipped" 	PLAY
+thing 9101 x -	32 "Fists"		PLAY
+thing 9102 x -	32 "Berserk"		PLAY
+thing 9103 x -	32 "ChainSaw" 		PLAY
+thing 9104 x -	32 "Pistol"		PLAY
+thing 9105 x -	32 "Shotgun"		PLAY
+thing 9106 x -	32 "SSG"		PLAY
+thing 9107 x -	32 "ChainGun"		PLAY
+thing 9108 x -	32 "Rocket"		PLAY
+thing 9109 x -	32 "PlasmaGun"		PLAY
+thing 9110 x -	32 "RailGun"		PLAY
+thing 9111 x -	32 "BFG"		PLAY

@@ -1,0 +1,25 @@
+clusterdef 1
+hub
+
+map MAP01 "UAC Base Terra"
+sky1 RSKY1 0.05
+par 50
+music d_dead
+cluster 1
+lightning
+nointermission
+
+map MAP02 "Translocator tesing site"
+sky1 RSKY1 0.05
+cluster 1
+par 100
+music d_dead
+lightning
+nointermission
+
+map MAP03 "UAC Base Tei-Tenga"
+sky1 RSKY1 0.05
+cluster 1
+par 100
+music d_dead
+nointermission

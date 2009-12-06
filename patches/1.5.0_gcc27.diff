@@ -1,0 +1,240 @@
+yadex-1.5.0_gcc-2.7.diff - make compile Yadex 1.5.0 with GCC 2.7
+
+To apply,
+
+  cd yadex-1.5.0
+  patch -p1 <patch/gcc-2.7.diff
+
+GCC 2.7 is not recommended to compile C++. It's shipped with a
+very old version of STL, hence conflict on "times" and missing
+clear(). It insists on having default constructors for classes
+used in conjunction with the STL containers. It wants three
+arguments for map<>. It barfs if you use -> on the right hand
+of an iterator. It's a pain.
+
+I consider GCC 2.7 obsolete, and not a supported compiler for
+Yadex. This patch will rot or go away. Please upgrade. More
+recent versions of EGCS and GCC work fine.
+
+-- AYM 2000-08-27
+
+diff -ur yadex-1.5.0/src/bench.cc yadex-1.5.0-gcc27/src/bench.cc
+--- yadex-1.5.0/src/bench.cc	Sun Aug 13 16:43:11 2000
++++ yadex-1.5.0-gcc27/src/bench.cc	Sun Aug 27 17:41:26 2000
+@@ -33,10 +33,12 @@
+ #include <time.h>
+ #include <sys/times.h>
+ 
++#define times FOOBAR
+ #include "gfx.h"
+ #include "img.h"
+ #include "pic2img.h"
+ #include "wadres.h"
++#undef times
+ 
+ 
+ 
+diff -ur yadex-1.5.0/src/drawmap.cc yadex-1.5.0-gcc27/src/drawmap.cc
+--- yadex-1.5.0/src/drawmap.cc	Thu Aug 24 15:36:36 2000
++++ yadex-1.5.0-gcc27/src/drawmap.cc	Sun Aug 27 18:03:49 2000
+@@ -518,6 +518,7 @@
+ class Thing_npixels
+ {
+   public :
++    Thing_npixels () : thing_no (0), npixels (0), type (0) { }
+     Thing_npixels (i16 thing_no, unsigned long npixels, wad_ttype_t type)
+       : thing_no (thing_no), npixels (npixels), type (type) { }
+     bool operator< (const Thing_npixels& other) const
+@@ -541,7 +542,7 @@
+     const Thing_npixels& operator[] (int n) { return a[n]; }
+     void refresh ()
+     {
+-      a.clear ();
++      a.erase (a.begin (), a.end ());
+       a.reserve (NumThings);
+       for (int n = 0; n < NumThings; n++)
+       {
+@@ -576,7 +577,20 @@
+   unsigned short height;
+ };
+ 
+-typedef map <i16, sprite_dim_t> dim_map_t;
++class Dim_map_key
++{
++  public :
++    Dim_map_key () { value = 0; }
++    Dim_map_key (i16 v) { value = v; }
++    i16 value;
++};
++
++bool operator< (Dim_map_key a, Dim_map_key b)
++{
++  return a.value - b.value;
++}
++
++typedef map <Dim_map_key, sprite_dim_t, less<Dim_map_key> > dim_map_t;
+ static dim_map_t dim_map;  // FIXME there should be one for each game
+ 
+ 
+@@ -638,10 +652,10 @@
+       }
+       else
+       {
+-	mapx0 = MAPX (0)       - dim->second.width / 2;
+-	mapx9 = MAPX (ScrMaxX) + dim->second.width / 2;
+-	mapy0 = MAPY (ScrMaxY) - dim->second.height / 2;
+-	mapy9 = MAPY (0)       + dim->second.height / 2;
++	mapx0 = MAPX (0)       - (*dim).second.width / 2;
++	mapx9 = MAPX (ScrMaxX) + (*dim).second.width / 2;
++	mapy0 = MAPY (ScrMaxY) - (*dim).second.height / 2;
++	mapy9 = MAPY (0)       + (*dim).second.height / 2;
+       }
+     }
+     int mapx = Things[t.thing_no].xpos;
+diff -ur yadex-1.5.0/src/lumpdir.cc yadex-1.5.0-gcc27/src/lumpdir.cc
+--- yadex-1.5.0/src/lumpdir.cc	Mon Jun  5 13:46:40 2000
++++ yadex-1.5.0-gcc27/src/lumpdir.cc	Sun Aug 27 17:38:44 2000
+@@ -64,7 +64,7 @@
+   if (dependency)
+     delete dependency;
+   if (! lump_map.empty ())
+-    lump_map.clear ();
++    lump_map.erase (lump_map.begin (), lump_map.end ());
+ }
+ 
+ 
+@@ -92,7 +92,7 @@
+   if (i == lump_map.end ())
+     loc.wad = loc_prev.wad = 0;
+   else
+-    loc = loc_prev = i->second;
++    loc = loc_prev = (*i).second;
+ }
+ 
+ 
+@@ -122,7 +122,7 @@
+      And usually is ! */
+   have_prev = false;
+   if (! lump_map.empty ())
+-    lump_map.clear ();
++    lump_map.erase (lump_map.begin (), lump_map.end ());
+ 
+   /* Get list of lumps in the master directory. Everything
+      that is between X_START/X_END or XX_START/XX_END and that
+@@ -231,7 +231,8 @@
+   {
+     array[n] = new char[WAD_NAME + 1];
+     *array[n] = '\0';
+-    strncat (array[n], i++->first.name, WAD_NAME);
++    strncat (array[n], (*i).first.name, WAD_NAME);
++    i++;
+   }
+ }
+ 
+diff -ur yadex-1.5.0/src/lumpdir.h yadex-1.5.0-gcc27/src/lumpdir.h
+--- yadex-1.5.0/src/lumpdir.h	Thu Jun  1 14:25:30 2000
++++ yadex-1.5.0-gcc27/src/lumpdir.h	Sun Aug 27 17:38:44 2000
+@@ -34,10 +34,11 @@
+ 
+ #include <map>
+ 
++#include "wadname.h"
++
+ 
+ class Dependency;
+ class Serial_num;
+-class Wad_name;
+ 
+ 
+ /*
+diff -ur yadex-1.5.0/src/objinfo.cc yadex-1.5.0-gcc27/src/objinfo.cc
+--- yadex-1.5.0/src/objinfo.cc	Sat Aug 26 16:22:37 2000
++++ yadex-1.5.0-gcc27/src/objinfo.cc	Sun Aug 27 18:07:51 2000
+@@ -56,6 +56,12 @@
+ class Extraf
+ {
+   public :
++    Extraf ()
++    {
++      sector = 0;
++      memset (tex, '\0', sizeof tex);
++      height = 0;
++    }
+     Extraf (obj_no_t sector, wad_name_t& tex, wad_z_t height)
+     {
+       this->sector = sector;
+@@ -683,7 +689,7 @@
+  */
+ static void get_extrafloors (vector<Extraf>& v, wad_tag_t tag)
+ {
+-  v.clear ();
++  v.erase (v.begin (), v.end ());
+   for (obj_no_t l = 0; l < NumLineDefs; l++)
+   {
+     if (LineDefs[l].tag == tag
+diff -ur yadex-1.5.0/src/patchdir.cc yadex-1.5.0-gcc27/src/patchdir.cc
+--- yadex-1.5.0/src/patchdir.cc	Sat Apr 29 00:57:39 2000
++++ yadex-1.5.0-gcc27/src/patchdir.cc	Sun Aug 27 17:38:44 2000
+@@ -60,7 +60,7 @@
+   if (pnames != 0)
+     FreeMemory (pnames);
+   if (! patch_lumps.empty ())
+-    patch_lumps.clear ();
++    patch_lumps.erase (patch_lumps.begin (), patch_lumps.end ());
+ }
+ 
+ 
+@@ -78,7 +78,7 @@
+     npnames = 0;
+   }
+   if (! patch_lumps.empty ())
+-    patch_lumps.clear ();
++    patch_lumps.erase (patch_lumps.begin (), patch_lumps.end ());
+ 
+   /* First load PNAMES so that we known in which order we should
+      put the patches in the array. */
+@@ -221,7 +221,7 @@
+     loc.wad = 0;
+     return;
+   }
+-  loc = i->second;
++  loc = (*i).second;
+ }
+ 
+ 
+@@ -293,7 +293,8 @@
+   {
+     array[n] = new char[WAD_PIC_NAME + 1];
+     *array[n] = '\0';
+-    strncat (array[n], i++->first._name, WAD_PIC_NAME);
++    strncat (array[n], (*i).first._name, WAD_PIC_NAME);
++    i++;
+   }
+ }
+ 
+diff -ur yadex-1.5.0/src/patchdir.h yadex-1.5.0-gcc27/src/patchdir.h
+--- yadex-1.5.0/src/patchdir.h	Mon Jan 10 13:40:12 2000
++++ yadex-1.5.0-gcc27/src/patchdir.h	Sun Aug 27 17:38:44 2000
+@@ -76,6 +76,7 @@
+ 
+ struct Pllik
+ {
++  Pllik () { memset (_name, '\0', sizeof _name); }
+   Pllik (const char *name);
+   wad_pic_name_t _name;
+ };
+diff -ur yadex-1.5.0/src/spritdir.cc yadex-1.5.0-gcc27/src/spritdir.cc
+--- yadex-1.5.0/src/spritdir.cc	Sun Jul  9 23:04:18 2000
++++ yadex-1.5.0-gcc27/src/spritdir.cc	Sun Aug 27 17:38:44 2000
+@@ -58,9 +58,9 @@
+ 
+   Lump_map::const_iterator i = lump_map.lower_bound (name);
+   have_prev = true;
+-  if (i == lump_map.end () || y_strnicmp (name, i->first.name, strlen (name)))
++  if (i == lump_map.end () || y_strnicmp (name, (*i).first.name, strlen (name)))
+     loc.wad = loc_prev.wad = 0;
+   else
+-    loc = loc_prev = i->second;
++    loc = loc_prev = (*i).second;
+ }
+ 

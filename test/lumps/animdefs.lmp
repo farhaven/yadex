@@ -1,0 +1,22 @@
+CAMERATEXTURE	CAMERA1	640	480	fit	96	64
+CAMERATEXTURE	CAMERA3	640	480	fit	64	48
+CAMERATEXTURE	CAMERA4	640	480	fit	64	48
+CAMERATEXTURE	CAMERA5	640	480	fit	96	64
+CAMERATEXTURE	CAMERA6	640	480	fit	96	64
+
+texture VENDH1
+    allowdecals
+    pic VENDH1 tics 5
+    pic VENDH2 tics 5
+    pic VENDH3 tics 5
+    pic VENDH4 tics 5
+
+texture WFALL1
+    pic WFALL1 rand 5 12
+    pic WFALL2 rand 5 12
+    pic WFALL3 rand 5 12
+    pic WFALL4 rand 5 12
+
+// warp flat FWATER1
+
+warp texture SHAWN2

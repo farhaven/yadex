@@ -1,0 +1,374 @@
+.TH YADEX 6 $SOURCE_DATE "Yadex $VERSION" \" -*- nroff -*-
+.\" .OP - synopsis of an option
+.\"   $1: short name
+.\"   $2: long name
+.\"   $3: argument
+.de OP
+\\fB\-\\$1\\fP, \\fB\-\\$2\\fP \\fI\\$3\\fP
+..
+.SH NAME
+yadex \- a Doom/Heretic/Strife level editor
+.SH SYNOPSIS
+.BR "yadex \-?" | \-help | \-\-help
+.br
+.B yadex \-\-version
+.br
+\fByadex\fP [\fIoptions\fP] [\fIfile\fP ...]
+.br
+\fByadex\fP [\fIoptions\fP] \fB\-b\fP \fIstring\fP [\fIfile\fP ...]
+.SH DESCRIPTION
+Yadex can be used to view, create and modify levels for
+\fBDoom\fP, \fBUltimate Doom\fP, \fBDoom II\fP, \fBFinal
+Doom\fP, \fBDoom press release pre beta\fP and \fBHeretic\fP.
+It also supports, to a lesser extent, \fBDoom alpha\fP,
+\fBHexen\fP and \fBStrife\fP.
+
+See \fBREADME\fP for a quick start.
+.br
+To know what's new in this release, see \fBCHANGES\fP.
+.br
+The rest of documentation is in \fBdoc/index.html\fP (HTML format).
+.SH OPTIONS
+Boolean options can be negated by using \fB+\fP instead of
+\fB\-\fP.  For example, \fB+v\fP would disable verbose mode even
+if \fBverbose\fP is set to 1 in the configuration file. For non
+boolean options, \fB+\fP is equivalent to \fB\-\fP (note: the
+fact that a misimplementation is documented should not be
+construed as an incitement to make use of it).
+
+For options that take a parameter, the option and the parameter
+must be in separate command\-line arguments, i.e. you
+\fIcannot\fP write \fB\-gdoom\fP.
+
+It is not possible to run options together, i.e. you \fIcan't\fP
+use \fB\-dv\fP as short for \fB\-d\fP \fB\-v\fP.
+
+The \fB\-\-\fP "end-of-options" convention is not supported.
+.TP
+.BR \-? , \ \-help , \ \-\-help
+Print usage summary to stdout and exit successfully.
+.TP
+.BI \-b \ string
+Run a benchmark on some part of Yadex and exit successfully. See
+the \fBbenchmark()\fP function for further details.
+.TP
+.OP d debug
+Debug mode.
+This option is equivalent to and overrides the \fBdebug\fP
+directive of the configuration file.
+.TP
+.B \-expert
+Expert mode. Enforces default choices for certain dialogs. As
+those default choices are IMHO not all judicious, I don't
+recommend using this option. Check
+\fBinsert_vertex_split_linedef\fP and
+\fBinsert_vertex_merge_vertices\fP instead.
+This option is equivalent to and overrides the \fBexpert\fP
+directive of the configuration file.
+.TP
+.OP f config_file file
+Use \fIfile\fP as the config file instead of the default.
+.TP
+.OP fc fake_cursor
+(X11 only) Fake cursor. Currently, this option is a no\-op.
+This option is equivalent to and overrides the \fBfake_cursor\fP
+directive of the configuration file.
+.TP
+.OP fn font string
+(X11 only) Use font \fIstring\fP.
+If no font is specified or if the specified font is not
+found, Yadex falls back on the default font of the X server.
+This option is equivalent to and overrides the \fBfont\fP
+directive of the configuration file.
+.TP
+.OP g game string
+Set the game to \fIstring\fP, which can be one of the following:
+.if n \{ .ta 2 12
+.sp \}
+.if t \{ .ta 1.5 7.5
+.sp 0.4 \}
+.nf
+\(bu	\fBdoom\fP	Doom or Ultimate Doom
+\(bu	\fBdoom02\fP	Doom alpha 0.2
+\(bu	\fBdoom04\fP	Doom alpha 0.4
+\(bu	\fBdoom05\fP	Doom alpha 0.5
+\(bu	\fBdoom2\fP	Doom II or Final Doom
+\(bu	\fBdoompr\fP	Doom press release pre-beta
+\(bu	\fBheretic\fP	Heretic
+\(bu	\fBhexen\fP	Hexen
+\(bu	\fBstrife\fP	Strife 1.1 and later
+\(bu	\fBstrife10\fP	Strife 1.0
+.fi
+.if n .sp
+.if t .sp 0.4
+This option is equivalent to and overrides the \fBgame\fP
+directive of the configuration file.
+.TP
+.OP h height integer
+(X11 only) Initial height of the window. If the argument is just
+a number, the height of the window will be that many pixels. If
+the argument is a number followed by a percent sign (\fB%\fP),
+it will be that many percent of the width of the screen. The
+default is 90%.
+This option is equivalent to and overrides the \fBheight\fP
+directive of the configuration file.
+See also \fB\-w\fP.
+.TP
+.OP i1 iwad1 file
+The name of the Doom or Ultimate Doom iwad.
+This option has effect only if the game is \fBdoom\fP.
+This option is equivalent to and overrides the \fBiwad1\fP
+directive of the configuration file.
+.TP
+.OP i2 iwad2 file
+The name of the Doom II or Final Doom iwad.
+This option has effect only if the game is \fBdoom2\fP.
+This option is equivalent to and overrides the \fBiwad2\fP
+directive of the configuration file.
+.TP
+.OP i3 iwad3 file
+The name of the Heretic iwad.
+This option has effect only if the game is \fBheretic\fP.
+This option is equivalent to and overrides the \fBiwad3\fP
+directive of the configuration file.
+.TP
+.OP i4 iwad4 file
+The name of the Hexen iwad.
+This option has effect only if the game is \fBhexen\fP.
+This option is equivalent to and overrides the \fBiwad4\fP
+directive of the configuration file.
+.TP
+.OP i5 iwad5 file
+The name of the Strife iwad.
+This option has effect only if the game is \fBstrife\fP.
+This option is equivalent to and overrides the \fBiwad5\fP
+directive of the configuration file.
+.TP
+.OP i6 iwad6 file
+The name of the Doom alpha 0.2 iwad.
+This option has effect only if the game is \fBdoom02\fP.
+This option is equivalent to and overrides the \fBiwad6\fP
+directive of the configuration file.
+.TP
+.OP i7 iwad7 file
+The name of the Doom alpha 0.4 iwad.
+This option has effect only if the game is \fBdoom04\fP.
+This option is equivalent to and overrides the \fBiwad7\fP
+directive of the configuration file.
+.TP
+.OP i8 iwad8 file
+The name of the Doom alpha 0.5 iwad.
+This option has effect only if the game is \fBdoom05\fP.
+This option is equivalent to and overrides the \fBiwad8\fP
+directive of the configuration file.
+.TP
+.OP i9 iwad9 file
+The name of the Doom press release pre-beta iwad.
+This option has effect only if the game is \fBdoompr\fP.
+This option is equivalent to and overrides the \fBiwad9\fP
+directive of the configuration file.
+.TP
+.OP i10 iwad10 file
+The name of the Strife 1.0 iwad.
+This option has effect only if the game is \fBstrife10\fP.
+This option is equivalent to and overrides the \fBiwad10\fP
+directive of the configuration file.
+.TP
+.OP pw pwad file
+[Deprecated] Load pwad \fIfile\fP. This option is useless since
+pwads can be given as arguments anyway. It's there for backward
+compatibility only.
+This option is equivalent to and overrides the \fBpwad\fP
+directive of the configuration file.
+.TP
+.OP P no_pixmap
+(X11 only) Use no pixmap. Makes Yadex more responsive at the
+cost of a lot of flickering. Off by default.
+This option is equivalent to and overrides the \fBno_pixmap\fP
+directive of the configuration file.
+.TP
+.OP q quiet
+In theory, quiet mode. In practice, has no effect.
+This option is equivalent to and overrides the \fBquiet\fP
+directive of the configuration file.
+.TP
+.OP qq quieter
+Quieter. Makes Yadex completely silent (beepless).
+This option is equivalent to and overrides the \fBquieter\fP
+directive of the configuration file.
+.TP
+.OP s0 select0
+Select the 0th object automatically whenever the editing mode is
+set.
+This option is equivalent to and overrides the \fBselect0\fP
+directive of the configuration file.
+.TP
+.OP sb swap_buttons
+Swap mouse buttons. Currently, this option is a no\-op.
+This option is equivalent to and overrides the \fBswap_buttons\fP
+directive of the configuration file.
+.TP
+.OP td text_dot
+Debug the \fBDrawScreenText\fP() function.
+This option is equivalent to and overrides the \fBtext_dot\fP
+directive of the configuration file.
+.TP
+.OP v verbose
+Verbose mode.
+This option is equivalent to and overrides the \fBverbose\fP
+directive of the configuration file.
+.TP
+.B \-\-version
+Print version information to stdout and exit successfully.
+
+The first line contain three fields, separated by white space,
+with no other punctuation. The first field is the name of the
+program ("\fBYadex\fP"). The second field is the version number
+("\fB$VERSION\fP"). The third field is the release date, between
+parentheses ("\fB($SOURCE_DATE)\fP").
+
+The second line contains a configuration file magic string (not
+used).
+
+The third line contains the magic string that this version
+requires at the beginning of game definition files.
+.TP
+.OP w width dimension
+(X11 only) Initial width of the window. If the argument is just
+a number, the width of the window will be that many pixels. If
+the argument is a number followed by a percent sign (\fB%\fP),
+it will be that many percent of the width of the screen. The
+default is 90%.
+This option is equivalent to and overrides the \fBwidth\fP
+directive in the configuration file.
+See also \fB\-h\fP.
+.TP
+.OP z zoom_default integer
+Initial zoom factor in percent. The default is 0, which means
+that the zoom factor is to be adjusted so that the level fills
+the window.
+This option is equivalent to and overrides the \fBzoom_default\fP
+directive of the configuration file.
+.SH FILES
+.SS Configuration files
+.nf
+$FILES_ETC
+.fi
+.SS Game definition files
+.nf
+$FILES_SHARE
+.fi
+.SS Swap files
+.B $TMPDIR/yadexswp??????
+.br
+.B /tmp/yadexswp??????
+.SH ENVIRONMENT VARIABLES
+.IP \fBDISPLAY\fP
+X11 only. The name of the X display that Yadex will try to
+connect to.
+.IP \fBHOME\fP
+Used to expand \fB~\fP when locating configuration and game
+definition files.
+.IP \fBLINES\fP
+If set, Yadex assumes the tty has that many lines instead of 24.
+The value must be an unsigned, non-zero decimal integer.
+.IP \fBTMPDIR\fP
+If set, swap files are created there. Otherwise, in \fB/tmp\fP.
+.IP \fBYADEX_GAME\fP
+Indicates the game to use. Overrides the \fBgame\fP parameter in
+the config file, is overridden by the \fB\-g\fP command line
+option.
+.SH APPLICATION RESOURCES
+None. Yadex does not use the X resources system.
+.SH EXIT STATUS
+.ta 3
+\fB0\fP	OK.
+.br
+\fB1\fP	Incorrect invocation.
+.br
+\fB>1\fP	Fatal error.
+.SH BUGS
+In certain circumstances, exposures are not handled.
+If the Yadex window turns black,
+back out by pressing [Esc], several times if necessary.
+
+If you edit a level from a file that contains several and save it,
+all the other levels from that file are lost.
+
+And many more. See \fBTODO\fP.
+.SH AUTHOR
+André Majorel (http://www.teaser.fr/~amajorel/)
+
+.nf
+Contributors:
+Andrew J. Apted (http://www.netspace.net.au/~ajapted/)
+Matthew W. Miller (zbp+ee+fhozhybp=eryyvzjz)
+.fi
+
+Yadex is derived from DEU 5.21 that was written by Raphaël Quinet,
+Brendon Wyber and others.
+
+See the HTML documentation for detailed credits.
+.SH LEGAL
+.SS Yadex
+.nf
+$COPYRIGHT_MAN
+.fi
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307, USA.
+.SS Atclib
+The Yadex distribution includes a subset of Atclib.
+
+Atclib is copyright André Majorel 1995-1999 and distributed under the terms of
+version 2 of the GNU Library General Public License.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of version 2 of the GNU Library General Public
+License as published by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+MA 02111-1307, USA
+.SS Boost
+The Yadex distribution includes a subset of Boost 1.25.0.
+
+Boost 1.25.0 is copyright various authors and released under the following
+terms\ : Permission to copy, use, modify, sell and distribute this software is
+granted provided this copyright notice appears in all copies.
+This software is provided "as is" without express or implied warranty, and with
+no claim as to its suitability for any purpose.
+.SH SEE ALSO
+.BR bsp (6),
+.BR idbsp (6),
+.BR tkwadcad (6),
+.BR warm (6),
+.BR xwadtools (6)
+.IP LDE
+http://interreality.org/~tetron/technology/lde/
+.IP PFME
+http://www.purplefrog.com/~thoth/purplefrog/editor.html
+.IP Why
+http://www.hut.fi/~jpakkane/why/
+.IP "Xwad (part of Dumb)"
+http://stekt.oulu.fi/~tosi/dumb/dumb.html
+.IP Xwadtools
+ftp://3darchives.in-span.net/pub/idgames/source/

@@ -1,0 +1,133 @@
+# DeuTex 4.4.0 by Olivier Montanuy
+# PWAD creation directives
+
+# List of levels
+[levels]
+MAP01
+MAP02
+MAP03
+
+# List of data Lumps
+[lumps]
+DECORATE
+KEYCONF
+SNDINFO
+MAPINFO
+ANIMDEFS
+COLORMAP
+PLAYPAL
+LOADACS
+TRANSL
+GLOBAL
+SCRIPT
+SCRIPT01
+SCRIPT02
+SCRIPT03
+GLOB
+
+# List of definitions for TEXTURE1
+[texture1]
+TEXTURE1
+
+# List of Sounds
+[sounds]
+DSMORFSH
+
+# List of Pictures (with insertion point)
+[graphics]
+SUNDERS	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+GUARD	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+YOU	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+SPEECH	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+CURSOR	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+VEND_SYS	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+CREDITS2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+STIM_1	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+STIM_2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+SHELL_1	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+SHELL_2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+ROUND_1	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+ROUND_2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+CELL_1	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+CELL_2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+DONE_1	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+DONE_2	0	0
+
+# List of Pictures (with insertion point)
+[graphics]
+INV	0	0
+
+# List of Sprites
+[sprites]
+TRANA0	43	13
+TRANB0	-156	-82
+TRANC0	-144	-66
+TRAND0	-139	-59
+TRANE0	-132	-54
+TRANF0	-128	-42
+TRANG0	18	9
+TRANH0	18	9
+TRANI0	18	9
+TRANJ0	18	9
+SPRKA0	11	11
+
+# List of wall patches
+[patches]
+VENDH1
+VENDH2
+VENDH3
+VENDH4
+WFALL1
+WFALL2
+WFALL3
+WFALL4
+
+# End of extraction

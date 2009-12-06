@@ -1,0 +1,1475 @@
+Changes
+
+Yadex 1.7.0 (2003-12-28)
+
+  * Build: The configure script autodetects the C and C++ compiler (cc,
+    c89 or gcc and c++, cxx or g++). To skip the detection and force a
+    particular value, use the --cc and --cxx options.
+
+  * Code: Minor warningectomy. Fixed potential uses of uninitialised
+    pointers if wad I/O errors occurred while reading the texture list.
+
+  * Editing: Improved the handling of superimposed objects.
+      + The linedef object info box now lists any superimposed linedefs
+        (up to seven). No such feature for vertices, sectors and
+        things, mainly because it doesn't seem to be as big an issue
+        and I'm lazy.
+      + When the pointer is over more than one object, it's now the
+        highest-numbered one that's highlighted and not the
+        lowest-numbered as it used to be. Thus the highlight and the
+        info box match the display (that shows the highest-numbered
+        object and always has), which should be less confusing.
+        Highlighting the highest-numbered object seems to be the right
+        thing too, since the object you created last is the one you're
+        most likely to want to edit or delete. This change only affects
+        vertices, linedefs and things. For sectors, the code hasn't
+        changed.
+
+  * Game/wad: Heretic: correct definitions for linedef types 28, 33,
+    99, 105, 107-141 and sector types 4, 21-51, courtesy of Barry Mead.
+    Correct definitions for linedef types 35, 40, 100 and 106 and
+    sector type 11.
+
+  * Game/wad: Doom (all versions), Heretic and Strife:
+      + Linedef type 68 is now described as "raise floor" and not
+        "lower floor". This error can be traced back to... DEU 5.21.
+      + Linedef types 36 and 98 are now described as "lower turbo
+        floor" instead of "lower floor fast". The UDS inaccurately list
+        these types (as well as 70 and 71) as "fast", even though
+        they're "turbo" (4 × FLOORSPEED).
+      + Linedef types 70 and 71 are now described as "lower turbo
+        floor" instead of just "lower floor". This one is all mine.
+      + Linedef types 35 and 79 are now described as "light level goes
+        to 35", not "light level goes to 0". The UDS needs a
+        correction.
+
+    Thanks to Barry Mead for pointing out these errors.
+
+  * Misc: Finished the alternative (black-on-white) colour scheme. To
+    use it, compile with CXXFLAGS=-DWHITE_BACKGROUND. There are a few
+    remaining problems in view*.
+
+  * Misc: Fixed geometry problems in Input2Numbers() (as used in Rotate
+    And Scale Objects, Insert Rectangle, etc.).
+
+Yadex 1.6.0 (2003-04-01)
+
+  * BSP: Removed the old buggy patched up BSP 2.3. People should
+    download BSP 5 from http://doombsp.sourceforge.net/, which is a
+    much better nodes builder.
+
+  * Build: Changed the "! grep" command in the makefile so that it does
+    not match itself. Also added a dummy "true;" in front of it because
+    GNU make 3.76.1 does not seem to like commands that begin with "!"
+    (says "Error 1" and bails out).
+
+  * Build: Removed the empty lines in the makefile's output. Small
+    fixes w.r.t. $(HAVE_GCC), "make showconf" and elsewhere.
+
+  * Build: As scripts/ftime can't be shared across builds, it's now put
+    in obj/0/, making it possible to build for different architectures
+    from the same tree without having to type "make clean" between the
+    builds.
+
+  * Build: Not using "test -e" anymore in the makefile. This should fix
+    build problems on OpenServer, UnixWare, Solaris and other unices
+    with a non-POSIX /bin/sh. Thanks to Udo Munk and Oliver Kraus for
+    telling me about it.
+
+  * Build: "make clean" and "make dclean" now remove obj and dobj
+    respectively. This is for UnixWare where reportedly "ln -sf" does
+    not overwrite dangling symlinks. Thanks to Udo Munk for warning me
+    about it.
+
+  * Build: "make clean" now removes the doc directory as suggested by
+    Udo Munk.
+
+  * Build: The man page is now named yadex-VERSION. "yadex" is a
+    symlink to the above. This means that the day you install version
+    1.7, you will still have access to the man page of version 1.6 by
+    typing "man yadex-1.6.0".
+
+  * Build: The system fingerprint is now much shorter to avoid build
+    errors on QNX where the native fs limits file names to 48
+    characters.
+
+  * Build: Files installed by "make install" are now owned by the user
+    who ran "make install", instead of the user who ran "make".
+    Typically, when installing in /usr/local, files are now owned by
+    something like root:root instead of user:user.
+
+  * Build: Files installed by "make install" now have their mode forced
+    to something sensible (i.e. 755 or 644), regardless of whatever
+    umask the users who built and installed happen to have.
+
+  * Build: Use "rm -f new && ln -s old new" instead of "ln -sf old new"
+    for compatibility with Solaris 2.6 where reportedly "ln -sf" does
+    not overwrite the destination.
+
+  * Build: New configure script. "Not the famous GNU autoconf, but an
+    incredible simulation".
+
+    Installing in an other directory than /usr/local is now done by
+    giving ./configure the --prefix option. The old method (overriding
+    the PREFIX makefile variable) is not supported anymore.
+
+    Some configuration variables (whether gettimeofday(), nanosleep(),
+    snprintf() and usleep() are present) are now detected automatically
+    by configure.
+
+    Others (CFLAGS, CXXFLAGS, LDFLAGS, X11LIBDIR and X11INCLUDEDIR) are
+    still set in the Makefile.
+
+  * Build: Removed the merging of stderr with stdout from the makefile
+    recipes. It was just a commodity and nobody else does that.
+
+  * Build: The compilation and linking recipes in the makefile now
+    print the actual commands being run. Now that the defines are
+    passed via config.h and not on the command line, command length is
+    not as big an issue as it used to be.
+
+  * Code: Changed the input event type from int to unsigned short to
+    avoid wasting too much space in the menus.
+
+  * Code: Fixed bug in hextoi() : due to a typo, upper case letters in
+    hexadecimal numbers were evaluated to 75 instead of 10 through 15.
+
+  * Code: Used mkstemp() instead of tempnam() to shut warning on
+    FreeBSD (thanks to Colin Phipps for the report) and with recent
+    versions of Glibc. While I was at it, changed the temporary file
+    name prefix from "{DEU}" to "$TMPDIR/yadexswp??????" (or "/tmp/
+    yadexswp??????" if $TMPDIR is not set).
+
+  * Code: Certain variables have been changed from integer to unsigned
+    integer. Better syntax checking for unsigned integers. Trailing
+    spaces no longer cause syntax errors.
+
+  * Code: The diff distribution is now made with "diff -a" to cope with
+    binary files that change between versions. Thanks to Ouafae Kotby
+    and Benjamin Bayart for telling me about this flag.
+
+  * Code: The diff distribution is now a single gzipped file instead of
+    a tarball (the README has been inlined).
+
+  * Code: Changed all occurrences of "gray" to "grey" since apparently
+    "gray" is an americanism.
+
+  * Code: Fixed bug in Img::resize() when new width × height was the
+    same as old width × height. Spotted by IvL.
+
+  * Code: Fixed x/y mix-up in DrawScreenText(). Spotted by IvL.
+
+  * Code: Protected against inadvertent assignment or copy-construction
+    of classes for which those actions are not implemented by declaring
+    the corresponding methods private and not defining them.
+
+  * Code: Removed non-portable "t" fopen() mode qualifiers.
+
+  * Command-line: Options --help and --version now check for write
+    errors and exit with a non zero status should the occasion arise.
+
+  * Doc: FAQ fixes. Updated the "supported games" section.
+    Clarifications, additions and corrections in the misc. op.
+    sections.
+
+  * Doc: The welcome banner suggests "c" (instead of "c levelname"
+    which is not implemented).
+
+  * Doc: Added complete copyright information to the man page and
+    "about" box. Author section in man page now gives proper credit to
+    contributors.
+
+  * Doc: Updates to the hacker's guide.
+
+  * Doc: s/ftp.cdrom.com/3darchives.in-span.net/g
+
+  * Doc: users_guide.html has numbered heading and working links in the
+    TOC. Overhauled the sections about configuration and game
+    definition files.
+
+  * Editing: Make linedef single-sided: the lower and upper texture are
+    cleared. The middle texture is set to the default.
+
+  * Editing: Found a funny bug; if you tried to highlight a
+    way-off-screen sector at a high (> 3) zoom factor, sometimes the
+    sector actually appeared on the window, even though it was supposed
+    to be a few thousand pixels off-screen. I don't know if the
+    "oddity" is in Xlib, in the X server or in my video card but,
+    interestingly, the symptoms show up only when drawing horizontal or
+    vertical lines on the window, not when drawing oblique lines or on
+    the pixmap.
+
+    Since it only occurs at high zoom factors, it must be some sort of
+    overflow error though it doesn't look like a 32-bit value being
+    truncated to 16 bits because the values are too small. Strange. I
+    dumbly worked around it by skipping off-screen objects.
+
+  * Editing: A linedef, thing or vertex is highlighted if the pointer
+    is within 15 pixels of it. Previously, the threshold was 20 map
+    units which was too narrow at low zoom factors and too broad at
+    high zoom factors. This change makes drawing selection boxes in
+    crowded areas much easier than before.
+
+  * Editing: Configuration variables thing_fudge and vertex_fudge are
+    gone, since they've been made irrelevant by changes in the
+    highlighting code.
+
+  * Editing: If the pointer is within highlighting distance of more
+    than one thing, the one that is highlighted is the one in which the
+    pointer is, or the one that has the smallest radius, or the one
+    whose centre is nearest. Previously, the lowest-numbered one was
+    highlighted, making it impossible to select, say, a high numbered
+    baron standing in the same spot as an arachnotron.
+
+  * Editing: Restored [Shift][Ins] that was inadvertently disabled
+    during the port to X. Thanks to Ingo van Lil for reporting this
+    bug.
+
+  * Editing: If a linedef has a negative tag, tagged sectors are now
+    shown.
+
+  * Editing: As per Ingo van Lil's suggestion, if a linedef is tagged
+    to more than one sector, a "+" is appended to the sector number in
+    the object info window. Similarly, if a sector is tagged to more
+    than one linedef, a "+" is appended to the linedef number in the
+    object info window.
+
+  * Editing: In the object info window, tag 667 is now marked as
+    special. Yadex catches up with that newfangled Doom II thing.
+
+  * Editing: The static text in the object info boxes is now a bit
+    dimmer to make the important information stand out.
+
+  * Editing: Started working on a global mode, where you can work with
+    all types of objects at once, vertices, linedefs, sectors and
+    things. It's toggled by pressing [Ctrl][g] in the editing window.
+    Since it's an experimental feature, it comes with a big fat
+    warning, that you should take seriously. One known bug is that
+    selection is broken is this mode. Overhauled GetCurObject() to make
+    it able to cope with global mode.
+
+  * Editing: [1] through [9] and [0] are now configurable through the
+    new variables "digit_zoom_base" and "digit_zoom_step". The default
+    values are set to roughly emulate the old behaviour but it's now
+    possible to have the zoom factor increase across the keyboard, for
+    instance. Patch by AJA.
+
+  * Editing: New variable "blindly_swap_sidedefs" to prevent Yadex from
+    asking for confirmation when swapping sidedefs. Patch by AJA.
+
+  * Editing: Placeat AJA, it's now possible to toggle the object info
+    boxes with [i]. Toggling the info bar is now bound to [Alt][i].
+
+  * Editing: The "Info bar" item has been moved from the "Help" menu to
+    the "View" menu. Fixed misplaced underscore in linedef "Misc" menu.
+    Fixed misplaced tick marks (thanks to Ingo van Lil) and added
+    separations in the "View" menu. Added missing ellipses here and
+    there.
+
+  * Editing: Removed the sudden jump (down) in the size of the vertices
+    when zooming in.
+
+  * Editing: Sectors are now shown in one of three colours : green for
+    sectors that have a tag, blue for sectors that have a type and cyan
+    for sectors that have both. Previously, all tagged sectors looked
+    the same, whether they had a type or not.
+
+  * Editing: Integer entry: you can now enter hexadecimal or octal
+    numbers by prefixing them with "0x" or "0", as in C. This should
+    make it easier to enter Boom generalized types. You are now allowed
+    to start the number with an explicit plus sign ("+"). The lower
+    limit has been pushed from -32,749 to -32,768. The upper limit has
+    been pushed from +32,749 to +32,767. For consistency with the rest
+    of the interface, if the current entry is invalid, it is shown in
+    red instead of dim grey. You are allowed to type more characters,
+    even if the current entry is invalid ([Return] is still disabled,
+    however). The message in InputIntegerValue() has been changed from
+    "Enter a decimal number" to "Enter a number".
+
+  * Editing: Fixed segfault on "Save as..." on a new level (i.e. opened
+    with the "create" command). This bug was there ever since 1.1.
+
+  * Editing: On a new level (opened with the "create" command), the
+    level name and file name are now remembered so you don't have to
+    enter them again every time you save.
+
+  * Editing: New function "cut a slice out of a sector" to easily split
+    doughnut-shaped sectors. Shortcut is [Ctrl][k]. See
+    users_guide.html for details. Thanks to Jim Flynn for writing a
+    similar function in DETH, which I used as a reference.
+
+  * Editing: Setting things flags by value now allows any value between
+    0 and 65,535 (instead of 1 through 31). The word "decimal" has been
+    removed from the menu item since you can now enter hexadecimal as
+    well.
+
+  * Editing: [n], [p], [<] and [>] work properly even if no object was
+    highlighted.
+
+  * Editing: In linedef mode, linedefs that have no first sidedef, or a
+    bad sidedef number are drawn in red.
+
+  * Game/wad: MBF: changed the radius of the dog from 16 to 12. Thanks
+    to AJA for pointing it out.
+
+  * Game/wad: Boom: added all of Boom's 130 non-generalized linedef
+    types to doom.ygd and doom2.ygd. New "elevator" linedef type group.
+    Many thanks to AJA for typing in the ygd data.
+
+  * Game/wad: Linedef types 33 and 34 were incorrectly labelled "yel"
+    and "red" instead of the other way around. Thanks to Ingo van Lil
+    for pointing this out.
+
+  * Game/wad: Linedef type 96 was incorrectly marked "W1" instead of
+    "WR". Spotted by IvL.
+
+  * Game/wad: Hexen: added to hexen.ygd a couple of things types and
+    most sector and linedef types. Linedefs now have their tag set to
+    arg1. It used to be left uninitialized, which is why so many
+    linedefs were shown in red on the map.
+
+  * Game/wad: Linedef types 105 and 111 had their descriptions
+    reversed. Don't blindly trust the UDS. Spotted by AJA.
+
+  * Game/wad: Gave a sprite to Doom thing type 23 (dead lost soul),
+    SKULK.
+
+  * Game/wad: Strife: definitions for thing types 10, 27, 46, 50, 81,
+    137, 138, 2018, 2019 and 2026.
+
+  * Game/wad: Hexen: definitions for things 122, 124 and 8004.
+
+  * Misc: Flat/patch/sprite/texture viewer: restored ability to save to
+    file by pressing [Shift][F1].
+
+  * Misc: Flat/patch/sprite/texture viewer: not unnecessarily
+    refreshing the whole image window anymore when browsing patches or
+    sprites.
+
+  * Misc: Texture viewer: new bindings [Ctrl][a] [Ctrl][x] to change
+    the number of patches shown.
+
+  * Misc: Most I/O errors occurring while reading wads are now handled
+    gracefully (fewer gratuitous calls to fatal_error()).
+
+  * Misc: The menu code (menu.cc and oldmenus.cc) has been partly
+    rewritten. Made the automatic shortcuts case-sensitive to allow up
+    to 61 entries instead of just 35. Option numbers shortcuts are
+    framed with dimmer square brackets, instead of parentheses.
+    Implemented separations. Two extra pixels of space between lines.
+    Tick marks now look like tick marks, not asterisks. Unticked
+    entries now have a dash in front of them.
+
+  * Misc: The search paths for game definition files and configuration
+    files have changed in several ways.
+
+    Some config file search directories have changed for conformance to
+    the FHS. If the prefix is "/usr/local", the path is now "/etc/
+    yadex" instead of "/usr/local/etc/yadex". If the prefix is "/opt/
+    something", the path is now "/etc/opt/something" instead of "/opt/
+    something/etc/yadex". The practical consequence for the 90% of you
+    who install in /usr/local is that the system-wide config file has
+    moved from /usr/local/etc to /etc.
+
+    Overriding the prefix now actually works for other prefixes than /
+    usr and /usr/local. The problem was that, even though the makefile
+    installed the files in the proper directories, the yadex binary
+    looked for them in /etc, /usr and /usr/local, regardless of the
+    prefix. Thanks to Oliver Kraus and Udo Munk for clueing me in.
+
+    Yadex used to look for files in places where it shouldn't have. For
+    example, it looked for game definition files in /usr even if
+    compiled for /usr/local and vice-versa. Yadex now looks for files
+    only in the places corresponding to the prefix it was compiled for.
+    This makes it possible to have several builds of the same version
+    of Yadex on the same machine without unwanted interactions, as long
+    as they're compiled for different prefixes. Note, however, that /
+    etc/yadex is used by both /usr and /usr/local but that is mandated
+    by the FHS and there's nothing I can do.
+
+    The search directories relative to $YADEX_DIR have been removed
+    from the Unix version (they were intended for DOS).
+
+    See users_guide.html for the exact contents of the new search
+    paths.
+
+  * Misc: Config file: bumped the config file version# from 3 to 4.
+
+  * Misc: Fixed strange reactions to percent character ("%") in the
+    file name entry box.
+
+  * Misc: Slightly less chaotic output in verbose mode.
+
+  * Misc: Fixed a memory leak that occurred when repeatedly reloading a
+    wad. This log entry is particularly delightful because that leak
+    was introduced by me in version 1.5.0 while trying to fix a bug in
+    the same code that was, guess what, an fd leak. For the
+    historically minded, that fd leak goes back to at least DEU 5.21.
+    Try it. It's easily exercised by loading the same wad over and
+    over. After about 20 iterations, you are rewarded with "patch wad
+    file xxx doesn't exist. Ignored.".
+
+  * Misc: Removed from the makefile unflattering comments on bzip2's
+    celerity that came from using an old version.
+
+  * Misc: Decapitalised object type names (GetObjectTypeName()).
+
+  * Misc: Fixed display bug in sector# and sidedef# entry box
+    (InputObjectXref()).
+
+  * Misc: The config file search algorithm has been modified to support
+    multiple config files. The old algorithm was to walk the search
+    path front to back and stop at the first match. The new algorithm
+    is to walk the path back to front and use all the matches. Thus
+    local files inherit parameter settings from global files and still
+    have the possibility to selectively override them (i.e. you can
+    override some parameters and inherit the others).
+
+    For example, assuming /etc/yadex/1.6.0/yadex.cfg contains :
+
+        a = old
+        b = old
+
+    and ./yadex.cfg contains :
+
+        a = new
+        c = new
+
+    the net effect is :
+
+        a = new
+        b = old
+        c = new
+
+    The motivation for the change was to allow users to put most of
+    their settings in global config files, either system wide or
+    per-user. When local files exist, they should contain only the
+    minimum, i.e. just those settings you want to override. This way of
+    doing has several advantages over the previous all-or-nothing
+    system. Obviously, you can now change a setting globally by editing
+    just one file, even if you have many local config files. Upgrades
+    are also smoother because any new variable definitions appearing in
+    global config files propagate even if local config files exist.
+    Finally, it's much easier to figure what local files are meant to
+    do because everything they contain is meaningful.
+
+  * Misc: Removed the start-up message stating that "this program is
+    derived from DEU 5.21 by Raphaël Quinet and Brendon Wyber" (for
+    clarity, not because I'm in denial).
+
+  * Platform: On DOS, the PPM files created by "make_palette_ppm" and
+    "mp2" now have correct CRLF line terminators instead of LFCR.
+
+  * Platform: Wart in gfx.cc to cope with QNX where DisplayWidth() and
+    DisplayHeight() return silly values.
+
+  * Platform: Added support for 16-colour displays. Tested with the
+    XFree86 VGA16 server which, when running in 640x480x16 (VGA mode
+    12h), provides a PseudoColor or StaticColor visual with an 8 bits
+    per pixel pixmap format. If there are any servers that expect a
+    pixmap format with a number of bits per pixel that is not a
+    multiple of 8, they're still unsupported.
+
+  * Platform: Reworked the pixmap format selection code. Should not
+    change anything for most people.
+
+  * Platform: Compiles and runs on HP-UX 10.0 (with GCC 3.0.1).
+
+  * Platform: Compiles on Linux PPC (with GCC 3.1). Thanks to Mark
+    Brown for the patch.
+
+Yadex 1.5.2 (2001-06-30)
+
+  * Platform: Compiles with GCC 3.0 (added std:: qualifiers where they
+    were missing and removed #ifdef inside printf()).
+
+Yadex 1.5.1 (2000-12-12)
+
+  * Platform: One-line fix in menu.cc to please GCC 2.96 (of Red Hat 7
+    fame). Thanks to Zebediah C. McClure for reporting the problem.
+
+Yadex 1.5.0 (2000-08-27)
+
+  * Build: Changed the way the diffs are generated after reading more
+    carefully the patch(1) man page and learning the hard way that it's
+    a very bad idea to put absolute paths in patches.
+
+  * Build: Made it easier to add or remove individual options in CFLAGS
+    and friends.
+
+  * Command-line: New option -b to benchmark parts of Yadex. For
+    hackers only.
+
+  * Command-line: Removed option -e in prevision of reuse for another
+    function.
+
+  * Doc: Completed ygd.html.
+
+  * Doc: Documented the usage of the LINES and YADEX_DIR environment
+    variables.
+
+  * Editing: Things that have an illegal angle are now shown with the
+    angle Doom would see, instead of just a dot in the middle. The
+    emulation is believed to be accurate for angles comprised between 0
+    and 359. Values outside that range have not been tested.
+
+  * Editing: Things flags and linedefs flags now grouped by 4 for
+    readability. For linedefs, the decimal value of the flags field is
+    not shown anymore.
+
+  * Editing: In the object info box, the type and description of the
+    current thing are now display in red if the type is invalid (i.e.
+    not defined in the .ygd).
+
+  * Editing: The things and linedefs flags operations ([a], [b], [c])
+    now set MadeChanges as they should have from the start.
+
+  * Editing: The View menu now contains entries for "Show object
+    numbers" [&] and "Show grid" [h].
+
+  * Editing: The Edit menu now contains entries for "Snap to grid" [y]
+    and "Loc grid step" [z].
+
+  * Editing: Rearranged the sidedef object info windows so that the
+    textures are listed in a more intuitive order (upper, middle, lower
+    instead of middle, upper, lower). Made labels shorter in
+    preparation of the hypothetical inclusion of texture swatches in
+    the future.
+
+  * Editing: Fixed long-standing buglet with the sidedef info saying
+    there are missing upper/lower textures even though both sectors
+    have a "sky" ceiling/floor.
+
+  * Editing: Implemented showing object numbers for linedefs and
+    sectors. The placement of sector numbers is naive and inadequate
+    for sectors that don't have a simple convex shape, but it's still
+    better than nothing. Picked a somewhat brighter colour for object
+    numbers.
+
+  * Editing: Linedef object info box: if the first sidedef is missing,
+    the message "(no first sidedef)" is printed in red instead of dim
+    gray. Same thing for the second sidedef if the "2" flag is set.
+
+  * Editing: Removed careless dereferencing of SideDefs[] for bad
+    sidedef numbers in the sector selection code. I don't think this is
+    what caused the mysterious unreproducible segfault James Caldwell
+    reported, though. Made the object deletion function paranoid
+    (checks that the objects to delete actually exist).
+
+  * Editing: When found superimposed linedefs after merging vertices,
+    the dialog box that asks whether they should be merged now mentions
+    the numbers of the first two superimposed linedefs found instead of
+    a laconic "Some linedefs are superimposed".
+
+  * Editing: Zooming: the zoom factor is now displayed in percent, 100%
+    being 1/1.
+
+  * Editing: Zooming: the zoom factors are now regularly spaced, with a
+    ratio of 1.414 between them. This removes the annoying "jump"
+    between the zoom factors greater than 1/2. It also fixes the
+    oddities that happened when zooming in after [`]. The ratio between
+    zoom factors can be controlled through the new parameter
+    "zoom_step".
+
+  * Editing: Zooming: the "zoom" parameter has been replaced by the new
+    parameter "zoom_default". The latter is expressed in percent, not
+    in 1/n units. It's now possible to specify an initial zoom factor
+    of more than 1/1. When opening a new window, Yadex now adjusts the
+    zoom factor so that the level fills the window. Should you want to
+    revert to the old behaviour, you can do it by setting zoom_default
+    to 12.
+
+  * Editing: ['] and [`] now go to the current centre of the level
+    (they used to go to where the centre was when the level was opened
+    or created).
+
+  * Editing: [`] now has a menu item (View -> Whole level).
+
+  * Editing: The grid has changed. There are now dots every step map
+    units, dim lines every 4×step units, normal lines every 16×step
+    units and bold lines every 64×step units. The new grid is supposed
+    to be less obtrusive visually, faster to display and more distinct
+    when scrolling.
+
+  * Editing: New function to swap floor and ceiling flats of selected
+    sectors (Misc. operations -> Swap flats).
+
+  * Editing: When not in things mode, things are drawn in a dimmer
+    shade of gray and do not hide the linedefs anymore.
+
+  * Game/wad: Removed the "-g wolf" bit. [For those who still haven't
+    got it : the support for Wolfenstein 3D announced in the CHANGES
+    for version 1.4.0 was of course a hoax, 1.4.0 having been released
+    on April 1st.] Hope you've been having as much fun as I have. :-)
+
+  * Game/wad: Heretic: made the golem leader ghost, undead warrior
+    ghost and golem ghost look a little more ghostly. Made the gargoyle
+    leader, golem leader and golem leader ghost look different from
+    their vanilla counterparts by using sprites IMPXD and MUMMY.
+    Assigned a sprite to things 31 and 32 (enchanted shield, SHD2 and
+    mystic urn, SPHL).
+
+  * Game/wad: Heretic: corrected things radii in heretic.ygd, using
+    info2ygd and the Heretic source as a reference. Almost all radii
+    were wrong, a few grossly so (maulotaur, ironlich and gargoyle).
+
+  * Game/wad: Strife: many new things and linedef types thanks to Matt
+    Miller.
+
+  * Game/wad: Doom alpha 0.4: definitions for thing types 2020, 2036,
+    2038 and 2046.
+
+  * Game/wad: Updated format comments in *.ygd.
+
+  * Game/wad: Sprites in pwads now supported (between S_START/S_END or
+    SS_START/SS_END or SS_START/S_END). This fixes Yadex's failure to
+    show redefined sprites in alitcsf.wad, basilica.wad and
+    strifed1.wad. A few Aliens TC sprites don't work yet but it's for a
+    different reason (DEH).
+
+  * Game/wad: Sprites now shown on the map when in things mode. You can
+    switch between sprites and squares with View -> Show sprites [%].
+    New config file parameter "sprite_scale" to adjust the scale at
+    which sprites are displayed (default 100%).
+
+  * Game/wad: The right sprite is shown, even if the sprites are not in
+    alphabetical order in the wad (cf BARWA0 in Strife).
+
+  * Game/wad: The function to add pwads (be it from the command line or
+    with the "r" command) has been heavily reworked. It's more robust
+    and handles errors better. It does not leak file handles anymore
+    when you add the same pwad more than once. It also accepts to add
+    iwads, modulo a warning (though you should expect problems later if
+    you do that). The merging of the pwad directory into the master
+    directory is still lousy.
+
+  * Game/wad: Fixed duplicate entries in the flat selector. This bug
+    was found by "Ras2". It happened whenever you added the same flat
+    thrice or more.
+
+  * Game/wad: EDGE: added definitions for EDGE linedef types and things
+    types to doom.ygd and doom2.ygd. Thanks to Andrew Apted for
+    providing the ygd data.
+
+  * Game/wad: EDGE: in sector mode, show information for EDGE
+    extrafloors if there are any.
+
+  * Misc: A couple of calls to fatal_error() were turned into calls to
+    report_error() (don't abort).
+
+  * Misc: New game definition file directive "sky_flat" to specify the
+    name of the "sky" flat. Replaced all occurrences of F_SKY1 by
+    references to this parameter. Fixes Check -> Check for missing
+    textures for Hexen and Strife. Bumped game definition file version#
+    to 4.
+
+  * Misc: Because it seems to disturb people (and for the pleasure of
+    proving Matt wrong), I've made the texture selector clip textures
+    to size. Since there's no scrolling/zooming system yet, I also
+    enlarged the viewing area from 256×128 to 512×256 to alleviate the
+    lossage on large textures.
+
+  * Misc: Removed the "Press Shift-F1 to save image to file" text in
+    the selector. It's been a no-op ever since 1.0, anyway.
+
+  * Misc: In the selectors, pressing [F1] prints the location of the
+    current item to stdout (file name and offset). Works with flats,
+    patches and sprites but not textures. It's there to help trace Ras'
+    bug.
+
+  * Misc: Made LoadPicture() nicer and safer. It gracefully bails out
+    if there are more than 20 errors on a single picture. It does not
+    make Yadex abort anymore on read errors in the header or column
+    offset table. I've done this by modifying wad_read_i16() and
+    wad_read_i32() so other functions might have been impacted.
+
+  * Misc: Config file: commented out most settings (this has no visible
+    effect since those settings were just reiterations of the default
+    values built into the executable). Also changed the initialization
+    code so that Yadex can run without a config file.
+
+  * Misc: Config file: unknown variables are ignored with a warning
+    instead of triggering a fatal error. The intent is to facilitate
+    sharing config files between versions.
+
+  * Misc: Config file: bumped version# to 3.
+
+  * Misc: Made Yadex use YADEX_GAME as documented and not Y_GAME.
+    Oops !
+
+  * Misc: New feature in the flat/picture/sprite selector to show where
+    the current image comes from (file name and file offset). For
+    debugging.
+
+  * Misc: The window size (width/height and -w/-h) can now be expressed
+    in percent of the screen size, by appending a "%" to the value. The
+    default size, instead of being 640×480 in the executable and 900×
+    600 in the config file is now 90%×90%. It's still possible to give
+    absolute width and heights, of course.
+
+  * Misc: No tantrum thrown if the game definition file contains no
+    thing directive.
+
+  * Misc: Removed the check for sector headroom being < 1024 in Checks
+    -> Check for missing textures. It was sometimes annoying and
+    inaccurate anyway.
+
+  * Platform: Images display correctly on packed 24-bit X servers (i.e.
+    bits_per_pixel actually is 24 and not 32). The scanline_pad member
+    of the ScreenFormat structure is now honoured (not that XFree86
+    seemed to mind much when it wasn't).
+
+  * Platform: Began to clean the code up to make porting less
+    difficult.
+
+  * Platform: Added patch to get Yadex to compile with GCC 2.7 (patch/
+    gcc-2.7.diff). GCC 2.7 is officially considered unsupported,
+    though. You're on your own.
+
+Yadex 1.4.0 (2000-04-01)
+
+  * Command-line: The parsing of the command line arguments is now
+    case-sensitive. Yes, that's right, it used to be case-insensitive.
+    I never knew. I just realized it by accident. DOS is not dead.
+
+  * Doc: The man page now has an "OPTIONS" section.
+
+  * Doc: Three new makefile targets, man, dvi and ps, for people who
+    hack the doc.
+
+  * Editing: Made object numbers slightly more legible in crowded
+    areas.
+
+  * Game/wad: Added support for Wolfenstein 3D (-g wolf).
+
+  * Misc: The code that parses the configuration file is smarter and
+    its error messages are more informative. Doesn't choke anymore on a
+    line containing just spaces or on comments not starting on
+    column 1. Thanks to "Ras2" for reporting the bug.
+
+  * Misc: New commands "viewtex" and "viewflat" so that you can browse
+    textures and flats without having to open a level. This is
+    primarily useful to me, for testing purposes.
+
+  * Misc: More sanitization : the parsing of the configuration file is
+    now case-sensitive when matching option names and values ("yes"/
+    "no", "true"/"false", "on"/"off").
+
+  * Misc: The flat/patch/sprite/texture viewer does not flicker
+    anymore, and is somewhat faster when viewing textures. The list of
+    names in the flat viewer has grown from 3 to 5 lines.
+
+  * Misc: The diffs are now in unified format (supposedly just as good
+    and IMHO clearer).
+
+Yadex 1.3.2 (2000-01-14)
+
+  * Build: Oops ! I had forgotten to set CC and CXX back to their
+    "sane" values before cutting the 1.3.1 tarball.
+
+  * Code: "make dist" now also generates a diff.
+
+Yadex 1.3.1 (2000-01-12)
+
+  * Build: Fix for "Ras2"'s compile error with g++ 2.7.2.3 :
+
+      c++ src/disppic.cc
+      In file included from /usr/include/g++-2.7/defalloc.h:24,
+                       from /usr/include/g++-2.7/map.h:21,
+                       from /usr/include/g++-2.7/map:6,
+                       from src/patchdir.h:35,
+                       from src/disppic.cc:33:
+      /usr/include/g++-2.7/algobase.h:47: macro `min' used with too many (3) args
+      /usr/include/g++-2.7/algobase.h:57: macro `max' used with too many (3) args
+      make: *** [obj/0/disppic.o] Error 1
+
+  * Build: Fix for HAVE_NANOSLEEP being always false. Thanks to "Ras2"
+    for pointing it out.
+
+Yadex 1.3.0 (2000-01-11)
+
+  * Build: The makefile now honours the dependencies in yadex.dep.
+
+  * Build: Support for FHS-compliant systems: "make install" now copies
+    the man pages into /usr/local/share/man/man6/ if /usr/local/share/
+    man/ exists. If not, it still uses /usr/local/man/man6/ (requested
+    by Joseph Carter).
+
+  * Build: Added "#include <stddef.h>" to fix compilation error on
+    wads.cc under Solaris.
+
+  * Build: Downgraded the makefile and scripts to use the old backquote
+    syntax for command substitution, because Oliver Kraus' reports
+    suggest that the Solaris sh does not understand the "$()" syntax.
+    Barfulation !
+
+  * Build: New makefile target showconf that shows the value of all the
+    important macros as well as the output of certain commands. If you
+    have trouble compiling Yadex, mail me the output of "make
+    showconf".
+
+  * Build: A bunch of little changes in the makefile to try to make
+    build problems on Solaris go away.
+
+  * Doc: Fixed several discrepancies in README.
+
+  * Game/wad: Support for the german edition of Doom II (as the iwad
+    has no MAP31 and MAP32, Yadex 1.1.0 and 1.2.0 used to say "this is
+    the shareware version of the game").
+
+  * Game/wad: Replacement patches in pwads are now supported, even if
+    between PP_START and PP_END. Fixes failure to see redefined
+    textures with mbfedit!.wad, alitcwad.wad and certainly many others.
+    Replacement patches in pwads not between P_START/P_END or PP_START/
+    PP_END are not recognized anymore. Many PNAMES errors that would
+    have made previous versions of Yadex abort now just make it print
+    warnings.
+
+  * Misc: Cleaned up the web page source and makefile. Added
+    documentation, should someone else take over maintainership. No
+    harm in dreaming.
+
+  * Misc: New command viewpat to browse through the patches.
+
+  * Misc: It's now possible to have several different versions of Yadex
+    installed simultaneously. Some paths have changed :
+      + $(PREFIX)/share/games/ is now $(PREFIX)/share/games/yadex/$
+        (VERSION)/
+      + $(PREFIX)/etc/yadex.cfg is now $(PREFIX)/etc/yadex/$(VERSION)/
+        yadex.cfg
+      + ~/yadex.cfg is now ~/.yadex/$(VERSION)/yadex.cfg
+      + $(PREFIX)/bin/yadex changed to $(PREFIX)/bin/yadex-$(VERSION)
+      + $(PREFIX)/bin/ybsp changed to $(PREFIX)/bin/ybsp-$(VERSION)
+      + $(PREFIX)/bin/yadex is now a symlink pointing to yadex-$
+        (VERSION)
+      + $(PREFIX)/bin/ybsp is now a symlink pointing to ybsp-$(VERSION)
+
+    The insertion of a yadex/ component in the paths was done for two
+    reasons. In the first place, it was requested by Joseph Carter for
+    game definition files, to reduce clutter in $(PREFIX)/share/games/.
+    I extended it to configuration files because it I thought it was a
+    nice way not to clutter $(PREFIX)/etc/. On the other hand, it was
+    not done for man pages and executables because it would have
+    interfered.
+
+  * Misc: Fixed bug where if you typed "yadex: c level", then created
+    or edited a level and then closed the editing window, you got a
+    dozen of messages like this one : "Warning: error freeing colour
+    00005820h (BadAccess (attempt to access private resource denied))".
+    I hope this fixes the related item in TODO.
+
+Yadex 1.2.0 (1999-11-23)
+
+  * BSP: Added missing newline in banner.
+
+  * BSP: Silenced GCC 2.95.2 warnings about implicit braces.
+
+  * Build: The makefile doesn't rebuild doc/ every time a source file
+    is changed anymore.
+
+  * Build: Can now be built on machines where Perl is not installed.
+
+  * Build: The doc can now be built on machines with a non-GNU find.
+
+  * Build: Fixed compilation errors with GCC 2.95.2 in src/infobar.cc.
+
+  * Build: Silenced most GCC warnings.
+
+  * Code: Fixed a typo in the legal notices at the beginning of the
+    source files.
+
+  * Doc: HISTORY renamed as CHANGES, since that seems to be a more
+    widespread convention.
+
+  * Editing: The checks don't beep for every error anymore, just the
+    first one.
+
+  * Editing: Object info window: the sprite and flats graphics don't
+    flicker anymore when the pointer moves from one object to another.
+    Besides, if the sprite is not found, displays the message
+    "sprite_name not found" instead of just a blank area.
+
+  * Game/wad: Doom alpha & press release versions: it's now possible to
+    save levels. Note: they're saved to regular Doom format, not Doom
+    alpha format.
+
+  * Game/wad: Doom II: The boss shooter thing now has a sprite
+    (BOSFB0).
+
+  * Game/wad: Hacx and Aliens TC: fixed a bug that made Yadex segfault
+    when trying to edit a Hacx level (or alitcsf.wad from alntc19
+    {a,b}.zip).
+
+  * Game/wad: For homogeneity with DeuTex, less confusion and to reduce
+    the risk of conflicts with other applications, the game names for
+    Doom alpha 0.2, Doom alpha 0.4, and Doom alpha 0.5 are now
+    "doom02", "doom04" and "doom05" respectively instead of "alpha02",
+    "alpha04" and "alpha05". It follows that some command-line options
+    have changed :
+      + "-g alpha02" is now "-g doom02",
+      + "-g alpha04" is now "-g doom04",
+      + "-g alpha05" is now "-g doom05".
+
+    Configuration file directives :
+      + "game = alpha02" is now "game = doom02",
+      + "game = alpha04" is now "game = doom04",
+      + "game = alpha05" is now "game = doom05".
+
+    Paths :
+      + /usr/local/share/games/alpha02/ is now /usr/local/share/games/
+        doom02/,
+      + /usr/local/share/games/alpha04/ is now /usr/local/share/games/
+        doom04/,
+      + /usr/local/share/games/alpha05/ is now /usr/local/share/games/
+        doom05/,
+      + /usr/local/share/games/alpha02.ygd is now /usr/local/share/
+        games/doom02.ygd,
+      + /usr/local/share/games/alpha04.ygd is now /usr/local/share/
+        games/doom04.ygd,
+      + /usr/local/share/games/alpha05.ygd is now /usr/local/share/
+        games/doom05.ygd.
+
+  * Game/wad: Fixed Yadex aborting when trying to view textures for
+    versions of Strife >= 1.1. The problem was that Strife 1.1 and
+    above use a different format for the TEXTURE1 and TEXTURE2 lumps
+    (Strife 1.0 uses the same format as Doom). New game definition file
+    directive "texture_format strife11" to support that format.
+    strife.ygd now contains "texture_format strife11". Added
+    strife10.ygd that is identical to strife.ygd except that it
+    contains "texture_format normal". Summary :
+
+      + if you have the Strife 1.0 iwad, use "-g strife10" or "game =
+        strife10",
+      + if you have Strife 1.1 or above, use "-g strife" or "game =
+        strife".
+
+    Thanks to Kim Parrott for reporting the bug and Len Pitre for
+    pointing me in the right direction.
+
+  * Misc: The "dump" command now prints correctly the last line even if
+    the length of the lump is not a multiple of 16.
+
+  * Misc: For homogeneity with DeuTex, the following game definition
+    file directives have changed :
+      + "texture_format alpha04" is now "texture_format nameless",
+      + "texture_lump texture1" is now "texture_lump normal",
+      + new choice "texture_lump none".
+
+  * Misc: For homogeneity with DeuTex, automatic texture names for Doom
+    alpha 0.4 are now "TEXnnnn" where nnnn is zero-based.
+
+  * Misc: Bumped game definition file version# to 3.
+
+  * Misc: When trying to use a pwad as iwad, emit a warning instead of
+    seeing this as a fatal error.
+
+  * Misc: Added a palette viewer (PLAYPAL and COLORMAP). Can be run
+    from the prompt with the viewpal command or from the level editing
+    window with [Ctrl][P].
+
+  * Misc: The sometimes tedious pwad loading messages are not displayed
+    anymore, unless in verbose mode. By default, Yadex now just prints
+    which levels the pwad contains.
+
+Yadex 1.1.0 (1999-08-22)
+
+  * BSP: Included Colin Phipps' fix for the bugs in bsp23bug.zip.
+
+  * BSP: Renamed the executable and the man page as ybsp, to avoid
+    having Yadex and Xwadtools overwrite each other's BSP.
+
+  * BSP: The whirling baton is now disabled if stderr is not a TTY.
+    This is the same thing Udo Munk did for Xwadtools' BSP with the
+    -noprog option except that here it's automatic.
+
+  * BSP: Made the man page spell out exactly which version of BSP this
+    is.
+
+  * BSP: Inserted notice in the banner that this is the version that
+    comes with Yadex. In the online help, replaced "TMP.WAD" by the
+    correct "tmp.wad".
+
+  * Building: Fixed compilation error on line 44 of bitvec.h.
+
+  * Code: Removed CR characters that remained in some of the source
+    files.
+
+  * Code: New function DrawScreenString(). Began to use it instead of
+    DrawScreenText(). This should squash some latent bugs, for example
+    regarding flat and texture names containing percent signs (%).
+
+  * Code: Fixed constness warnings in cfgfile.cc.
+
+  * Code: Replaced most occurrences of hard-coded 8 by one of WAD_NAME,
+    WAD_FLAT_NAME, WAD_PIC_NAME and WAD_TEX_NAME.
+
+  * Code: New directives level_format and level_name in the YGD files.
+    As a result, been able to remove most tests on specific values of
+    the game parameter.
+
+  * Doc: Too many changes and additions to list. Since the last
+    release, the HTML doc has doubled in size (from 80 kB to 160 kB).
+    Added a dozen of screenshots.
+
+  * Doc: In an attempt to make it easier to find what you're looking
+    for, I've split the doc in a larger number of files, referred to by
+    a top level index.html.
+
+  * Doc: Moved the HTML doc and the man pages to the doc/ directory, so
+    as not to clutter the base directory too much.
+
+  * Doc: Man pages: the first argument of the .TH macro (the name) is
+    now all caps since that's what (almost) everybody else does.
+
+  * Editing: Autoscroll is now off by default -- use "autoscroll =
+    true" in yadex.cfg if you want it back.
+
+  * Editing: New bindings [e] and [Ctrl][e] to select all linedefs that
+    belong to the same non-forked path.
+
+  * Editing: New bindings [E] and [Ctrl][Shift][e] to select all
+    single-sided linedefs that belong to the same non-forked path.
+
+  * Editing: New functions to flip and mirror linedefs, sectors, things
+    and vertices.
+
+  * Editing: Fixed the "string art" bug. That was a subtle bug that
+    happened only as a result of a rare chain of events. The recipe to
+    it is to render a vertex unused (for example by deleting all the
+    linedefs that use it), save the level, make a change that does not
+    call for a rebuilding of the nodes (for example, moving a thing or
+    changing an attribute of a sector), save the level, quit and load
+    again. At that point, a nice surprise awaits you: the linedefs are
+    all entangled (hence the name). Spectacular, and even beautiful,
+    but also very annoying if you don't have a backup copy of your
+    level.
+
+    This is the same bug I thought I had fixed in Yadex 1.0.0_alpha3.
+    In fact, I had cut one of the paths that led to it but the bug
+    itself was still there. It reappeared in february 1999.
+
+  * Editing: Fixed an old DEU bug where you sometimes couldn't select a
+    newly created sector to the west of the level until you saved.
+
+  * Editing: It's now possible to toggle linedef flags 8-15 and to
+    specify linedef flags field values greater than 511.
+
+  * Editing: It's now possible to set/clear/toggle things flags 7-15.
+
+  * Editing: Made the Not-enough-player-starts and
+    Not-enough-deathmatch-start dialogs on saving more intuitive (it
+    was about time).
+
+  * Editing: New function "Exchange objects numbers".
+
+  * Editing: Things types are now displayed in decimal, not in
+    hexadecimal. Other minor cosmetic changes.
+
+  * Editing: The focus-on-object function now works much better. It
+    does not land off-target or zoom in excessively anymore.
+    Superimposed things and sectors containing other sectors or not
+    containing their own centre don't confuse it anymore. It's still
+    fooled by unclosed sectors, though.
+
+  * Editing: Changed the meaning of [q]. It used to save and quit. Now
+    it just quits (same thing as [Esc]).
+
+  * Editing: The edit command can now edit levels of any name. If you
+    had a wad with a level named "FOO" in it, you could edit that level
+    by typing "edit foo". In case you're wondering, no there's no
+    practical application to this (beyond experimenting).
+
+  * Editing: Reminder to build nodes: the message is now more specific.
+
+  * Editing: Command mode: typing ^D at the prompt now works.
+
+  * Editing: Insert linedef and split sector: the new linedef now goes
+    from the first selected vertex to the second and not the other way
+    around.
+
+  * Editing: Insert linedef and split sector: does not loop forever
+    anymore if there are forks in the edge of the sector (for example
+    like when trying to split between vertices 283 and 278 of MAP01 of
+    Doom II).
+
+  * Editing: [n], [p], [>] and [<] now move the view so that the object
+    to highlight is under the pointer.
+
+  * Editing: The messages displayed when loading pwads are more compact
+    (several lumps are printed on the same line and groups of sprites
+    are collapsed). The end marker for groups of flats, patches and
+    sprites is now printed.
+
+  * Editing: Flat/sprite/texture viewer : added bindings [Ctrl][u] and
+    [Ctrl][w] to erase to start of line, [Ctrl][f] and [Ctrl][v] to
+    page down and [Ctrl][b] to page up.
+
+  * Editing: Flat/sprite/texture viewer : added bindings [Ctrl][PgUp]
+    and [Ctrl][PgDn] to move to top and bottom of list, because [Home]
+    and [End] will eventually cease to be available for that (they will
+    be bound to SOL and EOL).
+
+  * Editing: Flat/sprite/texture viewer : made [Up] and [Down] work
+    even when there are duplicate names.
+
+  * Editing: Flat/sprite/texture viewer : InputNameFromListWithFunc()
+    is now genuinely case insensitive. The positioning in the list of
+    names is now correct, even if the name given is lower-case.
+
+  * Editing: Flat/sprite/texture viewer : reduced flickering (still
+    room for improvement, though).
+
+  * Editing: Flat/sprite/texture viewer : the current name was way too
+    dim if not in the list. Fixed.
+
+  * Editing: Flat/sprite/texture viewer : made image window 320x200
+    instead of 256x128.
+
+  * Editing: Sprite viewer : new bindings [Ctrl][n] and [Ctrl][p] to go
+    to start of next/previous group of sprites.
+
+  * Editing: Sprite viewer : fixed display bug.
+
+  * Editing: Spectres now look more like spectres.
+
+  * Editing: Confirm-or-cancel dialogs: more intuitive. You can now
+    confirm with [y] or [Return] and cancel with [n] or [Esc]. All
+    other keys are ignored (previously, [y] confirmed and all other
+    keys cancelled). Expose events are now handled (previously they
+    were ignored).
+
+  * Editing: Some abnormal conditions that used to trigger fatal errors
+    now just cause a message error to be printed. The current operation
+    is aborted but not the whole program anymore.
+
+  * Game/wad: Fixed segfault on levels containing a thing of type 0
+    (like Eternal MAP25 and some Final Doom maps).
+
+  * Game/wad: When reading a level from a wad, now verifies that the
+    SECTORS, THINGS, VERTEXES, LINEDEFS and SIDEDEFS lumps have correct
+    sizes and that sidedefs, sectors and vertices references are
+    correct.
+
+  * Game/wad: Final Doom : should be supported now. Yadex does not
+    assume anymore that F1_START is always present, which caused it to
+    segfault on either or both Final Doom iwads.
+
+  * Game/wad: Heretic : added sprite names for 58 thing types.
+
+  * Game/wad: Hexen : added very partial support (-g hexen). You can
+    edit levels but not save them. Hexen-specific linedef and things
+    fields are ignored, and so is the BEHAVIOR lump. Most definitions
+    are missing.
+
+  * Game/wad: Strife : added partial support (-g strife). Yadex now
+    knows about the translucent linedef flag and the new sector types.
+    Thanks to Len Pitre for the help. Still missing : the new things
+    flags, most things types and linedefs types. Anybody wants to work
+    on strife.ygd ?
+
+  * Game/wad: MBF : supported. Yadex now knows about the friendly thing
+    flag, thing type 888 (Dog) and linedef types 271 and 272 (transfer
+    sky texture).
+
+  * Game/wad: Doom press release pre-beta : supported (-g doompr).
+    Added support for the PR picture format and the definitions for
+    things 2016 (evil sceptre) and 2017 (unholy bible).
+
+  * Game/wad: Doom alpha : read-only support (-g alpha02|alpha04|
+    alpha05). Added support for the alpha picture format, the TEXTURES
+    lump, the different level format and the incompatible level names
+    (E1M10 through E1M13).
+
+  * Game/wad: Added support for FF_START/FF_END in addition of FF_START
+    /F_END. As a result, Yadex does not barf anymore on basilica.wad
+    (but issue a warning). F?_START is not supported anymore ; it has
+    to be FF_START.
+
+  * Game/wad: Made "Post too long. Wad file might be corrupt" a
+    warning, not a fatal error anymore.
+
+  * Game/wad: New directives picture_format, texture_format and
+    texture_lump in the YGD files, to support Doom alpha and Doom PR.
+
+  * Misc: New command make_palette_ppm to generate a raw PPM file
+    containing all the colours of the palette.
+
+  * Misc: Cosmetic changes in the prompt and character mode interface.
+
+  * Misc: make_gimp_palette : the generated palette files now include
+    RGB values in the comments.
+
+  * Misc: Removed from the menus the functions that were not
+    implemented (File->Print, Edit->Find, View->3D preview).
+
+  * Misc: Failure to load the specified X font is not a fatal error
+    anymore.
+
+  * Misc: New command line options --help and --version.
+
+  * Misc: Bumped game definition file version# to 2.
+
+  * Platform: Removed dependency on nanosleep(), strcasecmp() and
+    strncasecmp(). Thanks to Udo Munk for pointing out that nanosleep()
+    is not always available.
+
+  * Platform: Now compiles with other compilers than GCC/EGCS without
+    modifying the makefile.
+
+  * Platform: New parameter idle_sleep_ms to set the time in ms between
+    polls of the X server when the input queue is empty.
+
+  * Platform: Previously, if the CPU and the X server had different
+    endiannesses and the screen depth was more than 8 bits, sprites,
+    flats and textures were displayed with wrong colours. This is now
+    fixed.
+
+  * Platform: The build, group, insert and save commands should now
+    work correctly on big-endian machines.
+
+  * Platform: The bell has been resurrected on X.
+
+  * Platform: Should now compile on X11R5 systems (to be verified).
+    Thanks to Udo Munk for the fix.
+
+Yadex 1.0.1 (1999-01-02)
+
+  * Doc: New sections "Moving around" and "Other credits" in the user's
+    guide.
+
+  * Editing: Split linedefs and sector: new linedef now goes from 1 to
+    2 and not the other way around.
+
+  * Editing: Added scrolling with the arrow keys.
+
+  * Editing: [Pgup], [Pgdn], [Home] and [End] now scroll one page at a
+    time.
+
+  * Editing: New variable autoscroll to disable autoscrolling.
+
+  * Editing: New variables autoscroll_amp and autoscroll_edge to tweak
+    autoscrolling.
+
+  * Editing: New shortcut [x] to "Split linedef (insert new vertex)".
+
+  * Editing: New shortcut [w] to "Split linedefs and sector".
+
+  * Misc: Fixed segfault on trying to edit MAPnm in Doom/Heretic mode
+    or EnMm in Doom II mode.
+
+  * Misc: New prompt command make_gimp_palette to generate a gimp
+    palette file from PLAYPAL.
+
+  * Misc: Bumped configuration file version# to 2.
+
+Yadex 1.0.0 (1998-12-26)
+
+  * Code: Moved the source files to a subdirectory.
+
+  * Doc: A few additions in the user's guide
+
+  * Editing: Fixed buglet in positioning of newly copied objects.
+
+  * Game/wad: Game support: added definitions for Boom's things 5001
+    and 5002 (point pusher and puller).
+
+  * Misc: Added reminder to build nodes after making changes.
+
+  * Misc: Added magic string to configuration file.
+
+  * Misc: Added magic string to game definition file.
+
+Yadex 1.0.0_alpha3 (1998-12-23)
+
+  * Doc: A few additions/corrections in the hacker's guide.
+
+  * Editing: Fixed spectacular corruption of linedefs (string art bug)
+    that occurred if all you did during a given session was deleting
+    vertices.
+
+Yadex 1.0.0_alpha2 (1998-12-22)
+
+  * BSP: Included BSP 2.3 (thanks to Lee Killough).
+
+  * Doc: Improved user's guide.
+
+  * Editing: Added new commands [a], [b] and [c] to set, toggle and
+    clear things and linedefs flags.
+
+Yadex 1.0.0_alpha1 (1998-12-17)
+
+  * Code: Removed dereferencing of NULL pointer in
+    ParseCommandLineOptions() (DEU).
+
+  * Code: Replaced occurrences of "x==TRUE" and "x==FALSE" by "x" and
+    "!x".
+
+  * Code: Replaced occurrences of "x=TRUE" and "x=FALSE" by "x=1" and
+    "x=0".
+
+  * Command-line: You don't have anymore to put "-file" or "-pwad" in
+    front of pwads names on the command line. E.G. you can type "yadex
+    foo.wad".
+
+  * Command-line: Deleted a few little-used or DOS-specific options.
+
+  * Editing: Menu bar and pop-up menus much improved.
+
+  * Editing: Info bar reworked.
+
+  * Editing: When prompted to "Press a key to continue", you can now
+    also press the left mouse button.
+
+  * Editing: Grid: the grid step can now adapt automatically as you
+    zoom in/out.
+
+  * Editing: Grid: whether dragging is snapped to grid is now
+    independent of whether the grid is shown or not (added flags
+    grid_snap and grid_shown).
+
+  * Editing: Added finer-grained confirmation options.
+
+  * Editing: General editing: you can now scroll the map further from
+    the centre of the level.
+
+  * Editing: Added ['] to re-centre the window around the centre of the
+    map.
+
+  * Editing: Added [`] to re-centre the window around the centre of the
+    map and adjust the zoom so that the map fills the screen.
+
+  * Editing: Added [&] to show things and vertices numbers.
+
+  * Editing: Autoscroll: scroll speed is now progressive.
+
+  * Editing: Autoscroll: easier to use near the top of the window.
+
+  * Editing: [Left], [Right], [Up], [Down] do nothing.
+
+  * Editing: [Space] does not toggle move fast/slow anymore; it toggles
+    between nominal zoom and x 4.
+
+  * Editing: Highlighting of things, vertices and linedefs much
+    improved.
+
+  * Editing: Dragging objects is now done with the left mouse button
+    instead of the right button.
+
+  * Editing: Editing object properties is now done by double-clicking
+    on the object.
+
+  * Editing: Selection and drag-and-drop have changed a lot.
+
+  * Editing: Selection box: removed the -a option and the addselbox
+    parameter. Whether the selection box is additive or not is now
+    controlled dynamically by the user (with [Ctrl]).
+
+  * Editing: Sprite viewer: sprites are now centred.
+
+  * Editing: Linedef info: shortened flags names to one character.
+
+  * Editing: Linedef info: a missing normal texture on a 1-sided
+    linedef is now flagged in red.
+
+  * Editing: Linedefs copy: you now have the choice between duplicating
+    the sidedefs too and reusing the same sidedefs. DEU left the new
+    linedefs sidedef-less and, so far, Yadex used to reuse the same
+    sidedefs.
+
+  * Editing: Linedefs: added function to "unlink" sidedefs.
+
+  * Editing: Linedefs: dragging linedefs is much faster than before.
+
+  * Editing: Sectors: in the object info window, added display of floor
+    and ceiling height delta with respect to previous sector.
+
+  * Editing: Sectors: in the object info window, added display of floor
+    and ceiling texture.
+
+  * Editing: Sectors: dragging sectors is much faster than before.
+
+  * Editing: Things: now drawn as squares so that it's easier to see
+    whether they are stuck in a wall or another thing. And you don't
+    have to highlight them to see their angle. Note: the old shape is
+    still available by defining ROUND_THINGS at compile-time.
+
+  * Editing: Things: changed the colours again. Tried to make important
+    things stand out and conversely. Bonuses are now dark green and
+    player/ deathmatch starts bright green. Keys are magenta.
+    Decoration is dim blue instead of white. Unknown objects are cyan
+    instead of white. Weapons are orange instead of brownish. Heretic
+    sound source things and Boom point pushers are dim turquoise-ish.
+
+  * Editing: Things: the sprite is now shown in the object info window.
+
+  * Editing: Vertices: deciding whether a vertex is on a linedef is now
+    done on the distance in pixels, not in map units. So you can now
+    work on very fine details (E.G. vertices only 2 map units away)
+    provided that the zoom factor is high enough.
+
+  * Editing: Fixed minor glitch in texture viewer that showed with
+    BIGDOOR7, SKY1, TEKWALL1, TEKWALL5 and others (DEU).
+
+  * Editing: When highlighting a sector, compared SideDefs[LineDef
+    [n].sidedef1].sector with ObjNum even though .sector was -1.
+    Somehow it always tested false (DEU).
+
+  * Editing: "Check textures names": the name of the offending texture
+    is now printed correctly even if it is 8 characters long (DEU).
+
+  * Editing: "Check textures names": if you fixed a missing texture,
+    the editor was not made aware that you had made changes to the
+    level (DEU).
+
+  * Editing: Unused sectors are not selected anymore (DEU).
+
+  * Editing: Changing the preferences could overwrite other variables
+    (DEU).
+
+  * Editing: InputNameFromListWithFunc() used to segfault if you
+    pressed [Pgdn] on a list shorter than (listdisp + 1) elements
+    (DEU).
+
+  * Editing: Removed segfault in AlignTexturesX() (DEU).
+
+  * Game/wad: Heretic is now supported.
+
+  * Game/wad: Added support for Boom's new thing flags
+    not-in-deathmatch and not-in-coop.
+
+  * Game/wad: Added support for Boom's new linedef flag pass-through.
+
+  * Misc: Renamed as Yadex to avoid confusion with Yet Another Diagram
+    Editor.
+
+  * Misc: Loading pwads: implemented standard directories. If the pwad
+    to load is in one of the standard directories (or a subdirectory)
+    you don't have to type the whole name.
+
+  * Misc: Loading pwads: added standard directories and made the
+    messages less verbose for pwads that contain patches (PP_START/
+    PP_END).
+
+  * Misc: Removed segfault during fatal_error() on failure to open the
+    iwad (DEU).
+
+  * Misc: The prompt now groks TTYs with a number of lines other than
+    25.
+
+  * Misc: Changed the welcome message (a.k.a. "reminder").
+
+  * Misc: Added an "About Yadex..." window.
+
+  * Misc: Don't copy SEGS, SSECTORS, NODES, REJECT and BLOCKMAP from
+    the original file anymore when the map has changed. Makes smaller
+    wad files. Nice for archival.
+
+  * Misc: Added environment variable YADEX_GAME.
+
+  * Platform: Ported to X (plain Xlib). This version is not available
+    for DOS.
+
+  * Platform: Now works on big-endian machines.
+
+  * Platform: Removed several DOS-isms from file name handling code.
+

@@ -1,0 +1,58 @@
+//compile target map02.o
+#include "zcommon.acs"
+#import "glob.lmp"
+#define mission 0
+
+script 1 (void)
+{	Thing_SpawnFacing(1,T_IMP);
+}
+
+script 2 (void)
+{	if (LineSide() == LINE_FRONT)
+	{	int previous_light = GetSectorLightLevel(1);
+		Floor_LowerToNearest(2,25);
+		TagWait(2);
+		Light_Fade(1,GetSectorLightLevel(2),30);
+		delay(105);
+		Floor_RaiseToNearest(2,25);
+		TagWait(2);
+		Light_Fade(1,previous_light,30);
+	}
+}
+	
+script 3 OPEN
+{	SetLineSpecial(1,ACS_Execute,4);
+	if (progress[mission] < 2)
+		progress[mission] = 2;
+	ACS_Execute(999,0);
+}
+
+script 4 (void)
+{	say(3,"Looks like a power outage");
+	delay(80);
+	say(3,"There has to be some emergency generator around here");
+	delay(150);
+	say(0,"");
+	ClearLineSpecial();
+}
+
+script 5 (void)
+{	if (CheckInventory("BlueCard"))
+	{	SetLineSpecial(1,ACS_Execute,6,0);
+		TakeInventory("BlueCard",1);
+		Thing_Activate(2);
+		say(3,"Looks good. Off we go!");
+		ClearLineSpecial();
+		delay(80);
+		say(0,"");
+	}else
+	{	say(3,"Damn,it says: Insert blue card here!");
+		delay(130);
+		say(0,"");
+	}
+}
+
+script 6 (void)
+{	Teleport_NewMap(1,0,1);
+	ACS_Execute(10,1);
+}

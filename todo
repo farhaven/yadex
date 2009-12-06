@@ -1,0 +1,2366 @@
+----------------------------------------
+
+TO-DO LIST FOR YADEX
+
+----------------------------------------
+
+
+General
+- Automatically adapt to level to edit; if it's a Doom level (ExMy),
+  reread doom.wad, if it's a Doom II level (MAPnn), reread doom2.wad.
+  what if it's a Heretic level ? It must be possible to tell a Heretic
+  level by the special sector & thing types.
+
+Command line
+- Add option -e like in sed and Perl. Auto quit at end or not ?
+- Add option -f like in sed ?
+- Unix version recognizes -V but does not list it in the usage.
+
+Configuration file
+- Add operator ".=" (E.G. "iwad_dir .= ,/foo/bar"). Perhaps implement
+  real lists. Perhaps not.
+- Comments are not allowed if not at the beginning of a line
+- New option --print-config-path or --cfg-dirs to print the config file
+  search path and exit
+
+Variables
+- Make variables objects instead of C++ variables. It should not be
+  necessary to recompile everything each time you want to add a
+  variable. Still be able to generate a list of all known variables...
+- Better support for changing of configuration variables from the
+  editor.
+- Add a way to set variables from the command line ("-sname=value" or
+  something like that).
+- Setting options: add a "set name value" prompt command.
+- Setting options: make "set" stop after each screenful.
+- Setting options: modify the "Preferences" menu so that all options can
+  be changed from there and modifications are saved.
+
+Game definitions
+- Move thing groups colour from .ygd to .cfg.
+- Generalize the principle of game by replacing iwad[123]= by iwad= in
+  different sections of the .cfg.
+- Fix TranslateToDoomColor().
+- -g should accept anything as long as <anything>.ygd exists.
+- It is prob. possible to crash the program by entering weird things in
+  LoadGameDefs. For example, shortdesc is not truncated and the current
+  number of "raise floor" types will probably make the menu "overflow"
+  the screen. DisplayMenu() should fix the y-offset if necessary.
+- It is possible to define the same group twice or use a non existing
+  group.
+- LoadGameDefs: try to waste less memory if possible.
+- FreeGameDefs(): apparently does not unallocate everything. It's
+  immaterial since it's only called just before exiting but I'll have to
+  fix it one day.
+- Enter two iwad names for the same game (E.G. doom.wad and doom1.wad).
+- Add list of animated flats and textures.
+- Add "height" and "is_obstacle" fields to things definitions.
+- Add flat width and height.
+- Add min and max player and deathmatch starts.
+- Add default level names.
+- Move the definition of special sector tags out of the exe and into the
+  ygd files.
+- Gadget: add level names (E.G. "E1M1" -> "Hangar").
+- The basename need not be in the configuration file; it should be in
+  the ygd (E.G. iwad_base = "doom.wad,doom1.wad")
+- The .ygd collection has grown so large that it has become difficult to
+  maintain. For example, changes made to strife.ygd must be propagated
+  to strife10.ygd by hand. There is a lot of duplication : the 150 kB of
+  game definition data boil down to 30 kB after piping into sort | uniq.
+  I would like to implement an include directive and reorganize
+  accordingly :
+    _boom.ygd     in Boom but not in Doom*
+    _doom.ygd     in all versions of Doom >= 1.0
+    _doom16.ygd   in Doom 1.666 and above (linedef types)
+    _doom2.ygd    in Doom II (things)
+    _heretic.ygd  in Heretic only (things, sector types)
+    _mbf.ygd      in MBF but not in Boom
+    _strife.ygd   in all versions of Strife
+    _tgroups.ygd  all things groups ?
+    _zdoom.ygd    in ZDoom but not in Boom
+    doom.ygd      include _doom; include _doom16
+    doom04.ygd    ?
+    doom05.ygd    ?
+    doompr.ygd    ?
+    doom2.ygd     include _doom; include _doom16; include _doom2
+    hacx.ygd      ??
+    heretic.ygd   include _doom; include _doom16/_doom2 (?); include _heretic
+    hexen.ygd     no change
+    plutonia.ygd  include doom2: iwad_base plutonia.wad [solves Colin's pb]
+    strife.ygd    include _strife; texture_format strife11
+    strife10.ygd  include _strife; texture_format normal
+    tnt.ygd       include doom2: iwad_base tnt.wad [solves Colin's pb]
+  The rules for locating of relative includes :
+    1. search the current directory,
+    2. search the directory where the parent ygd file is,
+    3. search the standard directories.
+  If an include has a bad magic, don't abort, just keep searching for
+  one that has the appropriate magic (but warn). If an include was not
+  found just print a warning and continue ?
+- Allow overriding of a previous linedef type / thing type / sector type
+  definition (currently it just *adds* and, since the new definition is
+  at the end the of list, it's *ignored*). Possibly with an option to
+  warn about such redefinitions.
+- New option -Y (or -y or -G ?) to insert a directory at the beginning
+  of the .ygd files search path. Perhaps -Y- to clear the path (think
+  -I-). Add it to "make test" and "make dtest".
+- New option --print-ygd-path or --ygd-dirs to print the ygd file search
+  path and exit.
+
+Game and wad support
+- Some wads have sidedefs with a sector# of -1. Apparently, those are
+  always unused sidedefs but perhaps there is something to do about it.
+  dyst3, mm, mm2 map13,28, wads2/1kill (e2m2,6,7,8,9), wads2/adieu
+  wads2/ebola, wads2/requiem (map03,08,etc).
+- Some wads generate a flurry of messages "updating entry ''" when
+  loaded (11fortko, 1_on_1, chase21). Fix that.
+- Some working pwads are not pwads. 1sthell is an iwad.
+- Some wads have a large number of unused vertices in the middle. base,
+  phobos, 2wad/dks_e1l1, 2wad/dks_e1l3, amanda2 (no tail !), atica,
+  badblu35, dmdv (tail 76% unused 45/469), drdeath (unused 69/1382),
+  spit e1m2 unused 661/816 tail 0
+- Perhaps it would make sense to forget the directory completely when
+  it's not needed ? Each entry takes 16+4+4 = 24 bytes. Here are the
+  number of entries in the iwads' directories :
+
+  Iwad     Total entries  Level entries
+  Doom     2306  54 kB    36  9 kB
+  Doom II  2956  69 kB    32  8 kB
+  Heretic  2415  56 kB    28  7 kB
+  Hexen    4249  99 kB    32  9 kB
+
+  That's a lot. When do we use the directory ?
+  - During an editing session, to display the flats.
+  - During an editing session, to display the textures (TEXTURE1,
+    TEXTURE2, PNAMES, patches).
+  - During an editing session, to get the PLAYPAL.
+  - When loading or saving a level.
+  - At the prompt when saving or extracting a lump (not often).
+  All the levels are kept in memory all the time, even though they're
+  used only when saving and reading. The sounds, musics and graphics are
+  never unused (about 450 entries = 10 kB).
+- The message "Use F_END instead" should be displayed only once, when
+  the pwad is loaded, not each time you open an edit window.
+- Fix OpenPatchWad() so that, if a pwad contains FF_START ... FF_END
+  F_END (mm2.wad), the F_END does not replace the F_END from the iwad,
+  as this causes a spurious "this wad uses FF_END" warning.
+- icarus.wad uses F_END + FF_END. Sigh.
+- Gothic2 uses F_END but not F*_START. Therefore, the custom flats don't
+  show. FMH !
+- When a pwad contains F_START F1_START ... F3_END F_END, the F_END
+  replaces the one from the iwad and this causes Yadex to think all
+  following lumps are flats (sod.wad).
+- With hacxsw.wad, which replaces all patches and has P_START/P_END
+  labels, get a "No matching P_END for P_START in hacxsw.wad". Surely
+  the same problem as with F_END ; OpenPatchWad() uses the P_END from
+  the pwad to replace the P_END from the iwad.
+- viewpat: mm.wad and mm2.wad put patches directly in the master
+  directory, without any surrounding P_START/P_END. viewpat sees the
+  replacement patches but not the new ones of course.
+- Now that wad_read_i16() and wad_read_i32() don't abort anymore, check
+  the code that uses them.
+- Colin wants to be able to use the Final Doom iwads without having to
+  type "yadex -iwad2 /foo/bar/tnt.wad". He suggests either (1) adding a
+  new game or (2) changing the code so that "yadex -iwad2 tnt.wad" looks
+  for tnt.wad in the iwad2 directory defined in the config file.
+- Graphics: Yadex uses no COLORMAP, instead of COLORMAP 0. In practice
+  COLORMAP 0 is very close to no COLORMAP but...
+- Graphics: Yadex uses colour index IMG_TRANSP = 0 to represent
+  transparent pixels and remaps index 0 to the closest index (247 in the
+  case of Doom). Because we save in PPM format, it doesn't matter. But
+  if we wanted to save in BMP format, many pixels would have their value
+  changed, which I'd rather avoid. If Yadex used IMG_TRANSP = 255, no
+  remapping would be necessary because that index is not used in Doom,
+  Doom II, Heretic and Hexen. For Strife, it's the other way around :
+  index 255 is used quite a lot and index 0 is not.
+- Be able to edit levels with silly names like "QD2" (cf. qdoomtst.wad).
+  This implies not replacing entries in the master directory anymore !
+- When "saving as" a create'd level, NODES, SEGS, SSECTORS, REJECT,
+  BLOCKMAP and VERTEXES are not empty. Recipe : yadex: c [Return] [F3]
+  [y] [Return] beurk.wad q yadex: q $ lswad -l beurk.wad.
+- Bug: there is a small memory leak in that can be seen when repeatedly
+  loading two wads that contain the same level (E.G. while true; do echo
+  r tmp.wad; echo r 11.wad; done | yadex). I suspect the leak is in
+  ReadLevelData().
+
+Doom alpha
+- Fix wrong things definitions and add missing ones.
+- When loading a pwad with several contiguous levels, every second level
+  is discarded. See wads2.cc.
+
+Doom press release pre-beta
+- Matt says there is a separate resource file named texture2.lmp.
+
+Hexen
+- Hexen has some flats with a size of 8 kB.
+- Generate the "thing" directives by either parsing info.c or ripping
+  off the one in DETH.
+- Hexen: add linedef types and check
+
+Heretic
+- Heretic has some flats with a size of 4160. Is this why DeuTex accepts
+  64x65 flats ?
+- Most "1.666" linedefs types are wrong.
+
+Strife
+- Extract the radii from the exe.
+- Matt says sector tag 999 means "slam shut on alarm".
+- Matt wonders what RIFLB0 is and what's the difference with RIFLA0.
+- Incorporate what's only in the USS.
+
+Boom
+- convenient way of entering generalized types.
+- Decode generalized types.
+- Allow WATERMAP pseudo-texture (frankc@srv.net).
+
+XDoom
+- Write or get someone to write xdoom.ygd.
+- Check XDoom linedef types
+- Copy XDoom linedefs types to doom.ygd
+
+ZDoom
+- Allow AARRGGBB pseudo-texture ? (frankc@srv.net)
+
+EDGE
+- Abstract away extrafloor linedef types.
+- Parse DDF and RTS.
+- Function to jump to n-th extrafloor for this sector.
+
+Messages and reports
+  The reason for emitting messages :
+  - Bug (internal error, unexpected condition in the program that
+    indicates the existence of a bug somewhere)
+  - Error in the iwad (something looks fishy)
+  - Environment error (not enough memory, failure to open a file for
+    writing, failure to create a subprocess, failure to allocate X
+    resources or to connect to the X server, etc.)
+  - Informational (to inform the user on what's happening)
+  - Verbose messages (like informational, except that they are not on by
+    default and are meant as an aid to debugging)
+  - Syntax error messages
+  - Usage message
+  - Copyright message
+
+  Certain messages could be prefixed by the name of the program
+  ("yadex: "). I think this would be only useful for messages that are
+  issued while Yadex is not in interactive mode. For messages that are
+  meant to happen only in interactive mode, the prefix is a waste of
+  screen real estate.
+
+  Messages can be printed to stdout, stderr and on the window, or a
+  combination of these. Future versions of Yadex might have a GUI-only
+  interface and stdout/stderr messages might be lost, then. To print
+  messages on the window, it would be better to have a scrollable
+  message textbox at the bottom than alert boxes, that require constant
+  interaction and leave no trace.
+
+  Bug messages should come with a "THIS IS A BUG" notice and an
+  exhortation to go tell the maintainer.
+
+  If possible, the message printing function(s) should be
+  interface-independant.
+
+  There should be a smart handling of carriage returns. Instead of
+  inserting '\n' in the format string, one should be able to specify
+  whether the message should start on a new line and whether the message
+  should be followed by a newline.
+
+  There should be some handling of indent. One should be able to start
+  and end an indented block. The output routine would take care of the
+  printing of the indent whitespace.
+
+  If possible, it should be possible to write to several channels
+  (indent levels) asynchronously.
+
+Confirmation
+- Fine selection of automatic confirmations ("split linedef when
+  inserting new vertex", "split linedef when moving vertex", "merging
+  vertices", etc).
+- When moving a bunch of vertices, do not check for vertex-on-linedef
+  condition if both vertices of the linedef were part of the vertices
+  that are being moved.
+  AJA 2000-09-21: (d) when moving a large bunch of vertices or linedefs
+  that are very close together (e.g. 2 units), there often pops up a
+  message to confirm merging vertices or splitting a linedef.  (This
+  would be worse with the 1.5.0 config file which makes merges/splits
+  happen automatically).
+  I guess the solution would be making Yadex to skip checks for
+  overlapping vertex/linedef _between_ all the vertices/lines that are
+  being moved at once (i.e. only check a moving V/L against a non-moving
+  V/L).
+
+Old bugs to fix
+- When splitting and merging sectors, some of the sidedefs in the split
+  sector are given the wrong sector number.
+- When splitting a sector, sometimes get erroneous messages like
+  "vertices A and B not on the same sector" or "cannot find a closed
+  path", etc. I have already got "no sector between vertex A and vertex
+  B" ; save, quit, edit and try again : it works !
+- DOS: Let [right] work after [space] (works if no mouse driver!)
+- DOS: understand why mouse pointer moves 8 pixels at a time and fix
+  that.
+- When merging sectors, linedefs sometimes get only 1 sidedef...
+- If you do "delete linedef and merge sectors" when it's the same sector
+  on both sides of the linedef, the sector is deleted.
+- Check that all sectors are closed : chokes on pseudo sectors (s1=s2).
+  I've verified that unclosed sectors, whether single ou double sided
+  don't disturb Doom. However, some look ugly. The checking function
+  should be modified so that only ugly unclosed sectors are reported.
+- Create new sector from linedefs: should be smarter.
+
+Editing in general
+- Implement undo and redo.
+- Move cursor : jump to next object in direction ...
+- Move objects n grid steps in direction ...
+- Move objects n Grid steps in direction ...
+- Move object to nth next grid position in direction ...
+- Move object to nth next Grid position in direction ...
+- Flip info window on either side of the screen.
+- Gadget: show level with different orientations, i.e. with logical
+  north not always being at the top. And rotate the sprite images
+  accordingly.
+- Go to next/previous object in selection.
+- Renumbering objects:
+  - Renumber the selected object by either exchanging numbers with the
+    object having the target number or bumping all numbers by one. The
+    former solution has the advantage of being faster. The second
+    solution has the advantage of not disturbing the relative numbering
+    of the other objects.
+  - Make the highlighted object the lowest-numbered (highest-numbered)
+    one of all the selected objects of the same kind.
+- Bug: pasting repeatedly a large number of objects (all the linedefs of
+  Eternal MAP28, for instance) ends up triggering a segfault. Perhaps
+  we're overflowing/underflowing the objects arrays ?
+- Bug: my tests indicate that out-of-memory conditions are badly handled
+  (E.G. segfault upon switching to sector mode).
+- For very large levels, the lower limit on the zoom factor is too high
+  to allow showing the whole level.
+- Bug: for very large levels (very low zoom factors), the upper limit on
+  the grid step is too restrictive.
+- Strife's MAP29 is so much to the west (-23,000 or so) that the current
+  limit to -20,000 prevents from seeing the whole map.
+- Cut and paste between wads. at least in a limited way: insert the
+  contents of a wad at the cursor. involves renumbering all items by
+  adding the number of such items already existing. E.G. if there are
+  already 50 vertices, increment the vertex numbers in all the linedefs
+  by 50. Same thing for sidedefs numbers in linedefs, sector tags (DON'T
+  increment those that have a special meaning like 666 or 667 or those
+  above 900!). increment sector# in sidedefs too. that's all ?
+- Andy Baker wants a don't-drag toggle. I'd rather just add some initial
+  resistance.
+- For the two widest grids, display the coordinates along the edges.
+- There is something that sucks in the edit loop ; when you scroll
+  without moving the mouse, the selection box always "lags behind"
+  because its map coordinates are updated only _after_ the next screen
+  refresh.
+- Select all.
+- Reverse selection (select everything that's not selected and unselect
+  everything that's selected).
+- Edit functions : copy, cut, paste.
+- Crop (delete all unselected objects).
+- Persistent box for cropping ?
+- BD suggests sector creation à la DCK ([r] then draw box).
+- When there are several objects under the pointer, report it and give a
+  way to access any one of them. Or maybe implement planes ?
+- When doing drag-n-drop, should the snap-to-grid be applied to A.
+  relative position since started dragging B. or to the highlighted
+  object ? If A, you can't use drag-n-drop to snap-to-grid objects that
+  aren't. If B, you can't drag correctly objects that are not aligned on
+  grid.
+- Object number: the type should be "i16", not "int" (cf. SelPtr).
+- Object number: the test for "none" should not be hard-coded "< 0".
+- While dragging or drawing a selbox, prevent Del, Ins, etc. from
+  working. E.G. Del would suppress the object being dragged !
+- Add config file parameters for initial snap_to_grid and
+  lock_grid_step.
+- Scale: make it local to an edit window.
+- MadeChanges: make it local to an edit window.
+- MadeMapChanges: make it local to an edit window.
+- When saving with [F2], ".wad" should be appended automatically.
+- Save ([F2]): should not ask for the file name every time.
+- Save ([F2]): I swear I've seen the file name dialog open with
+  "nase.bak" in it !
+- Save ([F2]): should use the Save as... ([F3]) code, not duplicate it.
+- Get rid of the Level variable.
+- The file name should be a member of edit-session or level-data, not
+  retrieved by looking up the master directory.
+- A function that would be really very useful would be the possibility
+  to change the start/end vertex of a linedef. That could be done by
+  holding, say, [Alt], down and dragging the start/end until on top of
+  another vertex. When the button is released, the linedef start/end is
+  changed and the sector references of the impacted linedefs are
+  updated.
+- Displaying pointer coords; should look into using PutImageFont().
+- [Ctrl][Click]: Press button: do nothing.  Release button: select or
+  unselect IF STILL ON TOP OF OBJECT.  Thus we can use [Ctrl] + drag to
+  copy :-).
+- Dragging with [Ctrl] on duplicates ?
+- Vertex on linedef: lower tolerance when zoom factor is high.  [partly
+  done as of 1998-12-20 but still needs work].
+- Check self-consistency of level data: for each linedef, v1 and v2 must
+  be either OBJ_NO_NONE or between 0 and NumVertexes and s1 and s2 must
+  be either OBJ_NO_NONE or between 0 and NumSideDefs.
+- Goto function: takes as an argument either the centre of the level or
+  a previously set mark. Like in vi: m<mark>, '<mark>. Maybe '' to go to
+  centre ?
+- Clicking and superimposed objects: if n1 and n2 (n1 < n2) are
+  superimposed, n1 is not selected but n2 is selected and you click on
+  them, Yadex thinks you are starting a new selection because
+  is_selected (highlight) is false.
+- objects.cc: GetObjectCoords(): should use center_of_objects() instead.
+- Permanently show a 64-wide object to scale ?
+- Right-button menus: access to many different menus (no modifier,
+  [Shift], [Ctrl], [Alt], several of them).
+  - Cut, copy, paste
+  - Show properties
+  - Misc. operations
+  - Frequently used properties (toggle bit of linedef...)
+  - Change tool
+- Menus: when you move the pointer over a pulled down menu is, you can
+  highlight the objects it hides.
+- Replace "insert rectangle"/"insert polygon" by :
+  - insert pillar (nb. of sides, size)
+  - insert subsector Differences in floor/ceiling height/textures and
+    lighting level could be set by predefined styles :
+    - pedestal (floor + 48, ceiling - ...)
+    - hanging from ceiling
+    - teleporters
+- In addition of make nook/make boss,
+  - insert protruding subsector
+  - insert recessed subsector
+- Minor glitch: when a popup menu is active, the spot is still shown
+- Object info box: if the box is already drawn, don't draw it again; it
+  makes the strings flicker slightly.
+- [Alt] alone should highlight the menu bar.
+- Split linedefs and sector: if there is no sector between the linedefs,
+  they shouldn't be split.
+- Split linedefs and sector: if only one linedef is
+  selected/highlighted, assume that the other linedef is the one
+  opposite.
+- Moving/scrolling: centre view around spot under pointer (binding :
+  perhaps [Ctrl][But2]).
+- James Caldwell says that, with v1.4, if you create a polygon, delete
+  the sector inside it and try to draw a selection box around the
+  linedefs, Yadex segfaults. James was not able to give me a backtrace
+  and, apparently, no one has been able to reproduce that bug. After
+  upgrading to 1.5 and a new version of Red Hat, the problem
+  disappeared. A bug in GCC 2.96 ?
+- Linedef type/sector type/thing type selector : the current
+  implementation (cascaded menus) has certain shortcomings :
+  - No scrollbars for long lists.
+  - It's not possible to associate a bitmap to an item, which would be
+    very useful for thing types.
+  - There doesn't seem to be a good way to specify which fields are to
+    be printed, especially not dynamically. This could be useful in some
+    occasions (thing types : sprite root).
+  - There doesn't seem to be a good way to change the sorting order,
+    especially not dynamically. Still it would be nice to be able to
+    sort linedef types by either (function, trigger) or (trigger,
+    function) or (number), etc.
+  - There doesn't seem to be a good way to restrict which items are
+    shown. For example, one might wish to hide all linedef types that
+    are not available in plain Doom 1.666. Arguably, that should be done
+    by chosing the right game specification in the first place, but
+    there *might* be good reasons to do otherwise.
+  It seems that ldt/st/tt selection is an operation that calls for more
+  complex interactions than a simple list menu can do. We should
+  probably use a specialised widget, perhaps like this one :
+   _________________________________________________________________
+  |                                 _____________________________   |
+  |  Group ( ) Door                |  0 --  None               |^|  |
+  |        ( ) Door (red key)      |  1 DR  Open door          | |  |
+  |         ...                    |  2 W1  Open door (stays op| |  |
+  |        ( ) Misc                |  3 ...                    | |  |
+  |        (o) All                 |  4                        | |  |
+  |                                |  5                        | |  |
+  |  Sort  ( ) Group, desc, trig   |  6                        | |  |
+  |        ( ) Group, trig, desc   |  7                        | |  |
+  |        ( ) Desc, trig, group   |  8                        | |  |
+  |        ( ) Trig, desc, group   |  9                        | |  |
+  |        ( ) Desc, trig, number  | 10                        | |  |
+  |        ( ) Trig, desc, number  | 11                        | |  |
+  |        (o) Number              | 12                        | |  |
+  |                                | 13                        | |  |
+  |  Show  [x] Boom                | 14                        | |  |
+  |        [x] EDGE                | 15                        | |  |
+  |        [x] MBF                 | 16                        | |  |
+  |        [x] PR                  | 17                        |_|  |
+  |        [x] XDoom               |_18________________________|v|  |
+  |        [x] v1.6                |<_________________________>|    |
+  |                                            _________________    |
+  |                                           |___OK___|_Cancel_|   |
+  |_________________________________________________________________|
+
+  Note #1: how do we enter linedef types by number ?
+  Note #2: the "Show" items are not hard coded but unique values of a
+  field that does not yet exist (alternatively "from which ygd file the
+  definition comes from").
+  Note #3: instead of hard-coding "Sort" items, one could make this
+  group a collection of special widgets, one for each field. Each widget
+  has two buttons : up and down. By clicking on said button, you move
+  the widget up down the list. More flexible, but also more confusing
+  when you're not used to it. Promises to be awkward to use with the
+  keyboard.
+  Note #4: it might be useful to have two descriptions : an internal one
+  that sorts well (door open, door close) and an external one that's
+  human readable (Open door, Close door).
+- Arguably, when snap to grid is on,
+  - the pointer position shown in the info bar should honour it,
+  - the pointer position used for dragging etc. should honour it.
+
+Editing, global mode:
+- Editing properties (double-clicking or [Return]), selecting by
+  clicking and selecting with a box still care about the mode. Selection
+  in general is broken, because only the number is remembered.
+- Autosplit linedef by dragging vertex doesn't work unless in vertex
+  mode.
+- draw_map(): linedefs are still shown according to mode.
+- draw_map(): need another representation for sectors (conflicts with
+  linedefs).
+- draw_map(): always show right side of linedefs ?
+
+Editing things:
+- Thing info box:
+  - Eye candy: animate the sprites.
+  - Eye candy: show the sprites according to their angle.
+  - Numeric thing type : make it optional. Give choice of format between
+    signed decimal, unsigned decimal and hexadecimal. Default format is
+    specified by config parameter format_thing_type. Also have a key
+    binding to cycle between the three.
+  - String thing type : when unknown, use the format for numeric thing
+    type.
+  - Thing angle : when unknown, give choice between signed decimal,
+    unsigned decimal and hexadecimal.
+  - Thing flags : have an option to show the numeric value of the flags
+    field, with a format one of signed decimal, unsigned decimal and
+    hexadecimal.
+- Flip/mirror: allow user to specify whether or not things should
+  be spinned.
+- Thing properties -> type : on selecting group with 0 things, fatal
+  error PTD1.
+- Check Doom's behaviour w.r.t. negative angles.
+- On the map, if the thing has a root but no sprite by that root was
+  found, display the root ? (instead of the type)
+- On the map, show things according to their angles ?
+- On the map, switch between displaying the sprite, the type in decimal,
+  the type in hex, the root, etc.
+- Option to show both the sprite and the square. Or maybe the sprite and
+  a cross, à la WinDEU/DETH ?
+- Perhaps choose between sprite and square automatically depending on
+  zoom factor ?
+- Things: the name is sometimes too long and cut off. It looks bad.
+- Unknown things (i.e. thing numbers for which there's no record in the
+  ygd) should be displayed in red, to distinguish them from things that
+  just don't have a root.
+
+Editing vertices:
+
+Editing linedefs and sidedefs
+- Linedef type : show long name.
+- Paint linedef with colour depending on difference of floor height...
+- Show several textures at a time ?
+- Insert window/corridor/door between sectors. exactly 2 linedefs must
+  be selected and they must no belong to the same sector. select style;
+  low window, high window, small door (64x72), big door (128x128-),
+  user-defined.
+- Function: split inner sector with channel:
+
+		+---------+		+---------+
+		| +-----+ |		| +-----+ |
+		| |     | |		| |     | |
+		| |     | |	===>	| +-----+ |
+		| |     | |		| +-----+ |
+		| |     | |		| |     | |
+		| +-----+ |		| +-----+ |
+		+---------+		+---------+
+
+- Function: make plain embrasure:
+
+		---+----+---		---+----+---
+		   |    |       ===>       |----|
+		   |    |                  |    |
+
+  also "45° embrasure" and "fancy embrasure" (sides are L-shaped).
+- Nooks and bosses: add a way to specify width and depth. Maybe have
+  several predefined dimensions plus user-defined dimensions (set in the
+  config file). Maybe set textures automatically (EG DOORSTOP and
+  LITE4). Provide for shapes other than rectangle.  Difference with
+  "Make nook" is that it also splits the sector.  Maybe set
+  automatically floor and ceiling height of new sector.
+- Automatically set UTU/LTU when line becomes 2-sided ?
+- Reset linedef as double-sided (sets 2S, unsets IM, clears normal
+  texture, set upper and lower textures, possibly set UTU and LTU).
+- Frequent operations : copy upper texture -> lower texture or inverse
+  set texture. mostly on 1st sidedef set normal texture copy lower+upper
+  texture = normal texture of adjacent linedef, set lower+upper texture
+  unpegged, normaltx = -
+- Select all linedefs that in same path as the highlighted one.  This
+  can be hairy when the same vertex is shared by more than 2 sidedefs.
+  Ideas that come to mind :
+  - only single-sided linedefs,
+  - only linedefs that have as many sides as the reference linedef,
+  - called from sector mode: select all linedefs that form the boundary
+    of the sector and switch to linedef mode,
+  - only linedefs that form a chain (last (n-1) == first (n)).
+- Duplicating/copying linedefs: fix the mess. The ideal would be to
+  duplicate sidedefs, but to be also able to share them (if asked
+  explicitly). Maybe by using a modifier when copying like [Alt]...
+- Duplicating/copying linedefs: allow user to specify whether or not
+  sectors should be duplicated too.
+- Function to substitute sidedef texture.
+- Dragging linedefs is still slower than dragging vertices. But it might
+  be just because of the overhead of highlighting all those linedefs.
+- Another function often needed : "split" a vertex shared between
+  several linedefs :
+
+                    |                  |
+                  --x--     ===>     --x  x--
+                    |                     |
+
+  The way to use it could be : select one or more linedefs that have a
+  common vertex. That vertex is duplicated, moved aside a little bit (so
+  as to reduce the lengths of the linedefs and the vertex reference of
+  the concerned linedefs is changed. Instead of moving it, it could be
+  selected for dragging automatically...  Could be called "unlink
+  vertex".
+- Cut corner : must select a vertex shared by two linedefs. The linedefs
+  are shortened and the vertex is replaced by a linedef connecting the
+  two other linedefs, an forming the same angle with both of them
+  (typically, 45°)
+
+                   x---              x--
+		   |       ===>     /
+		   |               x
+		   |               |
+
+  It should be possible to set the length of the new linedef in an
+  interactive fashion. But I don't see how to do that without having a
+  modeful interface.
+- Linedef type : give choice of format between signed decimal, unsigned
+  decimal, hexadecimal. Default format is specified by config parameter
+  format_thing_type. Also have a key binding to cycle between the three.
+- Linedef tag : same thing.
+- Linedef flags : give choice between string, signed decimal, unsigned
+  decimal and hexadecimal.
+- AJA 2000-09-21: (b) the texture checker only gives you two choices
+  when it encounters missing textures: stop, or make it STARTAN3 and
+  continue.  When using some Doom tricks using missing uppers/lowers,
+  this is a pain, ideally (IMHO) there would be four options: 
+
+       Press ESC to see the object,
+       or `y' to fix the texture and continue,
+       or `A' to fix all remaining textures,
+       or any other key to leave it and continue
+
+- Look into texture alignment. Look at what's been done with DETH.
+  AJA 2000-09-21: (e) I wanted to horizontally align a bunch of lower
+  textures on some two-sided lines, but the X alignment functions only
+  work on middle textures.
+
+    This is how I would prefer it to work: well, pseudo-code would
+    explain it best:
+
+       AlignX(sidedef_t S[], int NUM)
+       {
+         int i, x_offset;
+
+         // initial x offset comes from first sidedef
+         int x_offset = S[0].x_offset;
+
+         for (i=1; i < NUM; i++)
+         {
+           // ... check if S[i] contiguous with S[i-1] ...
+
+           x_offset += LineLength(S[i-1]);
+           x_offset &= 4095;
+
+           S[i].x_offset = x_offset;
+         }
+       }
+    
+    That would collapse the 8 alignment choices into 2 (sidedef1 or
+    sidedef2).  Well, 4 if you keep the texture checking versions.
+
+    It should work fine in practice since all Doom textures are powers
+    of two.  If one wasn't, it wouldn't be drawn properly since the
+    R_GetColumn() routine in the Doom source does this:
+
+        column &= (width-1)
+    
+    Do you think this "texture-independent" version is better ?
+
+- Highlighting linedefs: the test "tag > 0" is arguable. Shouldn't it be
+  "tag != 0" ?
+- When merging superimposed 1S linedefs, the resulting 2S linedef often
+  has the middle textures the 1S linedefs had.
+- Showing linedef textures: several solutions:
+  - easiest: show raw middle texture,
+  - easy: show raw upper, middle and lower textures,
+  - hardest: show as Doom would render it, with offsets, LTU, UTU and
+    all. Scale it down so as to fit in the window that has a fixed size.
+    Optionally apply brightness. Maybe show the edge of the neighbouring
+    walls, it might help for alignment.  ISSUE: it might not be a good
+    thing to respect the length of the linedef as, for long linedefs, it
+    will force us to scale down too much.  For textures that don't
+    exist, show background with cross. For texture "-", show background
+    only. For transparent texture, background sees through. It's
+    probably better to use a special colour (like black) for background
+    as the user might want to use a bright colour for window
+    backgrounds, which wouldn't look too good with Doom's dark textures.
+- Split linedef: if pointer is somewhere on top of linedef, split it
+  there (not in the middle).
+- Split linedef: buglet: the new vertex is initially put at (0,0) and
+  MapMaxX and friends are updated accordingly. So if the centre of the
+  map is way off (0,0), the next centre-map command will appear to put
+  the map off-centre.
+- Highlighting linedefs: same problem when some of the linedefs to
+  highlight have a non-zero tag. IMO, the key of the problem is the O(2)
+  part in the highlighting of sectors. Should restructure
+  HighlightObject() and HighlightObjects(). Build a bit vector of all
+  linedefs that should be highlighted and do them all in a loop, without
+  recursion. And thus we would not highlight the same linedef more than
+  once anymore.
+- Show all linedefs that have errors in red. That includes :
+  1. bad type,
+  2. type requires a tag but its tag is set to 0,
+  3. type requires a tag but no sector uses that tag,
+  4. door type on a single-sided linedef,
+  4b. W? linedef type used on single-sided linedef,
+  5. missing texture (HOM) (though this is normal for some tricks),
+  6. tx with multi-patch columns on a double-sided linedef (medusa),
+  7. bad flag,
+  8. misaligned (bad X-offset),
+  9. superimposed linedefs.
+  10. teleport type, but the target sector has no teleport exit, or it's
+      not present at all skill levels.
+  Notes:
+  - For (3), you probably need a bit vector of tags used by at least one
+    sector. When should it be refreshed ? It's perhaps safer to do it
+    from scratch before displaying, than trying to keep track...
+  - (7) is another reason to move the definition of flags out of the
+    executable and into the .ygd.
+  - (6), (8) and (9) are not too easy.
+  - The colour of the linedef should probably be reset to normal before
+    highlighting and selecting. Having lines of many different colour is
+    just going to be confusing.
+- Check texture names: if the sidedef is not used by any linedefs, you
+  are still prompted to "press [esc] to see the object". If you do, you
+  get a "Bug: GetObjectCoords: bad sector# x" message.
+
+Editing sectors
+- Set floor height to ceiling height - headroom.
+- Set ceiling height to floor height + headroom.
+- "Change sector reference" or "substitute sector" Change sector
+  reference for all the sidedefs that reference one of the selected
+  sectors.
+- Paint sectors with colour depending on tallness, brightness,
+  texture...
+- Function to substitute sector texture.
+- Dragging sectors is still slower than dragging vertices. But it might
+  be because of the overhead incurred by highlighting all the linedefs.
+- Sectors are sometimes mistakenly considered unclosed and don't
+  highlight properly. E.G. in ss27bet2.wad, sector #66.
+  Also: I already got erroneous "sector not closed" messages. The last
+  time I remember, it was on a tiny triangular sector (base=16,
+  height=2).
+  AJA 2000-09-21: two linedefs meeting at a vertex, and the other ends
+  are very close to each other (like 2 units) causes spurious
+  Sector-not-closed messages in the consistency check.
+- A DCK-like philosophy could be used when moving sectors :
+
+	|			|
+	|  +----+	      +-+--+
+	|  |    |	==>   |    |
+	|  |    |	      |    |
+	|  +----+	      +-+--+
+	|			|
+
+- Sector type : give choice of format between signed decimal, unsigned
+  decimal, hexadecimal. Default format is specified by config parameter
+  format_thing_type. Also have a key binding to cycle between the three.
+- Sector tag : same thing.
+- Eye candy: animate flats
+- Bug: in sectors mode, [n], [p] and [<] sometimes loop over the same
+  sector forever because GoToObject() does not do quite the right thing
+  regarding subsectors. [>] is not subject to this problem because then
+  [Shift] is on. [If you're confused by this entry, look at the layout
+  for a french PC keyboard in xkeycaps.]
+- Place the sector number correctly. Account for convex sectors
+  and fractioned sectors. Avoid sloping due to an excess of
+  vertices on one side. One strategy that comes to mind is
+  placing it at the centre of the largest area (where
+  "largeness" is a compound of "surface" and "squareness").
+- Showing sector textures: optionally apply brightness.
+- Andy Baker reported than when merging linedefs, Yadex sometimes
+  deleted the wrong linedef.
+- Highlighting sectors: for a constant number of sectors to highlight,
+  gets slower as the total number of sectors increases. Might have to do
+  with the search for tagged linedefs.
+
+Keyboard interface
+- Proposition: in linedef mode, <letter><letter> gives access to
+  parameter.
+- Add macros and key bindings.
+
+Documentation
+- Update DEU 5.21 doc...
+- Document screenshot.
+- faq.html should be included in the distribution.
+- Some entries in the FAQ should also be in trouble.html and vice-versa.
+- In TODO, entries should be numbered.
+- The following should be externalized:
+  - the URL of the homepage (when it's done, update web/readme.html)
+  - the URLs of the mirrors
+  - the names of the copyright holders (contributors et al.)
+  - the name of the maintainer
+- Each file should have its own copyright statement.
+
+Unimportant :
+- If bgi= or -bgi specifies a path for the .bgi driver, handle it.
+- Search for .cfg in directory where .wad is. hm-hm...
+- Nodes: have an option to pipe the output file through BSP.
+
+Flat/sprite/texture viewer
+- Use other palettes than #0 (also when saving).
+- Use COLORMAPs (also when saving).
+- Save bug: should save entire image, not clipped. Requires implementing
+  Sticker::load (Img, int oxfs, int yofs, int width, int height). And
+  changing textures.cc so that it does not clip the width and height.
+- Save: will never be able to save all arch-vile frame under MS-DOS
+  (contain "[", "\", "]"). Use DeuTex's translation scheme ?
+- Zoom and scrollbars.
+- Add binding to toggle between SW1* and SW2*, cycle through the frames
+  of an animation. For Hexen, it's much more complicated (3-frame
+  switches...).
+- Display number of patches (and posts, and patch list...).
+- Show several pictures at a time.
+- Add a flag somewhere to allow choosing a flat/texture that's not in
+  the list.
+- Support pictures higher than 255 and textures higher than 128.
+- If the "view" command is given a lower case argument, the positionning
+  in the list of sprite names is wrong.
+
+Build:
+- Document somewhere what RELEASE does and why it's important.
+- Makefile: after changing DEFINES in the makefile, running make does
+  nothing ! (have to delete manually wads.o and sanity.o)
+- Makefile: after hacking for two days on a machine, some objects are
+  not rebuilt on another machine. Even though yadex.h has changed !
+- Should not build yadex.dep from scratch every time you type "make".
+- "make clean all" fails because clean removes obj/0 but does not create
+  it again.
+- Some configuration items are not detected by configure but by the
+  makefile. This is confusing (there's no simple rule).
+- It would be nice to automatically detect when -fpermissive is needed
+  (GCC >= 3 + "extern XSetTransientForHint" in /usr/include/X11/Xlib.h)
+- It would be nice to automatically detect where the X11 headers and
+  library are. And omit -I/usr/X11R6/include from the command line when
+  it's not needed.
+
+DOS/BGI port
+- Do more modules splitting (deu.c, ReadConfigFile, menus.c). In
+  gfx.c, move InitGfx() in a separate module.
+- Be able to handle large levels.
+- Switch to DJGPP
+- Dig *.wad...
+- Maybe compress the sidedef struct (30 B -> 12 B).
+- Try to waste less space with in-core image of wad directories.
+- Respect screen ;
+  - restore contents
+  - restore proper number of lines/columns
+- Replace putimage() by calls to display_game_image().  Implement the
+  BGI version of display_game_image().
+- Old bug: numeric keypad "." means Del even if Numlock is on.
+- Old bug: fake pointer: make it an arrow and not flickering (Ben Davies).
+
+X11 port
+- Implement -geometry and -display.
+- Add an option like in Xmame to have either a private or shared
+  colormap (by default shared, at least in map mode).
+- Look into *WMHints*()
+- When drawing the map, etc, ignore some intermediate events (for mouse
+  pointer position). Also, when several arrow key keystrokes are in the
+  input key, just count them and redraw only once.
+- Set WM hints (icon name, min size, max size, etc.).
+- Find a replacement for bioskey(0) in text mode.
+- Look into getting the status of scroll lock.
+- Handle KeymapNotify events.
+- Show cursor in input boxes and let user move it with arrows and mouse.
+- The numeric keypad does not seem to work.
+- When there is another colour-hungry app running (like Netscape), get
+  error upon freeing colours. I think Xmame has the same problem.
+- Make sure that input.c intercepts only events concerning Yadex's
+  window.
+- After a resize, pointer_x/y are not updated so the wrong object is
+  highlighted.
+- After a resize, the map is redrawn 3 TIMES !  I know why : the window
+  manager (FVWM) sends three sets of exposure events. Making drawmap()
+  and refresh in general able to do partial drawings will eliminate this
+  problem. And give better performance when moving a thing, or flipping
+  through the menus.
+- Fonts: allow several font names in the config file. The first font
+  found is used. If none is found, use the default font.
+- Fonts: be able to use variable-width fonts.
+- With font "variable", in the flat viewer, underscores are not cleared
+  properly.
+- Why do I sometimes get this when closing a window :
+    X Error of failed request:  BadAccess (attempt to access private resource
+    denied)
+    Major opcode of failed request:  88 (X_FreeColors)
+    Serial number of failed request:  503121
+    Current serial number in output stream:  503135
+  I've trapped it in colour4.cc :
+    Warning: error freeing colour <hex number> (<cause>)
+  If you can reproduce this error, mail me.
+- I've heard on comp.windows.x Mattias Engdegård say that bitmap_pad is
+  relevant. What are the constraints on it, then ?
+- Use XShm.
+- Perhaps optimize transparency :
+    pic -> img -> img(scaled) -> ximage, ximage -> pixmap, pixmap
+    pic -----------------------> ximage, ximage -> pixmap, pixmap
+- Time spent within Yadex and time spent within the X server
+- When moving sprites at large scale factor, we waste a lot of time in
+  Sprite::make_bitmap, scale_img and, above all, Sprite::make_ximage.
+  Making sprites persistent across iterations helps enormously. Do it.
+
+Unix port
+- Basenames are truncated to 8 characters. The DOS approach of fixed
+  size al_f* types does not scale on Unix. Should probably modify
+  al_fana() to use dynamically allocated buffers.
+
+Platforms/Portability
+- Solaris 7: bad X11/Xlib.h. With GCC, need -fpermissive
+  and/or  -isystem /usr/openwin/include
+- Solaris 7: don't assume that having gcc implies that cc is
+  gcc. cc might be the native compiler in which case -Wall might
+  no be appreciated.
+- Solaris 9: nanosleep() needs -lrt. Best to use usleep() ?
+
+Prompt
+- Add access to the prompt from an editing window (":" like in vi).
+- Use readline.
+- "e" command (and possibly others): warn if too many arguments.
+- "e" command: perhaps accept "e 4 2" as synonym to "e e4m2".
+
+Misc.
+- Implement several windows at once ?
+- Replace all occurrences of BLACK, WHITE, ... by logical colours.
+- Externalize occurrences of ".wad".
+- Externalize occurrences of ".bak".
+- Browse mode, as in xv and psp, to browse through a large number of
+  wads.
+- Be able to open zipped files ?
+- On ProgError(), save current data to a file named yadexcrash.wad. On
+  startup, if that file exists, propose to use it.
+- Add a handler for the SIGSEGV signal to, on segfault (SIGSEGV), save
+  current data to a file named yadexcrash.wad. On startup, if that file
+  exists, propose to use it.
+- If DOOMWADDIR exists, use it ? But overridden by yadex.cfg & -iwad
+- Texture browser : it's so slow that, even on a K6/200, some textures
+  are slow to come (AMRIBS). Should cache patches ? 1999-11-28: after
+  implementing Patch_dir, did not notice a huge improvement.
+- Parameters :
+  - colour# used to represent transparent colour when saving textures,
+  - rgb used to represent transparent colour when saving textures,
+  - rgb used to represent transparent colour when displaying textures,
+- Log file: create/update it iff the pwad file is modified.
+- Events; generalize internal events and hold refresh until all events
+  have been processed. Though autoscroll could bite me.
+- Delete all those "huge" qualifiers ; means nothing for Unix and the
+  DOS version should be compiled with -mh anyway. Update: 1999-11-25:
+  Ha! Ha! Ha! Ha! Ho! Ho! ... I was so young and naive...
+- The popup menus should get the pointer position event when there is no
+  motion event. It's an issue when, to close a submenu, you click on the
+  parent menu; until you move, the parent menu still highlights the old
+  line.
+- Popup menus: that code is brittle because the same menu_c object is
+  used for popups and pull-downs. For example, if a menu was pulled down
+  before the same menu (that was previously popped up) was undrawn,
+  weird things might happen. I don't like the idea of duplicating the
+  whole menus, though. It would be cleaner to split the menu_c class
+  into a constant part and a dynamic part but it would be a lot of work.
+- Instead of { Beep(); Notify (); }, should have a specialized function.
+- Somehow unify configuration variables and game definition variables,
+  at least so that "set" displays both. AYM 2000-07-11: mmm...
+- Palette viewer: better cursor.
+- Textures: load the texture descriptions (TEXTURE[12]) once for all
+  at startup.
+- Textures: don't abort if the TEXTURE[12] lumps have weird things in
+  them.
+- There is a way to trigger the "Callback %p did not set disp_" bug
+  message. Don't remember where. Perphaps in the texture viewer. Had to
+  do with missing patches ?
+
+    yadex: viewflat checkers
+    Yadex: Bug: Callback 0x805a770 did not set disp_
+    REPORT ALL "Bug:" MESSAGES TO THE MAINTAINER !
+
+- Certain calls to InputInteger() should use different bounds so that
+  one can enter E.G. 0xffff as well as -1.
+- InputInteger() should be objectified so that it doesn't force the
+  number back to decimal every time the user hits [Tab], [Down] and
+  friends.
+- Wad_file has too many friends.
+- Do not include so much of the Boost library in the distribution
+  archive.
+- Implement a colour translation class that remaps palette indices
+  before the Sticker stage. Used for:
+  - Doom spectres,
+  - Strife peasants, advisors, etc.
+    - peasant: PEAS beige top, green trousers
+      grey    ramp: 01-1F
+      green   ramp: 20-3F
+      beige   ramp: A0-BF
+      greyish ramp: C0-DF
+  - Doom player:
+    - player 1: green:                    no translation
+    - player 2: indigo (or is it grey ?): 70h-7Fh => 60h-6Fh
+    - player 3: brown:                    70h-7Fh => 40h-4Fh
+    - player 4: red:                      70h-7Fh => 20h-2Fh
+  In the .ygd, add a "translation-id" field to the "thing" records.
+
+To do soon
+- Finish window_to_rgbbmp()
+- Transfer rgbbmp_to_rawppm() in another file (rgbppm2.cc ?)
+- Rename rgbbmp_to_rawppm() -> _ppm(), and add a parameter to choose
+  between P3 and P6.
+- Add a parameter in the config file to choose between P3 and P6 for
+  - screenshots
+  - pictures saved
+- Test XK_*_ISO_* on SCO X11R5.
+- Test on Final Doom.
+- Add option to let Yadex tell you with which options it was compiled.
+- Fix any remaining problems that might remain in saving.
+- "create": Fix the problem with levelname being NULL in EditLoop().
+  Check [F3].
+- "create": every time you [F2], the wad name is reset to the default
+  (E.G. "map01.wad").
+- Replace Patch_dir by Lump_dir.
+
+Web
+- Announce to cola automatically.
+- Generate LSM and upload to ftp.metalab.edu.
+- Upload to ftp.cdrom.com.
+- faq.html bears the wrong version number.
+- Bcc announcements to Oliver Kraus too.
+- Add patches/
+- patches/README: on the version included with the distribution archive,
+  mention that the latest patches can be found in
+  http://www.teaser.fr/~amajorel/yadex/patches/.
+- patches/README: mention the fate of the patches (some have already
+  made in into the dev version, some will have not because I haven't
+  decided yet or haven't even looked into them and some will never make
+  it).
+- Have an index page for patches/ ready, in case the web server does not
+  support automatic indexing. Use dldir for that.
+- Should all patches in the web page be also included in the
+  distribution, and vice-versa ?
+
+
+
+----------------------------------------
+
+MISCELLANEOUS MUSINGS
+
+----------------------------------------
+
+
+COLOUR HANDLING
+[AYM 1998-11-30: don't trust this, it's partially obsolete]
+Yadex can run on "a variety of displays". We can have anything from 16
+to 16M colours. It needs to be able to handle this variability correctly
+and quickly. I have to following idea : the code uses internal colour
+numbers (ICN) to specify colours. When a part of the code needs a
+certain colour, it calls a particular function with the RGB spec of that
+colour and the function returns an ICN. Only the function knows how many
+colours are really available. The rest of the code does not have to deal
+with that.  If more colours than that are asked for, it tries to
+allocate colours anyway, possibly by approximating the required colour
+by an already existing one or even by reshuffling the palette.
+
+The colour allocation function uses an internal table which has as many
+entries as there are allocated colours. Each entry contains the RGB
+description of the colour and the corresponding external colour number.
+
+The behaviour of the colour allocation function is influenced by certain
+parameters. E.G. for X11, there is a flag that says whether the user is
+willing to have a private colormap for the Yadex window.
+
+The IRGB constants in the code need to be replaced by RGB values taken
+from the configuration file (like has been done for THINGS colours).
+
+Suggestions if it's difficult to allocate all colours :
+
+  You could try to
+  - stop other colour-hungry applications
+    that may be running (such as Mozilla)
+    and restart Yadex,
+  - restart the X server with more colours
+    (E.G. "startx -- -bpp 16"),
+  - restart Yadex with -privatecmap.
+
+
+WIDGETS
+A widget should have the following methods :
+- create:
+- destroy:
+- get_size: the size the widget would like to have
+- set_size: the size the widget got from the geometry manager
+- set_coords: the top left corner assigned by the geometry manager
+- draw: can be partial !
+- undraw: only some widgets can do that
+- set_focus: gain or lose focus
+
+The types of widgets :
+- text label
+  Attribute: text
+- button: a rectangle.
+  Attribute: text label.
+  Attribute: text label colour (grayed out ?)
+  State: depressed or normal.
+  State: would be activated by return.
+  Event: if left button is pressed on it, sinks.
+  Event: if left button had been pressed on _that_ button and is
+    released on top of it, triggers.
+  Event: if pointer moves away, returns to normal.
+  Event: if pointer comes in and left button is pressed and when it
+    was pressed, the pointer was on top of _that_ button, sinks.
+- radio buttons
+  Attribute: channel #.
+  State: on or off
+  Event: similar to button.
+- check buttons
+  Event: similar to button.
+  State: on or off
+- window
+  Attribute: title
+  Attribute: a list of widgets with placement information.
+
+
+GEOMETRY MANAGER
+The geometry manager is passed a list of widgets with placement
+information.
+Each widget is 
+Braces are groups of widgets. A group of widgets is a rectangular shell.
+By default, the group places its widgets from top to bottom and aligned
+to the left.
+A widget group can optionally be materialized by a frame and a title.
+Brace modifiers:
+- place widgets left-to-right
+- place widgets left-to-right
+- place widgets top-to-bottom
+- place widgets bottom-to-top
+Widget modifiers (override the per-group placement order):
+- "<" left-align
+- ">" right-align
+- "^" place to the top
+- "v" place to the bottom
+
+
+DRAG-AND-DROP
+When dragging a group of objects, I see two possible policies:
+1. snap position of current object
+2. snap relative displacement
+The inconvenient of (1) is that, if no object was aligned, it is difficult
+to move the group by a whole number of grid steps.
+
+
+MOVING AND DRAGGING WITH THE KEYBOARD
+From main mode:
+  [c]  move cursor
+  [d]  drag objects
+  [f]  find object
+
+Followed by displacement commands.
+Displacement command:
+  [h]  west
+  [j]  south
+  [k]  north
+  [l]  east
+  [y]  north west
+  [u]  north east
+  [b]  south west
+  [n]  south east
+Optional displacement command prefix:
+  [f]  finer (grid step /= 4)
+  [c]  coarser (grid step *= 4)
+Any other key returns to main mode.
+
+
+FASTER DISPLAY
+I think that screen refreshes could be sped up a lot by avoiding to
+clear the pixmap but instead redrawing every widget as black. It would
+involve more CPU time per pixel but it would also divide the number of
+pixels to clear by between 10 and 100, depending on the zoom factor.
+
+It would not be very complicated to add a draw_with_background_colour()
+method to edwidget_c. But, between the moment the widgets are first
+drawn and the moment they're drawn again with the background colour, the
+level data is likely to have changed. For example, a group of vertices
+might have been dragged.
+
+I could save the level data as I draw it. The parts of the data that
+need to be saved : the vertices (x,y), the linedefs (v0,v1) and the
+things (x,y,type). For a very large level (600 things, 4000 vertices,
+4000 linedefs), that's 4000 * 4 + 4000 * 4 + 600 * 6 = 35 kB. Sounds
+quite acceptable to me, especially as compared to the 800*600*3 = 1.4 MB
+of the pixmap to clear. Idea: fold vertices data (no vertices, linedef
+is defined by x0, y0, x1, y1). A bit larger, a bit faster.
+
+I could use the undo information. But redoing might make that too
+complex.  Oh, and undoing it still not implemented ;-).
+
+I could embed some sort of versioning within the level data but I
+wouldn't like to slow down access to the level data, which is critical
+in certain parts of the application.
+
+If it works well, I might even get be able to do without a pixmap :-).
+
+
+FILE SELECTION BOX
+It would be nice to have a file selection box with a small window that
+shows a preview of the level(s) and also a few indicators for textures,
+flats and other lumps.
+
+
+FUNCTIONS AND BINDINGS
+As of version 1.6, there is a number of problems:
+- There is no way to get a list of all the bindings in use. Because of
+  that, neither the user's guide nor the man page document them and the
+  [F1] online help is incomplete and often out of date. There is also no
+  way to detect conflicts (i.e. two functions having the same binding).
+- It would be nice to be able to change the bindings for a function
+  without recompiling.
+- It would be nice to be able to define aliases or macros for the
+  functions you use often.
+- Adding a new function involves redundant changes to add it in both the
+  menus and in EditorLoop().
+- MiscOperations() makes me want to laugh.
+- EditorLoop() makes me want to cry.
+- Some functions are defined inside EditorLoop().
+- There is no simple way to define bindings using a sequence of keys
+  like g? and z? in vi.
+- The mechanism used to override the selection operation is awkward.
+- There is no support for a count prefix.
+- There is no command mode as in vi so you can't script and you can't
+  add a function without assigning it a binding first.
+
+The solution:
+All actions should, as far as possible be functions. A function is a
+piece of code that acts on editing session. It's identified by its name
+(E.G. "split_sector"). It can take parameters, such a count, the working
+set, a texture name, etc.
+
+There are three ways to invoke functions :
+- through the bindings,
+- through the menus,
+- in command mode.
+
+There should be a --list-functions option to print the list of functions
+to stdout. The output of this command would be included, after some
+massaging, into the man page and users guide.
+
+Bindings: a binding is a sequence of keystrokes, a function name and
+directives which define how the parameters of the function are set.
+There should be a --list-bindings option to print the list of bindings
+to stdout. This option would be used to generated the .cfg and the doc.
+
+Keys: keys that have no corresponding character in ASCII should be
+representable with something like "[keyname]": [ctrl], [alt], [shift],
+[return], [left], [pageup], [home], [end], [f1], [tab], [backtab]. To
+what KeySyms these map should be documented. There should be a
+--list-keys option to list all those codes to stdout. FIXME: How do we
+make the difference simultaneous and disjoint keystrokes ? Or do we just
+assume that modifiers (ctrl/alt/shift) are always simultaneous and the
+rest never are ?
+
+Command mode: by typing [:], you enter command mode. This is similar to
+vi's. Any function name can be used as a command. Parameters such as
+object numbers are entered literally (E.G. ":delete_vertex 69"). It
+should be possible to use the selection and highlight, either implicitly
+(E.G. ":delete_vertex") or explicitly (E.G. ":delete_vertex $S"). There
+should be shortcuts for function names (E.G. "dv" for "delete_vertex").
+I'd like to unify the command mode and the .cfg syntax so that you can
+call function in a .cfg, that sort of stuff.
+
+Interactivity: functions should probably refrain from popping up dialog
+boxes when called from command mode (it could be script). Either the
+caller should pass a "don't-be-interactive" flag or it's the caller that
+should pop up the dialog boxes, in which case it would have to be aware
+of an awful lot of things.
+
+Arguments 1: FIXME: named arguments ? Unix-style options ? Purely
+positional ?
+
+Arguments 2: FIXME: if there are any commands that take more than one
+list, arguments must be typed (is it a list or not) and command mode
+must provide a syntax for lists, E.G.  "item1,item2,item3".
+
+Arguments 3: FIXME: cardinality checks in the caller ? (E.G. "need
+exactly two linedefs selected").
+
+Movement functions: movement commands are used in several ways:
+- to select everything between the current pointer position to where
+  destination position without actually moving the pointer,
+- to move the pointer.
+How ?
+
+Modifiers: some functions don't do anything by themselves but change the
+way the next function behaves :
+- ["] followed by a register name, causes the next cut or paste function
+  to used that register instead of the unnamed register
+- Modifiers for selection operations. By default a selection function
+  replaces the current selection. With the following modifiers, the
+  output of the function is combined with the current selection by the
+  means of a selop : [^] xor (sel = sel ^ func), [&] intersection (sel =
+  sel & func), [|] union (sel = sel | func), [~] subtraction (sel = sel
+  & ~func).
+- <count>
+- something to make the next command use a movement selection as its
+  working set (vi can afford the luxury of duplicating commands (c vs. s
+  and d vs. x, but Yadex cannot because it has too many commands).
+
+It is desirable that these modifiers be implemented as functions, so
+that they use the same binding system as everything else.
+
+A problem with modifiers is who resets the default settings ? If it's
+EditorLoop(), how does it know which functions trigger resetting and
+which don't ? If it's the functions, isn't it a bit bletcherous ? Should
+functions have to declare that they use, say, the working set and
+EditorLoop() reset the working set only after such functions ?
+
+FIXME: at the moment, certain keys are bound to several different
+functions, depending on the mode. How do we do that ? Does it make any
+sense now that global mode is in sight ?
+
+Current functions:
+- [!]		_debug_info
+- [#]		move_num
+- [%]		toggle_show_things_sprites
+- [&]		toggle_show_object_numbers
+- [']		view_centre
+- [+]		zoom_in
+- [-]		zoom_out
+- [0]..[9]	zoom_set
+- [<]		move_prev
+- [=]		zoom_in
+- [>]		move_next
+- [@]		pop up font window
+- [E]		select_linedefs_ss
+- [G]		grid_inc
+- [H]		grid_reset
+- [_]		zoom_out
+- [`]		view_centre_zoom_fit
+- [a]		pop up "Set flag"
+- [alt][a]	pop up "About"
+- [alt][i]	info_bar_toggle
+- [b]		pop up "Toggle flag"
+- [backtab]	mode_prev
+- [c]		pop up "Clear flag"
+- [ctrl][E]	^select_linedefs_ss
+- [ctrl][b]	select_linedefs_whose_sidedefs_reference_non_existant_sector
+- [ctrl][e]	^select_linedefs_nf
+- [ctrl][g]	mode_global_toggle
+- [ctrl][k]	sector_slice
+- [ctrl][l]	force_redraw
+- [ctrl][p]	pop up palette window
+- [ctrl][r]	print sidedef xref
+- [ctrl][s]	print secret sectors
+- [ctrl][t]	print tagged linedefs or sectors
+- [ctrl][u]	select linedefs with unknown type
+- [ctrl][v]	toggle snap vertex tool
+- [ctrl][x]	obj_exchange_numbers
+- [del]		obj_delete
+- [down]	scroll_down
+- [e]		select_linedefs_nf
+- [end]		scroll_down_page
+- [esc]		quit
+- [f10]		pop up "Checks"
+- [f1]		pop up "Help"
+- [f2]		save
+- [f3]		save_as
+- [f5]		pop up "Preferences"
+- [f8]		pop up "Misc. operations"
+- [f9]		pop up "Insert a standard object"
+- [g]		grid_dec
+- [h]		grid_toggle
+- [home]	scroll_up_page
+- [i]		info_box_toggle
+- [ins]		obj_insert
+- [j]		move_num
+- [l]		mode_linedefs
+- [left]	scroll_left
+- [n]		move_next
+- [o]		copy
+- [p]		move_prev
+- [pagedown]	scroll_right_page
+- [pageup]	scroll_left_page
+- [q]		quit
+- [r]		rulers_toggle
+- [return]	pop up "Properties"
+- [right]	scroll_right
+- [s]		mode_sectors
+- [shift][f1]	screenshot
+- [shift][f2]	test_entry2
+- [space]	zoom_toggle
+- [t]		mode_things
+- [tab]		mode_next
+- [up]		scroll_up
+- [v]		mode_vertices
+- [w]		linedef_split_sector_split
+- [w]		thing_spin_ccw
+- [x]		linedef_split
+- [x]		thing_spin_cw
+- [y]		snap_toggle
+- [z]		grid_lock_toggle
+- [|]		pop up colour window
+
+Possible new functions:
+- go to {start,end,middle,other end} of linedef
+- go <count> pixels toward the {start,end} of this linedef
+- go to the {next,previous} angle along this path of linedefs (how are
+  "next" and "previous" defined ? what happens if you're on a vertex
+  that's shared by several linedefs ?)
+- move {left,right,up,down} to the edge of the selection
+- go to the centre of the rectangle that contains the selection
+- go to the nearest vertex
+- go to the nearest vertex to the {north,south,east,west}
+- make sector from linedefs, adding linedefs if necessary
+- select shortest closed linedef path
+- raise or lower the {ceiling,floor} of a sector by <count> units
+- [e][space] select_clear
+- [e][~] select_invert (in same class of objects ?)
+
+Implementation: Functions are C++ functions (FIXME: what about aliases
+and macros ?). There is a global map named "function" whose key is the
+name of the function and the value a pointer on the corresponding C++
+function. FIXME: How is this map filled ? Hard coded ? Is is possible to
+insert new elements dynamically ? It should probably be forbidden to
+modify an existing element.
+
+There is a global map named "binding" whose key is the key sequence and
+whose value is a structure containing the function name and the binding
+information. FIXME: How is this map filled ? Are the default binding
+hard coded ?
+
+FIXME: what the syntax to modify the bindings from the .cfg ? A separate
+keyword (bind [shift][f9] fart \$@) or a pseudo hash
+(binding["[shift][f9]"] = fart \$@) ? The interesting feature of the
+pseudo hash is that it can be read, not just written to.
+
+Functions that modify the selection: They do not necessarily operate on
+the main selection but perhaps on a copy of it. If we want to implement
+env_push and env_pop, it is necessary to be able to dissociate the
+selection from the editing session.
+
+FIXME do we implement the selop in EditorLoop() or in the selection
+functions ? The obvious drawback of doing it in the functions is
+redundant code and more bugs. The advantage is that it permits certain
+optimisations. For example, if selop is intersect, there is no need to
+scan the objects that are not already in the selection. Is the
+performance gain worth the ugliness ? A O(1) scan is fast and if we need
+a O(2) scan (for example to get the list of linedefs tagged to a list a
+sectors), we can make it O(1) again by using a temporary table. It's
+also a more general way to improve performance ; what if the selection
+contains everything ?
+
+I'm tempted to go for the clean, easy solution (having the functions
+return a selection of their own and having EditorLoop() combine it with
+the existing list). If performance is a problem, it can be changed
+later. One thing that will not be possible with this approach, though,
+is to write a function that inserts items in the selection a certain
+places (silly example : a function that takes a list of linedefs and
+inserts after each linedef the sectors it is tagged to). But I guess we
+can do without such a feature for the time being.
+
+Combining code:
+  (*function) (old_list, new_list);
+  if (selop == replace) {
+      old_list = new_list;
+  }
+  else {
+      if (selop == intersection) {
+	  // Make bitvector new_bv from new_list
+	  for each item in old_list
+	      if not in new_bv
+		  remove it from old_list
+      }
+      else if (selop == union) {
+	  // Make bitvector old_bv from old_list
+	  for each item in new_list
+	      if not in old_bv
+		  append in to old_list
+      }
+      else if (selop == xor) {
+	  // Make bitvector new_bv from new_list
+	  for each item in old_list
+	      if in new_bv
+		  remove it from old_list and from new_bv
+	  for each item in new_list
+	      if in new_bv
+		  append it to old_list
+      }
+      else if (selop == subtraction) {
+	  // Make bitvector new_bv from new_list
+	  for each item in old_list
+	      if in new_bv
+		  remove it from old_list
+      }
+  }
+
+In any case, it should be possible for functions to modify the input
+selection because select_clear is going to be implemented as a function.
+
+There should be a way to override the selop until further notice.
+
+EditorLoop() algorithm:
+1. Get keystroke
+2. Append to buffer
+3. Is there a binding that is exactly equal to the buffer ? If yes, call
+   the corresponding function, empty the buffer and go to 1.
+4. Is there a binding of which the contents of the buffer is an initial
+   substring ? If no, beep and empty the buffer.
+5. Go to 1.
+Also accumulate count.
+
+
+AJA PATCH
+Below is a patch that implements two other things that I would've
+liked.  Firstly, being able to turn off the warning message for the
+"Swap Sidedefs" functions for lines.  I find that I often need to flip
+a line but keep the sidedefs where they were.  The patch adds a
+"blindly_swap_sidedefs" field to the config file.  Incidentally I
+found it strange that using "Add a 2nd Sidedef" onto a fresh line
+(with no sidedefs already) put it as the first, yet flipping a single
+sided line happily swaps the sidedefs, making a line with no right
+side.
+
+Secondly, the patch lets the zoom factors of the number keys be
+configurable.
+
+Cheers,
+__
+\/   Andrew Apted  <ajapted@users.sourceforge.net>
+ 
+
+===========================================================================
+
+diff -u ./src/editloop.cc.prev ./src/editloop.cc
+--- ./src/editloop.cc.prev	Tue Sep 19 16:20:03 2000
++++ ./src/editloop.cc	Tue Sep 19 17:38:52 2000
+@@ -247,6 +247,8 @@
+ OrigX = 0;
+ OrigY = 0;
+ 
++edit_zoom_init ();
++
+ if (zoom_default == 0)
+    {
+    zoom_fit (e);
+@@ -1370,7 +1372,7 @@
+       // [0], [1], ... [9]: set the zoom factor
+       else if (is.key >= '0' && is.key <= '9')
+          {
+-         int r = edit_set_zoom (&e, is.key == '0' ? 0.1 : 1.0 / dectoi(is.key));
++         int r = edit_set_zoom (&e, digit_zoom_factors[dectoi(is.key)]);
+ 	 if (r == 0)
+ 	   RedrawMap = 1;
+          }
+diff -u ./src/cfgfile.cc.prev ./src/cfgfile.cc
+--- ./src/cfgfile.cc.prev	Tue Sep 19 16:20:24 2000
++++ ./src/cfgfile.cc	Tue Sep 19 18:33:03 2000
+@@ -345,6 +345,13 @@
+   "Merge vertices after ins. vertex",
+   &insert_vertex_merge_vertices },
+ 
++{ "blindly_swap_sidedefs",
++  NULL,
++  OPT_BOOLEAN,
++  NULL,
++  "Blindly swap sidedefs on a linedef",
++  &blindly_swap_sidedefs },
++
+ { "iwad1",
+   "i1",
+   OPT_STRINGPTR,
+@@ -556,6 +563,20 @@
+   NULL,
+   "Step between zoom factors (in %)",
+   &zoom_step },
++
++{ "digit_zoom_base",
++  NULL,
++  OPT_INTEGER,
++  NULL,
++  "Base zoom factor of digit keys (in %)",
++  &digit_zoom_base },
++
++{ "digit_zoom_step",
++  NULL,
++  OPT_INTEGER,
++  NULL,
++  "Step between zoom factors of digit keys (in %)",
++  &digit_zoom_step },
+ 
+ { NULL,
+   NULL,
+diff -u ./src/yadex.cc.prev ./src/yadex.cc
+--- ./src/yadex.cc.prev	Tue Sep 19 16:21:16 2000
++++ ./src/yadex.cc	Tue Sep 19 18:33:03 2000
+@@ -109,8 +109,11 @@
+ bool      InfoShown			= true;
+ int       zoom_default			= 0;  // 0 means fit
+ int       zoom_step			= 0;  // 0 means sqrt(2)
++int       digit_zoom_base               = 100;
++int       digit_zoom_step               = 30;
+ confirm_t insert_vertex_split_linedef	= YC_ASK_ONCE;
+ confirm_t insert_vertex_merge_vertices	= YC_ASK_ONCE;
++bool      blindly_swap_sidedefs         = false;
+ const char *Iwad1			= NULL;
+ const char *Iwad2			= NULL;
+ const char *Iwad3			= NULL;
+diff -u ./src/yadex.h.prev ./src/yadex.h
+--- ./src/yadex.h.prev	Tue Sep 19 16:21:20 2000
++++ ./src/yadex.h	Tue Sep 19 18:33:03 2000
+@@ -396,8 +396,11 @@
+ extern int   idle_sleep_ms;	// Time to sleep after empty XPending()
+ extern int   zoom_default;	// Initial zoom factor for map
+ extern int   zoom_step;		// Step between zoom factors in percent
++extern int   digit_zoom_base;	// Zoom factor of `1' key, in percent
++extern int   digit_zoom_step;	// Step between digit keys, in percent 
+ extern confirm_t insert_vertex_merge_vertices;
+ extern confirm_t insert_vertex_split_linedef;
++extern bool  blindly_swap_sidedefs;
+ extern const char *Iwad1;	// Name of the Doom iwad
+ extern const char *Iwad2;	// Name of the Doom II iwad
+ extern const char *Iwad3;	// Name of the Heretic iwad
+diff -u ./src/editobj.cc.prev ./src/editobj.cc
+--- ./src/editobj.cc.prev	Tue Sep 19 18:29:40 2000
++++ ./src/editobj.cc	Tue Sep 19 18:29:53 2000
+@@ -747,6 +747,7 @@
+       if (objtype == OBJ_LINEDEFS)
+ 	 {
+ 	 if (Expert
++            || blindly_swap_sidedefs
+             || Confirm (-1, -1,
+                "Warning: the sector references are also swapped",
+                "You may get strange results if you don't know what you are doing..."))
+diff -u ./src/editzoom.cc.prev ./src/editzoom.cc
+--- ./src/editzoom.cc.prev	Tue Sep 19 17:15:54 2000
++++ ./src/editzoom.cc	Tue Sep 19 17:42:57 2000
+@@ -36,6 +36,21 @@
+ #include "gfx.h"
+ 
+ 
++double digit_zoom_factors[10];
++
++
++void edit_zoom_init ()
++{
++  int i;
++  
++  double current = digit_zoom_base / 100.0;
++  double step = (digit_zoom_step + 100.0) / 100.0;
++
++  for (i=1; i <= 10; i++, current /= step)
++    digit_zoom_factors[i % 10] = current;
++}
++
++
+ int edit_zoom_in (edit_t *e)
+ {
+   if (! e) return 1;  // Prevent compiler warning about unused .p.
+diff -u ./src/editzoom.h.prev ./src/editzoom.h
+--- ./src/editzoom.h.prev	Tue Sep 19 17:15:58 2000
++++ ./src/editzoom.h	Tue Sep 19 17:39:03 2000
+@@ -4,6 +4,17 @@
+  */
+ 
+ 
++/* zoom factors for the digit keys
++ */
++extern double digit_zoom_factors[10];
++
++
++/*
++ *      edit_zoom_init - initialise
++ */
++void edit_zoom_init (void);
++
++
+ /*
+  *	edit_zoom_in - zoom_in
+  *
+diff -u ./yadex.cfg.prev ./yadex.cfg
+--- ./yadex.cfg.prev	Tue Sep 19 16:30:47 2000
++++ ./yadex.cfg	Tue Sep 19 18:41:14 2000
+@@ -78,6 +78,11 @@
+ 
+   insert_vertex_split_linedef = yes
+ 
++# Blindly swaps the sidedefs on a linedef, i.e. without any warning
++# prompt.  Default is false.
++
++  #blindly_swap_sidedefs = false
++
+ # Is the infobar shown ? On by default.
+ 
+   #info_bar = true
+@@ -111,8 +116,8 @@
+   #default_light_level     = 144
+   #default_lower_texture   = STARTAN3
+   #default_middle_texture  = STARTAN3
+-  #default_thing           = 3004
+   #default_upper_texture   = STARTAN3
++  #default_thing           = 3004
+ 
+ # Initial zoom factor when opening a new edit window, in
+ # percent. The special value 0 causes Yadex to adjust the zoom
+@@ -127,6 +132,12 @@
+ # two (slightly above 41% increase). It's the default.
+ 
+   #zoom_step = 0
++
++# Base zoom factor and step for the digit keys, in percent.  They work
++# like zoom_default and zoom_step above, but no special values.
++
++  #digit_zoom_base = 100
++  #digit_zoom_step = 30
+ 
+ 
+ #
+
+
+AJA PATCH #2
+Hey all,
+
+One feature I've really wanted in Yadex is the ability to point to an
+area, press a key, and have all the linedefs that face into that area
+updated so that it forms a new sector.  If the lines don't have a
+sidedef on that side, it is added, otherwise the existing sidedef is
+updated.
+
+Well I've implemented it, below is the patch :-).  The key is capital
+`Z'.  I tried `S' initially but it was easy to get mixed up with the
+sector mode switch key `s'.  It hasn't gotten heavy testing yet, but
+so far so good.  One limitation is that it doesn't handle islands
+within the chosen area -- for example the pillars near the start of
+MAP01 of DOOM 2.  Oh yeah if you're in sector mode and press the 'Z'
+key while another sector is selected, that sector reference is used on
+the updated sidedefs rather than making a new sector.
+
+Cheers,
+__
+\/   Andrew Apted  <ajapted@users.sourceforge.net>
+ 
+
+diff -r -u src_aja/editloop.cc src/editloop.cc
+--- src_aja/editloop.cc	Tue Aug 15 11:14:25 2000
++++ src/editloop.cc	Wed May  9 17:19:27 2001
+@@ -2123,6 +2123,21 @@
+ 	 RedrawMap = 1;
+ 	 }
+ 
++      // [Z] Set sector on surrounding linedefs (AJA)
++      else if (is.key == 'Z' && e.pointer_in_window) 
++         {
++         if (e.obj_type == OBJ_SECTORS && e.Selected)
++            {
++            SuperSectorSelector (e.pointer_x, e.pointer_y,
++               e.Selected->objnum);
++            }
++         else
++            {
++            SuperSectorSelector (e.pointer_x, e.pointer_y, OBJ_NO_NONE);
++            }
++         RedrawMap = 1;
++         }
++
+       // [!] Debug info (not documented)
+       else if (is.key == '!')
+          {
+diff -r -u src_aja/s_misc.cc src/s_misc.cc
+--- src_aja/s_misc.cc	Mon Aug 28 07:33:51 2000
++++ src/s_misc.cc	Thu May 10 22:16:49 2001
+@@ -29,10 +29,13 @@
+ 
+ 
+ #include "yadex.h"
++#include <math.h>
++
+ #include "entry.h"
+ #include "gfx.h"
+ #include "levels.h"
+ #include "selectn.h"
++#include "dialog.h"
+ 
+ 
+ /*
+@@ -176,6 +179,342 @@
+   Sectors[cur->objnum].light = light;
+   }
+ MadeChanges = 1;
++}
++
++
++static int find_linedef_for_area (int x, int y, int& side)
++{
++   int n, m, curx;
++   int best_match = -1;
++
++   curx = 32767;  // Oh yes, one more hard-coded constant!
++
++   for (n = 0; n < NumLineDefs; n++)
++      if ((Vertices[LineDefs[n].start].y > y)
++       != (Vertices[LineDefs[n].end].y > y))
++      {
++         int lx0 = Vertices[LineDefs[n].start].x;
++         int ly0 = Vertices[LineDefs[n].start].y;
++         int lx1 = Vertices[LineDefs[n].end].x;
++         int ly1 = Vertices[LineDefs[n].end].y;
++         m = lx0 + (int) ((long) (y - ly0) * (long) (lx1 - lx0)
++                                           / (long) (ly1 - ly0));
++         if (m >= x && m < curx)
++         {
++            curx = m;
++            best_match = n;
++         }
++      }
++
++   /* now look if this linedef has a sidedef bound to one sector */
++   if (best_match < 0)
++      return OBJ_NO_NONE;
++
++   if (Vertices[LineDefs[best_match].start].y
++     > Vertices[LineDefs[best_match].end].y)
++      side = 1;
++   else
++      side = 2;
++
++   return best_match;
++}
++
++/*
++   compute the angle between lines AB and BC, going anticlockwise.
++   result is in degrees 0 - 359.  A, B and C are vertex indices.
++   -AJA- 2001-05-09
++ */
++#define DEBUG_ANGLE  0
++
++static double angle_between_linedefs (int A, int B, int C)
++{
++   int a_dx = Vertices[B].x - Vertices[A].x;
++   int a_dy = Vertices[B].y - Vertices[A].y;
++   
++   int c_dx = Vertices[B].x - Vertices[C].x;
++   int c_dy = Vertices[B].y - Vertices[C].y;
++   
++   double AB_angle = (a_dx == 0) ? (a_dy >= 0 ? 90 : -90) :
++      atan2 (a_dy, a_dx) * 180 / M_PI;
++
++   double CB_angle = (c_dx == 0) ? (c_dy >= 0 ? 90 : -90) :
++      atan2 (c_dy, c_dx) * 180 / M_PI;
++
++   double result = CB_angle - AB_angle;
++
++   if (result >= 360)
++      result -= 360;
++   
++   while (result < 0)
++      result += 360;
++
++#if (DEBUG_ANGLE)
++   fprintf(stderr, "ANGLE %1.6f  (%d,%d) -> (%d,%d) -> (%d,%d)\n",
++      result, Vertices[A].x, Vertices[A].y,
++      Vertices[B].x, Vertices[B].y, Vertices[C].x, Vertices[C].y);
++#endif
++
++   return result;
++}
++
++/*
++   follows the path clockwise from the given start line, adding each
++   line into the appropriate set.  If the path is not closed, zero is
++   returned.  
++   
++   -AJA- 2001-05-09
++ */
++#define DEBUG_PATH  0
++
++static int select_sides_in_closed_path (bitvec_c& ld_side1,
++    bitvec_c& ld_side2, int line, int side)
++{
++   int cur_vert, prev_vert, final_vert;
++   
++   if (side == 1)
++   {
++      ld_side1.set (line);
++      cur_vert = LineDefs[line].end;
++      prev_vert = final_vert = LineDefs[line].start;
++   }
++   else
++   {
++      ld_side2.set (line);
++      cur_vert = LineDefs[line].start;
++      prev_vert = final_vert = LineDefs[line].end;
++   }
++
++#if (DEBUG_PATH)
++      fprintf(stderr, "PATH: line %d  side %d  cur %d  final %d\n",
++         line, side, cur_vert, final_vert);
++#endif
++
++   while (cur_vert != final_vert)
++   {
++      int next_line = OBJ_NO_NONE;
++      int next_vert = OBJ_NO_NONE;
++      int next_side;
++      double best_angle = 999;
++
++      // Look for the next linedef in the path.  It's the linedef that
++      // uses the current vertex and is not the current one.
++
++      for (int n = 0; n < NumLineDefs; n++)
++      {
++         if (n == line)
++            continue;
++
++         int other_vert;
++         int which_side;
++
++         if (LineDefs[n].start == cur_vert)
++         {
++            other_vert = LineDefs[n].end;
++            which_side = 1;
++         }
++         else if (LineDefs[n].end == cur_vert)
++         {
++            other_vert = LineDefs[n].start;
++            which_side = 2;
++         }
++         else
++            continue;
++
++         // found adjoining linedef
++         
++         double angle = angle_between_linedefs (prev_vert, cur_vert,
++            other_vert);
++         
++         if (! is_obj (next_line) || angle < best_angle)
++         {
++            next_line = n;
++            next_vert = other_vert;
++            next_side = which_side;
++            
++            best_angle = angle;
++         }
++
++         // Continue the search
++      }
++ 
++      line = next_line;
++      side = next_side;
++
++#if (DEBUG_PATH)
++      fprintf(stderr, "PATH NEXT: line %d  side %d  vert %d  angle %1.6f\n",
++         line, side, next_vert, best_angle);
++#endif
++
++      // None ?  Path cannot be closed
++      if (! is_obj (line))
++         return 0;
++
++      // Line already seen ?  Under normal circumstances this won't
++      // happen, but it _can_ happen and indicates a non-closed
++      // structure
++      if (ld_side1.get (line) || ld_side2.get (line))
++         return 0;
++
++      if (side == 1)
++         ld_side1.set (line);
++      else
++         ld_side2.set (line);
++       
++      prev_vert = cur_vert;
++      cur_vert = next_vert;
++   }
++
++#if (DEBUG_PATH)
++      fprintf(stderr, "PATH CLOSED !\n");
++#endif
++
++   return 1;
++}
++
++/*
++   update the side on a single linedef, using the given sector
++   reference.  Will create a new sidedef if necessary.
++ */
++static void super_set_sector_on_side (int line, wad_sdn_t& side,
++   wad_sdn_t& other, int side_no, int sector)
++{
++   if (is_obj (side) && SideDefs[side].sector == sector)
++   {
++      // there was no change.
++      return;
++   }
++   
++   int must_flip = 0;
++
++   if (! is_obj (side))
++   {
++      // if we're adding a sidedef to a line that has no sides, and
++      // the sidedef would be the 2nd one, then flip the linedef.
++      // Thus we don't end up with invalid lines -- i.e. ones with a
++      // left side but no right side.
++
++      if (! is_obj (other) && side_no == 2)
++         must_flip = 1;
++
++      InsertObject (OBJ_SIDEDEFS, OBJ_NO_NONE, 0, 0);
++      side = NumSideDefs - 1;
++
++      // if we're adding a second side to the linedef, clear out some
++      // of the properties that aren't needed anymore: middle texture,
++      // two-sided flag, and impassible flag.
++      
++      if (is_obj (other))
++      {
++         strncpy (SideDefs[side].tex3,  "-", WAD_TEX_NAME);
++         strncpy (SideDefs[other].tex3, "-", WAD_TEX_NAME);
++
++         LineDefs[line].flags |=  4;  // Set the 2S bit
++         LineDefs[line].flags &= ~1;  // Clear the Im bit
++      }
++   }
++
++   SideDefs[side].sector = sector;
++   
++   if (must_flip)
++   {
++      int temp = LineDefs[line].start;
++      LineDefs[line].start = LineDefs[line].end;
++      LineDefs[line].end = temp;
++
++      temp = side; 
++      side = other; 
++      other = temp;
++   }
++
++   MadeChanges = 1;
++   MadeMapChanges = 1;
++}
++
++static int super_find_sector_model (bitvec_c& ld_side1,
++    bitvec_c& ld_side2)
++{
++   for (int line=0; line < NumLineDefs; line++)
++   {
++      int side1 = LineDefs[line].sidedef1;
++      int side2 = LineDefs[line].sidedef2;
++
++      if (ld_side1.get (line))
++         if (is_obj (side2))
++            return SideDefs[side2].sector;
++
++      if (ld_side2.get (line))
++         if (is_obj (side1))
++            return SideDefs[side1].sector;
++   }
++
++   return OBJ_NO_NONE;
++}
++
++
++/*
++   Change the closed sector at the pointer
++
++   "sector" here really means a bunch of sidedefs that all face
++   inward to the current area under the mouse cursor.  Two basic
++   operations: (a) set the sidedef sector references to a completely
++   new sector, or (b) set them to an existing sector.  This is
++   controlled by the `new_sec' parameter.
++
++   -AJA- 2001-05-08
++ */
++
++void SuperSectorSelector (int map_x, int map_y, int new_sec)
++{
++   int line, side;
++   char msg_buf[200];
++
++   line = find_linedef_for_area (map_x, map_y, side);
++
++   if (! is_obj (line))
++   {
++      Beep ();
++      sprintf (msg_buf, "Chosen area is not closed");
++      Notify (-1, -1, msg_buf, NULL);
++      return;
++   }
++
++   bitvec_c ld_side1 (NumLineDefs);
++   bitvec_c ld_side2 (NumLineDefs);
++   
++   int closed = select_sides_in_closed_path (ld_side1, ld_side2,
++      line, side);
++
++   if (! closed)
++   {
++      Beep ();
++      sprintf (msg_buf, "Area chosen is not closed");
++      Notify (-1, -1, msg_buf, NULL);
++      return;
++   }
++
++   // -AJA- FIXME: look for "islands", closed linedef paths that lie
++   // completely inside the area, i.e. not connected to the main path.
++   // Example: the two pillars at the start of MAP01 of DOOM 2.  See
++   // GetOppositeSector() and the end of SplitSector() for a possible
++   // algorithm.
++   
++   if (! is_obj (new_sec))
++   {
++      int model = super_find_sector_model (ld_side1, ld_side2);
++      InsertObject (OBJ_SECTORS, model, 0, 0);
++      new_sec = NumSectors - 1;
++   }
++   
++   for (line=0; line < NumLineDefs; line++)
++   {
++      if (ld_side1.get (line))
++         super_set_sector_on_side (line, LineDefs[line].sidedef1,
++            LineDefs[line].sidedef2, 1, new_sec);
++
++      else if (ld_side2.get (line))
++         super_set_sector_on_side (line, LineDefs[line].sidedef2,
++            LineDefs[line].sidedef1, 2, new_sec);
++   }
+ }
+ 
+ /* end of file */
+diff -r -u src_aja/yadex.h src/yadex.h
+--- src_aja/yadex.h	Wed Aug 16 07:22:40 2000
++++ src/yadex.h	Tue May  8 20:32:53 2001
+@@ -584,6 +584,7 @@
+ void DistributeSectorCeilings (SelPtr); /* SWAP! */
+ void RaiseOrLowerSectors (SelPtr obj);
+ void BrightenOrDarkenSectors (SelPtr obj);
++void SuperSectorSelector (int map_x, int map_y, int new_sec);
+ 
+ /* s_prop.cc (previously in editobj.cc) */
+ void SectorProperties (int x0, int y0, SelPtr obj);
+
+
+AJA PATCH #3
+Here is a patch that implements two features I mentioned before:
+
+  (a) the 'w' key in vertex mode doing "split sector" function.
+      It's quite handy.  (code was a doddle).
+
+  (b) the 'T' key doing property transfer from highlighted object
+      to all selected objects.
+
+Patch is against 1.5.1 (like the SuperSector one, which BTW has been
+extremely useful -- I use it all the time and wouldn't want to edit
+without it.  Plus it hasn't crashed or fouled up yet).  I've tried to
+keep both patches independent -- might cause a reject against yadex.h
+though.  Andre, if you'd rather one big patch, will do.
+
+Cheers,
+__
+\/   Andrew Apted  <ajapted@users.sourceforge.net>
+ 
+
+diff -u -r src_aja/editloop.cc src/editloop.cc
+--- src_aja/editloop.cc	Tue Aug 15 11:14:25 2000
++++ src/editloop.cc	Sun May 27 15:46:12 2001
+@@ -1853,6 +1853,17 @@
+          StretchSelBox = false;
+          }
+ 
++      // [w]: split sector between vertices
++      else if (is.key == 'w' && e.obj_type == OBJ_VERTICES
++         && e.Selected && e.Selected->next && ! e.Selected->next->next)
++         {
++         SplitSector (e.Selected->next->objnum, e.Selected->objnum);
++         ForgetSelection (&e.Selected);
++         RedrawMap = 1;
++         DragObject = false;
++         StretchSelBox = false;
++         }
++
+       // [x]: spin things 1/8 turn clockwise
+       else if (is.key == 'x' && e.obj_type == OBJ_THINGS
+          && (e.Selected || is_obj (e.highlight_obj_no)))
+@@ -2134,6 +2160,30 @@
+          {
+          show_font ();
+ 	 RedrawMap = 1;
++         }
++
++      // [T] Transfer properties to selected objects (AJA)
++      else if (is.key == 'T' && e.Selected 
++            && e.highlight_obj_no >= 0)
++         {
++         switch (e.obj_type)
++            {
++            case OBJ_SECTORS:
++               TransferSectorProperties (e.highlight_obj_no, e.Selected);
++               RedrawMap = 1;
++               break;
++            case OBJ_THINGS:
++               TransferThingProperties (e.highlight_obj_no, e.Selected);
++               RedrawMap = 1;
++               break;
++            case OBJ_LINEDEFS:
++               TransferLinedefProperties (e.highlight_obj_no, e.Selected);
++               RedrawMap = 1;
++               break;
++            default:
++               Beep ();
++               break;
++            }
+          }
+ 
+       // [|] Show colours (not documented)
+diff -u -r src_aja/l_prop.cc src/l_prop.cc
+--- src_aja/l_prop.cc	Sun Apr 30 06:37:12 2000
++++ src/l_prop.cc	Sun May 27 15:41:37 2001
+@@ -477,3 +477,37 @@
+ }
+ 
+ 
++/*
++ *   TransferLinedefProperties
++ *
++ *   Note: right now nothing is done about sidedefs.  Being able to
++ *   (intelligently) transfer sidedef properties from source line to
++ *   destination linedefs could be a useful feature -- though it is
++ *   unclear the best way to do it.  OTOH not touching sidedefs might
++ *   be useful too.
++ *
++ *   -AJA- 2001-05-27
++ */
++#define LINEDEF_FLAG_KEEP  (1 + 4)
++
++void TransferLinedefProperties (int src_linedef, SelPtr linedefs)
++{
++   SelPtr cur;
++   wad_ldflags_t src_flags = LineDefs[src_linedef].flags & ~LINEDEF_FLAG_KEEP;
++
++   for (cur=linedefs; cur; cur=cur->next)
++   {
++      if (! is_obj(cur->objnum))
++         continue;
++
++      // don't transfer certain flags
++      LineDefs[cur->objnum].flags &= LINEDEF_FLAG_KEEP;
++      LineDefs[cur->objnum].flags |= src_flags;
++
++      LineDefs[cur->objnum].type = LineDefs[src_linedef].type;
++      LineDefs[cur->objnum].tag  = LineDefs[src_linedef].tag;
++
++      MadeChanges = 1;
++   }
++}
++
+diff -u -r src_aja/s_prop.cc src/s_prop.cc
+--- src_aja/s_prop.cc	Tue Jan 11 00:40:11 2000
++++ src/s_prop.cc	Sun May 27 13:29:27 2001
+@@ -208,3 +208,32 @@
+ }
+ 
+ 
++/*
++ *   TransferSectorProperties
++ *
++ *   -AJA- 2001-05-27
++ */
++void TransferSectorProperties (int src_sector, SelPtr sectors)
++{
++   SelPtr cur;
++
++   for (cur=sectors; cur; cur=cur->next)
++   {
++      if (! is_obj(cur->objnum))
++         continue;
++
++      strncpy (Sectors[cur->objnum].floort, Sectors[src_sector].floort,
++            WAD_FLAT_NAME);
++      strncpy (Sectors[cur->objnum].ceilt, Sectors[src_sector].ceilt,
++            WAD_FLAT_NAME);
++
++      Sectors[cur->objnum].floorh  = Sectors[src_sector].floorh;
++      Sectors[cur->objnum].ceilh   = Sectors[src_sector].ceilh;
++      Sectors[cur->objnum].light   = Sectors[src_sector].light;
++      Sectors[cur->objnum].special = Sectors[src_sector].special;
++      Sectors[cur->objnum].tag     = Sectors[src_sector].tag;
++
++      MadeChanges = 1;
++   }
++}
++
+diff -u -r src_aja/t_prop.cc src/t_prop.cc
+--- src_aja/t_prop.cc	Tue Jul 25 08:46:49 2000
++++ src/t_prop.cc	Sun May 27 15:22:29 2001
+@@ -315,4 +315,30 @@
+ }
+ 
+ 
++/*
++ *   TransferThingProperties
++ *
++ *   -AJA- 2001-05-27
++ */
++void TransferThingProperties (int src_thing, SelPtr things)
++{
++   SelPtr cur;
++
++   for (cur=things; cur; cur=cur->next)
++   {
++      if (! is_obj(cur->objnum))
++         continue;
++
++      Things[cur->objnum].angle = Things[src_thing].angle;
++      Things[cur->objnum].type  = Things[src_thing].type;
++      Things[cur->objnum].when  = Things[src_thing].when;
++
++      MadeChanges = 1;
++
++      things_types++;
++      things_angles++;
++   }
++}
++
++
+ /* end of file */
+diff -u -r src_aja/yadex.h src/yadex.h
+--- src_aja/yadex.h	Wed Aug 16 07:22:40 2000
++++ src/yadex.h	Sun May 27 15:45:18 2001
+@@ -506,6 +506,7 @@
+ 
+ /* l_prop.cc (previously in editobj.cc) */
+ void LinedefProperties (int x0, int y0, SelPtr obj);
++void TransferLinedefProperties (int src_linedef, SelPtr linedefs);
+ 
+ /* l_unlink.cc */
+ void unlink_sidedef (SelPtr linedefs, int side1, int side2);
+@@ -587,6 +589,7 @@
+ 
+ /* s_prop.cc (previously in editobj.cc) */
+ void SectorProperties (int x0, int y0, SelPtr obj);
++void TransferSectorProperties (int src_sector, SelPtr sectors);
+ 
+ /* s_split.cc (previously in objects.cc) */
+ void SplitSector (int, int); /* SWAP! */
+@@ -603,6 +606,7 @@
+ /* selrect.cc */
+ /* t_prop.c (previously in editobj.c) */
+ void ThingProperties (int x0, int y0, SelPtr obj);
++void TransferThingProperties (int src_thing, SelPtr things);
+ 
+ /* v_merge.cc */
+ void DeleteVerticesJoinLineDefs (SelPtr ); /* SWAP! */
+
+

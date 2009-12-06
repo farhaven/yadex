@@ -1,0 +1,77 @@
+//compile target map03.o
+#include "zcommon.acs"
+#import "glob.lmp"
+#define mission 0
+#define saved_buddys 1
+
+script 1 OPEN
+{	if (progress[mission] < 4)
+	{	progress[mission] = 4;
+		progress[saved_buddys] = 0;
+	}
+	ACS_Execute(999,0);
+	SetLineSpecial(1,ACS_Execute,2,0);
+	SetLineSpecial(2,Door_Open,0,25,105);
+	SetCameraToTexture(6,"CAMERA1",100);
+	SetCameraToTexture(7,"CAMERA3",100);
+	SetCameraToTexture(8,"CAMERA4",100);
+	SetCameraToTexture(15,"CAMERA5",100);
+	SetCameraToTexture(14,"CAMERA6",100);
+	Sector_SetFade(10,255,255,255);
+	Sector_SetFade(12,0,0,0);
+	Sector_SetDamage(7,60,MOD_LAVA);
+	Line_AlignFloor(3,0);
+	Line_AlignCeiling(3,0);
+}
+
+script 2 (void)
+{	say(3,"This door seems to be locked remotely");
+	delay(100);
+	say(0,"");
+}
+
+script 3 (void)
+{	SetLineSpecial(1,0,0);
+	Door_Open(4,25);
+}
+
+script 4 (void)
+{	say(3,"This door is jammed");
+	delay(70);
+	say(0,"");
+}
+
+script 5 (void)
+{	if (!CheckInventory("RedCard"))
+	{	say(3,"Looks like I need a red keycard for this to work");
+		delay(130);
+		say(0,"");
+	}else
+	{	SetLineSpecial(2,0,0);
+		Door_Close(6,25);
+		TagWait(6);
+		Sector_SetFade(7,255,255,255);
+		Sector_SetFade(8,255,255,255);
+		Light_ChangeToValue(7,255);
+		Light_ChangeToValue(8,255);
+		Light_Fade(7,80,105);
+		Light_Fade(8,80,105);
+		ReplaceTextures("FIREWALA","-");
+		Sector_SetDamage(7,0,0);
+		delay(140);
+		Light_Fade(7,255,105);
+		Light_Fade(8,255,105);
+		delay(105);
+		Sector_SetFade(7,0,0,0);
+		Sector_SetFade(8,0,0,0);
+		delay(1);
+		Light_ChangeToValue(7,120);
+		Light_ChangeToValue(8,120);
+		delay(5);
+		SetLineSpecial(2,Door_Open,0,25,105);
+	}	
+}
+
+script 6 ENTER
+{	SetActorAngle(0,1.0);
+}

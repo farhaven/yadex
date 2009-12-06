@@ -1,0 +1,302 @@
+<html>
+  <head>
+    <title>Yadex FAQ</title>
+  </head>
+  <body>
+
+    <div align="center">
+    <img src="logo_small.png" alt="Fancy logo">
+    <br>Yadex 1.7.1 (2008-09-01)
+    <h1>Yadex FAQ</h1>
+    </div>
+    <br>
+    <br>
+    <br>
+
+    <h2>Compilation problems</h2>
+
+    <dl>
+      <dt>
+	<strong>
+	  During configure,
+	  <br><code>error: none of (gcc, c89, cc) work, is your PATH set
+	  right?</code>
+	</strong>
+      <dd>
+	<p>
+	  You need a C compiler to compile Yadex.
+	</p>
+
+	<p>
+	  If you have one but it's not in the path, either fix
+	  <code>$PATH</code> or pass the full pathname to the configure script
+	  with the <code>--cc</code> flag (E.G. "<code>./configure --cc
+	  /opt/sfw/bin/gcc</code>").
+	</p>
+
+	<p>
+	  If it's in the path but it's not called <code>gcc</code> or
+	  <code>c89</code> or <code>cc</code>, pass the name to the configure
+	  script with the <code>--cc</code> flag (E.G. "<code>./configure --cc
+	  icc</code>").
+	</p>
+
+      <dt>
+	<strong>During configure,
+	<br><code>error: none of (g++, c++, cxx) work, is your PATH set right?
+	</code></strong>
+      <dd>
+	<p>
+	  You need a C++ compiler to compile Yadex.
+	</p>
+
+	<p>
+	  If you have one but it's not in the path, either fix
+	  <code>$PATH</code> or pass the full pathname to the configure script
+	  with the <code>--cxx</code> flag (E.G.  "<code>./configure --cxx
+	  /opt/sfw/bin/g++</code>").
+	</p>
+
+	<p>
+	  If it's in the path but it's not called <code>g++</code> or
+	  <code>c++</code> or <code>cxx</code>, pass the name to the configure
+	  script with the <code>--cxx</code> flag (E.G. "<code>./configure
+	  --cxx icc</code>").
+	</p>
+
+      <dt><strong>X11/Xlib.h: No such file or directory</strong>
+
+      <dd>
+	<p>
+	  Are you sure you have the Xlib headers&nbsp;? If not, install them.
+	  If you already have them, then find out where they are and change the
+	  "<code>X11INCLUDEDIR =</code>" line in <code>GNUmakefile</code>
+	  accordingly.
+	</p>
+
+      <dt><strong>The compiler chokes on the Xlib headers</strong>
+
+      <dd>
+	<p>
+	  This happens on Solaris 2.6 with GCC 2.95.2. Oliver Kraus says that
+	  the solution is to add "<code>-fpermissive</code>" to "<code>CXXFLAGS
+	  =</code>" in <code>GNUmakefile</code>.
+	</p>
+
+      <dt>
+	<strong>/usr/X11R6/lib/libX11.so: undefined reference to `recv'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `connect'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `socket'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `setsockopt'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `shutdown'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `gethostbyname'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `getservbyname'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `getpeername'
+	<br>/usr/X11R6/lib/libX11.so: undefined reference to `getsockname'
+	</strong>
+
+      <dd>
+	<p>
+	  This happens with QNX 6 and other Unices. Add "<code>-lsocket</code>"
+	  to "<code>LDFLAGS =</code>" in <code>GNUmakefile</code>.
+	</p>
+
+      <dt><strong>Solaris: can't resolve <code>gettimeofday()</code></strong>
+
+      <dd>
+	<p>
+	  In <code>GNUmakefile</code>, add "<code>-lrt</code>" after
+	  "<code>-lX11</code>".
+	</p>
+
+      <dt>
+	<strong>Mac OS X:
+	<br><code>al_adigits.o literal C string section (__TEXT,__cstring) does
+	not end with a '\0'</code></strong>
+
+      <dd>
+	<p>
+	  As far as I can see, the code in Yadex is legal C, and Mac OS X's
+	  <code>ld</code> is incorrect in rejecting it. As a workaround, change
+	  the size of <code>al_adigits[]</code> from 36 to 37 in
+	  <code>al_adigits.c</code> and <code>atclib.h</code>. The real fix is
+	  to complain to <a href="http://www.apple.com/">Apple</a> for selling
+	  you a linker that won't link valid C code.
+	</p>
+
+      <dt><strong>GCC 3.0: Yadex 1.5.1 doesn't compile</strong>
+
+      <dd>
+	<p>
+	  Get Yadex 1.5.2 or later.
+	</p>
+
+      <dt>
+	<strong>GCC 2.96: Yadex 1.5.0 doesn't compile</strong>
+
+      <dd>
+	<p>
+	  Get Yadex 1.5.1 or later.
+	</p>
+
+      <dt>
+        <strong>EGCS&nbsp;1.1.2 / SuSE&nbsp;6.2:
+	<br><code>no matching function for call to `menu_c::menu_c (...)'
+	</code></strong>
+
+      <dd>
+	<p>
+	  Apparently, there is a bug in certain EGCS 1.1.2 installations that
+	  makes them choke on <code>src/editloop.cc</code>. I know no
+	  workaround. I'd suggest that you try to get a fix from your
+	  distributor or use another compiler. EGCS&nbsp;1.0.3, EGCS&nbsp;1.1.1
+	  and GCC&nbsp;2.95.2 are known to work. 
+	</p>
+
+      <dt><strong>GCC 2.7: lots of compilation errors</strong>
+
+      <dd>
+	<p>
+	  GCC 2.7 is a very old compiler, it does not implement the current C++
+	  standard and I don't support it. If you must, try applying
+	  <code>patch/gcc-2.7.diff</code> that's included in the archive but
+	  don't complain to me if it doesn't work.
+	</p>
+
+
+      <dt>
+        <strong>GCC:
+	<br><code>warning: comparison between signed and unsigned</code>
+	</strong>
+
+      <dd>
+        <p>
+	  GCC is over-sensitive to signedness mismatches. Don't worry, that
+	  won't prevent Yadex from working.
+	</p>
+
+      <dt>
+        <strong>GCC: In <code>sanity.cc</code>,
+	<br><code>warning: decimal integer constant is so large that it is
+	unsigned</code></strong>
+
+      <dd>
+        <p>
+	  Weird as it may sound, the standard says that the lowest value that a
+	  signed long can hold is -(2^31). GCC sticks to the party line, never
+	  mind that you're on a platform like i386 where <code>LONG_MIN</code>
+	  is -(2^31)&nbsp;-&nbsp;1.
+	</p>
+
+	<p>
+	  You can ignore this warning.
+	</p>
+      
+      <dt>
+	<strong>GCC: In <code>sanity.cc</code>,
+	<br><code>warning: this decimal constant is unsigned only in ISO
+	C90</code></strong>
+
+      <dd>
+        <p>
+	  This is a new avatar (as of GCC 3.3) of the previous warning. Ignore
+	  it.
+	</p>
+
+      <dt><strong>Yadex 1.3.1 doesn't compile</strong>
+
+      <dd>
+        <p>
+	  There's a thinko in the makefile. It's fixed in version 1.3.2.
+	</p>
+
+      <dt><strong>Yadex 1.1.0 doesn't compile</strong>
+
+      <dd>
+        <p>
+	  In <code>src/infobar.cc</code>, lines 48 and 49, replace
+	</p>
+
+<pre>  const char infobar_c::FILE_NAME_UNSET[1];  // A special pointer value 
+  const char infobar_c::LEVEL_NAME_UNSET[1];  // A special pointer value</pre>
+
+	<p>
+	  by
+	</p>
+
+<pre>  const char infobar_c::FILE_NAME_UNSET[1] = { ' ' };
+  const char infobar_c::LEVEL_NAME_UNSET[1] = { ' ' };</pre>
+
+      <dt><strong>Yadex 1.0.1 doesn't compile</strong>
+
+      <dd>
+        <p>
+	  In <code>src/vector.h</code>, delete line 44 ("<code>return
+	  this;</code>") and compile again.
+	</p>
+    </dl>
+
+	    <h2>Misc.</h2>
+
+    <dl>
+      <dt><strong>I don't have an iwad</strong>
+
+      <dd>
+        <p>
+	  You can download certain iwads for free&nbsp;;
+	</p>
+
+	<ul>
+	  <li><a href="ftp://ftp.idsoftware.com/idstuff/doom/doom-1.8.wad.gz"
+	  >Doom 1.8 shareware iwad</a>
+	  <li><a href="ftp://ftp.idsoftware.com/idstuff/heretic/htic_v12.zip"
+	  >Heretic shareware version</a>
+	  <li><a href="ftp://ftp.idsoftware.com/idstuff/hexen/hexndemo.zip"
+	  >Hexen demo</a>
+	  <li><a href="http://www.rogue-ent.com/sfiles.html"
+	  >Strife demo</a>
+	</ul>
+
+      <dt><strong>What about a 3D preview&nbsp;?</strong>
+
+      <dd>
+        <p>
+	  Andrew Apted has written an amazing <a
+	  href="http://glbsp.sourceforge.net/files/RenderDiff.gz">patch</a>
+	  that does exactly that.
+	</p>
+
+      <dt><strong>Yadex is slow, particularly when dragging objects</strong>
+
+      <dd>
+        <p>
+	  Yes. I plan to replace the current implementation (pixmap) by drawing
+	  directly to the window. The difficulty lies in making that without
+	  generating a lot of flicker. In the meantime, try the <code>-P</code>
+	  option.
+	</p>
+
+      <dt><strong>How many people use Yadex&nbsp;?</strong>
+
+      <dd>
+        <p>
+	  I don't know for sure. Each new release gets a few hundred downloads.
+	</p>
+
+      <dt><strong>Why didn't you use &lt;insert speaker's favourite
+	toolkit&gt;&nbsp;?</strong>
+
+      <dd>
+        <p>
+	  I used plain Xlib and not a toolkit for several reasons. Firstly, I
+	  wanted to learn Xlib. Secondly, I reckoned it would be easier to
+	  translate the existing BGI calls to Xlib than to some higher level
+	  toolkit. Thirdly, I feared that depending on a toolkit would hurt
+	  portability.
+	</p>
+    </dl>
+
+    <hr>AYM 2008-01-17
+
+  </body>
+</html>

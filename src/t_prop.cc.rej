@@ -1,0 +1,16 @@
+*************** Place, Suite 330, Boston, MA 02111-1307,
+*** 45,50 ****
+  static const char *PrintThinggroup (void *ptr);
+  static const char *PrintThingdef (void *ptr);
+  int InputThingType (int x0, int y0, int *number);
+  
+  
+  /*
+--- 45,51 ----
+  static const char *PrintThinggroup (void *ptr);
+  static const char *PrintThingdef (void *ptr);
+  int InputThingType (int x0, int y0, int *number);
++ int InputLinedefType (int x0, int y0, int *number);
+  
+  
+  /*

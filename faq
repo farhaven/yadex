@@ -1,0 +1,181 @@
+                               Fancy logo
+                        Yadex 1.7.0 (2003-12-28)
+
+                               Yadex FAQ
+
+Compilation problems
+
+   During configure,
+   error: none of (gcc, c89, cc) work, is your PATH set right?
+
+           You need a C compiler to compile Yadex.
+
+           If you have one but it's not in the path, either fix $PATH
+           or pass the full pathname to the configure script with the
+           --cc flag (E.G. "./configure --cc /opt/sfw/bin/gcc").
+
+           If it's in the path but it's not called gcc or c89 or cc,
+           pass the name to the configure script with the --cc flag
+           (E.G. "./configure --cc icc").
+
+   During configure,
+   error: none of (g++, c++, cxx) work, is your PATH set right?
+
+           You need a C++ compiler to compile Yadex.
+
+           If you have one but it's not in the path, either fix $PATH
+           or pass the full pathname to the configure script with the
+           --cxx flag (E.G. "./configure --cxx /opt/sfw/bin/g++").
+
+           If it's in the path but it's not called g++ or c++ or cxx,
+           pass the name to the configure script with the --cxx flag
+           (E.G. "./configure --cxx icc").
+
+   X11/Xlib.h: No such file or directory
+
+           Are you sure you have the Xlib headers ? If not, install
+           them. If you already have them, then find out where they
+           are and change the "X11INCLUDEDIR =" line in GNUmakefile
+           accordingly.
+
+   The compiler chokes on the Xlib headers
+
+           This happens on Solaris 2.6 with GCC 2.95.2. Oliver Kraus
+           says that the solution is to add "-fpermissive" to
+           "CXXFLAGS =" in GNUmakefile.
+
+   /usr/X11R6/lib/libX11.so: undefined reference to `recv'
+   /usr/X11R6/lib/libX11.so: undefined reference to `connect'
+   /usr/X11R6/lib/libX11.so: undefined reference to `socket'
+   /usr/X11R6/lib/libX11.so: undefined reference to `setsockopt'
+   /usr/X11R6/lib/libX11.so: undefined reference to `shutdown'
+   /usr/X11R6/lib/libX11.so: undefined reference to `gethostbyname'
+   /usr/X11R6/lib/libX11.so: undefined reference to `getservbyname'
+   /usr/X11R6/lib/libX11.so: undefined reference to `getpeername'
+   /usr/X11R6/lib/libX11.so: undefined reference to `getsockname'
+
+           This happens with QNX 6 and other Unices. Add "-lsocket"
+           to "LDFLAGS =" in GNUmakefile.
+
+   Solaris: can't resolve gettimeofday()
+
+           In GNUmakefile, add "-lrt" after "-lX11".
+
+   Mac OS X:
+   al_adigits.o literal C string section (__TEXT,__cstring) does not
+   end with a '\0'
+
+           As far as I can see, the code in Yadex is legal C, and Mac
+           OS X's ld is incorrect in rejecting it. As a workaround,
+           change the size of al_adigits[] from 36 to 37 in
+           al_adigits.c and atclib.h. The real fix is to complain to
+           Apple for selling you a linker that won't link valid C
+           code.
+
+   GCC 3.0: Yadex 1.5.1 doesn't compile
+
+           Get Yadex 1.5.2 or later.
+
+   GCC 2.96: Yadex 1.5.0 doesn't compile
+
+           Get Yadex 1.5.1 or later.
+
+   EGCS 1.1.2 / SuSE 6.2:
+   no matching function for call to `menu_c::menu_c (...)'
+
+           Apparently, there is a bug in certain EGCS 1.1.2
+           installations that makes them choke on src/editloop.cc. I
+           know no workaround. I'd suggest that you try to get a fix
+           from your distributor or use another compiler. EGCS 1.0.3,
+           EGCS 1.1.1 and GCC 2.95.2 are known to work.
+
+   GCC 2.7: lots of compilation errors
+
+           GCC 2.7 is a very old compiler, it does not implement the
+           current C++ standard and I don't support it. If you must,
+           try applying patch/gcc-2.7.diff that's included in the
+           archive but don't complain to me if it doesn't work.
+
+   GCC:
+   warning: comparison between signed and unsigned
+
+           GCC is over-sensitive to signedness mismatches. Don't
+           worry, that won't prevent Yadex from working.
+
+   GCC: In sanity.cc,
+   warning: decimal integer constant is so large that it is unsigned
+
+           Weird as it may sound, the standard says that the lowest
+           value that a signed long can hold is -(2^31). GCC sticks
+           to the party line, never mind that you're on a platform
+           like i386 where LONG_MIN is -(2^31) - 1.
+
+           You can ignore this warning.
+
+   GCC: In sanity.cc,
+   warning: this decimal constant is unsigned only in ISO C90
+
+           This is a new avatar (as of GCC 3.3) of the previous
+           warning. Ignore it.
+
+   Yadex 1.3.1 doesn't compile
+
+           There's a thinko in the makefile. It's fixed in version
+           1.3.2.
+
+   Yadex 1.1.0 doesn't compile
+
+           In src/infobar.cc, lines 48 and 49, replace
+
+   const char infobar_c::FILE_NAME_UNSET[1];  // A special pointer value
+   const char infobar_c::LEVEL_NAME_UNSET[1];  // A special pointer value
+
+           by
+
+   const char infobar_c::FILE_NAME_UNSET[1] = { ' ' };
+   const char infobar_c::LEVEL_NAME_UNSET[1] = { ' ' };
+
+   Yadex 1.0.1 doesn't compile
+
+           In src/vector.h, delete line 44 ("return this;") and
+           compile again.
+
+Misc.
+
+   I don't have an iwad
+
+           You can download certain iwads for free ;
+
+              * Doom 1.8 shareware iwad
+              * Heretic shareware version
+              * Hexen demo
+              * Strife demo
+
+   What about a 3D preview ?
+
+           Andrew Apted has written an amazing patch that does
+           exactly that.
+
+   Yadex is slow, particularly when dragging objects
+
+           Yes. I plan to replace the current implementation (pixmap)
+           by drawing directly to the window. The difficulty lies in
+           making that without generating a lot of flicker. In the
+           meantime, try the -P option.
+
+   How many people use Yadex ?
+
+           I don't know for sure. Each new release gets a few hundred
+           downloads.
+
+   Why didn't you use <insert speaker's favourite toolkit> ?
+
+           I used plain Xlib and not a toolkit for several reasons.
+           Firstly, I wanted to learn Xlib. Secondly, I reckoned it
+           would be easier to translate the existing BGI calls to
+           Xlib than to some higher level toolkit. Thirdly, I feared
+           that depending on a toolkit would hurt portability.
+
+     --------------------------------------------------------------
+
+   AYM 2003-12-28

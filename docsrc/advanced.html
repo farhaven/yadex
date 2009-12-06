@@ -1,0 +1,140 @@
+<html>
+<head>
+<title>Yadex advanced uses</title>
+</head>
+<body>
+
+<div align="center">
+<img src="logo_small.png" alt="Fancy logo">
+<br>Yadex $VERSION ($SOURCE_DATE)
+<h1>Advanced user's guide</h1>
+<table><tr><td><td width="50%" align="center">
+Under a silly name, this document discusses some issues that
+only "advanced" users might want to know about. If you're a new
+user, you can probably skip this document for the moment.
+
+<td></td></table>
+</div>
+<br>
+<br>
+<br>
+
+		<h2>Scalability</h2>
+
+			<h3>Level size</h3>
+
+Very large levels, that is levels with large numbers of things,
+vertices, linedefs, sidedefs or sectors, affect both memory
+consumption and responsiveness.
+
+<ul>
+<p><li>In theory, the amount of memory needed by Yadex to hold
+a level open for editing is exactly equal to the cumulated size
+of the <code>THINGS</code>, <code>VERTEXES</code>,
+<code>LINEDEFS</code>, <code>SIDEDEFS</code> and
+<code>SECTORS</code> lumps of said level. In practice, it
+probably will be a little higher because of the overhead in the
+memory allocation system.
+
+<p>In addition, each object in the selection consumes about 8
+bytes.
+
+<p>Finally, during certain operations, Yadex creates bit
+vectors. Fortunately, these consume very little memory, about 1
+bit for each object. If you had a level with 32,767 linedefs,
+creating a bit vector for the linedefs would require about
+4&nbsp;kB, which is not much, especially by comparison with the
+447&nbsp;kB that would be needed to store the linedefs
+themselves.
+
+<p><li>The worst problem that large levels cause is not memory
+but CPU cycles.  Yadex spends a lot of its time browsing through
+the entire level data. For example, if you are in linedefs mode,
+every time you move the pointer, Yadex scans the entire linedefs
+table to see which linedef is under the pointer. As the number
+of objects increases, the responsiveness is bound to decrease.
+
+<p>There are several places in DEU where there were algorithms
+in O(2). For example, when you dragged a vertex, the piece of
+code that checked whether you dragged it on top of another
+vertex made about 1/2 N<sup>2</sup> tests, which is unreasonably
+high past a few hundred vertices. I've tried to replace such
+algorithms by ones in N&times;log(N) but some of them might
+remain.
+
+<p>The drag-and-drop code is awfully slow when dragging a large
+number of objects. I'm still not sure why.
+
+<p>The worst offender by far in terms of CPU cycles is the
+display itself, for obvious reasons. Zooming in will make it
+better since Yadex avoids drawing objects that are off-screen.
+Using a pixmap (as is the default) will make it <em>much</em>
+worse as (at least on my system) drawing to a pixmap is way
+slower than drawing to a window. With a large number of objects
+in sight, the difference can be very noticeable.
+
+</ul>
+
+			<h3>Wad size</h3>
+
+<p>Since the directory of all loaded wads is kept in memory all
+the time, in pathological cases this could cause trouble.
+However, I don't think the problem could arise in practice as
+even the biggest wads have directories no larger than about
+100&nbsp;kB.
+
+<p>Wads with a large number of entries tend to cause delays
+because loading them generates several screenfuls of messages.
+I've made those load-time messages much more compact than they
+used to be but there's still enough left to be annoying with
+certain megawads. And, no, there's no way to suppress them (I
+mean the messages &lt;g&gt;).
+
+<p>If and when in-place saving is ever implemented, there'll be
+something to say about it here.
+
+			<h3>Window size</h3>
+
+In the present implementation, the window is probably the worst
+memory and CPU hog. Unless the <code>-P</code> option is used, a
+pixmap is created for the window. For large window sizes, that
+pixmap can be quite large. For example, for a 1024&times;768
+window on a 16-bit display, it would be about 1.5&nbsp;MB large.
+
+<p>On the CPU side, every times the screen is redrawn completely
+(which happens quite often, particularly when dragging objects),
+the pixmap is filled with black and then blitted back to the
+frame buffer. In the above example, that amounts to reading or
+writing no less than about 4.5 million bytes for <em>every</em>
+refresh. This alone could explain why Yadex becomes so sluggish
+when the window size grows.
+
+<p>I plan to remove the pixmap completely and always display
+directly onto the window, like is done when <code>-P</code> is
+given. That would eliminate the need for the blitting step,
+which would cut two thirds of the load. What's more, I strongly
+suspect that clearing and drawing to a window is significantly
+faster than doing the same with a pixmap (because the X server
+typically can't use the video hardware on pixmaps). The problem
+is doing that in a flicker-free fashion.
+
+		<h2>How Yadex deals with wad files</h2>
+
+<p>Yadex keeps the iwad open for the whole duration of the Yadex
+session. The iwad is closed only when Yadex exits. Pwads are
+kept open as long as they are loaded. A pwad is closed only when
+another pwad with exactly the same resources is loaded or, if it
+contains only a level, when that level is saved.
+
+<p>The wad files are opened with a simple <code>fopen()</code>.
+Yadex make no attempt to control the locking. However, even
+though it would probably be possible for another process to open
+a file while Yadex keeps it open, it would nontheless be a bad
+idea.
+
+<p>For more high-level information on how Yadex treats wad
+files, see <a href="wad_specs.html">there</a>.
+
+</p><hr>AYM $SELF_DATE
+</body>
+</html>

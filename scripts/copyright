@@ -1,0 +1,177 @@
+#!/usr/bin/perl -w
+#
+#	copyright - print copyright info from docsrc/copyright
+#	AYM 2002-09-15
+#
+
+
+# This file is copyright André Majorel 2002.
+# 
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of version 2 of the GNU General Public License as published by the
+# Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
+use strict;
+use Getopt::Long;
+
+
+sub byname ($$);
+
+
+my %licences =
+(
+  'GPL'  => 'GNU GPL v2', 
+  'LGPL' => 'GNU LGPL v2',
+  'PD'   => 'public domain'
+);
+
+
+my @items;
+my $what = 'copyright';
+my $format = undef;
+
+
+#
+#	Parse the command line
+#
+{
+  Getopt::Long::Configure 'bundling', 'noignorecase';
+  die "copyright: syntax error\n"
+    if ! GetOptions
+      'a' => sub { $what   = 'authors'; },
+      'c' => sub { $format = 'c';       },
+      'h' => sub { $format = 'html';    },
+      'm' => sub { $format = 'troff';   },
+      't' => sub { $format = 'text';    };
+  die "copyright: use one of -chmt\n" if ! defined $format;
+}
+
+
+#
+#	Load the AUTHORS file
+#
+while (defined (my $line = <>))
+{
+  chomp $line;
+  my @fields = split "\t", $line;
+  die "copyright: $ARGV($.): wrong number of fields\n" if (@fields != 4);
+  my %authinfo;
+  $authinfo{name}      = $fields[0];
+  $authinfo{firstname} = $fields[1];
+  $authinfo{years}     = $fields[2];
+  $authinfo{licence}   = $fields[3];
+  push @items, \%authinfo;
+}
+
+
+#
+#	Write the output into @output (one line per element)
+#
+my @output;
+if ($what eq 'authors')		# Print the list of authors
+{
+  foreach my $item (sort byname @items)
+  {
+    push @output, "$item->{firstname} $item->{name}";
+  }
+}
+elsif ($what eq 'copyright')	# Print the list of copyright holders
+{
+  foreach my $item (sort byname @items)
+  {
+    my $licence;
+    die "copyright: bad licence \"$item->{licence}\"\n"
+      if ! exists $licences{$item->{licence}};
+    $licence = $licences{$item->{licence}};
+
+    my $string;
+    if ($item->{licence} eq 'PD')
+    {
+      $string = "Parts written by"
+	. " $item->{firstname} $item->{name}"
+	. ", $licence";
+    }
+    else
+    {
+      $string = "Parts copyright"
+	. " $item->{firstname} $item->{name}"
+	. " $item->{years}"
+	. ", $licence";
+    }
+    push @output, $string;
+  }
+}
+else
+{
+  die "copyright: bad \$what \"$what\"";
+}
+
+
+#
+#	Dump @output to stdout using the specified format
+#	(text, troff, HTML, C)
+#
+if ($format eq 'c')
+{
+  print "\n";
+  print "extern const char *const yadex_copyright[] =\n";
+  print "{\n";
+}
+foreach my $string (@output)
+{
+  if ($format eq 'c')
+  {
+    $string =~ s/\\/\\\\/g;		# Escape backslashes
+    $string =~ s/"/\"/g;		# Escape double quotes
+    print "  \"$string\",\n";
+  }
+  elsif ($format eq 'html')
+  {
+    $string =~ s/</\&lt;/g;		# Escape "<"
+    $string =~ s/©/\&copy;/g;		# Encode the copyright symbol
+    print "$string<br>\n";
+  }
+  elsif ($format eq 'text')
+  {
+    print "$string\n";
+  }
+  elsif ($format eq 'troff')
+  {
+    $string =~ s/\\/\\\\/g;		# Escape backslashes
+    $string =~ s/©/\\(co/g;		# Encode the copyright symbol
+    print "$string\n";
+    print ".br\n";
+  }
+  else
+  {
+    die "copyright: bad format \"$format\"\n";
+  }
+}
+if ($format eq 'c')
+{
+  print "  0\n";
+  print "};\n";
+  print "\n";
+}
+
+exit 0;
+
+
+#
+#	byname - sort() callback to sort by (lastname, firstname)
+#
+sub byname ($$)
+{
+  my ($a, $b) = @_;
+  return "$a->{name}\01$a->{firstname}" cmp "$b->{name}\01$b->{firstname}";
+}
+

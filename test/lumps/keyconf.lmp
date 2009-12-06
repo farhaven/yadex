@@ -1,0 +1,18 @@
+weaponsection Translocator
+setslot 1 Fist Chainsaw Translocator
+
+addkeysection "Information" info
+addmenukey "Show objectives" objectives
+	alias objectives "puke 999"
+	defaultbind O objectives
+
+addkeysection "Ingame menus" in_menu
+addmenukey "Menu up" menu_up
+	alias menu_up "puke 997 1"
+	defaultbind U menu_up
+addmenukey "Menu down" menu_down
+	alias menu_down "puke 997 2"
+	defaultbind J menu_down
+addmenukey "Menu select" menu_select
+	alias menu_select "puke 997 3"
+	defaultbind K menu_select

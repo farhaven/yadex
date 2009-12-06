@@ -1,0 +1,77 @@
+//compile target transl.lmp
+#include "zcommon.acs"
+#library "transl"
+#import "glob.lmp"
+
+/* This library contains the scripts used in conjunction
+ * with the translocator rifle. It is called TRANSL and
+ * invoked through the LOADACS lump.
+ */
+
+#define particle 254 // the spawn number of the blue particle fountain
+int disks[32] = {0}; // tids of translocator disks
+int coordinates[32][2] = {{0},{0}}; // positions of the players while firing a disk
+#define x 0
+#define y 1
+#define diskdelay 70 // how many tics a player has to wait for a new disk
+int diskid; // the next disk's tid
+int offset[2] = {11,11};
+
+script 800 (void)
+{	int disk = disks[Playernumber()];
+	
+	if (ThingCount(0,disk))
+	{	Thing_Remove(disk);
+		Thing_Remove(disk+40);
+	}
+	
+	disk = 30000;
+	while (ThingCount(0,disk))
+	{	disk++;
+	}
+	disks[Playernumber()] = disk;
+	diskid = disk;
+	ACS_Execute(804,0,0,0,0);
+	coordinates[Playernumber()][x] = GetActorX(0);
+	coordinates[Playernumber()][y] = GetActorY(0);
+}
+
+script 801 (void)
+{	if (!ActivatorTID())
+		Thing_ChangeTID(0,diskid);
+	Thing_SpawnNoFog(ActivatorTID(),particle,0,ActivatorTID()+40);
+	delay(350);
+	Thing_Remove(ActivatorTID());
+}
+
+script 802 (void)
+{	Thing_ChangeTID(0,diskid);
+}
+
+script 803 (void)
+{	int disk = disks[Playernumber()];
+	int angle = 0;
+	int spawnangle;
+	int xx,yy;
+	if (disk)
+	{	angle = GetActorAngle(0);
+		spawnangle = VectorAngle(GetActorX(disk)-coordinates[Playernumber()][x],GetActorY(disk)-coordinates[Playernumber()][y]);
+		Teleport(disk,0,0);
+		xx = cos(spawnangle) * offset[x];
+		yy = sin(spawnangle) * offset[y];
+		SetActorPosition(0,GetActorX(0) - xx,GetActorY(0) - yy,GetActorZ(disk),0);
+		Thing_Remove(disk);
+		Thing_Remove(disk+40);
+		disks[Playernumber()] = 0;
+		SetActorAngle(0,angle);
+	}
+	
+}
+
+script 804 ENTER
+{	while (CheckInventory("disk") < 5)
+	{	delay(diskdelay);
+		GiveInventory("disk",1);
+	}
+}
+

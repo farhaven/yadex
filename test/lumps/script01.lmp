@@ -1,0 +1,193 @@
+//compile target map01.o
+#include "zcommon.acs"
+#import "glob.lmp"
+#define mission 0
+
+int angle;
+int show_hologram = 0;
+int talk = 0;
+
+script 1 (void)
+{	if (!(ActivatorTID() >= 401))
+		terminate;
+	Thing_SetSpecial(19,0,0,0,0);
+	ACS_Execute(7,0);
+	SetPlayerProperty(0,1,0);
+	Thing_Activate(3);
+	Thing_SetGoal(3,7,0,0);
+	while (!talk)
+		delay(1);
+	if (progress[mission] == 1)
+	{	say(1,"Hello Corporal, I'm glad they sent you.");
+		delay(120);
+		say(1,"We have a big problem here");
+		delay(110);
+		say(1,"As you know,we were developing a translocator device for the UAC");
+		delay(180);
+		say(1,"Now,well,it has been stolen");
+		delay(110);
+		say(3,"Stolen? Who could do that?");
+		delay(110);
+		say(1,"That is a bit hard to explain. Follow me please.");
+		delay(120);
+		say(0,"");
+		Thing_SetGoal(3,12,0,0);
+		Thing_Activate(3);
+		ACS_Terminate(7,0);
+		SetPlayerProperty(0,0,0);
+		while (!show_hologram)
+			delay(1);
+		delay(35);
+		ACS_Execute(8,0);
+		say(1,"Here we have a hologram of one the thieves.");
+		delay(120);
+		say(3,"Yuck. Looks mean.");
+		delay(100);
+		say(1,"They *are* mean. A group of those creatures raided one of");
+		delay(150);
+		say(1,"our field teams which was testing the device.");
+		delay(120);
+		say(1,"noone survived. It was a bloody massacre.");
+		delay(120);
+		say(1,"We need this thing back.");
+		delay(110);
+		say(3,"I see. Ok, let's go.");
+		delay(110);
+		say(1,"Okay, I'll give orders to open the transporter room for you.");
+		delay(150);
+		say(1,"Good luck, Flynn!");
+		delay(110);
+		say(0,"");
+		SetLineSpecial(4,Teleport_NewMap,2,0,1);
+		Door_Open(2,25,0);
+	}else if (progress[mission] == 3)
+	{	say(1,"Welcome back,Corporal. I see you had success.");
+		delay(130);
+		say(3,"Yep, got that thing. It wasn't too easy though.");
+		delay(135);
+		say(1,"We expected things like that. It looks like you're not leaving");
+		delay(160);
+		say(1,"too soon. We got yet another mission for you.");
+		delay(130);
+		say(3,"What is it?");
+		delay(100);
+		say(1,"Some hours before you arrived, we lost radio connection to");
+		delay(160);
+		say(1,"one of our outposts. You have to go there and look what happened");
+		delay(170);
+		say(3,"What outpost is this exactly?");
+		delay(120);
+		say(1,"It is called Tei-Tenga. I suppose you know this name.");
+		delay(150);
+		say(3,"Yeah, it sounds familiar. Anyway, I'll see whether I know");
+		delay(155);
+		say(3,"it when I'm there.");
+		delay(110);
+		say(1,"Fine. I reprogrammed the teleporters destination for you.");
+		delay(155);
+		say(0,"");
+		SetLineSpecial(4,Teleport_NewMap,3,0,1);
+		ACS_Terminate(7,0);
+		SetPlayerProperty(0,0,0);
+		progress[mission] = 4;
+	}
+		
+	SetLineSpecial(1,0);
+}
+	
+script 2 (int face)
+{	Thing_Deactivate(3);
+	if (!face)
+		show_hologram = 1;
+	else
+		talk = 1;
+}
+
+script 3 (void)
+{	SetActorAngle(13,VectorAngle(GetActorX(0) - GetActorX(13),GetActorY(0) - GetActorY(13)));
+	say(2,"You have to talk to Dr Sunders first.");
+	delay(100);
+	say(0,"");
+	SetActorAngle(13,0.75);
+	ClearLineSpecial();
+}
+
+script 4 open
+{	SetLineSpecial(1,ACS_Execute,3);
+	Thing_SetSpecial(19,ACS_Execute,1,0,0);
+	Thing_SetSpecial(18,ACS_Execute,11,0,0);
+	Line_AlignCeiling(4,0);
+	CreateTranslation(1,112:127=32:47,152:159=24:31);
+	CreateTranslation(2,112:127=192:207);
+	CreateTranslation(3,112:127=176:191,152:159=168:175);
+	Thing_SetTranslation(13,2);
+	Thing_SetTranslation(14,2);
+	Thing_SetTranslation(15,3);
+	if (progress[mission] < 1)
+		progress[mission] = 1;
+	ACS_Execute(999,0);
+}
+
+script 5 (void)
+{	Door_Open(2,25,0);
+}
+
+script 6 (void)
+{	Floor_LowerByValue(1,25,256);
+	TagWait(1);
+	Delay(105);
+	Floor_RaiseByValue(1,25,256);
+}
+
+script 7 (void)
+{	Thing_Stop(0);
+	Thing_Remove(900+Playernumber());
+	Spawn("mapspot",GetActorX(0),GetActorY(0),GetActorZ(0),900+Playernumber());
+	int x,y,z;
+	while (1)
+	{	x = GetActorX(900+Playernumber());
+		y = GetActorY(900+Playernumber());
+		z = GetActorZ(900+Playernumber());
+		SetActorPosition(401+Playernumber(),x,y,z,false);
+		delay(1);
+	}
+}
+script 8 (void)
+{	TeleportOther(1,2,1);
+	while(1)
+	{	delay(random(15,70));
+		TeleportOther(1,16,0);
+		delay(random(1,10));
+		TeleportOther(1,2,0);
+	}
+}
+script 9 ENTER
+{	NoiseAlert(0,0);
+	Thing_ChangeTID(0,401+Playernumber());
+}
+script 10 (void)
+{	Teleport_NoFog(17,0,0);
+	SetLineSpecial(1,0,0);
+	progress[mission]++;
+	SetActorAngle(0,0.75);
+	ACS_Execute(999,0);
+	Thing_ChangeTID(0,401+Playernumber());
+	Thing_SetSpecial(19,ACS_Execute,1,0,0);
+	Thing_SetSpecial(18,ACS_Execute,11,0,0);
+	talk = 0;
+}
+script 11 (void)
+{	ACS_Terminate(1,0);
+	ACS_Terminate(7,0);
+	Door_Open(2,25,0);
+	SetLineSpecial(1,0);
+	SetPlayerProperty(0,0,0);
+	Thing_Deactivate(3);
+	Thing_SetSpecial(18,0,0,0,0);
+	say(0,"");
+	if (progress[mission] == 1)
+		SetLineSpecial(4,Teleport_NewMap,2,0,1);
+	else if (progress[mission] == 3)
+		SetLineSpecial(4,Teleport_NewMap,3,0,1);
+		
+}

@@ -1,0 +1,26 @@
+These are patches for Yadex that have for some reason not made
+it in the stable version. Some were written by me, some by
+others.
+
+Please note :
+
+- These patches are not part of the stable version; they come
+  with NO WARRANTY (as if the stable version came with any sort
+  of warranty). They may not have been given even the slightest
+  amount of testing. How long since your last backup ?
+
+- These diffs are against various versions of Yadex, not
+  necessarily the latest one or the one you have. Sometimes a
+  patch against version X works against version Y, sometimes
+  not. While patching, keep an eye open for error messages such
+  as "Hunk #n FAILED".
+
+- To apply, try this :
+
+    $ cd yadex-$VERSION
+    $ patch -p1 <foo.diff
+
+  You may have to tweak the arguments to patch but -p1 should
+  work with most diffs.
+
+-- AYM 2001-07-01

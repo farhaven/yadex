@@ -1,0 +1,216 @@
+<html>
+<head>
+<title>Differences between Yadex and DEU 5.21</title>
+</head>
+<body>
+
+<div align="center">
+<img src="logo_small.png" alt="Fancy logo">
+<br>Yadex 1.7.1 (2008-09-01)
+<h1>Differences between Yadex and DEU 5.21</h1>
+<table><tr><td></td><td width="50%" align="center">
+<p>If you're an old DEU user, you might find this useful.
+
+<p><strong>Warning&nbsp;: as it has not been updated since
+1998-02, this document is badly out of date.</strong>
+
+<td></td></table>
+</div>
+<br>
+<br>
+<br>
+
+<p>1. SIGNIFICANT CHANGES
+
+<ul>
+<li> ADDED SUPPORT FOR VERSIONS OF DOOM BEYOND 1.2
+  Added support for levels E4Mn. Added linedef and sector types
+  introduced with Doom v1.666.
+<li> ADDED SUPPORT FOR DOOM II
+  Added support for levels MAPnn. Added new linedef and sector types
+  (see above). Added reading sector and wall textures from doom2.wad.
+  Added definition of Doom II things.
+  You now have to replace main= in the config.file by iwad1= and
+  iwad2= and invoke yadex with either "-g doom" or "-g doom2".
+
+<li> INTEGRATED INFO FROM DOOM SPECS 1.6
+  Corrected linedef types and sector types. Reordered sector types.
+  Added new linedef and sector types (see above).
+
+<li> EDITING IN GENERAL
+  <ul>
+  <li> Highlighting: it does not require as much a precise positionning
+    of the pointer as it did (+/-8 pixels instead of +/-4).
+  <li> Made PU PD END HOME scroll only 1/6 screen at a time (not 1/2)
+  <li> Grid: also highlights multiples of 1024 or 256 or 64. This is
+    useful when you are working with small grid steps (E.G. 8) but
+    still need to align to 64.
+  <li> Grid: you can now have a grid finer than 8 or coarser than 256.
+    So you can now do 4-alignment or even 2-alignment. There are two
+    new parameters (gridmin and gridmax) in the config file to set the
+    low and high bounds (default&nbsp;: 4 and 256).
+  <li> Zoom: added 1 extra magnification step (x8).
+  <li> Zoom: vertices green crosses and linedef arrows are never drawn
+    larger than they would at zoom 1.0. This makes editing of crowded
+    areas easier.
+  <li> Status bar: added the name of the file the level being edited comes
+    from.
+  <li> Made checking after moving a vertex onto a linedef much faster. This
+    should be a relief when connecting sectors together
+  <li> Map: now drawn faster, especially when viewing only a part of it.
+  </ul>
+
+<li> EDITING THINGS
+  <ul>
+  <li> Rotate things with W and X in things mode.
+  <li> The thing type dialog is slightly better.
+  <li> You can now enter type in the range [-32749, 32749].
+  </ul>
+
+<li> EDITING SECTORS
+  <ul>
+  <li> Added raising or lowering of a group of sectors.
+  <li> Added brightening or darkening of a group of sectors.
+  <li> Added display of the headroom (ceiling height - floor height).
+  <li> You can now enter type, tag, floor height and ceiling height in the
+    range [-32749, 32749].
+  </ul>
+
+<li> EDITING LINEDEFS &amp; SIDEDEFS
+  <ul>
+  <li> Added function to remove the 2nd sidedef (make linedef single-sided).
+  <li> Added function to make a nook or a boss.
+  <li> Added function to set length of linedef by moving either vertex.
+  <li> You can now enter type, tag, sidedef x-offset and sidedef y-offset
+    in the range [-32749, 32749].
+  </ul>
+
+<li> GENERAL
+  <ul>
+  <li> The slash is also recognized in file names.
+  <li> You can omit the ".wad" in the names of patch wads files (after
+    -pw, -file, READ).
+  <li> Consumes about 20 kB less memory than DEU 5.21 did.
+  </ul>
+
+<li> CAN BE RUN FROM ANY DIRECTORY
+  <ul>
+  <li> The .bgi driver is searched for in the directory where yadex is
+    installed (i.e. where yadex.exe is), not in the current directory.
+  <li> If the config file (yadex.cfg) is not found in the current directory,
+    it is searched for in the installation directory. On the other hand,
+    if the config file is specified with -config on the command line,
+    default locations are not used.
+  </ul>
+  Deu was difficult to run from another directory that its own. Now you
+  can run it from the directory where the file to edit is, just like you
+  do with, for example, a text editor. That's a bit of improvement,
+  believe me! And you still have the possibility of having a .cfg in the
+  current directory, if you want to have different settings locally.
+  You have several different approaches to making yadex available from
+  anywhere&nbsp;:
+  1. put yadex.exe and the .bgi you need in one of the directories of
+     your PATH
+  2. add the yadex directory to your path.
+  3. make a yadex.bat in one of the directories of your path with the
+     line "@&lt;yadex_directory&gt;\yadex %1 %2 %3 %4 %5 %6 %7 %8 %9"
+  Each solution has pros and cons.
+
+<li> DELETED NODES BUILDER. Nodes are NEVER built and you are not queried
+  whether to do it. In 1994, the nodes builder of DEU 5.21 was a
+  pioneer and we have to thank RQ for having done it. However, in 1997,
+  it is perceived as slow and buggy. Better to use an external nodes
+  builder (I use bsp 2.1).
+
+<li> SYNTAX OF THE "EDIT" AND "CREATE" COMMANDS
+  They now take only one argument. It may be either a complete level
+  name (such as "e1m1" or "map01") or a number. For example, "1"
+  matches "map01", "11" matches both "e1m1 and "map11", etc. If there
+  is not exactly 1 level that matches the argument, a list of levels
+  to choose from is displayed. It contains all levels that matched or
+  all levels if 0 matched.
+
+<li> LETS YOU USE NEW FLOOR/CEILING TEXTURES
+  Understands FF_START/F_END and does the proper additions/replacements
+  ATTENTION, BUG: but an old one: if you have a lump that has the same
+  name as the texture to display...
+
+<li> SCREEN SHOT, SAVING TEXTURE TO FILE
+  When editing, Shift-F1 dumps the current window to a 16-colour GIF
+  file named yadex.gif. Works _only_ when in 256-colour mode.
+  In the image viewer, pressing shift-F1 saves the current image to a
+  file of the same name as the image followed by ".gif". That's the
+  only way I know to extract a texture.
+
+<li> LOG FILE
+  To help you keep track of time spent on a wad, Yadex writes down the
+  number of minutes spent editing in a log file. The name of the log
+  file is the same as the name of the .wad file except it has the
+  extension ".yl". The log file is _not_ created if it does not already
+  exist. Example&nbsp;: if you want to enable logging for /foo/bar.wad,
+  you should first create the file /foo/bar.yl.
+</ul>
+
+
+<p>2. COSMETIC CHANGES
+
+<ul>
+<li> #ifdef'd out the funny message (assuming this is used by wizards)
+  and the "Goodbye..." message
+<li> Do not force anymore the name of pwads to upper case.
+<li> changed "LineDefs and SideDefs" to "LD &amp; SD" to make room in the
+  status bar.
+<li> **Spector -&gt; Spectre, **Sargeant -&gt; Sergeant
+<li> "Misc operations" menus now have "..." where due.
+<li> When drawing the map, negative linedef types and linedef/sector tags
+  are now considered non-zero.
+</ul>
+
+
+<p>3. TECHNICAL CHANGES
+
+<ul>
+<li> Replaced c:\bc4\lib by g:\dt\bcpp.402\lib.
+<li> Replaced d:\bc4\include by g:\dt\bcpp.402\include.
+<li> Removed both "-v" from compiler options.
+<li> Added "-mh" to compiler options.
+<li> Removed "/v" from linker options.
+<li> Removed some private functions from deu.h (SelectLevel).
+<li> Do not demand anymore that an EnMn/MAPnn entry have a length of 0
+  because MAP05 and MAP10 in dyst3 failed that test. Just print a
+  warning.
+<li> Further externalized paths in the makefile...
+<li> Increased overlay granularity (to improve memory consumption).
+<li> In the makefile, put explicit /o+ or /o- options in front of all
+  modules. The following modules were previously unqualified&nbsp;: edit
+  editobj objects things wads aym scrnshot. They now all have /o+.
+<li> Put all modules in alphabetical order in deu.h and in the makefile.
+</ul>
+
+<p>4. BUGS OF DEU 5.21 FIXED
+
+<ul>
+<li> Now you can use wall textures in PWADs without getting "Error
+  reading from file" when trying to display the texture in the
+  texture selector. Deutex users don't need the -deu option anymore.
+<li> The numeric keypad can now be used in menus.
+<li> Fixed 4 display bugs in BuildNewMainWad() and ListMasterDirectory
+  that were not noticeable on a little endian machine.
+<li> Menus work better&nbsp;: static right button state is now ignored (you
+  have to press it) and a left button release is ignored unless the
+  pointer was on an item when it was pressed.
+<li> Texture viewer&nbsp;: fixed minor glitch that showed with BIGDOOR7,
+  SKY1, TEKWALL1, TEKWALL5 and some others.
+</ul>
+
+
+<p>5. NEW BUGS
+
+<ul>
+<li> For Doom II, some wall textures are not displayed correctly.
+  Specifically, instead of SW?BRN1, SW?STARG, SW?STON2 and SW?STONE,
+  SW?BRCOM is displayed. Very strange. I don't know why.
+</ul>
+
+</body>
+</html>

@@ -80,64 +80,64 @@ int         remind_to_build_nodes = 0;    // Remind user to build nodes
 Wad_res     wad_res (&MasterDir);
 
 // Set from command line and/or config file
-bool      autoscroll            = 0;
-unsigned long autoscroll_amp        = 10;
-unsigned long autoscroll_edge        = 30;
-const char *config_file                 = NULL;
-int       copy_linedef_reuse_sidedefs    = 0;
-int       cpu_big_endian        = 0;
-bool      Debug                = false;
-int       default_ceiling_height    = 128;
-char      default_ceiling_texture[WAD_FLAT_NAME + 1]    = "CEIL3_5";
-int       default_floor_height                = 0;
-char      default_floor_texture[WAD_FLAT_NAME + 1]    = "FLOOR4_8";
-int       default_light_level                = 144;
+bool      autoscroll             = 0;
+unsigned long autoscroll_amp     = 10;
+unsigned long autoscroll_edge    = 30;
+const char *config_file          = NULL;
+int       copy_linedef_reuse_sidedefs = 0;
+int       cpu_big_endian         = 0;
+bool      Debug                  = false;
+int       default_ceiling_height = 128;
+char      default_ceiling_texture[WAD_FLAT_NAME + 1] = "CEIL3_5";
+int       default_floor_height   = 0;
+char      default_floor_texture[WAD_FLAT_NAME + 1]   = "FLOOR4_8";
+int       default_light_level    = 144;
 char      default_lower_texture[WAD_TEX_NAME + 1]    = "STARTAN3";
-char      default_middle_texture[WAD_TEX_NAME + 1]    = "STARTAN3";
+char      default_middle_texture[WAD_TEX_NAME + 1]   = "STARTAN3";
 char      default_upper_texture[WAD_TEX_NAME + 1]    = "STARTAN3";
-int       default_thing            = 3004;
-int       double_click_timeout        = 200;
-bool      Expert            = false;
-const char *Game            = NULL;
+int       default_thing          = 3004;
+int       double_click_timeout   = 200;
+bool      Expert                 = false;
+const char *Game                 = NULL;
 int       grid_pixels_min        = 10;
-int       GridMin            = 2;
-int       GridMax            = 128;
-int       idle_sleep_ms            = 50;
-bool      InfoShown            = true;
-int       zoom_default            = 0;  // 0 means fit
-int       zoom_step            = 0;  // 0 means sqrt(2)
-int       digit_zoom_base               = 100;
-int       digit_zoom_step               = 0;  // 0 means sqrt(2)
-confirm_t insert_vertex_split_linedef    = YC_ASK_ONCE;
-confirm_t insert_vertex_merge_vertices    = YC_ASK_ONCE;
-bool      blindly_swap_sidedefs         = false;
-const char *Iwad1            = NULL;
-const char *Iwad2            = NULL;
-const char *Iwad3            = NULL;
-const char *Iwad4            = NULL;
-const char *Iwad5            = NULL;
-const char *Iwad6            = NULL;
-const char *Iwad7            = NULL;
-const char *Iwad8            = NULL;
-const char *Iwad9            = NULL;
-const char *Iwad10            = NULL;
-const char *MainWad            = NULL;
+int       GridMin                = 2;
+int       GridMax                = 128;
+int       idle_sleep_ms          = 50;
+bool      InfoShown              = true;
+int       zoom_default           = 0;  // 0 means fit
+int       zoom_step              = 0;  // 0 means sqrt(2)
+int       digit_zoom_base        = 100;
+int       digit_zoom_step        = 0;  // 0 means sqrt(2)
+confirm_t insert_vertex_split_linedef  = YC_ASK_ONCE;
+confirm_t insert_vertex_merge_vertices = YC_ASK_ONCE;
+bool      blindly_swap_sidedefs        = false;
+const char *Iwad1   = NULL;
+const char *Iwad2   = NULL;
+const char *Iwad3   = NULL;
+const char *Iwad4   = NULL;
+const char *Iwad5   = NULL;
+const char *Iwad6   = NULL;
+const char *Iwad7   = NULL;
+const char *Iwad8   = NULL;
+const char *Iwad9   = NULL;
+const char *Iwad10  = NULL;
+const char *MainWad = NULL;
 #ifdef AYM_MOUSE_HACKS
 int       MouseMickeysH            = 5;
 int       MouseMickeysV            = 5;
 #endif
-char **   PatchWads            = NULL;
-bool      Quiet                = false;
-bool      Quieter            = false;
-unsigned long scroll_less        = 10;
-unsigned long scroll_more        = 90;
-bool      Select0            = false;
-int       show_help            = 0;
-int       sprite_scale                  = 100;
-bool      SwapButtons            = false;
-int       verbose            = 0;
-int       welcome_message        = 1;
-const char *bench            = 0;
+char **   PatchWads = NULL;
+bool      Quiet     = false;
+bool      Quieter   = false;
+unsigned long scroll_less = 10;
+unsigned long scroll_more = 90;
+bool      Select0   = false;
+int       show_help = 0;
+int       sprite_scale = 100;
+bool      SwapButtons  = false;
+int       verbose      = 0;
+int       welcome_message = 1;
+const char *bench      = 0;
 
 // Global variables declared in game.h
 yglf_t yg_level_format   = YGLF__;
@@ -155,14 +155,13 @@ Wad_name sky_flat;
 /*
  *    Prototypes of private functions
  */
-static int  parse_environment_vars ();
-static void MainLoop ();
-static void print_error_message (const char *fmt, va_list args);
-static void add_base_colours ();
+static int   parse_environment_vars ();
+static void  MainLoop ();
+static void  print_error_message (const char *fmt, va_list args);
+static void  add_base_colours ();
 static const Wad_file *wad_by_name (const char *pathname);
-static bool wad_already_loaded (const char *pathname);
-
-void read_decorate();
+static bool  wad_already_loaded (const char *pathname);
+       void read_decorate();
 
 /*
  *    main

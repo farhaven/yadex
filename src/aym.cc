@@ -4,7 +4,6 @@
  *	AYM 1997-??-??
  */
 
-
 /*
 This file is part of Yadex.
 
@@ -27,10 +26,8 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"
 #include "game.h"
-
 
 /*
  *	levelname2levelno
@@ -44,35 +41,34 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 int levelname2levelno (const char *name)
 {
-  const unsigned char *s = (const unsigned char *) name;
-  if (toupper (s[0]) == 'E'
-   && isdigit (s[1])
-   && s[1] != '0'
-   && toupper (s[2]) == 'M'
-   && isdigit (s[3])
-   && s[3] != '0'
-   && s[4] == '\0')
-    return 10 * dectoi (s[1]) + dectoi (s[3]);
-  if (yg_level_name == YGLN_E1M10
-   && toupper (s[0]) == 'E'
-   && isdigit (s[1])
-   && s[1] != '0'
-   && toupper (s[2]) == 'M'
-   && isdigit (s[3])
-   && s[3] != '0'
-   && isdigit (s[4])
-   && s[5] == '\0')
-    return 100 * dectoi (s[1]) + 10 * dectoi (s[3]) + dectoi (s[4]);
-  if (toupper (s[0]) == 'M'
-   && toupper (s[1]) == 'A'
-   && toupper (s[2]) == 'P'
-   && isdigit (s[3])
-   && isdigit (s[4])
-   && s[5] == '\0')
-    return 1000 + 10 * dectoi (s[3]) + dectoi (s[4]);
-  return 0;
+    const unsigned char *s = (const unsigned char *) name;
+    if (toupper (s[0]) == 'E'
+        && isdigit (s[1])
+        && s[1] != '0'
+        && toupper (s[2]) == 'M'
+        && isdigit (s[3])
+        && s[3] != '0'
+        && s[4] == '\0')
+            return 10 * dectoi (s[1]) + dectoi (s[3]);
+    if (yg_level_name == YGLN_E1M10
+        && toupper (s[0]) == 'E'
+        && isdigit (s[1])
+        && s[1] != '0'
+        && toupper (s[2]) == 'M'
+        && isdigit (s[3])
+        && s[3] != '0'
+        && isdigit (s[4])
+        && s[5] == '\0')
+            return 100 * dectoi (s[1]) + 10 * dectoi (s[3]) + dectoi (s[4]);
+    if (toupper (s[0]) == 'M'
+        && toupper (s[1]) == 'A'
+        && toupper (s[2]) == 'P'
+        && isdigit (s[3])
+        && isdigit (s[4])
+        && s[5] == '\0')
+            return 1000 + 10 * dectoi (s[3]) + dectoi (s[4]);
+    return 0;
 }
-
 
 /*
  *	levelname2rank
@@ -87,35 +83,34 @@ int levelname2levelno (const char *name)
  */
 int levelname2rank (const char *name)
 {
-  const unsigned char *s = (const unsigned char *) name;
-  if (toupper (s[0]) == 'E'
-   && isdigit (s[1])
-   && s[1] != '0'
-   && toupper (s[2]) == 'M'
-   && isdigit (s[3])
-   && s[3] != '0'
-   && s[4] == '\0')
-    return 100 * dectoi (s[1]) + dectoi (s[3]);
-  if (yg_level_name == YGLN_E1M10
-   && toupper (s[0]) == 'E'
-   && isdigit (s[1])
-   && s[1] != '0'
-   && toupper (s[2]) == 'M'
-   && isdigit (s[3])
-   && s[3] != '0'
-   && isdigit (s[4])
-   && s[5] == '\0')
-    return 100 * dectoi (s[1]) + 10 * dectoi (s[3]) + dectoi (s[4]);
-  if (toupper (s[0]) == 'M'
-   && toupper (s[1]) == 'A'
-   && toupper (s[2]) == 'P'
-   && isdigit (s[3])
-   && isdigit (s[4])
-   && s[5] == '\0')
-    return 1000 + 10 * dectoi (s[3]) + dectoi (s[4]);
-  return 0;
+    const unsigned char *s = (const unsigned char *) name;
+    if (toupper (s[0]) == 'E'
+        && isdigit (s[1])
+        && s[1] != '0'
+        && toupper (s[2]) == 'M'
+        && isdigit (s[3])
+        && s[3] != '0'
+        && s[4] == '\0')
+            return 100 * dectoi (s[1]) + dectoi (s[3]);
+    if (yg_level_name == YGLN_E1M10
+        && toupper (s[0]) == 'E'
+        && isdigit (s[1])
+        && s[1] != '0'
+        && toupper (s[2]) == 'M'
+        && isdigit (s[3])
+        && s[3] != '0'
+        && isdigit (s[4])
+        && s[5] == '\0')
+            return 100 * dectoi (s[1]) + 10 * dectoi (s[3]) + dectoi (s[4]);
+    if (toupper (s[0]) == 'M'
+        && toupper (s[1]) == 'A'
+        && toupper (s[2]) == 'P'
+        && isdigit (s[3])
+        && isdigit (s[4])
+        && s[5] == '\0')
+            return 1000 + 10 * dectoi (s[3]) + dectoi (s[4]);
+    return 0;
 }
-
 
 /*
  *	spec_path
@@ -123,26 +118,14 @@ int levelname2rank (const char *name)
  */
 const char *spec_path (const char *spec)
 {
-  static char path[Y_PATH + 1];
-  size_t n;
+    static char path[Y_PATH + 1];
+    size_t n;
 
-  *path = '\0';
-  strncat (path, spec, sizeof path - 1);
-  for (n = strlen (path); n > 0 && ! al_fisps (path[n-1]); n--)
-    ;
-  path[n] = '\0';
-  return path;
-}
-
-
-/*
- *	fncmp
- *	Compare two filenames
- *	For Unix, it's a simple strcmp.
- */
-int fncmp (const char *name1, const char *name2)
-{
-  return strcmp (name1, name2);
+    *path = '\0';
+    strncat (path, spec, sizeof path - 1);
+    for (n = strlen (path); n > 0 && ! al_fisps (path[n-1]); n--);
+    path[n] = '\0';
+    return path;
 }
 
 /*
@@ -151,9 +134,8 @@ int fncmp (const char *name1, const char *name2)
  */
 int is_absolute (const char *filename)
 {
-return *filename == '/';
+    return *filename == '/';
 }
-
 
 /*
  *	y_stricmp
@@ -161,22 +143,22 @@ return *filename == '/';
  */
 int y_stricmp (const char *s1, const char *s2)
 {
-for (;;)
-   {
-   if (tolower (*s1) != tolower (*s2))
-      return (unsigned char) *s1 - (unsigned char) *s2;
-   if (! *s1)
-      if (! *s2)
-         return 0;
-      else
-	 return -1;
-   if (! *s2)
-      return 1;
-   s1++;
-   s2++;
-   }
+    for (;;)
+    {
+        if (tolower (*s1) != tolower (*s2))
+            return (unsigned char) *s1 - (unsigned char) *s2;
+        if (! *s1)
+        {
+            if (! *s2)
+                return 0;
+            return -1;
+        }
+        if (! *s2)
+            return 1;
+        s1++;
+        s2++;
+    }
 }
-
 
 /*
  *	y_strnicmp
@@ -184,23 +166,23 @@ for (;;)
  */
 int y_strnicmp (const char *s1, const char *s2, size_t len)
 {
-while (len-- > 0)
-   {
-   if (tolower (*s1) != tolower (*s2))
-      return (unsigned char) *s1 - (unsigned char) *s2;
-   if (! *s1)
-      if (! *s2)
-         return 0;
-      else
-	 return -1;
-   if (! *s2)
-      return 1;
-   s1++;
-   s2++;
-   }
-return 0;
+    while (len-- > 0)
+    {
+        if (tolower (*s1) != tolower (*s2))
+            return (unsigned char) *s1 - (unsigned char) *s2;
+        if (! *s1)
+        {
+            if (! *s2)
+                return 0;
+            return -1;
+        }
+        if (! *s2)
+            return 1;
+        s1++;
+        s2++;
+    }
+    return 0;
 }
-
 
 /*
  *	y_snprintf
@@ -208,15 +190,14 @@ return 0;
  */
 int y_snprintf (char *buf, size_t size, const char *fmt, ...)
 {
-va_list args;
-va_start (args, fmt);
+    va_list args;
+    va_start (args, fmt);
 #ifdef Y_SNPRINTF
-return vsnprintf (buf, size, fmt, args);
+    return vsnprintf (buf, size, fmt, args);
 #else
-return vsprintf (buf, fmt, args);
+    return vsprintf (buf, fmt, args);
 #endif
 }
-
 
 /*
  *	y_vsnprintf
@@ -225,12 +206,11 @@ return vsprintf (buf, fmt, args);
 int y_vsnprintf (char *buf, size_t size, const char *fmt, va_list args)
 {
 #ifdef Y_SNPRINTF
-return vsnprintf (buf, size, fmt, args);
+    return vsnprintf (buf, size, fmt, args);
 #else
-return vsprintf (buf, fmt, args);
+    return vsprintf (buf, fmt, args);
 #endif
 }
-
 
 /*
  *	y_strupr
@@ -238,11 +218,11 @@ return vsprintf (buf, fmt, args);
  */
 void y_strupr (char *string)
 {
-  while (*string)
-  {
-    *string = toupper (*string);
-    string++;
-  }
+    while (*string)
+    {
+        *string = toupper (*string);
+        string++;
+    }
 }
 
 /*
@@ -254,20 +234,18 @@ void y_strupr (char *string)
  */
 int is_one_of (const char *needle, ...)
 {
-  va_list args;
-  va_start (args, needle);
-  for (;;)
-  {
-    const char *haystack = va_arg (args, const char *);
-    if (haystack == Y_NULL)
-      break;
-    if (! strcmp (needle, haystack))
-      return 1;
-  }
-  return 0;
+    va_list args;
+    va_start (args, needle);
+    for (;;)
+    {
+        const char *haystack = va_arg (args, const char *);
+        if (haystack == Y_NULL)
+            break;
+        if (! strcmp (needle, haystack))
+            return 1;
+    }
+    return 0;
 }
-
-
 
 /*
  *	file_exists
@@ -276,14 +254,13 @@ int is_one_of (const char *needle, ...)
  */
 bool file_exists (const char *filename)
 {
-  FILE *test;
+    FILE *test;
 
-  if ((test = fopen (filename, "rb")) == NULL)
-    return 0;
-  fclose (test);
-  return 1;
+    if ((test = fopen (filename, "rb")) == NULL)
+        return 0;
+    fclose (test);
+        return 1;
 }
-
 
 /*
  *	y_filename
@@ -295,49 +272,47 @@ bool file_exists (const char *filename)
  */
 void y_filename (char *buf, size_t size, const char *filename)
 {
-  if (size == 0)
-    return;
-  if (size == 1)
-  {
-    *buf = '\0';
-    return;
-  }
-  size_t len    = strlen (filename);
-  size_t maxlen = size - 1;
-
-  if (len > 3 && maxlen <= 3)  // Pathological case, fill with dots
-  {
-    memset (buf, '.', maxlen);
-    buf[maxlen] = '\0';
-    return;
-  }
-
-  size_t len1 = len;
-  size_t len2 = 0;
-  if (len > maxlen)
-  {
-    len1 = (maxlen - 3) / 2;
-    len2 = maxlen - 3 - len1;
-  }
-  char *p = buf;
-  for (size_t n = 0; n < len1; n++)
-  {
-    *p++ = y_isprint (*filename) ? *filename : '?';
-    filename++;
-  }
-  if (len2 > 0)
-  {
-    *p++ = '.';
-    *p++ = '.';
-    *p++ = '.';
-    filename += len - len1 - len2;
-    for (size_t n = 0; n < len2; n++)
+    if (size == 0)
+        return;
+    if (size == 1)
     {
-      *p++ = y_isprint (*filename) ? *filename : '?';
-      filename++;
+        *buf = '\0';
+        return;
     }
-  }
-  *p++ = '\0';
-}
- 
+    size_t len    = strlen (filename);
+    size_t maxlen = size - 1;
 
+    if (len > 3 && maxlen <= 3)  // Pathological case, fill with dots
+    {
+        memset (buf, '.', maxlen);
+        buf[maxlen] = '\0';
+        return;
+    }
+
+    size_t len1 = len;
+    size_t len2 = 0;
+    if (len > maxlen)
+    {
+        len1 = (maxlen - 3) / 2;
+        len2 = maxlen - 3 - len1;
+    }
+    char *p = buf;
+    for (size_t n = 0; n < len1; n++)
+    {
+        *p++ = y_isprint (*filename) ? *filename : '?';
+        filename++;
+    }
+    if (len2 > 0)
+    {
+        *p++ = '.';
+        *p++ = '.';
+        *p++ = '.';
+        filename += len - len1 - len2;
+        for (size_t n = 0; n < len2; n++)
+        {
+            *p++ = y_isprint (*filename) ? *filename : '?';
+            filename++;
+        }
+    }
+    *p++ = '\0';
+}

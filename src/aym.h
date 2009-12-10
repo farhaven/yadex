@@ -4,7 +4,6 @@
  *	AYM 1999-03-15
  */
 
-
 /*
 This file is part of Yadex.
 
@@ -27,15 +26,12 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #ifndef YH_AYM  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_AYM
-
 
 int levelname2levelno (const char *name);
 int levelname2rank (const char *name);
 const char *spec_path (const char *spec);
-int fncmp (const char *name1, const char *name2);
 int is_absolute (const char *filename);
 int y_stricmp (const char *s1, const char *s2);
 int y_strnicmp (const char *s1, const char *s2, size_t len);
@@ -46,16 +42,14 @@ int is_one_of (const char *needle, ...);
 bool file_exists (const char *);
 void y_filename (char *buf, size_t size, const char *path);
 
-
 /*
  *	within
  *	Is <value> >= <lower_bound> and <= <upper_bound> ?
  */
 inline int within (int value, int lower_bound, int upper_bound)
 {
-  return value >= lower_bound && value <= upper_bound;
+    return value >= lower_bound && value <= upper_bound;
 }
-
 
 /*
  *	outside
@@ -63,9 +57,8 @@ inline int within (int value, int lower_bound, int upper_bound)
  */
 inline int outside (int value, int lower_bound, int upper_bound)
 {
-  return value < lower_bound || value > upper_bound;
+    return value < lower_bound || value > upper_bound;
 }
-
 
 /*
  *	dectoi
@@ -74,12 +67,11 @@ inline int outside (int value, int lower_bound, int upper_bound)
  */
 inline int dectoi (char c)
 {
-  if (isdigit ((unsigned char) c))
-    return c - '0';
-  else
-    return -1;
+    if (isdigit ((unsigned char) c))
+        return c - '0';
+    else
+        return -1;
 }
-
 
 /*
  *	hextoi
@@ -88,16 +80,15 @@ inline int dectoi (char c)
  */
 inline int hextoi (char c)
 {
-  if (isdigit ((unsigned char) c))
-    return c - '0';
-  else if (c >= 'a' && c <= 'f')
-    return c - 'a' + 10;
-  else if (c >= 'A' && c <= 'F')
-    return c - 'A' + 10;
-  else
-    return -1;
+    if (isdigit ((unsigned char) c))
+        return c - '0';
+    else if (c >= 'a' && c <= 'f')
+        return c - 'a' + 10;
+    else if (c >= 'A' && c <= 'F')
+        return c - 'A' + 10;
+    else
+        return -1;
 }
-
 
 /*
  *	b36toi
@@ -106,16 +97,15 @@ inline int hextoi (char c)
  */
 inline int b36toi (char c)
 {
-  if (isdigit ((unsigned char) c))
-    return c - '0';
-  else if (islower (c))
-    return c - 'a' + 10;
-  else if (isupper (c))
-    return c - 'A' + 10;
-  else
-    return -1;
+    if (isdigit ((unsigned char) c))
+        return c - '0';
+    else if (islower (c))
+        return c - 'a' + 10;
+    else if (isupper (c))
+        return c - 'A' + 10;
+    else
+        return -1;
 }
-
 
 /*
  *	y_isident - return true iff <c> is one of a-z, A-Z, 0-9 or "_".
@@ -125,45 +115,40 @@ inline int b36toi (char c)
  */
 inline bool y_isident (char c)
 {
-  switch (c)
-  {
-    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-    case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
-    case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
-    case 's': case 't': case 'u': case 'v': case 'w': case 'x':
-    case 'y': case 'z':
+    switch (c)
+    {
+        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+        case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+        case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+        case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+        case 'y': case 'z':
 
-    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-    case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-    case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-    case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-    case 'Y': case 'Z':
+        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+        case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+        case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+        case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+        case 'Y': case 'Z':
 
-    case '0': case '1': case '2': case '3': case '4': case '5':
-    case '6': case '7': case '8': case '9':
+        case '0': case '1': case '2': case '3': case '4': case '5':
+        case '6': case '7': case '8': case '9':
 
-    case '_':
-
-      return true;
+        case '_':
+            return true;
 
     default:
-
-      return false;
-  }
+            return false;
+    }
 }
-
 
 /*
  *	fnewline
- *	Write a newline to a binary file. For Unix, LF. For
- *	other platforms, CR LF.
+ *	Write a newline to a binary file.
  *	Return EOF on failure.
  */
 inline int fnewline (FILE *fd)
 {
-  return putc ('\n', fd);
+    return putc ('\n', fd);
 }
-
 
 /*
  *	round_up
@@ -173,9 +158,8 @@ inline int fnewline (FILE *fd)
  */
 inline void round_up (int& value, int quantum)
 {
-  value = ((value + quantum - 1) / quantum) * quantum;
+    value = ((value + quantum - 1) / quantum) * quantum;
 }
-
 
 /*
  *	y_isprint
@@ -183,8 +167,7 @@ inline void round_up (int& value, int quantum)
  */
 inline bool y_isprint (char c)
 {
-  return (c & 0x60) && (c != 0x7f);
+    return (c & 0x60) && (c != 0x7f);
 }
-
 
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

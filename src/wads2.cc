@@ -427,7 +427,7 @@ bool fail = false;
    Wad_file *dummy;
    wad_list.rewind ();
    while (wad_list.get (dummy))
-      if (fncmp (filename, dummy->filename) == 0)
+      if (strcmp(filename, dummy->filename) == 0)
 	 {
 	 wad_list.del ();
 	 break;

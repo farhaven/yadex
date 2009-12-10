@@ -118,7 +118,7 @@ bool save_save_as (bool prompt)
 try_again :
 
   // If necessary, prompt for new level name and file name
-  if (prompt || ! fncmp (level_name, MainWad))
+  if (prompt || ! strcmp(level_name, MainWad))
   {
     int r = e.loop ();
     if (! r)  // Cancelled by user
@@ -189,7 +189,7 @@ char *GetWadFileName (const char *levelname)
 
   if (! Level
     || ! Level->wadfile
-    || ! fncmp (Level->wadfile->filename, MainWad))
+    || ! strcmp(Level->wadfile->filename, MainWad))
   {
     al_scpslower (outfile, levelname, BUFSZ);
     al_saps (outfile, ".wad", BUFSZ);
@@ -198,7 +198,7 @@ char *GetWadFileName (const char *levelname)
     strcpy (outfile, Level->wadfile->filename);
   do
     InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, outfile);
-  while (! fncmp (outfile, MainWad));
+  while (! strcmp(outfile, MainWad));
   /* escape */
   if (outfile[0] == '\0')
   {
@@ -208,7 +208,7 @@ char *GetWadFileName (const char *levelname)
   /* if the wad file already exists, rename it to "*.bak" */
   Wad_file *wf;
   for (wad_list.rewind (); wad_list.get (wf);)
-    if (fncmp (outfile, wf->filename) == 0)
+    if (strcmp(outfile, wf->filename) == 0)
     {
       verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
       verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG

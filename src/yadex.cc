@@ -1302,7 +1302,7 @@ static const Wad_file *wad_by_name (const char *pathname)
     const Wad_file *wf;
 
     for (wad_list.rewind (); wad_list.get (wf);)
-        if (fncmp (pathname, wf->pathname ()) == 0)
+        if (strcmp(pathname, wf->pathname ()) == 0)
             return wf;
     return 0;
 }

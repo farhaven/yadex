@@ -1270,13 +1270,6 @@ cancel_save:
 		  newl->wadfile = oldl->wadfile;
 		  if (m > 0)
 		     newl->dir = oldl->dir;
-		  /*
-		  if (!fncmp (outfile, oldl->wadfile->filename))
-		     {
-		     oldl->wadfile = WadFileList;
-		     oldl->dir = lost...
-		     }
-		  */
 		  oldl = oldl->next;
 		  newl = newl->next;
 		  }

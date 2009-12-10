@@ -4,7 +4,6 @@
  *	AYM 2000-04-13
  */
 
-
 /*
 This file is part of Yadex.
 
@@ -27,7 +26,6 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"
 
 #include <time.h>
@@ -38,62 +36,55 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "pic2img.h"
 #include "wadres.h"
 
-
-
 static void bench_LoadPicture ();
-
 
 /*
  *	benchmark - run the benchmarks specified by <what>.
  */
 void benchmark (const char *what)
 {
-  // Insert parsing of <what> here
-  if (! strcmp (what, "loadpic"))
-    bench_LoadPicture ();
+    // Insert parsing of <what> here
+    if (! strcmp (what, "loadpic"))
+        bench_LoadPicture ();
 }
-
 
 /*
  *	bench_LoadPicture - run a benchmark of LoadPicture()
  */
 static void bench_LoadPicture ()
 {
-  const char *sprite_name = "TROOA1";
-  unsigned long iterations = 100000;
-  const int width = 100;
-  const int height = 100;
-  Lump_loc sprite_loc;
-  
-  wad_res.sprites.loc_by_name (sprite_name, sprite_loc);
-  if (sprite_loc.wad == 0)
-    fprintf (stderr, "Could not locate sprite %s\n", sprite_name);
+    const char *sprite_name = "TROOA1";
+    unsigned long iterations = 100000;
+    const int width = 100;
+    const int height = 100;
+    Lump_loc sprite_loc;
 
-  Img img (width, height, false);
-  struct tms t0;
-  times (&t0);
-  for (unsigned long n = 0; n < iterations; n++)
-    LoadPicture (img, sprite_name, sprite_loc, 0, 0, 0, 0);
-  struct tms t1;
-  times (&t1);
+    wad_res.sprites.loc_by_name (sprite_name, sprite_loc);
+    if (sprite_loc.wad == 0)
+        fprintf (stderr, "Could not locate sprite %s\n", sprite_name);
 
-// Glibc 2.1 (?) has a broken CLOCKS_PER_SEC.
+    Img img (width, height, false);
+    struct tms t0;
+    times (&t0);
+    for (unsigned long n = 0; n < iterations; n++)
+        LoadPicture (img, sprite_name, sprite_loc, 0, 0, 0, 0);
+    struct tms t1;
+    times (&t1);
+
+    // Glibc 2.1 (?) has a broken CLOCKS_PER_SEC.
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC CLK_TCK
 #endif
-  const char *unit  = "s";
-  double value = (double) (t1.tms_utime - t0.tms_utime)
-		 / CLOCKS_PER_SEC / iterations;
-  if (value < 1E-3)
-  {
-    unit = "µs";
-    value *= 1000000;
-  }
-  else if (value < 1.0)
-  {
-    unit = "ms";
-    value *= 1000;
-  }
-  printf ("LoadPicture: %f %s per call\n", value, unit);
+    const char *unit  = "s";
+    double value = (double) (t1.tms_utime - t0.tms_utime) / CLOCKS_PER_SEC / iterations;
+    if (value < 1E-3)
+    {
+        unit = "µs";
+        value *= 1000000;
+    }else if (value < 1.0)
+    {
+        unit = "ms";
+        value *= 1000;
+    }
+    printf ("LoadPicture: %f %s per call\n", value, unit);
 }
-

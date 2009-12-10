@@ -27,9 +27,7 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"
-#ifdef Y_X11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "gfx.h"
@@ -116,6 +114,3 @@ const char *x_error ()
   XGetErrorText (dpy, _error_code, buf, sizeof buf);
   return buf;
 }
-
-
-#endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

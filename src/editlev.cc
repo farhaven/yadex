@@ -27,9 +27,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "yadex.h"
 #include <time.h>
-#ifdef Y_X11
 #include <X11/Xlib.h>
-#endif
 #include "editlev.h"
 #include "editloop.h"
 #include "events.h"

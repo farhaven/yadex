@@ -35,10 +35,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include <map>
 #include <algorithm>
 
-#ifdef Y_X11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#endif
+
 #include "levels.h"
 #include "wstructs.h"
 #include "gfx.h"

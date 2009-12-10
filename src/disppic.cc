@@ -28,9 +28,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
 #include "yadex.h"
-#ifdef Y_X11
 #include <X11/Xlib.h>
-#endif
 #include "gfx.h"
 #include "imgspect.h"
 #include "lists.h"

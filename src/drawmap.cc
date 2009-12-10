@@ -32,9 +32,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include <algorithm>
 #include <map>
 #include <vector>
-#ifdef Y_X11
-#  include <X11/Xlib.h>
-#endif
+#include <X11/Xlib.h>
 #include "_edit.h"
 #include "disppic.h"  /* Sprites */
 #include "drawmap.h"
@@ -264,7 +262,6 @@ static void draw_grid (edit_t *e)
     if (mapy0_1 < mapy0)
       mapy0_1 += grid_step_1;
 
-#ifdef Y_X11
     // Optimisation for X: draw several points in one go
     int npoints = (mapx1 - mapx0_1) / grid_step_1 + 1;
     XPoint *points = (XPoint *) malloc (npoints * sizeof *points);
@@ -288,21 +285,6 @@ static void draw_grid (edit_t *e)
       XDrawPoints (dpy, drw, gc, points, npoints, CoordModePrevious);
     }
     free (points);
-#else
-    // Generic code. Untested.
-    int npoints = (mapx1 - mapx0_1) / grid_step_1 + 1;
-    int dispx[npoints];
-    for (int n = 0; n < npoints; n++)
-      dispx[n] = SCREENX (mapx0_1 + n * grid_step_1);
-    for (int j = mapy0_1; j <= mapy1; j += grid_step_1)
-    {
-      int dispy = SCREENY (j);
-      for (int n = 0; n < npoints; n++)
-      {
-	draw_point (dispx[n], dispy);
-      }
-    }
-#endif
   }
 }
 

@@ -100,7 +100,6 @@ Entry2::~Entry2 ()
  */
 int Entry2::loop ()
 {
-  HideMousePointer ();
   int r;
   for (;;)
   {
@@ -120,7 +119,6 @@ int Entry2::loop ()
     printf ("Internal error: Entry2::process_event returned %d\n", (int) r);
     return 0;
   }
-  ShowMousePointer ();
 }
 
 

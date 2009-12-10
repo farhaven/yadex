@@ -58,7 +58,6 @@ int InputObjectNumber (int x0, int y0, int objtype, int curobj)
 int val, key;
 char prompt[80];
 
-HideMousePointer ();
 sprintf (prompt, "Enter a %s number between 0 and %d:",
    GetObjectTypeName (objtype), GetMaxObjectNum (objtype));
 if (x0 < 0)
@@ -73,7 +72,6 @@ while ((key
        = InputInteger (x0 + 10, y0 + 28, &val, 0, GetMaxObjectNum (objtype)))
        != YK_RETURN && key != YK_ESC)
    Beep ();
-ShowMousePointer ();
 return val;
 }
 
@@ -89,7 +87,6 @@ void input_objid (Objid& objid, const Objid& init, int x0, int y0)
 {
 char prompt[80];
 
-HideMousePointer ();
 sprintf (prompt, "Enter a %s number between 0 and %d:",
    GetObjectTypeName (init.type), GetMaxObjectNum (init.type));
 if (x0 < 0)
@@ -117,7 +114,6 @@ else
    nf_bug ("input_objid: bad key %d", (int) key);  // Can't happen
    objid.nil ();
    }
-ShowMousePointer ();
 }
 
 
@@ -163,7 +159,6 @@ if (x0 < 0)
 if (y0 < 0)
    y0 = (ScrMaxY - height) / 2;
 
-HideMousePointer ();
 DrawScreenBox3D (x0, y0, x0 + width, y0 + height);
 set_colour (WHITE);
 int x = x0 + BOX_BORDER + WIDE_HSPACING;
@@ -181,7 +176,6 @@ int max = GetMaxObjectNum (objtype);
 while (key = InputInteger (x, y0 + yc, &val, min, max),
        key != YK_RETURN && key != YK_ESC)
    Beep ();
-ShowMousePointer ();
 return val;
 }
 
@@ -206,7 +200,6 @@ int entry2_y0;
 const int entry_width  = 2 * HOLLOW_BORDER + 2 * NARROW_HSPACING + 7 * FONTW;
 const int entry_height = 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH;
 
-HideMousePointer ();
 sprintf (prompt2, "Enter two numbers between 0 and %d:", NumVertices - 1);
 
 if (strlen (prompt1) > strlen (prompt2))
@@ -272,7 +265,6 @@ for (;;)
    else
       Beep ();
    }
-ShowMousePointer ();
 return (key == YK_RETURN);
 }
 
@@ -423,7 +415,6 @@ if (x0 < 0)
 if (y0 < 0)
    y0 = (ScrMaxY - window_y1) / 2;
 
-HideMousePointer ();
 DrawScreenBox3D (x0, y0, x0 + window_x1, y0 + window_y1);
 set_colour     (WHITE);
 DrawScreenText (x0 + title_x0,  y0 + title_x0,  prompt);
@@ -477,7 +468,6 @@ for (;;)
    else
       Beep ();
    }
-ShowMousePointer ();
 return (key == YK_RETURN);
 }
 
@@ -493,10 +483,6 @@ int sector;
 int n;
 int a, b;
 
-/* show where the object will be inserted */
-HideMousePointer ();
-DrawPointer (1);
-ShowMousePointer ();
 /* are we inside a Sector? */
 Objid o;
 GetCurObject (o, OBJ_SECTORS, xpos, ypos);

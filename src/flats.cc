@@ -55,22 +55,9 @@ void ChooseFloorTexture (int x0, int y0, const char *prompt, int listsize, char 
   for (size_t n = 0; n < NumFTexture; n++)
     flat_names[n] = flat_list[n].name;
 
-  HideMousePointer ();
-
-  SwitchToVGA256 ();
-  /* If we only have a 320x200x256 VGA driver, we must change x0 and y0.
-     Yuck! */
-  if (GfxMode > -2)
-  {
-    x0 = -1;
-    y0 = -1;
-  }
   InputNameFromListWithFunc (x0, y0, prompt, (size_t) NumFTexture, flat_names,
     5, name, 64, 64, DisplayFloorTexture);
 
-  SwitchToVGA16 ();
-
-  ShowMousePointer ();
   FreeMemory (flat_names);
 }
 

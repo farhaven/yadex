@@ -43,7 +43,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 void window_to_rgbbmp (int x, int y, int width, int height, Rgbbmp &b)
 {
-#if defined Y_X11
   b.resize (width, height);
   // FIXME
   for (int y = 0; y < b.height (); y++)
@@ -55,10 +54,6 @@ void window_to_rgbbmp (int x, int y, int width, int height, Rgbbmp &b)
   for (int y = 0; y < b.height (); y++)
     for (int x = 0; x < b.width (); x++)
       b.set_b (x, y, 255 * (x + y) / (b.width () + b.height ()));
-#elif defined Y_BGI
-  printf ("window_to_rgb: unimplemented\n");
-  return 0;
-#endif
 }
 
 

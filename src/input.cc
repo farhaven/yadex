@@ -29,44 +29,11 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
 #include "yadex.h"
-#ifdef Y_X11
 #include <time.h>	// nanosleep ()
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>  // XLookupString
 #include <X11/keysym.h>
 #include "gfx.h"
-
-
-/* BGI keyboard input :
-altkey (bios(2)) : 0x03 = shift
-                   0x08 = alt
-3bxx F1
-3cxx F2
-3dxx F3
-3fxx F5
-42xx F8
-43xx F9
-44xx F10
-4bxx left
-4dxx right
-48xx up
-50xx down
-47xx home
-4fxx end
-49xx page up
-51xx page down
-52xx ins
-53xx del
-2exx alt-c
-12xx alt-e
-21xx alt-f
-23xx alt-h
-17xx alt-i
-32xx alt-m
-18xx alt-o
-1fxx alt-s
-*/
-
 
 /* This variable needs to be global because get_input_status() is called
    from different places and some state needs to be saved (shift, ctrl,
@@ -75,7 +42,6 @@ altkey (bios(2)) : 0x03 = shift
    enough. Multi-threading (one thread per edit window) is also an
    issue. Have to think of it. */
 input_status_t is;
-
 
 /*
  *	init_input_status
@@ -397,9 +363,6 @@ switch (ev.type)
       }
    }  /* switch (ev.type) */
 }
-
-#endif  /* #ifdef Y_X11 */
-
 
 /*
  *	has_input_event

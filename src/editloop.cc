@@ -73,9 +73,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "xref.h"
 #include "r_render.h"
 
-#ifdef Y_X11
 #include <X11/Xlib.h>
-#endif
 
 
 
@@ -83,9 +81,6 @@ static int zoom_fit (edit_t&);
 
 
 extern bool InfoShown;		/* should we display the info bar? */
-#if defined Y_BGI && defined CIRRUS_PATCH
-extern char HWCursor[];		/* Cirrus hardware cursor data */
-#endif /* Y_BGI && CIRRUS_PATCH */
 #ifdef DIALOG
 #endif
 
@@ -277,22 +272,7 @@ else
    if (r == 0)
       CenterMapAroundCoords ((MapMinX + MapMaxX) / 2, (MapMinY + MapMaxY) / 2);
    }
-if (UseMouse)
-   {
-   ResetMouseLimits ();
-   SetMouseCoords (is.x, is.y);
-   ShowMousePointer ();
-#if defined Y_BGI && defined CIRRUS_PATCH
-   if (CirrusCursor)
-      {
-      SetHWCursorMap (HWCursor);
-      SetHWCursorPos (is.x, is.y);
-      }
-#endif /* Y_BGI && CIRRUS_PATCH */
    oldbuttons = 0;
-   }
-else
-  FakeCursor = true;
 
 /* Create the menu bar */
 {
@@ -1451,52 +1431,6 @@ cancel_save_as:
 	   RedrawMap = 1;
          }
 
-#if 0
-      /* user wants to move */
-      else if (is.key == YK_UP && (is.y - e.move_speed) >= 0)
-         {
-	 if (UseMouse)
-	    SetMouseCoords (is.x, is.y - e.move_speed);
-	 else
-	    is.y -= e.move_speed;
-         }
-      else if (is.key == YK_DOWN && (is.y + e.move_speed) <= ScrMaxY)
-         {
-	 if (UseMouse)
-	    SetMouseCoords (is.x, is.y + e.move_speed);
-	 else
-	    is.y += e.move_speed;
-         }
-      else if (is.key == YK_LEFT && (is.x - e.move_speed) >= 0)
-         {
-	 if (UseMouse)
-	    { 
-	    SetMouseCoords (is.x - e.move_speed, is.y);
-	    LogMessage ("dec'd px=%d by %d\n", is.x, e.move_speed); /* AYM */
-	    }
-	 else
-	    is.x -= e.move_speed;
-         }
-      else if (is.key == YK_RIGHT)
-	 {
-	 if ((is.x + e.move_speed) <= ScrMaxX)
-	    {
-	    if (UseMouse)
-	       {
-	       SetMouseCoords (is.x + e.move_speed, is.y);
-	       LogMessage ("inc'd px=%d by %d\n", is.x, e.move_speed); /* AYM */
-	       }
-	    else
-	       {
-	       is.x += e.move_speed;
-	       LogMessage ("inc'd px by %d\n",  e.move_speed); /* AYM */
-	       }
-	    }
-	 else
-	    LogMessage ("px=%d ms=%d smx=%d\n", is.x, e.move_speed, ScrMaxX);
-	 }
-#endif
-
       // [Left], [Right], [Up], [Down]:
       // scroll <scroll_less> percents of a screenful.
       else if (is.key == YK_LEFT && MAPX (ScrCenterX) > -20000)
@@ -2398,8 +2332,6 @@ cancel_save_as:
       if (distance <= autoscroll_edge
          && e.menubar->is_under_menubar_item (is.x) < 0)
 	 {
-	 if (! UseMouse)
-	    is.y += e.move_speed;
 	 if (MAPY (ScrCenterY) < /*MapMaxY*/ 20000)
 	    {
 	    OrigY += actual_move (ScrMaxY, distance);
@@ -2410,8 +2342,6 @@ cancel_save_as:
       distance = ScrMaxY - is.y;
       if (distance <= autoscroll_edge)
 	 {
-	 if (! UseMouse)
-	    is.y -= e.move_speed;
 	 if (MAPY (ScrCenterY) > /*MapMinY*/ -20000)
 	    {
 	    OrigY -= actual_move (ScrMaxY, distance);
@@ -2422,8 +2352,6 @@ cancel_save_as:
       distance = is.x;
       if (distance <= autoscroll_edge)
 	 {
-	 if (! UseMouse)
-	    is.x += e.move_speed;
 	 if (MAPX (ScrCenterX) > /*MapMinX*/ -20000)
 	    {
 	    OrigX -= actual_move (ScrMaxX, distance);
@@ -2439,8 +2367,6 @@ cancel_save_as:
       distance = ScrMaxX - is.x;
       if (distance <= autoscroll_edge && (unsigned) is.y >= 3 * FONTH)
 	 {
-	 if (! UseMouse)
-	    is.x -= e.move_speed;
 	 if (MAPX (ScrCenterX) < /*MapMaxX*/ 20000)
 	    {
 	    OrigX += actual_move (ScrMaxX, distance);

@@ -29,9 +29,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
 #include "yadex.h"
-#ifdef Y_X11
 #include <X11/Xlib.h>
-#endif
 #include "dialog.h"
 #include "game.h"      /* yg_picture_format */
 #include "gfx.h"
@@ -93,11 +91,6 @@ else
    nf_bug ("Bad texture format %d.", (int) yg_texture_format);
    return;
    }
-
-#ifndef Y_X11
-if (have_key ())
-   return;				// Speedup
-#endif
 
 // Offset for texture we want
 texofs = 0;
@@ -355,16 +348,6 @@ c->flags   |= HOOK_SIZE_VALID | HOOK_DISP_SIZE;
 width  = y_min (width,  c->x1 - c->x0 + 1);
 height = y_min (height, c->y1 - c->y0 + 1);
 
-#ifndef Y_X11
-if (have_key ())
-   return;				// Speedup
-#endif
-
-#ifdef Y_BGI
-// Not really necessary, except when xofs or yofs < 0
-setviewport (c->x0, c->y0, c->x1, c->y1, 1);
-#endif  /* FIXME ! */
-
 // Compose the texture
 c->img.resize (width, height);
 c->img.set_opaque (false);
@@ -420,20 +403,10 @@ for (n = 0; n < maxpatches; n++)
 #endif
    }
 
-#ifdef Y_BGI
-   /* AYM 1998-07-11
-      Is it normal to set x0 and y0 to potentially negative values ? */
-   // coords changed because of the "setviewport"
-   subc.x0 = xofs;
-   subc.y0 = yofs;
-   subc.x1 = c->x1 - c->x0;
-   subc.y1 = c->y1 - c->y0;
-#else
    subc.x0 = y_max (c->x0, c->x0 + xofs);
    subc.y0 = y_min (c->y0, c->y0 + yofs);
    subc.x1 = c->x1;
    subc.x1 = c->y1;
-#endif
    subc.name = picname;
 
    if (LoadPicture (c->img, picname, loc, xofs, yofs, 0, 0))
@@ -450,10 +423,6 @@ c->disp_y0 = c->y0 + c->yofs;
 c->disp_x1 = c->disp_x0 + width - 1;
 c->disp_y1 = c->disp_y0 + height - 1;
 
-#ifdef Y_BGI
-// Restore the normal viewport
-setviewport (0, 0, ScrMaxX, ScrMaxY, 1);
-#endif  /* FIXME ! */
 }
 
 
@@ -575,20 +544,7 @@ else
 void ChooseWallTexture (int x0, int y0, const char *prompt, int listsize,
    char **list, char *name)
 {
-HideMousePointer ();
-
-SwitchToVGA256 ();
-/* If we only have a 320x200x256 VGA driver, we must change x0 and y0.
-   Yuck! */
-if (GfxMode > -2)
-   {
-   x0 = 0;
-   y0 = -1;
-   }
 InputNameFromListWithFunc (x0, y0, prompt, listsize, list, 9, name,
   512, 256, DisplayWallTexture);
-SwitchToVGA16 ();
-
-ShowMousePointer ();
 }
 

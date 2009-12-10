@@ -153,7 +153,7 @@ MODULES_YADEX =								\
 	l_misc		l_prop		l_unlink	l_vertices	\
 	levels		lists		locate		lumpdir		\
 	macro		memory		menubar		menu		\
-	mkpalette	mouse		names		nop		\
+	mkpalette	names		nop		\
 	objects		objinfo		oldmenus	palview		\
 	patchdir	pic2img		prefer		s_centre	\
 	s_door		s_lift		s_linedefs	s_merge		\

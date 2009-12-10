@@ -283,8 +283,6 @@ if (type_off == 1)    /* source taken from InputObjectNumber */
    int  key;         /* holds value returned by InputInteger */
    char prompt[80];  /* prompt for inital offset input */
 
-   HideMousePointer ();
-
    sprintf (prompt, "Enter initial offset between 0 and %d:", (int) texlength);
 
    x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
@@ -297,8 +295,6 @@ if (type_off == 1)    /* source taken from InputObjectNumber */
    while  ((key=InputInteger (x0+10, y0+28, &useroffset, 0, (int) texlength))
 	    != YK_RETURN && key != YK_ESC)
       Beep ();
-
-   ShowMousePointer ();
    }
 
 while (*sdlist)  /* main processing loop */

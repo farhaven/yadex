@@ -106,7 +106,6 @@ int  key;         // holds value returned by InputInteger
 int  delta = 0;   // user input for delta
 
 
-HideMousePointer ();
 x0 = (ScrMaxX - 25 - 44 * FONTW) / 2;
 y0 = (ScrMaxY - 7 * FONTH) / 2;
 DrawScreenBox3D (x0, y0, x0 + 25 + 44 * FONTW, y0 + 7 * FONTH);
@@ -121,7 +120,6 @@ while (1)
     break;
   Beep ();
   }
-ShowMousePointer ();
 if (key == YK_ESC)
   return;
 
@@ -147,8 +145,6 @@ int  y0;          // top (y) window start
 int  key;         // holds value returned by InputInteger
 int  delta = 0;   // user input for delta
 
-
-HideMousePointer ();
 x0 = (ScrMaxX - 25 - 44 * FONTW) / 2;
 y0 = (ScrMaxY - 7 * FONTH) / 2;
 DrawScreenBox3D (x0, y0, x0 + 25 + 44 * FONTW, y0 + 7 * FONTH);
@@ -163,7 +159,6 @@ while (1)
     break;
   Beep ();
   }
-ShowMousePointer ();
 if (key == YK_ESC)
   return;
 

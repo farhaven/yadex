@@ -28,10 +28,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "yadex.h"
 #include <math.h>
-#ifdef Y_X11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#endif
 #include "acolours.h"
 #include "gcolour1.h"
 #include "gcolour2.h"
@@ -40,27 +38,11 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "levels.h"  /* Level */
 #include "x11.h"
 
-#ifdef Y_DOS
-#include <direct.h>
-#endif
-
-// If your graphics driver doesn't like circles, draw squares instead
-#if defined NO_CIRCLES && defined Y_BGI
-#define circle (x, y, r) line (x - r, y - r, x - r, y + r); \
-                         line (x - r, y + r, x + r, y + r); \
-                         line (x + r, y + r, x + r, y - r); \
-                         line (x + r, y - r, x - r, y - r)
-#endif  /* NO_CIRCLES */
-
 /* Parameters set by the command line args and config file */
-const char *BGIDriver = "VESA";    // BGI: default extended BGI driver
-bool  CirrusCursor    = false;    // use HW cursor on Cirrus Logic VGA cards
-bool  FakeCursor      = false;    // use a "fake" mouse cursor
 const char *font_name = NULL;    // X: the name of the font to load
 Win_dim initial_window_width ("90%");    // X: the name says it all
 Win_dim initial_window_height ("90%");    // X: the name says it all
 int   no_pixmap;        // X: use no pixmap -- direct window output
-int   VideoMode = 2;        // BGI: default video mode for VESA cards
 
 /* Global variables */
 int GfxMode = 0; // graphics mode number, or 0 for text
@@ -78,7 +60,6 @@ unsigned FONTW;
 int font_xofs;
 int font_yofs;
 
-#ifdef Y_X11
 Display *dpy;        // The X display
 int      scn;        // The X screen number
 Colormap cmap = 0;   // The X colormap
@@ -114,58 +95,14 @@ static pcolour_t *app_colour = 0; // Pixel values for the app. colours
 static int DrawingMode    = 0;    // 0 = copy, 1 = xor
 static int LineThickness  = 0;    // 0 = thin, 1 = thick
 int      text_dot         = 0;    // DrawScreenText() debug flag
-#endif
 static acolour_t colour_stack[4];
 static int       colour_stack_pointer = 0;
 static Font      font_xfont;
 static bool      default_font = true;
 
-#if defined Y_BGI && defined CIRRUS_PATCH
-char mp[256];
-char HWCursor[] =
-{
-    0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00,
-    0x30, 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00, 0x00,
-    0x1F, 0x00, 0x00, 0x00, 0x1F, 0xC0, 0x00, 0x00,
-    0x0F, 0xF0, 0x00, 0x00, 0x0F, 0xE0, 0x00, 0x00,
-    0x07, 0xC0, 0x00, 0x00, 0x07, 0xE0, 0x00, 0x00,
-    0x03, 0x70, 0x00, 0x00, 0x02, 0x38, 0x00, 0x00,
-    0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x3F, 0xFF, 0xFF, 0xFF, 0x0F, 0xFF, 0xFF, 0xFF,
-    0x83, 0xFF, 0xFF, 0xFF, 0x80, 0xFF, 0xFF, 0xFF,
-    0xC0, 0x3F, 0xFF, 0xFF, 0xC0, 0x0F, 0xFF, 0xFF,
-    0xE0, 0x07, 0xFF, 0xFF, 0xE0, 0x0F, 0xFF, 0xFF,
-    0xF0, 0x1F, 0xFF, 0xFF, 0xF0, 0x0F, 0xFF, 0xFF,
-    0xF8, 0x07, 0xFF, 0xFF, 0xF8, 0x83, 0xFF, 0xFF,
-    0xFD, 0xC7, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
-};
-#endif  /* Y_BGI && CIRRUS_PATCH */
-
 /*
  *    Prototypes
  */
-#ifdef Y_BGI
-static int cooked_installuserdriver (const char far *__name,
-                             int huge (*detect)(void));
-#endif
 
 /*
  *    InitGfx - initialize the graphics display
@@ -177,56 +114,6 @@ int InitGfx (void)
     // Initialization is in fact not necessary
     int width;
     int height;
-
-#if defined Y_BGI
-    static bool firsttime = true;
-    static int  gdriver;
-    static int  gmode;
-    int         errorcode = grNoInitGraph;
-
-    verbmsg ("Switching to graphics mode...\n");
-#if defined Y_BGI && defined CIRRUS_PATCH
-    if (CirrusCursor)
-        SetHWCursorMap (HWCursor);
-#endif  /* Y_BGI && CIRRUS_PATCH */
-    if (firsttime)
-    {
-        if (VideoMode > 0)
-        {
-            gdriver = cooked_installuserdriver (BGIDriver, NULL);
-            gmode = VideoMode;
-            initgraph (&gdriver, &gmode, install_dir);
-            errorcode = graphresult ();
-        }
-        if (errorcode != grOk)
-        {
-            gdriver = VGA;
-            gmode = VGAHI;
-        }
-    }
-    if (gdriver == VGA || !firsttime)
-    {
-        initgraph (&gdriver, &gmode, install_dir);
-        errorcode = graphresult ();
-        if (errorcode != grOk)
-            fatal_error ("graphics error: %s", grapherrormsg (errorcode));
-    }
-    if (gdriver == VGA)
-        GfxMode = 2;  // 640x480x16
-    else
-    {
-        GfxMode = -gmode;  // 640x480x256, 800x600x256, or 1024x768x256
-        SetDoomPalette (0);
-    }
-    verbmsg ("GfxMode=%d\n", GfxMode);
-    setlinestyle (0, 0, 1);
-    setbkcolor (TranslateToDoomColor (BLACK));
-    settextstyle (0, 0, 1);
-    firsttime = false;
-    width = getmaxx () + 1;
-    height = getmaxy () + 1;
-
-#elif defined Y_X11
 
     /*
     *    Open display and get screen number
@@ -564,8 +451,8 @@ ximage_done:
         drw_mods = 0;  // Force display the first time
     }
     XSync (dpy, False);
-    GfxMode = - VideoMode;
-#endif
+
+    GfxMode = 1;
 
     SetWindowSize (width, height);
     return 0;
@@ -579,9 +466,6 @@ void TermGfx ()
     verbmsg ("TermGfx: GfxMode=%d\n", GfxMode);
     if (GfxMode)
     {
-#if defined Y_BGI
-        closegraph ();
-#elif defined Y_X11
         int r;
 
         if (! no_pixmap)
@@ -609,7 +493,6 @@ void TermGfx ()
         gc = 0;
         // FIXME there is surely more to do...
         XCloseDisplay (dpy);
-#endif
         GfxMode = 0;
     }
 }
@@ -627,7 +510,7 @@ void SetWindowSize (int width, int height)
     ScrMaxY = height - 1;
     ScrCenterX = ScrMaxX / 2;
     ScrCenterY = ScrMaxY / 2;
-#ifdef Y_X11
+
     // Replace the old pixmap by another of the new size
     if (! no_pixmap)
     {
@@ -635,92 +518,6 @@ void SetWindowSize (int width, int height)
         pixmap = XCreatePixmap (dpy, win, width, height, win_depth);
         drw = pixmap;
     }
-#endif
-}
-
-/*
- *    SwitchToVGA256 - switch from VGA 16 colours to VGA 256 colours
- *
- *    This function does something only in the BGI version and
- *    if the current mode is 16 colours (typically because the
- *    video card is a plain VGA one (as opposed to an SVGA
- *    one) so the only 256-colour mode is 320x200).
- *
- *    If compiled with Y_X11, this function is a no-op.
- */
-void SwitchToVGA256 (void)
-{
-#if defined Y_X11
-    return;
-#elif defined Y_BGI
-    static int gdriver = -1;
-    int gmode, errorcode;
-
-    if (GfxMode > 0 && gdriver != VGA) /* if 16 colors and not failed before */
-    {
-        if (gdriver == -1)
-        {
-            gdriver = cooked_installuserdriver ("VGA256", NULL);
-            errorcode = graphresult ();
-        }
-        HideMousePointer ();
-        closegraph ();
-        gmode = 0;
-        initgraph (&gdriver, &gmode, install_dir);
-        errorcode = graphresult ();
-        if (errorcode != grOk)
-        {
-            // Failed for 256 colors - back to 16 colors
-            gdriver = VGA;
-            gmode = VGAHI;
-            initgraph (&gdriver, &gmode, install_dir);
-            errorcode = graphresult ();
-        }
-        if (errorcode != grOk)  // Shouldn't happen
-            fatal_error ("graphics error: %s", grapherrormsg (errorcode));
-        ShowMousePointer ();
-        GfxMode = -1;  // 320x200x256
-        SetDoomPalette (0);
-        ScrMaxX = getmaxx ();
-        ScrMaxY = getmaxy ();
-        ScrCenterX = ScrMaxX / 2;
-        ScrCenterY = ScrMaxY / 2;
-    }
-#endif
-}
-
-/*
- *    SwitchToVGA16 -  switch from VGA 256 colours to VGA 16 colours
- *
- *    See comments for SwitchToVGA256().
- */
-void SwitchToVGA16 (void)
-{
-#if defined Y_X11
-    return;
-#elif defined Y_BGI
-    int gdriver, gmode, errorcode;
-
-    if (GfxMode == -1)  // Switch only if we are in 320x200x256 colors
-    {
-        HideMousePointer ();
-        closegraph ();
-        gdriver = VGA;
-        gmode = VGAHI;
-        initgraph (&gdriver, &gmode, install_dir);
-        errorcode = graphresult ();
-        if (errorcode != grOk)  // Shouldn't happen
-            fatal_error ("graphics error: %s", grapherrormsg (errorcode));
-        ShowMousePointer ();
-        GfxMode = 2;  // 640x480x16
-        ScrMaxX = getmaxx ();
-        ScrMaxY = getmaxy ();
-        ScrCenterX = ScrMaxX / 2;
-        ScrCenterY = ScrMaxY / 2;
-    }
-#else
-    ;
-#endif
 }
 
 /*
@@ -728,9 +525,6 @@ void SwitchToVGA16 (void)
  */
 void ClearScreen ()
 {
-#if defined Y_BGI
-    cleardevice ();
-#elif defined Y_X11
     if (no_pixmap)
         XClearWindow (dpy, win);
     else
@@ -738,9 +532,6 @@ void ClearScreen ()
         XFillRectangle (dpy, pixmap, pixmap_gc, 0, 0, ScrMaxX + 1, ScrMaxY + 1);
         drw = pixmap;  // Redisplaying from scratch so let's use the pixmap
     }
-#else
-    ;
-#endif
 }
 
 /*
@@ -757,9 +548,6 @@ void ClearScreen ()
  */
 void update_display ()
 {
-#if defined Y_BGI
-    ;  // Nothing ; with BGI, screen output is synchronous
-#elif defined Y_X11
     //if (drw_mods == 0)  // Nothing to do, display is already up to date
     //   return;
     //printf (" [");
@@ -774,9 +562,6 @@ void update_display ()
     //fflush (stdout);
     drw_mods = 0;
     drw = win;  // If they don't like it, they can call ClearScreen() [HHOS]
-#else
-    ;
-#endif
 }
 
 /*
@@ -804,9 +589,6 @@ void set_pcolour (pcolour_t colour)
 
 // Last application colour set by set_colour()
 static acolour_t current_acolour = 0;
-#ifdef Y_BGI
-static int current_bgicolour = 0;
-#endif
 
 /*
  *    get_colour - get the current drawing colour
@@ -823,20 +605,11 @@ acolour_t get_colour ()
  */
 void set_colour (acolour_t colour)
 {
-#if defined Y_BGI
-    if (colour != current_acolour)
-    {
-        current_acolour = colour;
-        current_bgicolour = (GfxMode < 0) ? TranslateToDoomColor (colour) : colour;
-        setcolor (current_bgicolour);
-    }
-#elif defined Y_X11
     if (colour != current_acolour)
     {
         current_acolour = colour;
         XSetForeground (dpy, gc, app_colour[colour]);
     }
-#endif
 }
 
 /*
@@ -878,9 +651,6 @@ void pop_colour (void)
  */
 void SetLineThickness (int thick)
 {
-#if defined Y_BGI
-    setlinestyle (SOLID_LINE, 0, thick ? THICK_WIDTH : NORM_WIDTH);
-#elif defined Y_X11
     if (!! thick != LineThickness)
     {
         LineThickness = !! thick;
@@ -890,7 +660,6 @@ void SetLineThickness (int thick)
         // See note (1) in the hacker's guide.
         XChangeGC (dpy, gc, GCLineWidth, &gcv);
     }
-#endif
 }
 
 /*
@@ -898,9 +667,6 @@ void SetLineThickness (int thick)
  */
 void SetDrawingMode (int _xor)
 {
-#if defined Y_BGI
-    setwritemode (_xor ? XOR_PUT : COPY_PUT);
-#elif defined Y_X11
     if (!! _xor != DrawingMode)
     {
         DrawingMode = !! _xor;
@@ -911,7 +677,6 @@ void SetDrawingMode (int _xor)
         // See note (1) in the hacker's guide.
         XChangeGC (dpy, gc, GCFunction | GCLineWidth, &gcv);
     }
-#endif
 }
 
 /*
@@ -921,11 +686,7 @@ void SetDrawingMode (int _xor)
  */
 void draw_point (int x, int y)
 {
-#if defined Y_BGI
-    putpixel (x, y, current_bgicolour);
-#elif defined Y_X11
     XDrawPoint (dpy, drw, gc, x, y);
-#endif
 }
 
 /*
@@ -935,12 +696,8 @@ void draw_point (int x, int y)
  */
 void draw_map_point (int mapx, int mapy)
 {
-#if defined Y_BGI
-    putpixel (SCREENX (mapx), SCREENY (mapy), current_bgicolour);
-#elif defined Y_X11
     XDrawPoint (dpy, drw, gc, SCREENX (mapx), SCREENY (mapy));
     drw_mods++;
-#endif
 }
 
 /*
@@ -948,13 +705,9 @@ void draw_map_point (int mapx, int mapy)
  */
 void DrawMapLine (int mapx1, int mapy1, int mapx2, int mapy2)
 {
-#if defined Y_BGI
-    line (SCREENX (mapx1), SCREENY (mapy1), SCREENX (mapx2), SCREENY (mapy2));
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, SCREENX (mapx1), SCREENY (mapy1),
     SCREENX (mapx2), SCREENY (mapy2));
     drw_mods++;
-#endif
 }
 
 /*
@@ -962,14 +715,10 @@ void DrawMapLine (int mapx1, int mapy1, int mapx2, int mapy2)
  */
 void DrawMapCircle (int mapx, int mapy, int mapradius)
 {
-#if defined Y_BGI
-    circle (SCREENX (mapx), SCREENY (mapy), (int) (mapradius * Scale));
-#elif defined Y_X11
     XDrawArc (dpy, drw, gc, SCREENX (mapx - mapradius), SCREENY (mapy + mapradius),
               (unsigned int) (2 * mapradius * Scale),
               (unsigned int) (2 * mapradius * Scale), 0, 360*64);
     drw_mods++;
-#endif
 }
 
 /*
@@ -982,29 +731,16 @@ void DrawMapVector (int mapx1, int mapy1, int mapx2, int mapy2)
     int    scrx2   = SCREENX (mapx2);
     int    scry2   = SCREENY (mapy2);
     double r       = hypot ((double) (scrx1 - scrx2), (double) (scry1 - scry2));
-#if 0
-    /* AYM 19980216 to avoid getting huge arrowheads when zooming in */
-    int    scrXoff = (r >= 1.0) ? (int) ((scrx1 - scrx2) * 8.0 / r * (Scale < 1 ? Scale : 1)) : 0;
-    int    scrYoff = (r >= 1.0) ? (int) ((scry1 - scry2) * 8.0 / r * (Scale < 1 ? Scale : 1)) : 0;
-#else
+
     int    scrXoff = (r >= 1.0) ? (int) ((scrx1 - scrx2) * 8.0 / r * (Scale / 2)) : 0;
     int    scrYoff = (r >= 1.0) ? (int) ((scry1 - scry2) * 8.0 / r * (Scale / 2)) : 0;
-#endif
 
-#if defined Y_BGI
-    line (scrx1, scry1, scrx2, scry2);
-    scrx1 = scrx2 + 2 * scrXoff;
-    scry1 = scry2 + 2 * scrYoff;
-    line (scrx1 - scrYoff, scry1 + scrXoff, scrx2, scry2);
-    line (scrx1 + scrYoff, scry1 - scrXoff, scrx2, scry2);
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, scrx1, scry1, scrx2, scry2);
     scrx1 = scrx2 + 2 * scrXoff;
     scry1 = scry2 + 2 * scrYoff;
     XDrawLine (dpy, drw, gc, scrx1 - scrYoff, scry1 + scrXoff, scrx2, scry2);
     XDrawLine (dpy, drw, gc, scrx1 + scrYoff, scry1 - scrXoff, scrx2, scry2);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1019,28 +755,16 @@ void DrawMapArrow (int mapx1, int mapy1, unsigned angle)
     int    scrx2   = SCREENX (mapx2);
     int    scry2   = SCREENY (mapy2);
     double r       = hypot (scrx1 - scrx2, scry1 - scry2);
-#if 0
-    int    scrXoff = (r >= 1.0) ? (int) ((scrx1 - scrx2) * 8.0 / r * (Scale < 1 ? Scale : 1)) : 0;
-    int    scrYoff = (r >= 1.0) ? (int) ((scry1 - scry2) * 8.0 / r * (Scale < 1 ? Scale : 1)) : 0;
-#else
+
     int    scrXoff = (r >= 1.0) ? (int) ((scrx1 - scrx2) * 8.0 / r * (Scale / 2)) : 0;
     int    scrYoff = (r >= 1.0) ? (int) ((scry1 - scry2) * 8.0 / r * (Scale / 2)) : 0;
-#endif
 
-#if defined Y_BGI
-    line (scrx1, scry1, scrx2, scry2);
-    scrx1 = scrx2 + 2 * scrXoff;
-    scry1 = scry2 + 2 * scrYoff;
-    line (scrx1 - scrYoff, scry1 + scrXoff, scrx2, scry2);
-    line (scrx1 + scrYoff, scry1 - scrXoff, scrx2, scry2);
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, scrx1, scry1, scrx2, scry2);
     scrx1 = scrx2 + 2 * scrXoff;
     scry1 = scry2 + 2 * scrYoff;
     XDrawLine (dpy, drw, gc, scrx1 - scrYoff, scry1 + scrXoff, scrx2, scry2);
     XDrawLine (dpy, drw, gc, scrx1 + scrYoff, scry1 - scrXoff, scrx2, scry2);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1048,12 +772,8 @@ void DrawMapArrow (int mapx1, int mapy1, unsigned angle)
  */
 void DrawScreenLine (int Xstart, int Ystart, int Xend, int Yend)
 {
-#if defined Y_BGI
-    line (Xstart, Ystart, Xend, Yend);
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, Xstart, Ystart, Xend, Yend);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1061,9 +781,6 @@ void DrawScreenLine (int Xstart, int Ystart, int Xend, int Yend)
  */
 void DrawScreenLineLen (int x, int y, int width, int height)
 {
-#if defined Y_BGI
-    line (x, y, x + width - 1, y + height - 1);
-#elif defined Y_X11
     if (width > 0)
         width--;
     else if (width < 0)
@@ -1074,7 +791,6 @@ void DrawScreenLineLen (int x, int y, int width, int height)
         height++;
     XDrawLine (dpy, drw, gc, x, y, x + width, y + height);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1085,12 +801,8 @@ void DrawScreenLineLen (int x, int y, int width, int height)
  */
 void DrawScreenRect (int x, int y, int width, int height)
 {
-#if defined Y_BGI
-    rectangle (x, y, x + width - 1, y + height - 1);
-#elif defined Y_X11
     XDrawRectangle (dpy, drw, gc, x, y, width - 1, height - 1);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1104,15 +816,10 @@ void DrawScreenBox (int scrx1, int scry1, int scrx2, int scry2)
 {
     if (scrx2 < scrx1 || scry2 < scry1)
         return;
-#if defined Y_BGI
-    setfillstyle (1, getcolor ());
-    bar (scrx1, scry1, scrx2, scry2);
-#elif defined Y_X11
     // FIXME missing gc fill_style
     XFillRectangle (dpy, drw, gc, scrx1, scry1,
     scrx2 - scrx1 + 1, scry2 - scry1 + 1);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1126,14 +833,9 @@ void DrawScreenBoxwh (int scrx0, int scry0, int width, int height)
 {
     if (width < 1 || height < 1)
         return;
-#if defined Y_BGI
-    setfillstyle (1, getcolor ());
-    bar (scrx0, scry0, scrx0 + width - 1, scry0 + height - 1);
-#elif defined Y_X11
     // FIXME missing gc fill_style
     XFillRectangle (dpy, drw, gc, scrx0, scry0, width, height);
     drw_mods++;
-#endif
 }
 
 /*
@@ -1144,23 +846,16 @@ void DrawScreenBoxwh (int scrx0, int scry0, int width, int height)
 void DrawScreenBox3D (int scrx1, int scry1, int scrx2, int scry2)
 {
     DrawScreenBox3DShallow (scrx1, scry1, scrx2, scry2);
+
     push_colour (WINBG_DARK);
-#if defined Y_BGI
-    line (scrx1 + 1, scry2 - 1, scrx2 - 1, scry2 - 1);
-    line (scrx2 - 1, scry1 + 1, scrx2 - 1, scry2 - 1);
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, scrx1 + 1, scry2 - 1, scrx2 - 1, scry2 - 1);
     XDrawLine (dpy, drw, gc, scrx2 - 1, scry1 + 1, scrx2 - 1, scry2 - 1);
-#endif
+
     set_colour (WINBG_LIGHT);
-#if defined Y_BGI
-    line (scrx1 + 1, scry1 + 1, scrx1 + 1, scry2 - 1);
-    line (scrx1 + 1, scry1 + 1, scrx2 - 1, scry1 + 1);
-#elif defined Y_X11
     XDrawLine (dpy, drw, gc, scrx1 + 1, scry1 + 1, scrx1 + 1, scry2 - 1);
     XDrawLine (dpy, drw, gc, scrx1 + 1, scry1 + 1, scrx2 - 1, scry1 + 1);
     drw_mods++;
-#endif
+
     pop_colour ();
 }
 
@@ -1172,18 +867,6 @@ void DrawScreenBox3D (int scrx1, int scry1, int scrx2, int scry2)
  */
 void DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2)
 {
-#if defined Y_BGI
-    setfillstyle (1, TranslateToDoomColor (LIGHTGREY));
-    bar (scrx1 + 1, scry1 + 1, scrx2 - 1, scry2 - 1);
-    push_colour (WINBG_DARK);
-    line (scrx1, scry2, scrx2, scry2);
-    line (scrx2, scry1, scrx2, scry2);
-    set_colour (WINBG_LIGHT);
-    line (scrx1, scry1, scrx2, scry1);
-    line (scrx1, scry1, scrx1, scry2);
-    pop_colour ();
-
-#elif defined Y_X11
     push_colour (WINBG);
     XFillRectangle (dpy, drw, gc, scrx1+1, scry1+1, scrx2-scrx1, scry2-scry1);
     set_colour (WINBG_DARK);
@@ -1194,7 +877,6 @@ void DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2)
     XDrawLine (dpy, drw, gc, scrx1, scry1, scrx1, scry2);
     drw_mods++;
     pop_colour ();
-#endif
 }
 
 /*
@@ -1208,9 +890,6 @@ void DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2)
 void draw_box_border (int x, int y, int width, int height,
       int thickness, int raised)
 {
-#if defined Y_BGI
-#error "You need to write the BGI version of draw_box_border()"
-#elif defined Y_X11
     int n;
     XPoint points[3];
 
@@ -1252,8 +931,7 @@ void draw_box_border (int x, int y, int width, int height,
         points[2].x--;
     }
 
-pop_colour ();
-#endif
+    pop_colour ();
 }
 
 /*
@@ -1263,19 +941,6 @@ pop_colour ();
  */
 void DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t colour)
 {
-#if defined Y_BGI
-      setfillstyle (1, TranslateToDoomColor (colour));
-      bar (scrx1 + HOLLOW_BORDER, scry1 + HOLLOW_BORDER,
-           scrx2 - HOLLOW_BORDER, scry2 - HOLLOW_BORDER);
-      push_colour (WINBG_LIGHT);
-      line (scrx1, scry2, scrx2, scry2);
-      line (scrx2, scry1, scrx2, scry2);
-      set_colour (WINBG_DARK);
-      line (scrx1, scry1, scrx2, scry1);
-      line (scrx1, scry1, scrx1, scry2);
-      pop_colour ();
-
-#elif defined Y_X11
       push_colour (colour);
       XFillRectangle (dpy, drw, gc,
           scrx1 + HOLLOW_BORDER, scry1 + HOLLOW_BORDER,
@@ -1288,7 +953,6 @@ void DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t 
       XDrawLine (dpy, drw, gc, scrx1, scry1, scrx1, scry2);
       drw_mods++;
       pop_colour ();
-#endif
 }
 
 /*
@@ -1298,18 +962,7 @@ void DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t 
  */
 void DrawScreenMeter (int scrx1, int scry1, int scrx2, int scry2, float value)
 {
-#if defined Y_BGI
-    if (value < 0.0)
-        value = 0.0;
-    if (value > 1.0)
-        value = 1.0;
-    setfillstyle (1, TranslateToDoomColor (BLACK));
-    bar (scrx1 + 1 + (int) ((scrx2 - scrx1 - 2) * value), scry1 + 1, scrx2 - 1, scry2 - 1);
-    setfillstyle (1, TranslateToDoomColor (LIGHTGREEN));
-    bar (scrx1 + 1, scry1 + 1, scrx1 + 1 + (int) ((scrx2 - scrx1 - 2) * value), scry2 - 1);
-#elif defined Y_X11
     printf ("DrawScreenMeter()\n");  // FIXME
-#endif
 }
 
 // Shared by DrawScreenText() and DrawScreenString()
@@ -1406,10 +1059,6 @@ void DrawScreenString (int scrx, int scry, const char *str)
     else
         y = scry;
 
-#if defined Y_BGI
-    outtextxy (x, y, str);
-    // FIXME implement colour changes (\1, \2)
-#elif defined Y_X11
     if (strchr (str, '\1') == 0)
     {
         XDrawString (dpy, drw, gc, x - font_xofs, y + font_yofs, str, len);
@@ -1442,7 +1091,6 @@ void DrawScreenString (int scrx, int scry, const char *str)
     if (text_dot)
     XDrawPoint (dpy, drw, gc, x, y);
     drw_mods++;
-#endif
 
     lastxcur = x + FONTW * len;
     lastycur = y;
@@ -1460,208 +1108,8 @@ void DrawScreenString (int scrx, int scry, const char *str)
  */
 void DrawScreenChar (int x, int y, char c)
 {
-#if defined Y_BGI
-    char buf[2];
-    buf[0] = c;
-    buf[1] = '\0';
-    outtextxy (x, y, buf);
-#elif defined Y_X11
     XDrawString (dpy, drw, gc, x - font_xofs, y + font_yofs, &c, 1);
     if (text_dot)
         XDrawPoint (dpy, drw, gc, x, y);
     drw_mods++;
-#endif
 }
-
-/*
- *    DrawPointer  - draw (or erase) the pointer if we aren't using the mouse
- */
-void DrawPointer (bool rulers)
-{
-#ifdef Y_BGI
-    int r;
-
-    // Use XOR mode : drawing the pointer twice erases it
-    SetDrawingMode (1);
-    // Draw the pointer
-    if (rulers)
-    {
-        set_colour (MAGENTA);
-        r = (int) (512 * Scale);
-        circle (is.x, is.y, r);
-        r >>= 1;
-        circle (is.x, is.y, r);
-        r >>= 1;
-        circle (is.x, is.y, r);
-        r >>= 1;
-        circle (is.x, is.y, r);
-        r = (int) (1024 * Scale);
-        line (is.x - r, is.y, is.x + r, is.y);
-        line (is.x, is.y - r, is.x, is.y + r);
-    } else
-    {
-        set_colour (YELLOW);
-        line (is.x - 15, is.y - 13, is.x + 15, is.y + 13);
-        line (is.x - 15, is.y + 13, is.x + 15, is.y - 13);
-    }
-    // Restore normal write mode
-    SetDrawingMode (0);
-#else
-;
-#endif
-}
-
-#ifdef Y_BGI
-/*
- *    TranslateToDoomColor - translate a standard color to Doom palette 0 (approx.)
- */
-int TranslateToDoomColor (int colour)
-{
-    if (GfxMode < 0)
-        switch (colour)
-        {
-            case BLACK:
-                return 0;
-            case BLUE:
-                return 202;
-            case GREEN:
-                return 118;
-            case CYAN:
-                return 194;
-            case RED:
-                return 183;
-            case MAGENTA:
-                return 253;
-            case BROWN:
-                return 144;
-            case LIGHTGREY:
-                return 88;
-            case DARKGREY:
-                return 96;
-            case LIGHTBLUE:
-                return 197;
-            case LIGHTGREEN:
-                return 112;
-            case LIGHTCYAN:
-                return 193;
-            case LIGHTRED:
-                return 176;
-            case LIGHTMAGENTA:
-                return 250;
-            case YELLOW:
-                return 231;
-            case WHITE:
-                return 4;
-        }
-    return colour;
-}
-#endif
-
-#if defined Y_BGI && defined CIRRUS_PATCH
-/*
- *    Cirrus Logic Hardware Mouse Cursor Stuff
- */
-
-#define CRTC 0x3D4
-#define ATTR 0x3C0
-#define SEQ  0x3C4
-#define GRC  0x3CE
-#define LOBYTE(w)  ((unsigned char)(w))
-#define HIBYTE(w)  ((unsigned char)((unsigned int)(w) >> 8))
-
-unsigned rdinx (unsigned pt, unsigned inx)
-{
-    if (pt == ATTR)
-        inportb (CRTC + 6);
-    outportb (pt, inx);
-    return inportb (pt + 1);
-}
-
-void wrinx (int pt, unsigned inx, unsigned val)
-{
-    if (pt == ATTR)
-    {
-        inportb (CRTC + 6);
-        outportb (pt, inx);
-        outportb (pt, val);
-    } else
-    {
-        outportb (pt, inx);
-        outportb (pt + 1, val);
-    }
-}
-
-void modinx (unsigned pt, unsigned inx, unsigned mask, unsigned nwv)
-{
-    unsigned temp;
-
-    temp = (rdinx (pt, inx) & ~mask) + (nwv & mask);
-    wrinx (pt, inx, temp);
-}
-
-void clrinx (unsigned pt, unsigned inx, unsigned val)
-{
-    unsigned x;
-
-    x = rdinx (pt, inx);
-    wrinx (pt, inx, x & ~val);
-}
-
-void SetHWCursorPos (unsigned x, unsigned y)
-{
-    outport (SEQ, (x << 5) | 0x10);
-    outport (SEQ, (y << 5) | 0x11);
-}
-
-void SetHWCursorCol (long fgcol, long bgcol)
-{
-    modinx (SEQ, 0x12, 3, 2);
-    outportb (0x3C8, 0xFF);
-    outportb (0x3C9, LOBYTE (fgcol) >> 2);
-    outportb (0x3C9, HIBYTE (bgcol) >> 2);
-    outportb (0x3C8, 0);
-    outportb (0x3C9, LOBYTE (bgcol) >> 2);
-    outportb (0x3C9, HIBYTE (bgcol) >> 2);
-    outportb (0x3C9, bgcol >> 18);
-    modinx (SEQ, 0x12, 3, 1);
-}
-
-void CopyHWCursorMap (unsigned bytes)
-{
-    char    *curmapptr = 0xA000FF00L;
-    unsigned lbank = (1024 / 64) - 1;
-
-    if ((rdinx (GRC, 0x0B) & 32)==0)
-        lbank = lbank << 2;
-    wrinx (GRC, 9, lbank << 2);
-    memmove (curmapptr, &mp, bytes);
-}
-
-void SetHWCursorMap (char *map)
-{
-    memmove (&mp, map, 128);
-    memmove (&mp + 128, &mp, 128);
-    CopyHWCursorMap (256);
-    SetHWCursorCol (0xFF00000L, 0xFF);
-    wrinx (SEQ, 0x13, 0x3F);
-}
-
-#endif  /* Y_BGI && CIRRUS_PATCH */
-
-#ifdef Y_DOS
-static int cooked_installuserdriver (const char far *__name,
-                                    int huge (*detect)(void))
-{
-    char savecwd[PATH_MAX+1];
-    int gdriver;
-
-    getcwd (savecwd, PATH_MAX);
-    if (al_fchdir (install_dir))
-        fatal_error ("installuserdriver: chdir1 error (%s)", strerror (errno));
-    gdriver = installuserdriver (__name, detect);
-    if (al_fchdir (savecwd))
-        fatal_error ("installuserdriver: chdir2 error (%s)", strerror (errno));
-    return gdriver;
-}
-#endif
-

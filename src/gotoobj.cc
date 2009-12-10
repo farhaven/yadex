@@ -146,9 +146,4 @@ if (objid.type == OBJ_SECTORS && sector_under_pointer () != objid.num)
 	 }
       }
    }
-if (UseMouse)
-   SetMouseCoords (is.x, is.y);
 }
-
-
-

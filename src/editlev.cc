@@ -152,7 +152,6 @@ void EditLevel (const char *levelname, bool newlevel)
     get_key(), have_key(), etc. with <is> still uninitialized. */
     init_input_status ();
     init_event ();
-    CheckMouseDriver ();
     if (newlevel && ! levelname)  // "create"
     {
         EmptyLevelData (levelname);

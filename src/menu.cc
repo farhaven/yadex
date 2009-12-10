@@ -1009,12 +1009,10 @@ void Menu_priv::draw ()
   // Display the static part of the menu
   if (from_scratch)
   {
-    HideMousePointer ();
     DrawScreenBox3D (ox0, oy0, ox1, oy1);
     set_colour (WINTITLE);
     if ((flags & MF_POPUP) && title != 0)
       DrawScreenString (ix0 + WIDE_HSPACING, ty0, title);
-    ShowMousePointer ();
 
     for (size_t l = 0; l < items.size (); l++)
     {
@@ -1054,7 +1052,6 @@ void Menu_priv::draw_one_line (size_t line, bool highlighted)
   int y      = ly0 + i.y;
   int text_y = y + VSPACE / 2;
 
-  HideMousePointer ();
 
   // Separation ?
   if (i.flags & MIF_SEPAR)
@@ -1197,7 +1194,6 @@ void Menu_priv::draw_one_line (size_t line, bool highlighted)
     const char *s = key_to_string (i.shortcut_key);
     DrawScreenString (ix1 + 1 - FONTW - strlen (s) * FONTW, text_y, s);
   }
-  ShowMousePointer ();
 }
 
 

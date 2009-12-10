@@ -206,10 +206,6 @@ void edisplay_c::refresh ()
   e->menubar->draw  ();
   e->modpopup->draw ();
 
-  // Redraw the pointer if necessary.
-  if (refresh_needed && (FakeCursor || e->rulers_shown))
-    DrawPointer (e->rulers_shown);  // FIXME should be widgetized
-
   // Refresh the physical display
   update_display ();
 }

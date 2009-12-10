@@ -44,7 +44,6 @@ extern int font_yofs;
 #define BOX_VSPACING  WIDE_VSPACING  // Vertical space between two hollow boxes
 
 /* Parameters set by command line args and configuration file */
-extern const char *BGIDriver;	// BGI: default extended BGI driver
 extern bool  CirrusCursor;	// use HW cursor on Cirrus Logic VGA cards
 extern bool  FakeCursor;	// use a "fake" mouse cursor
 extern const char *font_name;	// X: the name of the font to load
@@ -52,7 +51,6 @@ extern const char *font_name;	// X: the name of the font to load
 extern Win_dim initial_window_width;// X: the name says it all
 extern Win_dim initial_window_height;// X: the name says it all
 extern int   no_pixmap;		// X: use no pixmap -- direct window output
-extern int   VideoMode;		// BGI: default video mode for VESA cards
 
 /* Global variables */
 extern int   GfxMode;		// current graphics mode, or 0 for text
@@ -60,7 +58,6 @@ extern int   OrigX;		// Map X-coord of centre of screen/window
 extern int   OrigY;		// Map Y-coord of centre of screen/window
 extern int   ScrCenterX;	// Display X-coord of center of screen/window
 extern int   ScrCenterY;	// Display Y-coord of center of screen/window
-#ifdef Y_X11
 typedef unsigned long xpv_t;	// The type of a pixel value in X's opinion
 #ifdef X_PROTOCOL
 extern Display *dpy;
@@ -76,7 +73,6 @@ extern int	x_server_big_endian;	// Is the X server big-endian ?
 extern int      ximage_bpp;	// Number of bytes per pixels in XImages
 extern int      ximage_quantum;	// Pad XImage lines to a mult of that many B.
 #endif  // ifdef X_PROTOCOL
-#endif  // ifdef Y_X11
 extern int	text_dot;     // DrawScreenText()/DrawScreenString() debug flag
 
 /* gfx.cc */
@@ -110,11 +106,6 @@ void DrawPointer (bool);
 void DrawScreenMeter (int, int, int, int, float);
 void DrawScreenLineLen (int x, int y, int width, int height);
 int TranslateToDoomColor (int);
-#if defined Y_BGI && defined CIRRUS_PATCH
-void SetHWCursorPos (unsigned, unsigned);
-void SetHWCursorCol (long, long);
-void SetHWCursorMap (char *);
-#endif /* Y_BGI && CIRRUS_PATCH */
 #ifdef PCOLOUR_NONE
 void set_pcolour (pcolour_t colour);
 #endif

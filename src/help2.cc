@@ -98,7 +98,6 @@ void DisplayHelp () /* SWAP! */
   height = lines * FONTH + 2 * BOX_BORDER;
   x0 = (ScrMaxX + 1 - width) / 2;
   y0 = (ScrMaxY + 1 - height) / 2;
-  HideMousePointer ();
   /* put in the instructions */
   DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
   set_colour (LIGHTCYAN);
@@ -112,7 +111,6 @@ void DisplayHelp () /* SWAP! */
   set_colour (WINTITLE);
   DrawScreenText (-1, -1, "Press any key to return to the editor...");
   get_key_or_click ();
-  ShowMousePointer ();
 }
 
 
@@ -136,7 +134,6 @@ void about_yadex ()
   int x0 = (ScrMaxX + 1 - width) / 2;
   int y0 = (ScrMaxY + 1 - height) / 2;
 
-  HideMousePointer ();
   DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
   push_colour (WINFG);
   push_colour (WINFG_HL);
@@ -172,7 +169,6 @@ void about_yadex ()
   DrawScreenText (-1, -1, "Press any key to return to the editor...");
   pop_colour ();
   get_key_or_click ();
-  ShowMousePointer ();
 }
 
 

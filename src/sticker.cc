@@ -28,12 +28,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
 #include "yadex.h"
-#if defined Y_X11
-#  include <X11/Xlib.h>
-#  include <X11/Xutil.h>  // XDestroyImage
-#elif defined Y_BGI
-#  include <graphics.h>
-#endif
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>  // XDestroyImage
 #include "gcolour2.h"
 #include "gcolour3.h"
 #include "gfx.h"
@@ -54,14 +50,9 @@ class Sticker_priv
     bool has_data;
     int  width;
     int  height;
-#if defined Y_X11
     XImage *ximage;	// Used only if opaque
     Pixmap pixmap;	// Used only if not opaque
     Pixmap mask;	// Used only if not opaque
-#elif defined Y_BGI
-    void *putimage_data;// Used only if opaque
-    img_pixel_t *pixels	// Used only if not opaque
-#endif
 };
 
 
@@ -129,7 +120,6 @@ void Sticker::draw (Drawable drw, char grav, int x, int y)
     return;
   int x0 = grav == 'c' ? x - priv->width  / 2 : x;
   int y0 = grav == 'c' ? y - priv->height / 2 : y;
-#if defined Y_X11
   if (priv->opaque)
   {
     XPutImage (dpy, drw, gc, priv->ximage, 0, 0,
@@ -143,26 +133,6 @@ void Sticker::draw (Drawable drw, char grav, int x, int y)
       priv->height, x0, y0);
     XSetClipMask (dpy, gc, None);
   }
-#elif defined Y_BGI
-  // THE BGI CODE IS UNTESTED !! -- AYM 2000-08-13
-  if (priv->opaque)
-  {
-    putimage (x0, y0, priv->putimage_data, COPY_PUT);
-  }
-  else
-  {
-    char img_pixel_t *data = priv->pixels;
-    int _xmax = x0 + priv->width;
-    int _ymax = y0 + priv->height;
-    for (; x0 < _ymax; x0++)
-      for (; y0 < _xmax; y0++)
-      {
-	if (*data != IMG_TRANSP)
-	  putpixel (x0, y0, *data);
-	data++;
-      }
-  }
-#endif
 }
 
 
@@ -182,7 +152,6 @@ void Sticker_priv::clear ()
 {
   if (has_data)
   {
-#if defined Y_X11
     if (opaque)
     {
       XDestroyImage (ximage);  // Also frees buf.
@@ -193,16 +162,6 @@ void Sticker_priv::clear ()
       XFreePixmap (dpy, mask);
     }
     has_data = false;
-#elif defined Y_BGI
-    if (opaque)
-    {
-      FreeMemory (priv->putimage_data);
-    }
-    else
-    {
-      FreeMemory (priv->pixels);
-    }
-#endif
   }
 }
 
@@ -217,7 +176,6 @@ void Sticker_priv::load (const Img& img, bool opaque)
   if (width < 1 || height < 1)
     return;  // Can't create Pixmaps with null dimensions...
 
-#if defined Y_X11
   if (opaque)
   {
     ximage = make_ximage (img);
@@ -250,46 +208,9 @@ void Sticker_priv::load (const Img& img, bool opaque)
 
     has_data = true;
   }
-#elif defined Y_BGI
-  // THE BGI CODE IS UNTESTED !! -- AYM 2000-08-13
-  if (opaque)
-  {
-    putimage_data = GetMemory (4 + width * height * sizeof (img_pixel_t));
-    if (putimage_data == 0)
-    {
-      warn ("Out of memory in Sticker::load()\n");
-      return;
-    }
-    if (GfxMode < -1)  // The VESA drivers needs (size - 1) instead of (size)
-    {
-      ((unsigned short *) putimage_data)[0] = width  - 1;
-      ((unsigned short *) putimage_data)[1] = height - 1;
-    }
-    else
-    {
-      ((unsigned short *) putimage_data)[0] = width;
-      ((unsigned short *) putimage_data)[1] = height;
-    }
-    memcpy (((img_pixel_t *) putimage_data) + 4, img.buf (),
-      width * height * sizeof (img_pixel_t));
-    has_data = true;
-  }
-  else
-  {
-    pixels = (img_pixel_t *) GetMemory (width * height * sizeof (img_pixel_t));
-    if (pixels == 0)
-    {
-      warn ("Out of memory in Sticker::load()\n");
-      return;
-    }
-    memcpy (pixels, img.buf (), width * height * sizeof (img_pixel_t));
-    has_data = true;
-  }
-#endif
 }
 
 
-#if defined Y_X11
 /*
  *	Sticker_priv:ximage - create XImage from Img
  *
@@ -489,10 +410,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   }
   return ximage;
 }
-#endif  /* Y_X11 */
 
 
-#ifdef Y_X11
 /*
  *	Sticker_priv::make_bitmap - create 1-bpp XImage from Img
  *
@@ -609,5 +528,3 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   }
   return ximage;
 }
-#endif  /* Y_X11 */
-

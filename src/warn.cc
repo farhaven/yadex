@@ -36,8 +36,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  *	If the format string of the previous invocation did not
  *	end with a '\n', do not prepend the "Warning: " string.
  *
- *	FIXME should handle cases where stdout is not available
- *	(BGI version when in graphics mode).
  */
 void warn (const char *fmt, ...)
 {

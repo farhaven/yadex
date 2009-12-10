@@ -91,16 +91,6 @@ for (int n = 0; n <= playpalnum; n++)
       warn ("PLAYPAL: error reading entry #%d\n", n);
       }
    }
-#if defined Y_BGI
-for (int n = 0; n < 3 * DOOM_COLOURS; n++)
-   dpal[n] /= 4;
-_AX = 0x1012;
-_BX = 0;
-_CX = DOOM_COLOURS;
-_ES = FP_SEG (dpal);
-_DX = FP_OFF (dpal);
-__int__ (0x10);
-#elif defined Y_X11
 
 rgb_c rgb_values[DOOM_COLOURS];
 for (size_t n = 0; n < DOOM_COLOURS; n++)
@@ -144,7 +134,6 @@ game_colours = alloc_colours (rgb_values, DOOM_COLOURS);
    verbmsg ("Sky Colour remapped to %d (delta %d)\n", sky_colour, smallest_delta);
 }
 
-#endif
 FreeFarMemory (dpal);
 return game_colours;
 }

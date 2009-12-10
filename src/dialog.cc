@@ -74,7 +74,6 @@ bool Confirm (int x0, int y0, const char *prompt1, const char *prompt2)
   text_y0 = y0 + BOX_BORDER + WIDE_VSPACING;
   text_y1 = text_y0 + (int) (n_lines_of_text * FONTH) - 1;
   y1      = text_y1 + WIDE_HSPACING + BOX_BORDER;
-  HideMousePointer ();
   for (bool first_time = true; ; first_time = false)
   {
     if (first_time || is.key == YE_EXPOSE)
@@ -100,7 +99,6 @@ bool Confirm (int x0, int y0, const char *prompt1, const char *prompt2)
     }
   }
   is.key = 0;  // Shouldn't have to do that but EditorLoop() is broken
-  ShowMousePointer ();
   return rc;
 }
 
@@ -146,7 +144,6 @@ void Notify (int x0, int y0, const char *prompt1, const char *prompt2)
   int text_y1;
   int y1;
 
-  HideMousePointer ();
   maxlen = strlen (prompt3);
   if (strlen (prompt1) > maxlen)
     maxlen = strlen (prompt1);
@@ -173,7 +170,6 @@ void Notify (int x0, int y0, const char *prompt1, const char *prompt2)
   set_colour (WINTITLE);
   DrawScreenText (text_x0, text_y1 - FONTH - 1, prompt3);
   get_key_or_click ();
-  ShowMousePointer ();
 }
 
 
@@ -194,9 +190,6 @@ void debmes (const char *fmt, ...)
     return;
   va_start (arglist, fmt);
   y_vsnprintf (buf, sizeof buf, fmt, arglist);
-#ifdef Y_BGI
-  setviewport (0, 0, ScrMaxX, ScrMaxY, 1);
-#endif  /* FIXME! */
   Notify (-1, -1, buf, NULL);
 }
 
@@ -217,13 +210,11 @@ void DisplayMessage (int x0, int y0, const char *msg, ...)
     x0 = (ScrMaxX - width) / 2;
   if (y0 < 0)
     y0 = (ScrMaxY - height) / 2;
-  HideMousePointer ();
   DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
   push_colour (WINFG);
   DrawScreenText (x0 + BOX_BORDER + WIDE_HSPACING,
     y0 + BOX_BORDER + WIDE_VSPACING, prompt);
   pop_colour ();
-  ShowMousePointer ();
   XFlush (dpy);
 }
 

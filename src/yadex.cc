@@ -31,6 +31,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "acolours.h"
 #include "bench.h"
 #include "cfgfile.h"
+#include "decorate.h"
 #include "disppic.h"  /* Because of "p" */
 #include "editlev.h"
 #include "endian.h"
@@ -161,7 +162,6 @@ static void  print_error_message (const char *fmt, va_list args);
 static void  add_base_colours ();
 static const Wad_file *wad_by_name (const char *pathname);
 static bool  wad_already_loaded (const char *pathname);
-       void read_decorate();
 
 /*
  *    main
@@ -529,16 +529,6 @@ void PlaySound (int freq, int msec)
  */
 void fatal_error (const char *fmt, ...)
 {
-    // With BGI, we have to switch back to text mode
-    // before printing the error message so do it now...
-#ifdef Y_BGI
-    if (GfxMode)
-    {
-            sleep (1);
-            TermGfx ();
-    }
-#endif
-
     va_list args;
     va_start (args, fmt);
     print_error_message (fmt, args);
@@ -547,10 +537,8 @@ void fatal_error (const char *fmt, ...)
     // call TermGfx() before printing so we do it last so
     // that a segfault occuring in TermGfx() does not
     // prevent us from seeing the stderr message.
-#ifdef Y_X11
     if (GfxMode)
         TermGfx ();  // Don't need to sleep (1) either.
-#endif
 
     // Clean up things and free swap space
     ForgetLevelData ();

@@ -31,19 +31,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_YADEX  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_YADEX
 
-
 #include "config.h"
-
-
-// Sanity checks
-#if ! (defined Y_BGI ^ defined Y_X11)
-#error "You must #define either Y_BGI or Y_X11"
-#endif
-
-#if ! (defined Y_DOS ^ defined Y_UNIX)
-#error "You must #define either Y_DOS or Y_UNIX"
-#endif
-
 
 /*
  *	Standard headers
@@ -73,9 +61,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 /*
  *	Additional libraries
  */
-#ifdef Y_BGI 
-#include <graphics.h>
-#endif
 #include <atclib.h>
 #include "bitvec.h"  /* bv_set, bv_clear, bv_toggle */
 #include "yerror.h"
@@ -209,9 +194,7 @@ struct Lump_loc
 typedef u8 acolour_t;
 #define ACOLOUR_NONE 0xff  // The out-of-band value
 
-#ifndef Y_BGI
 /* The 16 VGA colours that DEU used to use.
-   For the BGI version, those macros are defined in graphics.h
    FIXME: all references to these in the code should be removed. */
 const acolour_t BLACK           = 0;
 const acolour_t BLUE            = 1;
@@ -229,7 +212,6 @@ const acolour_t LIGHTRED        = 12;
 const acolour_t LIGHTMAGENTA    = 13;
 const acolour_t YELLOW          = 14;
 const acolour_t WHITE           = 15;
-#endif
 
 // True logical colours
 const acolour_t WINBG           = 16;
@@ -417,14 +399,6 @@ extern Serial_num master_dir_serial;	// The revision# thereof
 // Defined in edit.cc
 extern bool InfoShown;          // Is the bottom line displayed?
 
-// Defined in mouse.cc
-#if defined Y_BGI
-extern bool UseMouse;		// Is there a mouse driver?
-#elif defined Y_X11
-#define UseMouse 1
-#endif
-
-
 /*
  *	Prototypes
  *	AYM 1998-10-16: DEU used to have _all_ prototypes here. Thus
@@ -492,26 +466,6 @@ void ForgetFTextureNames (void);
 int is_flat_name_in_list (const char *name);
 void ReadFTextureNames (void);
 void ForgetWTextureNames (void);
-
-// mouse.cc (this module is entirely DOS-specific)
-#if defined Y_BGI
-void CheckMouseDriver (void);
-void ShowMousePointer (void);
-void HideMousePointer (void);
-void GetMouseCoords (int *, int *, int *);
-void SetMouseCoords (int, int);
-void SetMouseLimits (int, int, int, int);
-void ResetMouseLimits (void);
-void MouseCallBackFunction (void);
-#elif defined Y_X11
-#define CheckMouseDriver nop
-#define ShowMousePointer nop
-#define HideMousePointer nop
-#define GetMouseCoords   nop
-#define SetMouseCoords   nop
-#define SetMouseLimits   nop
-#define ResetMouseLimits nop
-#endif
 
 // names.cc
 const char *GetObjectTypeName (int);

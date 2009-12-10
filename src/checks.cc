@@ -108,7 +108,6 @@ out_x0 = (ScrMaxX + 1 - width) / 2;
 out_y0 = (ScrMaxY + 1 - height) / 2;
 text_x0 = out_x0 + BOX_BORDER + WIDE_HSPACING;
 text_y0 = out_y0 + BOX_BORDER + WIDE_VSPACING;
-HideMousePointer ();
 DrawScreenBox3D (out_x0, out_y0, out_x0 + width - 1, out_y0 + height - 1);
 set_colour (WHITE);
 DrawScreenText (text_x0, text_y0, "Statistics");
@@ -153,7 +152,6 @@ DrawScreenText (-1, -1, "");
 set_colour (WINTITLE);
 DrawScreenText (-1, -1, "Press any key to continue...");
 get_key_or_click ();
-ShowMousePointer ();
 }
 
 
@@ -194,7 +192,6 @@ if (y0 < 0)
 int text_x0 = x0 + BOX_BORDER + WIDE_HSPACING;
 int text_y0 = y0 + BOX_BORDER + WIDE_VSPACING;
 int cur_y = text_y0;
-HideMousePointer ();
 DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
 set_colour (LIGHTRED);
 DrawScreenText (text_x0, cur_y, "Verification failed:");
@@ -232,7 +229,6 @@ if (key != YK_ESC)
 //   DrawScreenText (x0 + 10 + 4 * (maxlen - 26), y0 + 28,
 //      "Verifying other objects...");
    }
-ShowMousePointer ();
 first_time = false;
 return (key == YK_ESC);
 }

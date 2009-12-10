@@ -142,7 +142,6 @@ int InputIntegerValue (int x0, int y0, int minv, int maxv, int defv)
   int  val, key;
   char prompt[80];
 
-  HideMousePointer ();
   y_snprintf (prompt, sizeof prompt,
     "Enter a number between %d and %d:",
     minv, maxv);
@@ -157,7 +156,6 @@ int InputIntegerValue (int x0, int y0, int minv, int maxv, int defv)
   while ((key = InputInteger (x0 + 10, y0 + 28, &val, minv, maxv)) != YK_RETURN
    && key != YK_ESC)
     Beep ();
-  ShowMousePointer ();
   return val;
 }
 
@@ -183,7 +181,6 @@ void InputFileName (int x0, int y0, const char *prompt, size_t maxlen,
   int entry_text_x1;
   int entry_text_y1;
 
-  HideMousePointer ();
   for (l = strlen (filename) + 1; l <= maxlen; l++)
     filename [l] = '\0';
   /* compute the width of the input box */
@@ -264,7 +261,6 @@ void InputFileName (int x0, int y0, const char *prompt, size_t maxlen,
     else
       Beep ();
   }
-  ShowMousePointer ();
   is.key = 0;  // Shouldn't have to do that but EditorLoop() is broken
 }
 

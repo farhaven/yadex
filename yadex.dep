@@ -494,12 +494,6 @@ obj/0/mkpalette.o: src/wstructs.h src/input.h src/mkpalette.h src/gfx.h
 dobj/0/mkpalette.o: src/wstructs.h src/input.h src/mkpalette.h src/gfx.h
 obj/0/mkpalette.o: src/rgb.h src/wadfile.h src/wads.h
 dobj/0/mkpalette.o: src/rgb.h src/wadfile.h src/wads.h
-obj/0/mouse.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/mouse.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/mouse.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
-dobj/0/mouse.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
-obj/0/mouse.o: src/input.h
-dobj/0/mouse.o: src/input.h
 obj/0/names.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 dobj/0/names.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 obj/0/names.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
@@ -972,18 +966,20 @@ obj/0/yadex.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
 dobj/0/yadex.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
 obj/0/yadex.o: src/input.h src/acolours.h src/colour.h src/bench.h
 dobj/0/yadex.o: src/input.h src/acolours.h src/colour.h src/bench.h
-obj/0/yadex.o: src/cfgfile.h src/disppic.h src/lists.h src/img.h src/editlev.h
-dobj/0/yadex.o: src/cfgfile.h src/disppic.h src/lists.h src/img.h src/editlev.h
-obj/0/yadex.o: src/endian.h src/flats.h src/game.h src/rgb.h src/gfx.h
-dobj/0/yadex.o: src/endian.h src/flats.h src/game.h src/rgb.h src/gfx.h
-obj/0/yadex.o: src/gfx2.h src/help1.h src/levels.h src/things.h src/mkpalette.h
-dobj/0/yadex.o: src/gfx2.h src/help1.h src/levels.h src/things.h src/mkpalette.h
-obj/0/yadex.o: src/palview.h src/patchdir.h src/sanity.h src/textures.h
-dobj/0/yadex.o: src/palview.h src/patchdir.h src/sanity.h src/textures.h
-obj/0/yadex.o: src/x11.h src/wadfile.h src/wadlist.h src/wadname.h src/wadres.h
-dobj/0/yadex.o: src/x11.h src/wadfile.h src/wadlist.h src/wadname.h src/wadres.h
-obj/0/yadex.o: src/spritdir.h src/lumpdir.h src/wads2.h
-dobj/0/yadex.o: src/spritdir.h src/lumpdir.h src/wads2.h
+obj/0/yadex.o: src/cfgfile.h src/decorate.h src/disppic.h src/lists.h src/img.h
+dobj/0/yadex.o: src/cfgfile.h src/decorate.h src/disppic.h src/lists.h src/img.h
+obj/0/yadex.o: src/editlev.h src/endian.h src/flats.h src/game.h src/rgb.h
+dobj/0/yadex.o: src/editlev.h src/endian.h src/flats.h src/game.h src/rgb.h
+obj/0/yadex.o: src/gfx.h src/gfx2.h src/help1.h src/levels.h src/things.h
+dobj/0/yadex.o: src/gfx.h src/gfx2.h src/help1.h src/levels.h src/things.h
+obj/0/yadex.o: src/mkpalette.h src/palview.h src/patchdir.h src/sanity.h
+dobj/0/yadex.o: src/mkpalette.h src/palview.h src/patchdir.h src/sanity.h
+obj/0/yadex.o: src/textures.h src/x11.h src/wadfile.h src/wadlist.h
+dobj/0/yadex.o: src/textures.h src/x11.h src/wadfile.h src/wadlist.h
+obj/0/yadex.o: src/wadname.h src/wadres.h src/spritdir.h src/lumpdir.h
+dobj/0/yadex.o: src/wadname.h src/wadres.h src/spritdir.h src/lumpdir.h
+obj/0/yadex.o: src/wads2.h
+dobj/0/yadex.o: src/wads2.h
 obj/0/ytime.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 dobj/0/ytime.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 obj/0/ytime.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h

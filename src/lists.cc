@@ -583,9 +583,7 @@ void InputNameFromList (
    const char *const *list,
    char *name)
 {
-HideMousePointer ();
 InputNameFromListWithFunc (x0, y0, prompt, listsize, list, 5, name, 0, 0, NULL);
-ShowMousePointer ();
 }
 
 

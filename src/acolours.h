@@ -13,12 +13,9 @@
  *	AYM 1998-11-29
  */
 
-
 #include "colour.h"
-
 
 pcolour_t add_app_colour (rgb_c rgb);
 void delete_app_colour (acolour_t acn);
 pcolour_t *commit_app_colours ();
 void uncommit_app_colours (pcolour_t *app_colours);
-

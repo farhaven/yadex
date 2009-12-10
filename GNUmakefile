@@ -138,8 +138,8 @@ VERPREV := $(shell test -f VERPREV && cat VERPREV)
 # All the modules of Yadex without path or extension.
 MODULES_YADEX =								\
 	acolours	aym		bench		bitvec			\
-	cfgfile		checks		colour1		colour2		\
-	colour3		colour4		config		credits		\
+	cfgfile		checks		colour		\
+	config		credits		\
 	decorate 										\
 	dependcy	dialog		disppic		drawmap		\
 	edisplay	editgrid	editlev		editloop	\

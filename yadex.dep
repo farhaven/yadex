@@ -46,32 +46,14 @@ obj/0/checks.o: src/levels.h src/things.h src/objects.h src/objid.h
 dobj/0/checks.o: src/levels.h src/things.h src/objects.h src/objid.h
 obj/0/checks.o: src/oldmenus.h src/selectn.h
 dobj/0/checks.o: src/oldmenus.h src/selectn.h
-obj/0/colour1.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/colour1.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/colour1.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-dobj/0/colour1.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-obj/0/colour1.o: src/wstructs.h src/input.h src/rgb.h
-dobj/0/colour1.o: src/wstructs.h src/input.h src/rgb.h
-obj/0/colour2.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/colour2.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/colour2.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-dobj/0/colour2.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-obj/0/colour2.o: src/wstructs.h src/input.h
-dobj/0/colour2.o: src/wstructs.h src/input.h
-obj/0/colour3.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/colour3.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/colour3.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-dobj/0/colour3.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-obj/0/colour3.o: src/wstructs.h src/input.h src/rgb.h
-dobj/0/colour3.o: src/wstructs.h src/input.h src/rgb.h
-obj/0/colour4.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/colour4.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/colour4.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-dobj/0/colour4.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-obj/0/colour4.o: src/wstructs.h src/input.h src/colour.h src/gfx.h src/rgb.h
-dobj/0/colour4.o: src/wstructs.h src/input.h src/colour.h src/gfx.h src/rgb.h
-obj/0/colour4.o: src/x11.h
-dobj/0/colour4.o: src/x11.h
+obj/0/colour.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
+dobj/0/colour.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
+obj/0/colour.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
+dobj/0/colour.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
+obj/0/colour.o: src/wstructs.h src/input.h src/rgb.h src/colour.h src/gfx.h
+dobj/0/colour.o: src/wstructs.h src/input.h src/rgb.h src/colour.h src/gfx.h
+obj/0/colour.o: src/x11.h
+dobj/0/colour.o: src/x11.h
 obj/0/decorate.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 dobj/0/decorate.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 obj/0/decorate.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h

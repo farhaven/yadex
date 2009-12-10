@@ -3,7 +3,6 @@
  *	AYM 1998-11-28
  */
 
-
 #ifndef YH_COLOUR  // Prevent multiple inclusion
 #define YH_COLOUR  // Prevent multiple inclusion
 

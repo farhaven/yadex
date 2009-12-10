@@ -4,7 +4,6 @@
  *	AYM 2000-04-09
  */
 
-
 /*
 This file is part of Yadex.
 
@@ -27,30 +26,25 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"  /* Just to force a recompile when you ./configure again */
 #include "dependcy.h"
 #include "serialnum.h"
 
-
 Dependency::Dependency (Serial_num *sn)
 {
-  serial_num  = sn;
-  token_valid = false;
+    serial_num  = sn;
+    token_valid = false;
 }
-
 
 bool Dependency::outdated ()
 {
-  if (! token_valid)
-    return true;
-  return serial_num->outdated (token);
+    if (! token_valid)
+        return true;
+    return serial_num->outdated (token);
 }
-
 
 void Dependency::update ()
 {
-  serial_num->update (token);
-  token_valid = true;
+    serial_num->update (token);
+    token_valid = true;
 }
-

@@ -4,7 +4,6 @@
  *	AYM 2000-04-09
  */
 
-
 /* This class, along with the Serial_num class, allow one to
    express a relationship of dependency (think makefiles)
    between two objects. For the sake of discussion, let's assume
@@ -21,27 +20,22 @@
    shall update itself based on the new state of Source and then
    call Dependency::update(). */
 
-
 #ifndef YH_DEPENDCY  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_DEPENDCY
-
 
 class Serial_num;			// Defined in serialnum.h
 typedef unsigned long serial_num_t;	// Copied from serialnum.h
 
-
 class Dependency
 {
-  public :
-    Dependency (Serial_num *sn);
-    bool outdated ();
-    void update ();
+    public :
+        Dependency (Serial_num *sn);
+        bool outdated ();
+        void update ();
 
-  private :
-    Serial_num   *serial_num;
-    serial_num_t  token;
-    bool          token_valid;
+    private :
+        Serial_num   *serial_num;
+        serial_num_t  token;
+        bool          token_valid;
 };
-
-
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

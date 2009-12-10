@@ -183,9 +183,6 @@ switch (ev.type)
       is.key       = YE_ENTER;
       is.time      = ev.xcrossing.time;
       is.in_window = 1;
-      // Sanity
-      if (ev.xcrossing.x < 0) nf_bug ("xcrossing.x < 0");  // Paranoia
-      if (ev.xcrossing.y < 0) nf_bug ("xcrossing.y < 0");  // Paranoia
       is.x = ev.xcrossing.x;
       is.y = ev.xcrossing.y;
       break;
@@ -198,8 +195,6 @@ switch (ev.type)
    case MotionNotify :
       is.key  = YE_MOTION;
       is.time = ev.xmotion.time;
-      if (ev.xmotion.x < 0) nf_bug ("xmotion.x < 0");  // Paranoia
-      if (ev.xmotion.y < 0) nf_bug ("xmotion.y < 0");  // Paranoia
       is.x = ev.xmotion.x;
       is.y = ev.xmotion.y;
 #ifdef DEBUG

@@ -3,7 +3,6 @@
  *	AYM 1998-09-06
  */
 
-
 /*
 This file is part of Yadex.
 
@@ -26,13 +25,10 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #ifndef YH__EDIT	/* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH__EDIT
 
-
 #include "objid.h"
-
 
 class edisplay_c;
 class Menu;
@@ -41,52 +37,46 @@ class modpopup_c;
 class selbox_c;
 class spot_c;
 
-
 // The numbers of the items on the menu bar
 enum
 {
-  MBI_FILE,
-  MBI_EDIT,
-  MBI_VIEW,
-  MBI_SEARCH,
-  MBI_MISC,
-  MBI_OBJECTS,
-  MBI_CHECK,
-  MBI_HELP,
-  MBI_COUNT
+    MBI_FILE,
+    MBI_EDIT,
+    MBI_VIEW,
+    MBI_SEARCH,
+    MBI_MISC,
+    MBI_OBJECTS,
+    MBI_CHECK,
+    MBI_HELP,
+    MBI_COUNT
 };
-
 
 // The numbers of the actual menus (Menu objects)
 enum
 {
-  MBM_FILE,
-  MBM_EDIT,
-  MBM_VIEW,
-  MBM_SEARCH,
-  MBM_MISC_L,  // The "Misc. operations" menus changes with the mode
-  MBM_MISC_S,
-  MBM_MISC_T,
-  MBM_MISC_V,
-  MBM_OBJECTS,
-  MBM_CHECK,
-  MBM_HELP,
-  MBM_COUNT
+    MBM_FILE,
+    MBM_EDIT,
+    MBM_VIEW,
+    MBM_SEARCH,
+    MBM_MISC_L,  // The "Misc. operations" menus changes with the mode
+    MBM_MISC_S,
+    MBM_MISC_T,
+    MBM_MISC_V,
+    MBM_OBJECTS,
+    MBM_CHECK,
+    MBM_HELP,
+    MBM_COUNT
 };
-
 
 typedef enum
 {
-  TOOL_NORMAL,
-  TOOL_SNAP_VERTEX
+    TOOL_NORMAL,
+    TOOL_SNAP_VERTEX
 } tool_t;
 
-
 /* This structure holds all the data necessary to an edit window. */
-// FIXME: make a class of it.
 typedef struct
 {
-  public :
     int   mb_ino[MBI_COUNT];	// The numbers of the items on the menu bar
     Menu *mb_menu[MBM_COUNT];	// The actual menu objects
 
@@ -111,8 +101,8 @@ typedef struct
     int pointer_y;
     int pointer_in_window;	// If false, pointer_[xy] are not meaningful.
     Objid clicked;		// The object that was under the pointer when
-				// when the left click occurred. If clicked on
-				// empty space, == CANVAS.
+        // when the left click occurred. If clicked on
+        // empty space, == CANVAS.
     int click_ctrl;		// Was Ctrl pressed at the moment of the click?
     unsigned long click_time;	// Date of last left click in ms
     Objid highlighted;		// The highlighted object
@@ -126,6 +116,5 @@ typedef struct
     modpopup_c *modpopup;	// The modal popup menu (only one at a time!)
     char modal;
 } edit_t;
-
 
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

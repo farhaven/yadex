@@ -9,4 +9,3 @@ extern const char *const yadex_copyright[] =
   "Parts written by Brendon Wyber, public domain",
   0
 };
-

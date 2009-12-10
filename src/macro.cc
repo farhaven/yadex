@@ -224,7 +224,7 @@ int macro_expand (char *buf, size_t size, const char *fmt,
 
 #ifdef TEST
 /*
-  make CXXFLAGS='-DTEST -DY_UNIX -DY_X11'
+  make CXXFLAGS='-DTEST'
     LDFLAGS=../obj/0/atclib/al_saps.o\ ../obj/0/atclib/al_sapc.o
     macro
 */

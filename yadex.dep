@@ -676,12 +676,6 @@ obj/0/sanity.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
 dobj/0/sanity.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
 obj/0/sanity.o: src/wstructs.h src/input.h src/sanity.h
 dobj/0/sanity.o: src/wstructs.h src/input.h src/sanity.h
-obj/0/scrnshot.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-dobj/0/scrnshot.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
-obj/0/scrnshot.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-dobj/0/scrnshot.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h
-obj/0/scrnshot.o: src/wstructs.h src/input.h
-dobj/0/scrnshot.o: src/wstructs.h src/input.h
 obj/0/selbox.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 dobj/0/selbox.o: src/yadex.h src/config.h atclib/atclib.h src/bitvec.h
 obj/0/selbox.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h

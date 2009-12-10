@@ -710,9 +710,7 @@ for (MDirPtr entry = MasterDir; entry != 0; entry = entry->next)
 	 {
 	 if (buf[i] >= 0x20
 	    && buf[i] != 0x7f
-#ifdef Y_UNIX
 	    && ! (buf[i] >= 0x80 && buf[i] <= 0xa0)  // ISO 8859-1
-#endif
 	    )
 	    putc (buf[i], file);
 	 else

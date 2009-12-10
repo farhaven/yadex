@@ -215,11 +215,6 @@ int main (int argc, char *argv[])
 
     printf ("%s\n", what ());
 
-    // Where am I installed ? (the config file might be there)
-#if defined Y_DOS
-    install_dir = spec_path (argv[0]);
-#endif
-
     // The config file provides some values.
     if (config_file != NULL)
         r = parse_config_file_user (config_file);
@@ -481,46 +476,11 @@ static int parse_environment_vars ()
 
 void Beep ()
 {
-#if defined Y_DOS
     if (! Quieter)
-    {
-        sound (640);
-        delay (100);
-        nosound ();
-    }
-#elif defined Y_UNIX
-    if (! Quieter)
-#if 0
-       if (dpy)  // FIXME not defined here !
-#else
-    //   if (1)
-#endif
-    //      x_bell ();
-    //   else
         {
             putchar ('\a');
             fflush (stdout);
         }
-#endif
-}
-
-/*
-   play a sound
-*/
-
-void PlaySound (int freq, int msec)
-{
-#if defined Y_DOS
-    if (! Quiet)
-    {
-        sound (freq);
-        delay (msec);
-        nosound ();
-    }
-#elif defined Y_UNIX
-    freq = msec;    // To prevent a warning about unused variables
-    return;
-#endif
 }
 
 /*

@@ -203,17 +203,6 @@ if (redraw_from_scratch || grid_snap_disp != grid_snap)
    }
 x += 6 * FONTW;
 
-#ifdef Y_DOS
-if (farcoreleft () < 50000L)
-   {
-   if (farcoreleft () < 20000L)
-      set_colour (LIGHTRED);
-   else
-      set_colour (RED);
-   }
-DrawScreenText (x, text_y0, "Free mem: %lu", farcoreleft ());
-#endif
-
 // The current pointer coordinates.
 if ((flags & pointer_disp_set)
    && ! (flags & pointer_set)

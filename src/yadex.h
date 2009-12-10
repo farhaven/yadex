@@ -44,18 +44,12 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include <ctype.h>
 #include <limits.h>
 #include <errno.h>
-#ifdef Y_DOS
-#include <alloc.h>
-#include <dos.h>
-#include <bios.h>
-#elif defined Y_UNIX
 #include <unistd.h>
 #define far
 #define huge
 #define farmalloc  malloc
 #define farrealloc realloc
 #define farfree    free
-#endif
 
 
 /*
@@ -92,16 +86,8 @@ typedef signed   long  i32;
 #define F_I32_H "lX"
 
 
-/*
- *	Platform definitions
- */
-#if defined Y_DOS
-const int Y_PATH      = 64;	// Maximum length of a path
-const int Y_FILE_NAME = 255;	// Maximum length of file name, including path
-#elif defined Y_UNIX
 const int Y_PATH      = 255;
 const int Y_FILE_NAME = 255;
-#endif
 typedef char y_file_name_t[Y_FILE_NAME + 1];
 
 

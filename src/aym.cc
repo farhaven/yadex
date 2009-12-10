@@ -139,59 +139,25 @@ const char *spec_path (const char *spec)
  *	fncmp
  *	Compare two filenames
  *	For Unix, it's a simple strcmp.
- *	For DOS, it's case insensitive and "/" and "\" are equivalent.
- *	FIXME: should canonicalize both names and compare that.
  */
 int fncmp (const char *name1, const char *name2)
 {
-#if defined Y_DOS
-  char c1, c2;
-  for (;;)
-  {
-    c1 = tolower ((unsigned char) *name1++);
-    c2 = tolower ((unsigned char) *name2++);
-    if (c1=='\\')
-      c1 = '/';
-    if (c2=='\\')
-      c2 = '/';
-    if (c1 != c2)
-      return c1-c2;
-    if (!c1)
-      return 0;
-  }
-#elif defined Y_UNIX
   return strcmp (name1, name2);
-#endif
 }
-
 
 /*
  *	is_absolute
  *	Tell whether a file name is absolute or relative.
- *
- *	Note: for DOS, a filename of the form "d:foo" is
- *	considered absolute, even though it's technically
- *	relative to the	current working directory of "d:".
- *	My reasoning is that someone who wants to specify a
- *	name that's relative to one of the standard
- *	directories is not going to put a "d:" in front of it.
  */
 int is_absolute (const char *filename)
 {
-#if defined Y_UNIX
 return *filename == '/';
-#elif defined Y_DOS
-return *filename == '/'
-   || *filename == '\\'
-   || isalpha (*filename) && filename[1] == ':';
-#endif
 }
 
 
 /*
  *	y_stricmp
  *	A case-insensitive strcmp()
- *	(same thing as DOS stricmp() or GNU strcasecmp())
  */
 int y_stricmp (const char *s1, const char *s2)
 {
@@ -215,7 +181,6 @@ for (;;)
 /*
  *	y_strnicmp
  *	A case-insensitive strncmp()
- *	(same thing as DOS strnicmp() or GNU strncasecmp())
  */
 int y_strnicmp (const char *s1, const char *s2, size_t len)
 {

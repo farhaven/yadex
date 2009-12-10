@@ -161,11 +161,7 @@ inline bool y_isident (char c)
  */
 inline int fnewline (FILE *fd)
 {
-#ifdef Y_UNIX
   return putc ('\n', fd);
-#else
-  return putc ('\r', fd), putc ('\n', fd);
-#endif
 }
 
 

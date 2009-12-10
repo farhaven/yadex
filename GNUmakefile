@@ -137,38 +137,38 @@ VERPREV := $(shell test -f VERPREV && cat VERPREV)
 
 # All the modules of Yadex without path or extension.
 MODULES_YADEX =								\
-	acolours	aym		bench		bitvec		\
+	acolours	aym		bench		bitvec			\
 	cfgfile		checks		colour1		colour2		\
 	colour3		colour4		config		credits		\
-	decorate 							\
+	decorate 										\
 	dependcy	dialog		disppic		drawmap		\
 	edisplay	editgrid	editlev		editloop	\
 	editobj		editsave	endian		editzoom	\
 	entry		entry2		events		flats		\
 	game		gcolour1	gcolour2	gcolour3	\
-	geom		gfx		gfx2		gfx3		\
+	geom		gfx		gfx2		gfx3			\
 	gotoobj		help1		help2		highlt		\
-	img		imgscale	imgspect	infobar		\
+	img		imgscale	imgspect	infobar			\
 	input		l_align		l_centre	l_flags		\
 	l_misc		l_prop		l_unlink	l_vertices	\
 	levels		lists		locate		lumpdir		\
 	macro		memory		menubar		menu		\
-	mkpalette	names		nop		\
+	mkpalette	names		nop						\
 	objects		objinfo		oldmenus	palview		\
 	patchdir	pic2img		prefer		s_centre	\
 	s_door		s_lift		s_linedefs	s_merge		\
 	s_misc		s_prop		s_slice		s_split		\
-	s_swapf		s_vertices	sanity		scrnshot	\
+	s_swapf		s_vertices	sanity				    \
 	selbox		selectn		selpath		selrect		\
 	serialnum	spritdir	sticker		swapmem		\
- 	r_render	r_images					\
+ 	r_render	r_images							\
 	t_centre	t_flags		t_prop		t_spin		\
 	textures	things		trace		v_centre	\
 	v_merge		v_polyg		vectext		verbmsg		\
 	version		wadfile		wadlist		wadnamec	\
 	wadres		wads		wads2		warn		\
 	windim		x_centre	x_exchng	x_hover		\
-	x_mirror	x_rotate	x11		xref		\
+	x_mirror	x_rotate	x11			xref		\
 	yadex		ytime		
 
 # All the modules of Atclib without path or extension.

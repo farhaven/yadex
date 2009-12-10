@@ -37,7 +37,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  *	  strings (char *) constituting the search path. The
  *	  paths may contains the following macros, which will be
  *	  expanded on the fly :
- *	  %i  the installation directory (DOS only)
  *	  %v  the version of Yadex
  *	  ~   $HOME
  *

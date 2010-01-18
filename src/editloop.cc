@@ -1470,11 +1470,6 @@ cancel_save_as:
 	 RedrawMap = 1;
 	 }
 
-#if 0
-      /* user wants to change the movement speed */
-      else if (is.key == ' ')
-	 e.move_speed = e.move_speed == 1 ? 20 : 1;
-#endif
       else if (is.key == ' ')
          {
          e.extra_zoom = ! e.extra_zoom;
@@ -1616,38 +1611,7 @@ cancel_save_as:
 	 StretchSelBox = false;
 	 RedrawMap = 1;
 	 }
-#if 0
-      // [Ctrl][g]: toggle global mode
-      else if (is.key == '\7')
-	 {
-	 static bool dont_warn = false;
-	 bool        ok        = false;
-	 if (e.global)
-	    ok = true;  // No confirmation needed to switch off
-	 else if (dont_warn)
-	    ok = true;
-	 else
-	    {
-	    ok = Confirm (-1, -1,
-			  "Global mode is experimental and probably highly",
-			  "unstable. This means crashes. Are you sure ?");
-	    RedrawMap = 1;
-	    if (ok)
-	       {
-	       dont_warn = true;  // User is sure. Won't ask again
-	       Notify (-1, -1,
-		   "Selection does not work in global mode. Don't",
-		   "bother reporting it, I'm aware of it already.");
-	       }
-	    }
-	 if (ok)
-	    {
-	    ForgetSelection (&e.Selected);
-	    e.global = ! e.global;
-	    RedrawMap = 1;
-	    }
-	 }
-#endif
+
       // [e]: Select/unselect all linedefs in non-forked path
       else if (is.key == 'e' && e.highlighted._is_linedef ())
 	 {
@@ -1789,17 +1753,6 @@ cancel_save_as:
 	    GoToObject (target_obj);
 	 RedrawMap = 1;
 	 }
-
-#if 0
-      // [c]: clear selection and redraw the map
-      else if (is.key == 'c')
-	 {
-	 ForgetSelection (&e.Selected);
-	 RedrawMap = 1;
-	 DragObject = false;
-	 StretchSelBox = false;
-	 }
-#endif
 
       // [o]: copy a group of objects
       else if (is.key == 'o'

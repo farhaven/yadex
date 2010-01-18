@@ -38,7 +38,7 @@ void xref_sidedef ()
 {
   int sidedef_no;
   printf ("Enter sidedef number : ");
-  scanf ("%d", &sidedef_no);
+  int _ign = scanf ("%d", &sidedef_no);
   printf ("Sidedef %d is used by linedefs:", sidedef_no);
   int count = 0;
   for (int n = 0; n < NumLineDefs; n++)

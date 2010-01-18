@@ -73,8 +73,8 @@ void RotateAndScaleObjects (int objtype, SelPtr obj, double angle, double scale)
                 dx = Vertices[cur->objnum].x - centerx;
                 dy = Vertices[cur->objnum].y - centery;
                 RotateAndScaleCoords (&dx, &dy, angle, scale);
-                Vertices[cur->objnum].x = (centerx + dx + /*4*/ 2) & ~/*7*/3;
-                Vertices[cur->objnum].y = (centery + dy + /*4*/ 2) & ~/*7*/3;
+                Vertices[cur->objnum].x = (centerx + dx + 2) & ~ 3;
+                Vertices[cur->objnum].y = (centery + dy + 2) & ~ 3;
             }
             MadeChanges = 1;
             MadeMapChanges = 1;

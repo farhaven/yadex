@@ -2232,7 +2232,7 @@ cancel_save_as:
             BehaviorSize = ftell(f);
             Behavior = (u8*)GetFarMemory(BehaviorSize);
             fseek(f, 0, SEEK_SET);
-            fread(Behavior, BehaviorSize, 1, f);
+            int _ign = fread(Behavior, BehaviorSize, 1, f);
             fclose(f);
             }
          RedrawMap = 1;

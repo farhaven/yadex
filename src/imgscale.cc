@@ -57,60 +57,44 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 void scale_img (const Img& img, double scale, Img& omg)
 {
-  img_dim_t iwidth  = img.width ();
-  img_dim_t owidth  = (img_dim_t) (img.width () * scale + 0.5);
-  img_dim_t oheight = (img_dim_t) (img.height () * scale + 0.5);
-  omg.resize (owidth, oheight);
-  const img_pixel_t *const ibuf = img.buf ();
-  img_pixel_t       *const obuf = omg.wbuf ();
-  if (scale <= 2.0)
-  {
-#if 0
-    img_pixel_t *orow = obuf;
-    for (int oy = 0; oy < oheight; oy++)
+    img_dim_t iwidth  = img.width ();
+    img_dim_t owidth  = (img_dim_t) (img.width () * scale + 0.5);
+    img_dim_t oheight = (img_dim_t) (img.height () * scale + 0.5);
+    omg.resize (owidth, oheight);
+    const img_pixel_t *const ibuf = img.buf ();
+    img_pixel_t       *const obuf = omg.wbuf ();
+    if (scale <= 2.0)
     {
-      int iy = (int) (oy / scale);
-      const img_pixel_t *const irow = ibuf + iwidth * iy;
-      for (int ox = 0; ox < owidth; ox++)
-      {
-	int ix = (int) (ox / scale);
-	*orow++ = irow[ix];
-      }
+        img_pixel_t *orow = obuf;
+        int *ix = new int[owidth];
+        for (int ox = 0; ox < owidth; ox++)
+            ix[ox] = (int) (ox / scale);
+        const int *const ix_end = ix + owidth;
+        for (int oy = 0; oy < oheight; oy++)
+        {
+            int iy = (int) (oy / scale);
+            const img_pixel_t *const irow = ibuf + iwidth * iy;
+            for (const int *i = ix; i < ix_end; i++)
+            *orow++ = irow[*i];
+        }
+        delete[] ix;
     }
-#else  // Supposedly faster ?
-    img_pixel_t *orow = obuf;
-    int *ix = new int[owidth];
-    for (int ox = 0; ox < owidth; ox++)
-      ix[ox] = (int) (ox / scale);
-    const int *const ix_end = ix + owidth;
-    for (int oy = 0; oy < oheight; oy++)
+    // (Slightly) optimized version for large zoom factors.
+    else
     {
-      int iy = (int) (oy / scale);
-      const img_pixel_t *const irow = ibuf + iwidth * iy;
-      for (const int *i = ix; i < ix_end; i++)
-	*orow++ = irow[*i];
+        size_t pixels_at_a_time = (int) (scale + 0.99999999999);
+        int *ox = new int[iwidth];
+        for (int ix = 0; ix < iwidth; ix++)
+            ox[ix] = (int) (ix * scale);
+        for (int oy = 0; oy < oheight; oy++)
+        {
+            int iy = (int) (oy / scale);
+            const img_pixel_t *const irow = ibuf + iwidth * iy;
+            img_pixel_t       *const orow = obuf + owidth * oy;
+            for (int ix = 0; ix < iwidth; ix++)
+                memset (orow + ox[ix], irow[ix], pixels_at_a_time);
+        }
+        fflush (stdout);
+        delete[] ox;
     }
-    delete[] ix;
-#endif
-  }
-  // (Slightly) optimized version for large zoom factors.
-  else
-  {
-    size_t pixels_at_a_time = (int) (scale + 0.99999999999);
-    int *ox = new int[iwidth];
-    for (int ix = 0; ix < iwidth; ix++)
-      ox[ix] = (int) (ix * scale);
-    for (int oy = 0; oy < oheight; oy++)
-    {
-      int iy = (int) (oy / scale);
-      const img_pixel_t *const irow = ibuf + iwidth * iy;
-      img_pixel_t       *const orow = obuf + owidth * oy;
-      for (int ix = 0; ix < iwidth; ix++)
-	memset (orow + ox[ix], irow[ix], pixels_at_a_time);
-    }
-    fflush (stdout);
-    delete[] ox;
-  }
 }
-
-

@@ -332,14 +332,6 @@ ximage_done:
     /*
     *    Further configure the window
     */
-#if 0
-    {
-    XSetWindowAttributes wa;
-    wa.win_gravity = CenterGravity;
-    XChangeWindowAttributes (dpy, win, CWWinGravity, &wa);
-    }
-#endif
-
     XStoreName (dpy, win, "Yadex");  // Temporary name -- will be overwritten
     XSelectInput (dpy, win,
                   KeyPressMask | KeyReleaseMask

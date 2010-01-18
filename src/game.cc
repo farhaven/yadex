@@ -365,10 +365,6 @@ if (abort)
    exit (2);
 }
 
-#if 0
-
-#endif
-
 /*
  *	Second pass
  */

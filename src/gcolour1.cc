@@ -55,89 +55,88 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 pcolour_t *alloc_game_colours (int playpalnum)
 {
-MDirPtr dir;
-u8	*dpal;
-pcolour_t *game_colours = 0;
+    MDirPtr dir;
+    u8	*dpal;
+    pcolour_t *game_colours = 0;
 
-dir = FindMasterDir (MasterDir, "PLAYPAL");
-if (dir == NULL)
-   {
-   warn ("PLAYPAL lump not found.\n");
-   return 0;
-   }
-
-int playpal_count = dir->dir.size / (3 * DOOM_COLOURS);
-if (playpalnum < 0 || playpalnum >= playpal_count)
-   {
-   warn ("playpalnum %d out of range (0-%d). Using #0 instead.\n",
-      playpalnum, playpal_count - 1);
-   playpalnum = 0;
-   }
-
-dpal = (u8 *) GetFarMemory (3 * DOOM_COLOURS);
-dir->wadfile->seek (dir->dir.start);
-if (dir->wadfile->error ())
-   {
-   warn ("%s: can't seek to %lXh\n",
-       dir->wadfile->pathname (), (unsigned long) dir->dir.start);
-   warn ("PLAYPAL: seek error\n");
-   }
-for (int n = 0; n <= playpalnum; n++)
-   {
-   dir->wadfile->read_bytes (dpal, 3 * DOOM_COLOURS);
-   if (dir->wadfile->error ())
-      {
-      warn ("%s: read error\n", dir->wadfile->where ());
-      warn ("PLAYPAL: error reading entry #%d\n", n);
-      }
-   }
-
-rgb_c rgb_values[DOOM_COLOURS];
-for (size_t n = 0; n < DOOM_COLOURS; n++)
-   {
-   rgb_values[n].r = (u8) dpal[3 * n];
-   rgb_values[n].g = (u8) dpal[3 * n + 1];
-   rgb_values[n].b = (u8) dpal[3 * n + 2];
-   }
-game_colours = alloc_colours (rgb_values, DOOM_COLOURS);
-
-// Find the colour closest to IMG_TRANSP
-{
-  colour0 = IMG_TRANSP;
-  int smallest_delta = INT_MAX;
-
-  for (size_t n = 1; n < DOOM_COLOURS; n++)
-  {
-    int delta = rgb_values[IMG_TRANSP] - rgb_values[n];
-    if (delta < smallest_delta)
+    dir = FindMasterDir (MasterDir, "PLAYPAL");
+    if (dir == NULL)
     {
-      colour0 = n;
-      smallest_delta = delta;
+        warn ("PLAYPAL lump not found.\n");
+        return 0;
     }
-  }
-  verbmsg ("colours: colour %d remapped to %d (delta %d)\n",
-    IMG_TRANSP, colour0, smallest_delta);
-   
-   rgb_c med_blue (0, 0, 128);
-   sky_colour = 0;
-   smallest_delta = INT_MAX;
- 
-   for (size_t n = 0; n < DOOM_COLOURS; n++)
-   {
-     int delta = med_blue - rgb_values[n];
-     if (delta < smallest_delta)
-     {
-       sky_colour = n;
-       smallest_delta = delta;
-     }
-   }
-   verbmsg ("Sky Colour remapped to %d (delta %d)\n", sky_colour, smallest_delta);
-}
 
-FreeFarMemory (dpal);
-return game_colours;
-}
+    int playpal_count = dir->dir.size / (3 * DOOM_COLOURS);
+    if (playpalnum < 0 || playpalnum >= playpal_count)
+    {
+        warn ("playpalnum %d out of range (0-%d). Using #0 instead.\n",
+        playpalnum, playpal_count - 1);
+        playpalnum = 0;
+    }
 
+    dpal = (u8 *) GetFarMemory (3 * DOOM_COLOURS);
+    dir->wadfile->seek (dir->dir.start);
+    if (dir->wadfile->error ())
+    {
+        warn ("%s: can't seek to %lXh\n",
+        dir->wadfile->pathname (), (unsigned long) dir->dir.start);
+        warn ("PLAYPAL: seek error\n");
+    }
+    for (int n = 0; n <= playpalnum; n++)
+    {
+        dir->wadfile->read_bytes (dpal, 3 * DOOM_COLOURS);
+        if (dir->wadfile->error ())
+        {
+            warn ("%s: read error\n", dir->wadfile->where ());
+            warn ("PLAYPAL: error reading entry #%d\n", n);
+        }
+    }
+
+    rgb_c rgb_values[DOOM_COLOURS];
+    for (size_t n = 0; n < DOOM_COLOURS; n++)
+    {
+        rgb_values[n].r = (u8) dpal[3 * n];
+        rgb_values[n].g = (u8) dpal[3 * n + 1];
+        rgb_values[n].b = (u8) dpal[3 * n + 2];
+    }
+    game_colours = alloc_colours (rgb_values, DOOM_COLOURS);
+
+    // Find the colour closest to IMG_TRANSP
+    {
+        colour0 = IMG_TRANSP;
+        int smallest_delta = INT_MAX;
+
+        for (size_t n = 1; n < DOOM_COLOURS; n++)
+        {
+            int delta = rgb_values[IMG_TRANSP] - rgb_values[n];
+            if (delta < smallest_delta)
+            {
+                colour0 = n;
+                smallest_delta = delta;
+            }
+        }
+        verbmsg ("colours: colour %d remapped to %d (delta %d)\n",
+        IMG_TRANSP, colour0, smallest_delta);
+
+        rgb_c med_blue (0, 0, 128);
+        sky_colour = 0;
+        smallest_delta = INT_MAX;
+
+        for (size_t n = 0; n < DOOM_COLOURS; n++)
+        {
+            int delta = med_blue - rgb_values[n];
+            if (delta < smallest_delta)
+            {
+                sky_colour = n;
+                smallest_delta = delta;
+            }
+        }
+        verbmsg ("Sky Colour remapped to %d (delta %d)\n", sky_colour, smallest_delta);
+    }
+
+    FreeFarMemory (dpal);
+    return game_colours;
+}
 
 /*
  *	free_game_colours
@@ -145,53 +144,5 @@ return game_colours;
  */
 void free_game_colours (pcolour_t *game_colours)
 {
-free_colours (game_colours, DOOM_COLOURS);
+    free_colours (game_colours, DOOM_COLOURS);
 }
-
-
-
-/* This is how I used to calculate
-   the physical colour numbers.
-   Works only on TrueColor/DirectColor visuals. */
-
-#if 0
-/* FIXME this is a gross hack */
-for (n = 0; n < DOOM_COLOURS; n++)
-   {
-   xpv_t r = dpal[3*n];
-   xpv_t g = dpal[3*n+1];
-   xpv_t b = dpal[3*n+2];
-   if (win_vis_class == DirectColor || win_vis_class == TrueColor)
-      {
-      xpv_t r_scaled, g_scaled, b_scaled;
-      if (win_r_ofs + win_r_bits < 8)
-	 r_scaled = r >> (8 - (win_r_ofs + win_r_bits));
-      else
-	 r_scaled = r << (win_r_ofs + win_r_bits - 8) & win_r_mask;
-      if (win_g_ofs + win_g_bits < 8)
-	 g_scaled = g >> (8 - (win_g_ofs + win_g_bits));
-      else
-	 g_scaled = g << (win_g_ofs + win_g_bits - 8) & win_g_mask;
-      if (win_b_ofs + win_b_bits < 8)
-	 b_scaled = b >> (8 - (win_b_ofs + win_b_bits));
-      else
-	 b_scaled = b << (win_b_ofs + win_b_bits - 8) & win_b_mask;
-      game_colour[n] = r_scaled | g_scaled | b_scaled;
-      }
-   else if (win_vis_class== PseudoColor || win_vis_class == StaticColor)
-      game_colour[n] = n;  /* Ugh! */
-   else if (win_vis_class == GrayScale || win_vis_class == StaticGray)
-      {
-      game_colour[n] = (r + g + b) / 3;
-      if (win_depth < 8)
-	 game_colour[n] >>= 8 - win_depth;
-      else
-	 game_colour[n] <<= win_depth - 8;
-      }
-   // printf ("%02X %08lX", n, (unsigned long) game_colour[n]);
-   // if (n % 6 == 5)
-   //    putchar ('\n');
-   // else
-   //    printf ("  ");
-   }
-#endif  /* #if 0 */

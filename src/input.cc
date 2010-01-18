@@ -50,16 +50,16 @@ input_status_t is;
  */
 void init_input_status ()
 {
-is.in_window   = 0;
-is.width       = -1;
-is.height      = 0;
-is.butl        = 0;
-is.butm        = 0;
-is.butr        = 0;
-is.shift       = 0;
-is.ctrl        = 0;
-is.alt         = 0;
-is.scroll_lock = 0;
+    is.in_window   = 0;
+    is.width       = -1;
+    is.height      = 0;
+    is.butl        = 0;
+    is.butm        = 0;
+    is.butr        = 0;
+    is.shift       = 0;
+    is.ctrl        = 0;
+    is.alt         = 0;
+    is.scroll_lock = 0;
 }
 
 
@@ -68,46 +68,46 @@ is.scroll_lock = 0;
  *	of the YK_-something codes.
  */
 typedef struct
-   {
-   KeySym ks;
-   inpev_t key;
-   } key_info_t;
+{
+    KeySym ks;
+    inpev_t key;
+} key_info_t;
+
 static const key_info_t key_info[] =
-   {
-   { XK_BackSpace,	YK_BACKSPACE	},
+{
+    { XK_BackSpace,	YK_BACKSPACE	},
 #ifdef XK_ISO_Left_Tab  /* OpenServer 5.0 X11R5 doesn't have XK_ISO_Left_Tab */
-   { XK_ISO_Left_Tab,	YK_BACKTAB	},
+    { XK_ISO_Left_Tab,	YK_BACKTAB	},
 #endif
-   { XK_Delete,		YK_DEL,		},
-   { XK_Down,		YK_DOWN,	},
-   { XK_End,		YK_END,		},
-   { XK_Escape,		YK_ESC,		},
-   { XK_F1,		YK_F1,		},
-   { XK_F2,		YK_F2,		},
-   { XK_F3,		YK_F3,		},
-   { XK_F4,		YK_F4,		},
-   { XK_F5,		YK_F5,		},
-   { XK_F6,		YK_F6,		},
-   { XK_F7,		YK_F7,		},
-   { XK_F8,		YK_F8,		},
-   { XK_F9,		YK_F9,		},
-   { XK_F10,		YK_F10,		},
-   { XK_Home,		YK_HOME,	},
-   { XK_Insert,		YK_INS,		},
-   { XK_Left,		YK_LEFT,	},
-   { XK_Linefeed,	YK_RETURN,	},
+    { XK_Delete,    YK_DEL,		},
+    { XK_Down,		YK_DOWN,	},
+    { XK_End,		YK_END,		},
+    { XK_Escape,	YK_ESC,		},
+    { XK_F1,		YK_F1,		},
+    { XK_F2,		YK_F2,		},
+    { XK_F3,		YK_F3,		},
+    { XK_F4,		YK_F4,		},
+    { XK_F5,		YK_F5,		},
+    { XK_F6,		YK_F6,		},
+    { XK_F7,		YK_F7,		},
+    { XK_F8,		YK_F8,		},
+    { XK_F9,		YK_F9,		},
+    { XK_F10,		YK_F10,		},
+    { XK_Home,		YK_HOME,	},
+    { XK_Insert,	YK_INS,		},
+    { XK_Left,		YK_LEFT,	},
+    { XK_Linefeed,	YK_RETURN,	},
 #ifdef XK_Page_Down	/* HP-UX 10 doesn't have XK_Page_Down */
-   { XK_Page_Down,	YK_PD,		},
+    { XK_Page_Down,	YK_PD,		},
 #endif
 #ifdef XK_Page_Up	/* HP-UX 10 doesn't have XK_Page_Up */
-   { XK_Page_Up,	YK_PU,		},
+    { XK_Page_Up,	YK_PU,		},
 #endif
-   { XK_Return,		YK_RETURN,	},
-   { XK_Right,		YK_RIGHT,	},
-   { XK_Tab,		YK_TAB,		},
-   { XK_Up,		YK_UP,		},
-   };
-
+    { XK_Return,	YK_RETURN,	},
+    { XK_Right,		YK_RIGHT,	},
+    { XK_Tab,		YK_TAB,		},
+    { XK_Up,		YK_UP,		},
+};
 
 /*
  *	get_input_status
@@ -117,246 +117,216 @@ static const key_info_t key_info[] =
  */
 void get_input_status ()
 {
-XEvent ev;
+    XEvent ev;
 
-is.key = 0;
+    is.key = 0;
 
-if (! dpy)  /* Sanity check */
-   fatal_error ("get_input_status() called before XOpenDisplay()");
-if (XPending (dpy) == 0)
-   {
-   // No event ? Wait for <idle_sleep_ms> ms before polling again.
+    if (! dpy)  /* Sanity check */
+    fatal_error ("get_input_status() called before XOpenDisplay()");
+    if (XPending (dpy) == 0)
+    {
+        // No event ? Wait for <idle_sleep_ms> ms before polling again.
 #if defined Y_NANOSLEEP
-   struct timespec treq = { 0, 1000000ul * idle_sleep_ms };
-   struct timespec trem;
-   nanosleep (&treq, &trem);
+        struct timespec treq = { 0, 1000000ul * idle_sleep_ms };
+        struct timespec trem;
+        nanosleep (&treq, &trem);
 #elif defined Y_USLEEP
-   usleep (1000ul * idle_sleep_ms );
+        usleep (1000ul * idle_sleep_ms );
 #else
-   ;  // Neither nanosleep() no usleep() so be a CPU hog.
-   // FIXME: if autoscroll is turned off, could as well
-   // call XNextEvent and sleep for good.
+        ;  // Neither nanosleep() no usleep() so be a CPU hog.
+        // FIXME: if autoscroll is turned off, could as well
+        // call XNextEvent and sleep for good.
 #endif
-   return;
-   }
+        return;
+    }
 
-XNextEvent (dpy, &ev);
+    XNextEvent (dpy, &ev);
 
-switch (ev.type)
-   {
-   /* Exposure */
-   case Expose :
-#if 0
-      printf ("expose: send=%d w=%d x,y=%4d,%4d w,h=%4d,%4d c=%d\n",
-	 (int) ev.xexpose.send_event,
-	 (int) ev.xexpose.window,
-	 (int) ev.xexpose.x,
-	 (int) ev.xexpose.y,
-	 (int) ev.xexpose.width,
-	 (int) ev.xexpose.height,
-	 (int) ev.xexpose.count);
-#endif
-      if (ev.xexpose.window == win && ev.xexpose.count == 0)
-	 is.key = YE_EXPOSE;
-      break;
+    switch (ev.type)
+    {
+        /* Exposure */
+        case Expose :
+            if (ev.xexpose.window == win && ev.xexpose.count == 0)
+                is.key = YE_EXPOSE;
+            break;
 
-   /* Resize */
-   case ConfigureNotify :
-#if 0
-      printf ("configure: x,y=%4d,%4d w,h=%4d,%4d\n",
-         (int) ev.xconfigure.x,
-         (int) ev.xconfigure.y,
-         (int) ev.xconfigure.width,
-         (int) ev.xconfigure.height);
-#endif
-      if (is.width < 0 || ev.xconfigure.width != is.width
-		       || ev.xconfigure.height != is.height)
-	 {
-	 is.key    = YE_RESIZE;
-	 is.width  = ev.xconfigure.width;
-	 is.height = ev.xconfigure.height;
-	 }
-      break;
+        /* Resize */
+        case ConfigureNotify :
+            if (is.width < 0 || ev.xconfigure.width != is.width
+            || ev.xconfigure.height != is.height)
+            {
+                is.key    = YE_RESIZE;
+                is.width  = ev.xconfigure.width;
+                is.height = ev.xconfigure.height;
+            }
+            break;
 
-   /* Mouse motion */
-   case EnterNotify :
-      is.key       = YE_ENTER;
-      is.time      = ev.xcrossing.time;
-      is.in_window = 1;
-      is.x = ev.xcrossing.x;
-      is.y = ev.xcrossing.y;
-      break;
-   case LeaveNotify :
-      is.key       = YE_LEAVE;
-      is.time      = ev.xcrossing.time;
-      is.in_window = 0;  /* Should probably "release" buttons */
-      return;
-      break;
-   case MotionNotify :
-      is.key  = YE_MOTION;
-      is.time = ev.xmotion.time;
-      is.x = ev.xmotion.x;
-      is.y = ev.xmotion.y;
+        /* Mouse motion */
+        case EnterNotify :
+            is.key       = YE_ENTER;
+            is.time      = ev.xcrossing.time;
+            is.in_window = 1;
+            is.x = ev.xcrossing.x;
+            is.y = ev.xcrossing.y;
+            break;
+        case LeaveNotify :
+            is.key       = YE_LEAVE;
+            is.time      = ev.xcrossing.time;
+            is.in_window = 0;  /* Should probably "release" buttons */
+            return;
+            break;
+        case MotionNotify :
+            is.key  = YE_MOTION;
+            is.time = ev.xmotion.time;
+            is.x = ev.xmotion.x;
+            is.y = ev.xmotion.y;
 #ifdef DEBUG
-      {
-	static bool first_time = true;
-	static int dxmin = INT_MAX;
-	static int dxmax = INT_MIN;
-	static int dymin = INT_MAX;
-	static int dymax = INT_MIN;
-	static int prevx = 0;
-	static int prevy = 0;
-	bool change = false;
-	if (! first_time)
-	{
-	  int dx = prevx - ev.xmotion.x;
-	  int dy = prevy - ev.xmotion.y;
+            {
+                static bool first_time = true;
+                static int dxmin = INT_MAX;
+                static int dxmax = INT_MIN;
+                static int dymin = INT_MAX;
+                static int dymax = INT_MIN;
+                static int prevx = 0;
+                static int prevy = 0;
+                bool change = false;
+                if (! first_time)
+                {
+                    int dx = prevx - ev.xmotion.x;
+                    int dy = prevy - ev.xmotion.y;
 
-	  if (dx < dxmin)
-	  {
-	    dxmin = dx;
-	    change = true;
-	  }
-	  if (dx > dxmax)
-	  {
-	    dxmax = dx;
-	    change = true;
-	  }
-	  if (dy < dymin)
-	  {
-	    dymin = dy;
-	    change = true;
-	  }
-	  if (dy > dymax)
-	  {
-	    dymax = dy;
-	    change = true;
-	  }
-	}
-	prevx = ev.xmotion.x;
-	prevy = ev.xmotion.y;
-	first_time = false;
-	if (change)
-	  printf ("Mouse: xmin=%d, xmax=%d, ymin=%d, ymax=%d\n",
-	    dxmin, dxmax, dymin, dymax);
-      }
+                    if (dx < dxmin)
+                    {
+                        dxmin = dx;
+                        change = true;
+                    }
+                    if (dx > dxmax)
+                    {
+                        dxmax = dx;
+                        change = true;
+                    }
+                    if (dy < dymin)
+                    {
+                        dymin = dy;
+                        change = true;
+                    }
+                    if (dy > dymax)
+                    {
+                        dymax = dy;
+                        change = true;
+                    }
+                }
+                prevx = ev.xmotion.x;
+                prevy = ev.xmotion.y;
+                first_time = false;
+                if (change)
+                    printf ("Mouse: xmin=%d, xmax=%d, ymin=%d, ymax=%d\n",
+                dxmin, dxmax, dymin, dymax);
+            }
 #endif
-      // DEBUG
-      break;
+            // DEBUG
+            break;
 
-   /* Mouse buttons */
-   case ButtonPress :
-   case ButtonRelease :
-      {
-      is.time = ev.xbutton.time;
-      int press = (ev.type == ButtonPress);
-      if (ev.xbutton.button == Button1)
-	 {
-	 is.key = press ? YE_BUTL_PRESS : YE_BUTL_RELEASE;
-	 is.butl = press;
-	 }
-      else if (ev.xbutton.button == Button2)
-	 {
-	 is.key = press ? YE_BUTM_PRESS : YE_BUTM_RELEASE;
-	 is.butm = press;
-	 }
-      else if (ev.xbutton.button == Button3)
-	 {
-	 is.key = press ? YE_BUTR_PRESS : YE_BUTR_RELEASE;
-	 is.butr = press;
-	 }
-      else if (ev.xbutton.button == Button4)
-	 {
-	 is.key = press ? YE_WHEEL_UP : 0;
-	 }
-      else if (ev.xbutton.button == Button5)
-	 {
-	 is.key = press ? YE_WHEEL_DOWN : 0;
-	 }
-      break;
-      }
+        /* Mouse buttons */
+        case ButtonPress :
+        case ButtonRelease :
+            {
+                is.time = ev.xbutton.time;
+                int press = (ev.type == ButtonPress);
+                if (ev.xbutton.button == Button1)
+                {
+                    is.key = press ? YE_BUTL_PRESS : YE_BUTL_RELEASE;
+                    is.butl = press;
+                } else if (ev.xbutton.button == Button2)
+                {
+                    is.key = press ? YE_BUTM_PRESS : YE_BUTM_RELEASE;
+                    is.butm = press;
+                } else if (ev.xbutton.button == Button3)
+                {
+                    is.key = press ? YE_BUTR_PRESS : YE_BUTR_RELEASE;
+                    is.butr = press;
+                } else if (ev.xbutton.button == Button4)
+                {
+                    is.key = press ? YE_WHEEL_UP : 0;
+                } else if (ev.xbutton.button == Button5)
+                {
+                    is.key = press ? YE_WHEEL_DOWN : 0;
+                }
+                break;
+            }
 
-   /*
-    * Keyboard
-    * FIXME: need to handle NotifyKeymap event as well.
-    */
-   case KeyPress :
-   case KeyRelease :
-      {
-      KeySym ks;
-      int press;
-      unsigned char c;
-      int has_string;
+        /*
+        * Keyboard
+        * FIXME: need to handle NotifyKeymap event as well.
+        */
+        case KeyPress :
+        case KeyRelease :
+        {
+            KeySym ks;
+            int press;
+            unsigned char c;
+            int has_string;
 
-      is.time = ev.xkey.time;
+            is.time = ev.xkey.time;
 
-      press = (ev.type == KeyPress);
+            press = (ev.type == KeyPress);
 
-      /* Convert keycode -> keysym + char. The keysym is useful for keys
-	 such as cursor arrows that don't have an ASCII code. */
-      has_string = XLookupString ((XKeyEvent *) &ev, (char *) &c, 1, &ks, NULL);
+            /* Convert keycode -> keysym + char. The keysym is useful for keys
+            such as cursor arrows that don't have an ASCII code. */
+            has_string = XLookupString ((XKeyEvent *) &ev, (char *) &c, 1, &ks, NULL);
 
-      /* The event says that Ctrl, Alt and Shift are not in the state we
-	 thought they were. Don't panic ; it's just that we missed the
-	 modifier key press/release event as it happened when we didn't
-	 have focus. Adjust ourselves. */
-      if (!! (ev.xkey.state & ShiftMask) != is.shift)
-         is.shift = !! (ev.xkey.state & ShiftMask);
-      if (!! (ev.xkey.state & ControlMask) != is.ctrl)
-         is.ctrl = !! (ev.xkey.state & ControlMask);
-      if (!! (ev.xkey.state & Mod1Mask) != is.alt)
-         is.alt = !! (ev.xkey.state & Mod1Mask);
+            /* The event says that Ctrl, Alt and Shift are not in the state we
+            thought they were. Don't panic ; it's just that we missed the
+            modifier key press/release event as it happened when we didn't
+            have focus. Adjust ourselves. */
+            if (!! (ev.xkey.state & ShiftMask) != is.shift)
+            is.shift = !! (ev.xkey.state & ShiftMask);
+            if (!! (ev.xkey.state & ControlMask) != is.ctrl)
+            is.ctrl = !! (ev.xkey.state & ControlMask);
+            if (!! (ev.xkey.state & Mod1Mask) != is.alt)
+            is.alt = !! (ev.xkey.state & Mod1Mask);
 
-      /* It's a modifier ? Remember its state */
-      switch (ks)
-	 {
-	 case XK_Shift_L:
-	 case XK_Shift_R:
-	    is.shift = press;
-	    break;
-	 case XK_Control_L:
-	 case XK_Control_R:
-	    is.ctrl = press;
-	    break;
-	 case XK_Alt_L:
-	 case XK_Alt_R:
-	 case XK_Meta_L:
-	 case XK_Meta_R:
-	    is.alt = press;
-	    break;
-	 }
+            /* It's a modifier ? Remember its state */
+            switch (ks)
+            {
+                case XK_Shift_L:
+                case XK_Shift_R:
+                    is.shift = press;
+                    break;
+                case XK_Control_L:
+                case XK_Control_R:
+                    is.ctrl = press;
+                    break;
+                case XK_Alt_L:
+                case XK_Alt_R:
+                case XK_Meta_L:
+                case XK_Meta_R:
+                    is.alt = press;
+                    break;
+            }
 
-      /* Process ordinary keys */
-      if (press)
-	 {
-	 size_t n;
-	 if (has_string)
-	    is.key = c;
-	 for (n = 0; n < sizeof key_info / sizeof *key_info; n++)
-	    if (key_info[n].ks == ks)
-	       {
-	       is.key = key_info[n].key;
-	       break;
-	       }
-	 if (is.key >= YK_ && is.key != YK_BACKTAB && is.shift)
-	    is.key |= YK_SHIFT;
-	 if (is.key >= YK_ && is.ctrl)
-	    is.key |= YK_CTRL;
-	 if (is.key != 0 && is.alt)
-	    is.key |= YK_ALT;
-	 }
-#if 0
-      if (ev.type == KeyPress)
-	 {
-	 printf ("key=%04hXh", is.key);
-	 if (is.key >= 0 && is.key <= UCHAR_MAX && isprint (is.key))
-	    printf (" (%c)", (char) is.key);
-	 putchar ('\n');
-	 }
-#endif
-      break;
-      }
-   }  /* switch (ev.type) */
+            /* Process ordinary keys */
+            if (press)
+            {
+                size_t n;
+                if (has_string)
+                    is.key = c;
+                for (n = 0; n < sizeof key_info / sizeof *key_info; n++)
+                    if (key_info[n].ks == ks)
+                    {
+                        is.key = key_info[n].key;
+                        break;
+                    }
+                if (is.key >= YK_ && is.key != YK_BACKTAB && is.shift)
+                    is.key |= YK_SHIFT;
+                if (is.key >= YK_ && is.ctrl)
+                    is.key |= YK_CTRL;
+                if (is.key != 0 && is.alt)
+                    is.key |= YK_ALT;
+            }
+            break;
+        }
+    }  /* switch (ev.type) */
 }
 
 /*
@@ -365,15 +335,14 @@ switch (ev.type)
  */
 int has_input_event ()
 {
-XEvent xev;
-if (XCheckMaskEvent (dpy, 0xffffffff, &xev) == True)
-   {
-   XPutBackEvent (dpy, &xev);
-   return 1;
-   }
-return 0;
+    XEvent xev;
+    if (XCheckMaskEvent (dpy, 0xffffffff, &xev) == True)
+    {
+        XPutBackEvent (dpy, &xev);
+        return 1;
+    }
+    return 0;
 }
-
 
 /*
  *	have_key
@@ -382,9 +351,8 @@ return 0;
  */
 int have_key ()
 {
-return 1;  /* FIXME!! */
+    return 1;  /* FIXME!! */
 }
-
 
 /*
  *	get_key
@@ -393,12 +361,11 @@ return 1;  /* FIXME!! */
  */
 int get_key ()
 {
-do
-   get_input_status ();
-while (! event_is_key (is.key));
-return is.key;
+    do
+       get_input_status ();
+    while (! event_is_key (is.key));
+    return is.key;
 }
-
 
 /*
  *	get_key_or_click
@@ -407,13 +374,12 @@ return is.key;
  */
 void get_key_or_click ()
 {
-do
-   get_input_status ();
-while (! event_is_key (is.key) && is.key != YE_BUTL_PRESS);
+    do
+       get_input_status ();
+    while (! event_is_key (is.key) && is.key != YE_BUTL_PRESS);
 
-is.key = 0;  // FIXME Shouldn't have to do that but EditorLoop() is broken
+    is.key = 0;  // FIXME Shouldn't have to do that but EditorLoop() is broken
 }
-
 
 /*
  *	key_to_string
@@ -424,85 +390,88 @@ is.key = 0;  // FIXME Shouldn't have to do that but EditorLoop() is broken
  *	The string returned is guaranteed to have a length <= 50.
  */
 typedef struct
-   {
-   inpev_t key;
-   const char *string;
-   } key_string_t;
+{
+    inpev_t key;
+    const char *string;
+} key_string_t;
+
 static const key_string_t key_string[] =
-   {
-   { ' ',               "Space"         },
+{
+   { ' ',           "Space"     },
    { YK_BACKSPACE, 	"BS"		},
    { YK_BACKTAB,	"Shift-Tab"	},
    { YK_DEL,       	"Del"		},
    { YK_DOWN,      	"Down"		},
    { YK_END,		"End"		},
    { YK_ESC,		"Esc"		},
-   { YK_F1,		"F1"		},
-   { YK_F2,		"F2"		},
-   { YK_F3,		"F3"		},
-   { YK_F4,		"F4"		},
-   { YK_F5,		"F5"		},
-   { YK_F6,		"F6"		},
-   { YK_F7,		"F7"		},
-   { YK_F8,		"F8"		},
-   { YK_F9,		"F9"		},
+   { YK_F1,		    "F1"		},
+   { YK_F2,		    "F2"		},
+   { YK_F3,		    "F3"		},
+   { YK_F4,		    "F4"		},
+   { YK_F5,		    "F5"		},
+   { YK_F6,		    "F6"		},
+   { YK_F7,		    "F7"		},
+   { YK_F8,		    "F8"		},
+   { YK_F9,		    "F9"		},
    { YK_F10,		"F10"		},
    { YK_HOME,		"Home"		},
    { YK_INS,		"Ins"		},
    { YK_LEFT,		"Left"		},
-   { YK_PD,		"Pgdn"		},
-   { YK_PU,		"Pgup"		},
+   { YK_PD,		    "Pgdn"		},
+   { YK_PU,		    "Pgup"		},
    { YK_RETURN,		"Return"	},
    { YK_RIGHT,		"Right"		},
    { YK_TAB,		"Tab"		},
-   { YK_UP,		"Up"		},
-   };
+   { YK_UP,		    "Up"		},
+};
 
 const char *key_to_string (inpev_t k)
 {
-static char buf[51];
+    static char buf[51];
 
-// Is one of the special keys ?
-size_t n;
-const size_t nmax = sizeof key_string / sizeof *key_string;
-for (n = 0; n < nmax; n++)
-   if (key_string[n].key == k)
-      break;
+    // Is one of the special keys ?
+    size_t n;
+    const size_t nmax = sizeof key_string / sizeof *key_string;
+    for (n = 0; n < nmax; n++)
+        if (key_string[n].key == k)
+            break;
 
-*buf = '\0';
-if (k & YK_CTRL || (n == nmax && k <= 31))
-   {
-   al_saps (buf, "Ctrl-", sizeof buf - 1);
-   if (k & YK_CTRL)
-      k ^= YK_CTRL;
-   if (k <= 31)
-      k += 96;  // Heavy ASCII-ism : 01h (^A) -> 61h ("a")
-   }
-if (k & YK_ALT)
-   {
-   al_saps (buf, "Alt-", sizeof buf - 1);
-   k ^= YK_ALT;
-   }
-if (k & YK_SHIFT)
-   {
-   al_saps (buf, "Shift-", sizeof buf - 1);
-   k ^= YK_SHIFT;
-   }
+    *buf = '\0';
+    if (k & YK_CTRL || (n == nmax && k <= 31))
+    {
+        al_saps (buf, "Ctrl-", sizeof buf - 1);
+        if (k & YK_CTRL)
+            k ^= YK_CTRL;
+        if (k <= 31)
+            k += 96;  // Heavy ASCII-ism : 01h (^A) -> 61h ("a")
+    }
+    if (k & YK_ALT)
+    {
+        al_saps (buf, "Alt-", sizeof buf - 1);
+        k ^= YK_ALT;
+    }
+    if (k & YK_SHIFT)
+    {
+        al_saps (buf, "Shift-", sizeof buf - 1);
+        k ^= YK_SHIFT;
+    }
 
-if (n == nmax)
-   if (k <= UCHAR_MAX && isprint (k))
-      al_sapc (buf, k, sizeof buf - 1);
-   else
-      {
-      al_sapc (buf, al_adigits[(k >> 12) & 15], sizeof buf - 1);
-      al_sapc (buf, al_adigits[(k >>  8) & 15], sizeof buf - 1);
-      al_sapc (buf, al_adigits[(k >>  4) & 15], sizeof buf - 1);
-      al_sapc (buf, al_adigits[(k >>  0) & 15], sizeof buf - 1);
-      }
-else
-   al_saps (buf, key_string[n].string, sizeof buf - 1);
+    if (n == nmax)
+    {
+        if (k <= UCHAR_MAX && isprint (k))
+            al_sapc (buf, k, sizeof buf - 1);
+        else
+        {
+            al_sapc (buf, al_adigits[(k >> 12) & 15], sizeof buf - 1);
+            al_sapc (buf, al_adigits[(k >>  8) & 15], sizeof buf - 1);
+            al_sapc (buf, al_adigits[(k >>  4) & 15], sizeof buf - 1);
+            al_sapc (buf, al_adigits[(k >>  0) & 15], sizeof buf - 1);
+        }
+    }
+    else
+        al_saps (buf, key_string[n].string, sizeof buf - 1);
 
-buf[sizeof buf - 1] = '\0';  /* Paranoia */
-return buf;
+    buf[sizeof buf - 1] = '\0';  /* Paranoia */
+    return buf;
 }
 

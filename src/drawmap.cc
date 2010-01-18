@@ -49,14 +49,12 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "vectext.h"
 #include "wadres.h"
 
-
 static void draw_grid (edit_t *e);
 static void draw_vertices (edit_t *e);
 static void draw_linedefs (edit_t *e);
 static void draw_things_squares (edit_t *e);
 static void draw_things_sprites (edit_t *e);
 static void draw_obj_no (int x, int y, int obj_no, acolour_t c);
-
 
 /*
  *	vertex_radius - apparent radius of a vertex, in pixels
@@ -68,39 +66,9 @@ static void draw_obj_no (int x, int y, int obj_no, acolour_t c);
  */
 int vertex_radius (double scale)
 {
-#if 0
-  static double last_scale = 0;
-  static int    last_result = 0;
-
-  if (scale == last_scale)
-    return last_result;
-
-  const int    VERTEX_PIXELS  = 5;
-
-  // The scale past which we switch from linear to logarithmic.
-  const double crossover      = 0.1;
-
-  // The base of the log. The higher, the stronger the effect.
-  const double base           = 1.4;
-
-  /* The point at which the derivative of log{base}(x) is 1.
-     This is where we want the crossover to occur. */
-  const double knee_x         = 1 / log (base);
-  const double knee_y         = log (knee_x) / log (base);
-
-  double factor;
-  if (scale <= crossover)
-    factor = scale;
-  else
-    factor = crossover + log (scale -crossover + knee_x) / log (base) - knee_y;
-  last_result = (int) (VERTEX_PIXELS * factor + 0.5);
-  return last_result;
-#else
-  const int VERTEX_PIXELS = 6;
-  return (int) (VERTEX_PIXELS * (0.2 + scale / 2));
-#endif
+    const int VERTEX_PIXELS = 6;
+    return (int) (VERTEX_PIXELS * (0.2 + scale / 2));
 }
-
 
 /*
   draw the actual game map

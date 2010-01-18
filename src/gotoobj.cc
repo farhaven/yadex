@@ -48,10 +48,6 @@ OrigY = ypos;
 /* AYM 1998-09-20 This is a DOS-ism. IIRC, the ICCCM says an
    application program should generally not mess with the
    pointer. */
-#if 0
-is.x = ScrCenterX;
-is.y = ScrCenterY;
-#endif
 }
 
 
@@ -98,17 +94,6 @@ oldscale = Scale;
    does is (uselessly) messing the zoom factor up when there are
    superimposed objects and we're trying to focus on the
    highest-numbered (and therefore hidden) one. AYM 1999-07-26 */
-#if 0
-/* zoom in until the object can be selected */
-while (Scale < 8.0
-   && GetCurObject (objid.type, MAPX (is.x), MAPY (is.y)) != objid.num)
-   {
-   if (Scale < 1.0)
-      Scale = 1.0 / ((1.0 / Scale) - 1.0);
-   else
-      Scale = Scale * 2.0;
-   }
-#endif
 
 /* Special case for sectors: if a sector contains other sectors,
    or if its shape is such that it does not contain its own

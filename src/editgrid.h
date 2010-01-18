@@ -60,15 +60,3 @@ if (mapy >= 0)
 else
    return e->grid_step * ((mapy - e->grid_step / 2) / e->grid_step);
 }
-
-
-/* The old method for snapping to grid.
-   Required that grid_step be a power of 2. */
-#if 0
-(MAPX (is.x) + e.grid_step / 2) & ~(e.grid_step - 1),
-(MAPY (is.y) + e.grid_step / 2) & ~(e.grid_step - 1));
-MoveObjectsToCoords (e.obj_type, 0,
-e.pointer_x, e.pointer_y, e.grid_snap ? e.grid_step : 0);
-#endif
-
-

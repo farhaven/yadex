@@ -166,21 +166,11 @@ void EditLevel (const char *levelname, bool newlevel)
         return;
     } else  // "edit <level_name>" or "edit"
     {
-#if 0
-        if (levelname == 0 || ! levelname2levelno (levelname)
-            || ! FindMasterDir (MasterDir, levelname))
-            levelname = SelectLevel (atoi (levelname)); /* returns "" on Esc */
-        if (levelname2levelno (levelname))
-        {
-#endif
             ClearScreen ();
             if (ReadLevelData (levelname))
             {
                 goto done;  // Failure!
             }
-#if 0
-        }
-#endif
     }
     LogMessage (": Editing %s...\n", levelname ? levelname : "new level");
 

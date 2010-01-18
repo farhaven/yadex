@@ -83,7 +83,6 @@ typedef struct
     int move_speed;		// Movement speed.
     int extra_zoom;		// Act like the zoom was 4 times what it is
     int obj_type;		// The mode (OBJ_LINEDEF, OBJ_SECTOR...)
-    bool global;		// Global mode (experimental)
     tool_t tool;		// The current tool
     int grid_step;		// The grid step
     int grid_step_min;		// The floor of the grid step

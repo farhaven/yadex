@@ -108,72 +108,60 @@ int vertex_radius (double scale)
 
 void draw_map (edit_t *e) /* SWAP! */
 {
-  int mapx0 = MAPX (0);
-  int mapx9 = MAPX (ScrMaxX);
-  int mapy0 = MAPY (ScrMaxY);
-  int mapy9 = MAPY (0);
-  int n;
+    int mapx0 = MAPX (0);
+    int mapx9 = MAPX (ScrMaxX);
+    int mapy0 = MAPY (ScrMaxY);
+    int mapy9 = MAPY (0);
+    int n;
 
 
-  // Draw the grid first since it's in the background
-  draw_grid (e);
+    // Draw the grid first since it's in the background
+    draw_grid (e);
 
-  if (e->global)
-  {
-    draw_linedefs (e);
-    if (e->show_things_sprites)
-      draw_things_sprites (e);
-    else
-      draw_things_squares (e);
-    draw_vertices (e);
-  }
-  else
-  {
     if (e->obj_type != OBJ_THINGS)
-      draw_things_squares (e);
+        draw_things_squares (e);
     draw_linedefs (e);
     if (e->obj_type == OBJ_VERTICES)
-      draw_vertices (e);
+        draw_vertices (e);
     if (e->obj_type == OBJ_THINGS)
     {
-      if (e->show_things_sprites)
-	draw_things_sprites (e);
-      else
-	draw_things_squares (e);
+        if (e->show_things_sprites)
+            draw_things_sprites (e);
+        else
+            draw_things_squares (e);
     }
-  }
 
 
-  // Draw the things numbers
-  if (e->obj_type == OBJ_THINGS && e->show_object_numbers)
-  {
-    for (n = 0; n < NumThings; n++)
+    // Draw the things numbers
+    if (e->obj_type == OBJ_THINGS && e->show_object_numbers)
     {
-      int mapx = Things[n].xpos;
-      int mapy = Things[n].ypos;
-      if (mapx < mapx0 || mapx > mapx9 || mapy < mapy0 || mapy > mapy9)
-	continue;
-      draw_obj_no (SCREENX (mapx) + FONTW, SCREENY (mapy) + 2, n, THING_NO);
+        for (n = 0; n < NumThings; n++)
+        {
+            int mapx = Things[n].xpos;
+            int mapy = Things[n].ypos;
+            if (mapx < mapx0 || mapx > mapx9 || mapy < mapy0 || mapy > mapy9)
+                continue;
+            draw_obj_no (SCREENX (mapx) + FONTW, SCREENY (mapy) + 2, n, THING_NO);
+        }
     }
-  }
 
-  // Draw the sector numbers
-  if (e->obj_type == OBJ_SECTORS && e->show_object_numbers)
-  {
-    int xoffset = - FONTW / 2;
-
-    for (n = 0; n < NumSectors; n++)
+    // Draw the sector numbers
+    if (e->obj_type == OBJ_SECTORS && e->show_object_numbers)
     {
-      int mapx;
-      int mapy;
-      centre_of_sector (n, &mapx, &mapy);
-      if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9)
-	draw_obj_no (SCREENX (mapx) + xoffset, SCREENY (mapy) - FONTH / 2, n,
-	  SECTOR_NO);
-      if (n == 10 || n == 100 || n == 1000 || n == 10000)
-	xoffset -= FONTW / 2;
+        int xoffset = - FONTW / 2;
+
+        for (n = 0; n < NumSectors; n++)
+        {
+            int mapx;
+            int mapy;
+            centre_of_sector (n, &mapx, &mapy);
+            if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9)
+                draw_obj_no (SCREENX (mapx) + xoffset, SCREENY (mapy) - FONTH / 2, n,
+                SECTOR_NO);
+            if (n == 10 || n == 100 || n == 1000 || n == 10000)
+                xoffset -= FONTW / 2;
+        }
     }
-  }
 }
 
 

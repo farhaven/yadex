@@ -223,7 +223,6 @@ e.extra_zoom          = 0;
 // If you change this, don't forget to change
 // the initialisation of the menu bar below.
 e.obj_type            = OBJ_THINGS;
-e.global              = false;
 e.tool                = TOOL_NORMAL;
 e.grid_step           = 128;
 e.grid_step_min       = GridMin;
@@ -315,7 +314,6 @@ e.mb_menu[MBM_VIEW] = new Menu (NULL,
    "~Linedefs & sidedefs", 'l',        MIF_FTICK,   mode_l,  (micbarg_t) &e, 0,
    "~Vertices",            'v',        MIF_FTICK,   mode_v,  (micbarg_t) &e, 0,
    "~Sectors",             's',        MIF_FTICK,   mode_s,  (micbarg_t) &e, 0,
-   "Global",               '\7',       MIF_VTICK,   &e.global,               0,
    "~Next mode",           YK_TAB,     0,
    "~Prev mode",           YK_BACKTAB, 0,
    MI_SEPARATION,
@@ -550,8 +548,7 @@ for (RedrawMap = 1; ; RedrawMap = 0)
 
       e.pointer_x = MAPX (is.x);
       e.pointer_y = MAPY (is.y);
-      obj_type_t t = e.global ? OBJ_ANY : e.obj_type;
-      GetCurObject (object, t, e.pointer_x, e.pointer_y);
+      GetCurObject (object, e.obj_type, e.pointer_x, e.pointer_y);
       }
 
    /*
@@ -1599,7 +1596,7 @@ cancel_save_as:
 	    else
 	       ForgetSelection (&e.Selected);
 	    }
-	 if (GetMaxObjectNum (e.obj_type) >= 0 && Select0 && ! e.global)
+	 if (GetMaxObjectNum (e.obj_type) >= 0 && Select0)
 	 {
 	    e.highlighted.type = e.obj_type;
 	    e.highlighted.num  = 0;
@@ -1694,7 +1691,7 @@ cancel_save_as:
 
       // [n], [>]: highlight the next object
       else if ((is.key == 'n' || is.key == '>')
-	 && (! e.global || e.highlighted ()))
+	 && (e.highlighted ()))
 	 {
 	 obj_type_t t = e.highlighted () ? e.highlighted.type : e.obj_type;
 	 obj_no_t nmax = GetMaxObjectNum (t);
@@ -1718,7 +1715,7 @@ cancel_save_as:
 
       // [p], [<]: highlight the previous object
       else if ((is.key == 'p' || is.key == '<')
-	 && (! e.global || e.highlighted ()))
+	 && (e.highlighted ()))
 	 {
 	 obj_type_t t = e.highlighted () ? e.highlighted.type : e.obj_type;
 	 obj_no_t nmax = GetMaxObjectNum (t);
@@ -1742,7 +1739,7 @@ cancel_save_as:
 
       // [j], [#]: jump to object by number
       else if ((is.key == 'j' || is.key == '#')
-	 && (! e.global || e.highlighted ()))
+	 && (e.highlighted ()))
 	 {
 	 Objid default_obj;
 	 default_obj.type = e.highlighted () ? e.highlighted.type : e.obj_type;

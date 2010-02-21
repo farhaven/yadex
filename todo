@@ -296,9 +296,6 @@ Old bugs to fix
   "vertices A and B not on the same sector" or "cannot find a closed
   path", etc. I have already got "no sector between vertex A and vertex
   B" ; save, quit, edit and try again : it works !
-- DOS: Let [right] work after [space] (works if no mouse driver!)
-- DOS: understand why mouse pointer moves 8 pixels at a time and fix
-  that.
 - When merging sectors, linedefs sometimes get only 1 sidedef...
 - If you do "delete linedef and merge sectors" when it's the same sector
   on both sides of the linedef, the sector is deleted.

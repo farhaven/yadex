@@ -1193,7 +1193,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                     levelname = newlevelname;
                     // Sigh. Shouldn't have to do that. Level must die !
                     Level = FindMasterDir (MasterDir, levelname);
-    cancel_save:
+cancel_save:
                     RedrawMap = 1;
                 }
 
@@ -1237,7 +1237,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                         goto cancel_save_as;
                     SaveLevelData (outfile, newlevelname);
                     levelname = newlevelname;
-    cancel_save_as:
+cancel_save_as:
                     RedrawMap = 1;
                 }
 
@@ -1546,17 +1546,17 @@ void EditorLoop (const char *levelname) /* SWAP! */
                     /* unselect all */
                     else
                         ForgetSelection (&e.Selected);
-            }
-            if (GetMaxObjectNum (e.obj_type) >= 0 && Select0)
-            {
-                e.highlighted.type = e.obj_type;
-                e.highlighted.num  = 0;
-            } else
-                e.highlighted.nil ();
+                }
+                if (GetMaxObjectNum (e.obj_type) >= 0 && Select0)
+                {
+                    e.highlighted.type = e.obj_type;
+                    e.highlighted.num  = 0;
+                } else
+                    e.highlighted.nil ();
 
-            DragObject = false;
-            StretchSelBox = false;
-            RedrawMap = 1;
+                DragObject = false;
+                StretchSelBox = false;
+                RedrawMap = 1;
             }
 
             // [e]: Select/unselect all linedefs in non-forked path

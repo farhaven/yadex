@@ -14,7 +14,8 @@ under the terms of the GPL.
 PREREQUISITES
 -------------
 
-You need :
+You need:
+
 * Some flavour of Unix (known to work with AIX, FreeBSD, HP-UX,
   Irix, Linux, NetBSD, OpenBSD, OpenUnix, QNX and Solaris),
 * X11R6 or X11R5 and a display of at least 640x480,

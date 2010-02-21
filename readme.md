@@ -23,7 +23,7 @@ You need:
 * GNU make (vanilla make won't do),
 * a standard C compiler (ISO 9899:1990),
 * a standard C++ compiler,
-* hypot() and either nanosleep() or usleep().
+* `hypot()` and either `nanosleep()` or `usleep()`.
 
 BUILDING AND INSTALLING
 -----------------------

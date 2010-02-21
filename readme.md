@@ -15,14 +15,14 @@ PREREQUISITES
 -------------
 
 You need :
-- Some flavour of Unix (known to work with AIX, FreeBSD, HP-UX,
+* Some flavour of Unix (known to work with AIX, FreeBSD, HP-UX,
   Irix, Linux, NetBSD, OpenBSD, OpenUnix, QNX and Solaris),
-- X11R6 or X11R5 and a display of at least 640x480,
-- a Doom/Doom II/Heretic/Strife iwad (shareware/demo is OK),
-- GNU make (vanilla make won't do),
-- a standard C compiler (ISO 9899:1990),
-- a standard C++ compiler,
-- hypot() and either nanosleep() or usleep().
+* X11R6 or X11R5 and a display of at least 640x480,
+* a Doom/Doom II/Heretic/Strife iwad (shareware/demo is OK),
+* GNU make (vanilla make won't do),
+* a standard C compiler (ISO 9899:1990),
+* a standard C++ compiler,
+* hypot() and either nanosleep() or usleep().
 
 BUILDING AND INSTALLING
 -----------------------
@@ -51,22 +51,22 @@ Got no problem ? Read the FAQ anyway. See doc/faq.html.
 Beware, the installation OVERWRITES the following files (assuming
 you're installing in /usr/local) :
 
-       /etc/yadex/1.7.1/yadex.cfg
-       /usr/local/bin/yadex
-       /usr/local/bin/yadex-1.7.1
-       /usr/local/man/man6/yadex.6
-       /usr/local/man/man6/yadex-1.7.0.6
-       /usr/local/share/games/yadex/1.7.1/doom.ygd
-       /usr/local/share/games/yadex/1.7.1/zdoom.ygd
-       /usr/local/share/games/yadex/1.7.1/doom02.ygd
-       /usr/local/share/games/yadex/1.7.1/doom04.ygd
-       /usr/local/share/games/yadex/1.7.1/doom05.ygd
-       /usr/local/share/games/yadex/1.7.1/doom2.ygd 
-       /usr/local/share/games/yadex/1.7.1/doompr.ygd
-       /usr/local/share/games/yadex/1.7.1/heretic.ygd
-       /usr/local/share/games/yadex/1.7.1/hexen.ygd
-       /usr/local/share/games/yadex/1.7.1/strife.ygd
-       /usr/local/share/games/yadex/1.7.1/strife10.ygd
+    /etc/yadex/1.7.1/yadex.cfg
+    /usr/local/bin/yadex
+    /usr/local/bin/yadex-1.7.1
+    /usr/local/man/man6/yadex.6
+    /usr/local/man/man6/yadex-1.7.0.6
+    /usr/local/share/games/yadex/1.7.1/doom.ygd
+    /usr/local/share/games/yadex/1.7.1/zdoom.ygd
+    /usr/local/share/games/yadex/1.7.1/doom02.ygd
+    /usr/local/share/games/yadex/1.7.1/doom04.ygd
+    /usr/local/share/games/yadex/1.7.1/doom05.ygd
+    /usr/local/share/games/yadex/1.7.1/doom2.ygd 
+    /usr/local/share/games/yadex/1.7.1/doompr.ygd
+    /usr/local/share/games/yadex/1.7.1/heretic.ygd
+    /usr/local/share/games/yadex/1.7.1/hexen.ygd
+    /usr/local/share/games/yadex/1.7.1/strife.ygd
+    /usr/local/share/games/yadex/1.7.1/strife10.ygd
 
 CONFIGURING AND RUNNING
 -----------------------

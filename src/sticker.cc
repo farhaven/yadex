@@ -232,7 +232,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
     bytes_per_line++;
     padding++;
   }
-  u8 *buf = (u8 *) GetMemory ((unsigned long) bytes_per_line * height);
+  uint8_t *buf = (uint8_t *) GetMemory ((unsigned long) bytes_per_line * height);
   if (! buf)
   {
     err ("Not enough memory to display %dx%d image", width, height);
@@ -244,11 +244,11 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   if (ximage_bpp == 1)
   {
     register const img_pixel_t *image_ptr;
-    register u8 *buf_ptr = (u8 *) buf;
+    register uint8_t *buf_ptr = (uint8_t *) buf;
     if (padding == 0)
     {
       for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
-	*buf_ptr++ = (u8) game_colour[*image_ptr];
+	*buf_ptr++ = (uint8_t) game_colour[*image_ptr];
     }
     else
     {
@@ -258,7 +258,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
       {
 	image_line_end += img_width;
 	for (; image_ptr < image_line_end; image_ptr++)
-	  *buf_ptr++ = (u8) game_colour[*image_ptr];
+	  *buf_ptr++ = (uint8_t) game_colour[*image_ptr];
 	buf_ptr += padding;  // Line padding
       }
     }
@@ -267,13 +267,13 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   else if (ximage_bpp == 2)
   {
     register const img_pixel_t *image_ptr;
-    register u16 *buf_ptr = (u16 *) buf;
+    register uint16_t *buf_ptr = (uint16_t *) buf;
     if (cpu_big_endian == x_server_big_endian)
     {
       if (padding == 0)
       {
 	for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
-	  *buf_ptr++ = (u16) game_colour[*image_ptr];
+	  *buf_ptr++ = (uint16_t) game_colour[*image_ptr];
       }
       else
       {
@@ -283,8 +283,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	{
 	  image_line_end += img_width;
 	  for (; image_ptr < image_line_end; image_ptr++)
-	    *buf_ptr++ = (u16) game_colour[*image_ptr];
-	  buf_ptr = (u16 *) ((char *) buf_ptr + padding);  // Line padding
+	    *buf_ptr++ = (uint16_t) game_colour[*image_ptr];
+	  buf_ptr = (uint16_t *) ((char *) buf_ptr + padding);  // Line padding
 	}
       }
     }
@@ -293,7 +293,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
       if (padding == 0)
       {
 	for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
-	   *buf_ptr++ = (u16) (
+	   *buf_ptr++ = (uint16_t) (
 		 (game_colour[*image_ptr] >> 8)  // Assume game_colour unsigned
 	       | (game_colour[*image_ptr] << 8));
       }
@@ -305,10 +305,10 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	{
 	  image_line_end += img_width;
 	  for (; image_ptr < image_line_end; image_ptr++)
-	     *buf_ptr++ = (u16) (
+	     *buf_ptr++ = (uint16_t) (
 		   (game_colour[*image_ptr] >> 8)  // Assume game_colour uns.
 		 | (game_colour[*image_ptr] << 8));
-	  buf_ptr = (u16 *) ((char *) buf_ptr + padding);  // Line padding
+	  buf_ptr = (uint16_t *) ((char *) buf_ptr + padding);  // Line padding
 	}
       }
     }
@@ -341,13 +341,13 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   else if (ximage_bpp == 4)
   {
     register const img_pixel_t *image_ptr;
-    register u32 *buf_ptr = (u32 *) buf;
+    register uint32_t *buf_ptr = (uint32_t *) buf;
     if (cpu_big_endian == x_server_big_endian)
     {
       if (padding == 0)
       {
 	for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
-	  *buf_ptr++ = (u32) game_colour[*image_ptr];
+	  *buf_ptr++ = (uint32_t) game_colour[*image_ptr];
       }
       else
       {
@@ -357,8 +357,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	{
 	  image_line_end += img_width;
 	  for (; image_ptr < image_line_end; image_ptr++)
-	    *buf_ptr++ = (u32) game_colour[*image_ptr];
-	  buf_ptr = (u32 *) ((char *) buf_ptr + padding);  // Line padding
+	    *buf_ptr++ = (uint32_t) game_colour[*image_ptr];
+	  buf_ptr = (uint32_t *) ((char *) buf_ptr + padding);  // Line padding
 	}
       }
     }
@@ -367,7 +367,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
       if (padding == 0)
       {
 	for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
-	  *buf_ptr++ = (u32) (
+	  *buf_ptr++ = (uint32_t) (
 	      (game_colour[*image_ptr] >> 24)  // Assume game_colour unsigned
 	    | (game_colour[*image_ptr] >> 8) & 0x0000ff00
 	    | (game_colour[*image_ptr] << 8) & 0x00ff0000
@@ -381,12 +381,12 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	{
 	  image_line_end += img_width;
 	  for (; image_ptr < image_line_end; image_ptr++)
-	    *buf_ptr++ = (u32) (
+	    *buf_ptr++ = (uint32_t) (
 		(game_colour[*image_ptr] >> 24)  // Assume game_colour uns.
 	      | (game_colour[*image_ptr] >> 8) & 0x0000ff00
 	      | (game_colour[*image_ptr] << 8) & 0x00ff0000
 	      | (game_colour[*image_ptr] << 24));
-	  buf_ptr = (u32 *) ((char *) buf_ptr + padding);  // Line padding
+	  buf_ptr = (uint32_t *) ((char *) buf_ptr + padding);  // Line padding
 	}
       }
     }
@@ -432,7 +432,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   const size_t bitmap_pad     = BitmapPad (dpy);
   const size_t bytes_per_line = (width + bitmap_pad - 1) / bitmap_pad
 				* bitmap_pad / CHAR_BIT;
-  u8 *buf = (u8 *) GetMemory ((unsigned long) bytes_per_line * height);
+  uint8_t *buf = (uint8_t *) GetMemory ((unsigned long) bytes_per_line * height);
   if (! buf)
   {
     err ("Not enough memory to display %dx%d image", width, height);
@@ -442,22 +442,22 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   // Copy the "profile" of the Img onto the XImage
   {
     int bitmap_bit_order = BitmapBitOrder (dpy);
-    register u8 *buf_ptr = (u8 *) buf;
+    register uint8_t *buf_ptr = (uint8_t *) buf;
     const int IMG_TRANSP = 0;
     const img_pixel_t       *image_ptr = img.buf ();
     const img_pixel_t *const image_end = image_ptr + width * height;
 
     while (image_ptr < image_end)
     {
-      register const u8 *src   = image_ptr;
-      const u8 *const    stop1 = src + width - 7;
-      const u8 *const    stop2 = image_ptr + width;
-      u8* dest = buf_ptr;
+      register const uint8_t *src   = image_ptr;
+      const uint8_t *const    stop1 = src + width - 7;
+      const uint8_t *const    stop2 = image_ptr + width;
+      uint8_t* dest = buf_ptr;
       if (bitmap_bit_order == LSBFirst)
       {
 	while (src < stop1)
 	{
-	  register u8 d = 0;
+	  register uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 1;
 	  if (*src++ != IMG_TRANSP) d |= 2;
 	  if (*src++ != IMG_TRANSP) d |= 4;
@@ -470,7 +470,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
 	}
 	if (src < stop2)
 	{
-	  register u8 d = 0;
+	  register uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 1;   if (src >= stop2) goto eol_le;
 	  if (*src++ != IMG_TRANSP) d |= 2;   if (src >= stop2) goto eol_le;
 	  if (*src++ != IMG_TRANSP) d |= 4;   if (src >= stop2) goto eol_le;
@@ -487,7 +487,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
       {
 	while (src < stop1)
 	{
-	  register u8 d = 0;
+	  register uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 128;
 	  if (*src++ != IMG_TRANSP) d |= 64;
 	  if (*src++ != IMG_TRANSP) d |= 32;
@@ -500,7 +500,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
 	}
 	if (src < stop2)
 	{
-	  register u8 d = 0;
+	  register uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 128; if (src >= stop2) goto eol_be;
 	  if (*src++ != IMG_TRANSP) d |= 64;  if (src >= stop2) goto eol_be;
 	  if (*src++ != IMG_TRANSP) d |= 32;  if (src >= stop2) goto eol_be;

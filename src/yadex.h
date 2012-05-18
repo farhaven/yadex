@@ -66,22 +66,15 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 /*
  *	Platform-independant types and formats.
  */
-typedef unsigned char  u8;
-typedef signed   char  i8;
-
-typedef unsigned short u16;
 #define F_U16_D "hu"
 #define F_U16_H "hX"
 
-typedef signed   short i16;
 #define F_I16_D "hd"
 #define F_I16_H "hX"
 
-typedef unsigned long  u32;
 #define F_U32_D "lu"
 #define F_U32_H "lX"
 
-typedef signed   long  i32;
 #define F_I32_D "ld"
 #define F_I32_H "lX"
 
@@ -157,12 +150,12 @@ struct MasterDirectory
 struct Lump_loc
    {
    Lump_loc () { wad = 0; }
-   Lump_loc (const Wad_file *w, i32 o, i32 l) { wad = w; ofs = o; len = l; }
+   Lump_loc (const Wad_file *w, int32_t o, int32_t l) { wad = w; ofs = o; len = l; }
    bool operator == (const Lump_loc& other) const
      { return wad == other.wad && ofs == other.ofs && len == other.len; }
    const Wad_file *wad;
-   i32 ofs;
-   i32 len;
+   int32_t ofs;
+   int32_t len;
    };
 #include "wstructs.h"
 
@@ -177,7 +170,7 @@ struct Lump_loc
 /* acolour_t -- an application colour number.
    Several different application colours may refer to the same
    physical colour. */
-typedef u8 acolour_t;
+typedef uint8_t acolour_t;
 #define ACOLOUR_NONE 0xff  // The out-of-band value
 
 /* The 16 VGA colours that DEU used to use.

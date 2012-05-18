@@ -156,9 +156,9 @@ int  sd1;		/* current sidedef in *sdlist */
 int  vert1, vert2;	/* vertex 1 and 2 for the linedef under scrutiny */
 int  xoffset;		/* xoffset accumulator */
 int  useroffset;	/* user input offset for first input */
-i16  texlength;		/* the length of texture to format to */
+int16_t  texlength;		/* the length of texture to format to */
 int  length;		/* length of linedef under scrutiny */
-i16  dummy;		/* holds useless data */
+int16_t  dummy;		/* holds useless data */
 int  type_off;		/* do we have an initial offset to use */
 int  type_tex;		/* do we check for same textures */
 int  type_sd;		/* do we align sidedef 1 or sidedef 2 */

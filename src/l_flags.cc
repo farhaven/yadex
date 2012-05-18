@@ -41,7 +41,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 void frob_linedefs_flags (SelPtr list, int op, int operand)
 {
   SelPtr cur;
-  i16 mask;
+  int16_t mask;
 
   if (op == YO_CLEAR || op == YO_SET || op == YO_TOGGLE)
     mask = 1 << operand;

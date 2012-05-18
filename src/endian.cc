@@ -41,7 +41,7 @@ verbmsg ("CPU endianness: ");
 union
    {
    char mem[17];  // 5 is enough in theory
-   u32 n;
+   uint32_t n;
    } u;
 memset (u.mem, '\0', sizeof (u.mem));
 u.n = 0x31323334;

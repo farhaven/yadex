@@ -127,7 +127,7 @@ void irgb2rgb (int c, rgb_c *rgb)
  *	Convert an 8-bit RGB component value to a 16-bit one.
  *	Will convert 00h to 0000h, 80h to 8080h and FFh to FFFFh.
  */
-inline u16 eight2sixteen (u8 v)
+inline uint16_t eight2sixteen (uint8_t v)
 {
     return (v << 8) | v;
 }

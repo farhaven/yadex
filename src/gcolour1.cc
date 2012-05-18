@@ -56,7 +56,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 pcolour_t *alloc_game_colours (int playpalnum)
 {
     MDirPtr dir;
-    u8	*dpal;
+    uint8_t	*dpal;
     pcolour_t *game_colours = 0;
 
     dir = FindMasterDir (MasterDir, "PLAYPAL");
@@ -74,7 +74,7 @@ pcolour_t *alloc_game_colours (int playpalnum)
         playpalnum = 0;
     }
 
-    dpal = (u8 *) GetFarMemory (3 * DOOM_COLOURS);
+    dpal = (uint8_t *) GetFarMemory (3 * DOOM_COLOURS);
     dir->wadfile->seek (dir->dir.start);
     if (dir->wadfile->error ())
     {
@@ -95,9 +95,9 @@ pcolour_t *alloc_game_colours (int playpalnum)
     rgb_c rgb_values[DOOM_COLOURS];
     for (size_t n = 0; n < DOOM_COLOURS; n++)
     {
-        rgb_values[n].r = (u8) dpal[3 * n];
-        rgb_values[n].g = (u8) dpal[3 * n + 1];
-        rgb_values[n].b = (u8) dpal[3 * n + 2];
+        rgb_values[n].r = (uint8_t) dpal[3 * n];
+        rgb_values[n].g = (uint8_t) dpal[3 * n + 1];
+        rgb_values[n].b = (uint8_t) dpal[3 * n + 2];
     }
     game_colours = alloc_colours (rgb_values, DOOM_COLOURS);
 

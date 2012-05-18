@@ -14,7 +14,7 @@
 /* textures.cc */
 void DisplayPic (hookfunc_comm_t *c);
 void ChooseWallTexture (int, int, const char *, int, char **, char *);
-void GetWallTextureSize (i16 *, i16 *, const char *);
+void GetWallTextureSize (int16_t *, int16_t *, const char *);
 
 
 #endif

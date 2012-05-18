@@ -58,7 +58,7 @@ int NumVertices;		/* number of vertexes */
 VPtr Vertices;			/* vertex data */
 int NumSectors;			/* number of sectors */
 SPtr Sectors;			/* sectors data */
-u8* Behavior;
+uint8_t* Behavior;
 int BehaviorSize;
 
 // FIXME should be somewhere else
@@ -97,7 +97,7 @@ y_file_name_t Level_file_name_saved;  /* The name of the file in
 				   the Level has never been saved yet,
 				   an empty string. */
 
-static u8 DefaultBehavior[16] = {
+static uint8_t DefaultBehavior[16] = {
 	'A', 'C', 'S', 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
@@ -118,7 +118,7 @@ NumVertices = 0;
 if (yg_level_format == YGLF_HEXEN)
    {
       BehaviorSize = sizeof(DefaultBehavior);
-      Behavior = (u8*) GetFarMemory ((unsigned long) BehaviorSize );
+      Behavior = (uint8_t*) GetFarMemory ((unsigned long) BehaviorSize );
       memcpy(Behavior, DefaultBehavior, BehaviorSize);
    }
 }
@@ -131,7 +131,7 @@ if (yg_level_format == YGLF_HEXEN)
 static char *tex_list = 0;
 static size_t ntex = 0;
 static char tex_name[WAD_TEX_NAME + 1];
-inline const char *texno_texname (i16 texno)
+inline const char *texno_texname (int16_t texno)
 {
 if (texno < 0)
    return "-";
@@ -143,7 +143,7 @@ else
       }
    else
       {
-      if (texno < (i16) ntex)
+      if (texno < (int16_t) ntex)
 	 return tex_list + WAD_TEX_NAME * texno;
       else
 	 return "unknown";
@@ -171,8 +171,8 @@ if (!Level)
    fatal_error ("level data not found");
 
 /* Get the number of vertices */
-i32 v_offset = 42;
-i32 v_length = 42;
+int32_t v_offset = 42;
+int32_t v_length = 42;
 {
 const char *lump_name = "BUG";
 if (yg_level_format == YGLF_ALPHA)  // Doom alpha
@@ -192,7 +192,7 @@ else
       v_length -= 4;
       }
    OldNumVertices = (int) (v_length / WAD_VERTEX_BYTES);
-   if ((i32) (OldNumVertices * WAD_VERTEX_BYTES) != v_length)
+   if ((int32_t) (OldNumVertices * WAD_VERTEX_BYTES) != v_length)
       warn ("the %s lump has a weird size."
         " The wad might be corrupt or the -game parameter could be wrong.\n", lump_name);
    }
@@ -202,8 +202,8 @@ else
 {
 const char *lump_name = "THINGS";
 verbmsg ("Reading %s things", levelname);
-i32 offset = 42;
-i32 length;
+int32_t offset = 42;
+int32_t length;
 dir = FindMasterDir (Level, lump_name);
 if (dir == 0)
    NumThings = 0;
@@ -214,7 +214,7 @@ else
    if (yg_level_format == YGLF_HEXEN)  // Hexen mode
       {
       NumThings = (int) (length / WAD_HEXEN_THING_BYTES);
-      if ((i32) (NumThings * WAD_HEXEN_THING_BYTES) != length)
+      if ((int32_t) (NumThings * WAD_HEXEN_THING_BYTES) != length)
          warn ("the %s lump has a weird size."
             " The wad might be corrupt.\n", lump_name);
       }
@@ -227,7 +227,7 @@ else
 	 }
       size_t thing_size = yg_level_format == YGLF_ALPHA ? 12 : WAD_THING_BYTES;
       NumThings = (int) (length / thing_size);
-      if ((i32) (NumThings * thing_size) != length)
+      if ((int32_t) (NumThings * thing_size) != length)
          warn ("the %s lump has a weird size."
             " The wad might be corrupt or the -game parameter might be wrong.\n", lump_name);
       }
@@ -249,20 +249,20 @@ if (NumThings > 0)
    if (yg_level_format == YGLF_HEXEN)		// Hexen mode
       for (long n = 0; n < NumThings; n++)
 	 {
-         u8 dummy2[6];
-	 wf->read_i16   (&Things[n].tid  );
-	 wf->read_i16   (&Things[n].xpos );
-	 wf->read_i16   (&Things[n].ypos );
-	 wf->read_i16   (&Things[n].height);
-	 wf->read_i16   (&Things[n].angle);
-	 wf->read_i16   (&Things[n].type );
-	 wf->read_i16   (&Things[n].when );
-	 wf->read_u8    (Things[n].special);
-	 wf->read_u8    (Things[n].arg1  );
-	 wf->read_u8    (Things[n].arg2  );
-	 wf->read_u8    (Things[n].arg3  );
-	 wf->read_u8    (Things[n].arg4  );
-	 wf->read_u8    (Things[n].arg5  );
+         uint8_t dummy2[6];
+	 wf->read_int16_t   (&Things[n].tid  );
+	 wf->read_int16_t   (&Things[n].xpos );
+	 wf->read_int16_t   (&Things[n].ypos );
+	 wf->read_int16_t   (&Things[n].height);
+	 wf->read_int16_t   (&Things[n].angle);
+	 wf->read_int16_t   (&Things[n].type );
+	 wf->read_int16_t   (&Things[n].when );
+	 wf->read_uint8_t    (Things[n].special);
+	 wf->read_uint8_t    (Things[n].arg1  );
+	 wf->read_uint8_t    (Things[n].arg2  );
+	 wf->read_uint8_t    (Things[n].arg3  );
+	 wf->read_uint8_t    (Things[n].arg4  );
+	 wf->read_uint8_t    (Things[n].arg5  );
 	 if (wf->error ())
 	    {
 	    err ("%s: error reading thing #%ld", lump_name, n);
@@ -273,13 +273,13 @@ if (NumThings > 0)
    else					// Doom/Heretic/Strife mode
       for (long n = 0; n < NumThings; n++)
 	 {
-	 wf->read_i16 (&Things[n].xpos );
-	 wf->read_i16 (&Things[n].ypos );
-	 wf->read_i16 (&Things[n].angle);
-	 wf->read_i16 (&Things[n].type );
+	 wf->read_int16_t (&Things[n].xpos );
+	 wf->read_int16_t (&Things[n].ypos );
+	 wf->read_int16_t (&Things[n].angle);
+	 wf->read_int16_t (&Things[n].type );
 	 if (yg_level_format == YGLF_ALPHA)
-	    wf->read_i16 ();		// Alpha. Don't know what it's for.
-	 wf->read_i16 (&Things[n].when );
+	    wf->read_int16_t ();		// Alpha. Don't know what it's for.
+	 wf->read_int16_t (&Things[n].when );
 	 if (wf->error ())
 	    {
 	    err ("%s: error reading thing #%ld", lump_name, n);
@@ -303,14 +303,14 @@ if (yg_level_format != YGLF_ALPHA)
       if (yg_level_format == YGLF_HEXEN)  // Hexen mode
 	 {
 	 NumLineDefs = (int) (dir->dir.size / WAD_HEXEN_LINEDEF_BYTES);
-	 if ((i32) (NumLineDefs * WAD_HEXEN_LINEDEF_BYTES) != dir->dir.size)
+	 if ((int32_t) (NumLineDefs * WAD_HEXEN_LINEDEF_BYTES) != dir->dir.size)
 	    warn ("the %s lump has a weird size."
 	       " The wad might be corrupt.\n", lump_name);
 	 }
       else                   // Doom/Heretic/Strife mode
 	 {
 	 NumLineDefs = (int) (dir->dir.size / WAD_LINEDEF_BYTES);
-	 if ((i32) (NumLineDefs * WAD_LINEDEF_BYTES) != dir->dir.size)
+	 if ((int32_t) (NumLineDefs * WAD_LINEDEF_BYTES) != dir->dir.size)
 	    warn ("the %s lump has a weird size."
 	       " The wad might be corrupt.\n", lump_name);
 	 }
@@ -330,13 +330,13 @@ if (yg_level_format != YGLF_ALPHA)
       if (yg_level_format == YGLF_HEXEN)  // Hexen mode
 	 for (long n = 0; n < NumLineDefs; n++)
 	    {
-	    u8 dummy[6];
-	    wf->read_i16   (&LineDefs[n].start);
-	    wf->read_i16   (&LineDefs[n].end);
-	    wf->read_i16   (&LineDefs[n].flags);
+	    uint8_t dummy[6];
+	    wf->read_int16_t   (&LineDefs[n].start);
+	    wf->read_int16_t   (&LineDefs[n].end);
+	    wf->read_int16_t   (&LineDefs[n].flags);
 	    wf->read_bytes (dummy, sizeof dummy);
-	    wf->read_i16   (&LineDefs[n].sidedef1);
-	    wf->read_i16   (&LineDefs[n].sidedef2);
+	    wf->read_int16_t   (&LineDefs[n].sidedef1);
+	    wf->read_int16_t   (&LineDefs[n].sidedef2);
 	    LineDefs[n].type = dummy[0];
 	    LineDefs[n].tag  = dummy[1];  // arg1 often contains a tag
 		LineDefs[n].arg2 = dummy[2];
@@ -353,13 +353,13 @@ if (yg_level_format != YGLF_ALPHA)
       else                   // Doom/Heretic/Strife mode
 	 for (long n = 0; n < NumLineDefs; n++)
 	    {
-	    wf->read_i16 (&LineDefs[n].start);
-	    wf->read_i16 (&LineDefs[n].end);
-	    wf->read_i16 (&LineDefs[n].flags);
-	    wf->read_i16 (&LineDefs[n].type);
-	    wf->read_i16 (&LineDefs[n].tag);
-	    wf->read_i16 (&LineDefs[n].sidedef1);
-	    wf->read_i16 (&LineDefs[n].sidedef2);
+	    wf->read_int16_t (&LineDefs[n].start);
+	    wf->read_int16_t (&LineDefs[n].end);
+	    wf->read_int16_t (&LineDefs[n].flags);
+	    wf->read_int16_t (&LineDefs[n].type);
+	    wf->read_int16_t (&LineDefs[n].tag);
+	    wf->read_int16_t (&LineDefs[n].sidedef1);
+	    wf->read_int16_t (&LineDefs[n].sidedef2);
 	    if (wf->error ())
 	       {
 	       err ("%s: error reading linedef #%ld", lump_name, n);
@@ -378,7 +378,7 @@ dir = FindMasterDir (Level, lump_name);
 if (dir)
    {
    NumSideDefs = (int) (dir->dir.size / WAD_SIDEDEF_BYTES);
-   if ((i32) (NumSideDefs * WAD_SIDEDEF_BYTES) != dir->dir.size)
+   if ((int32_t) (NumSideDefs * WAD_SIDEDEF_BYTES) != dir->dir.size)
       warn ("the SIDEDEFS lump has a weird size."
          " The wad might be corrupt.\n");
    }
@@ -398,12 +398,12 @@ if (NumSideDefs > 0)
       }
    for (long n = 0; n < NumSideDefs; n++)
       {
-      wf->read_i16   (&SideDefs[n].xoff);
-      wf->read_i16   (&SideDefs[n].yoff);
+      wf->read_int16_t   (&SideDefs[n].xoff);
+      wf->read_int16_t   (&SideDefs[n].yoff);
       wf->read_bytes (&SideDefs[n].tex1, WAD_TEX_NAME);
       wf->read_bytes (&SideDefs[n].tex2, WAD_TEX_NAME);
       wf->read_bytes (&SideDefs[n].tex3, WAD_TEX_NAME);
-      wf->read_i16   (&SideDefs[n].sector);
+      wf->read_int16_t   (&SideDefs[n].sector);
       if (wf->error ())
 	 {
 	 err ("%s: error reading sidedef #%ld", lump_name, n);
@@ -475,7 +475,7 @@ if (yg_level_format == YGLF_ALPHA)
 	 const char *lump_name = "TEXTURES";
 	 bool success = false;
 	 ntex = 0;
-	 i32 *offset_table = 0;
+	 int32_t *offset_table = 0;
 	 MDirPtr d = FindMasterDir (MasterDir, lump_name);
 	 if (! d)
 	    {
@@ -490,8 +490,8 @@ if (yg_level_format == YGLF_ALPHA)
 	    warn ("%s: seek error\n", lump_name);
 	    goto textures_done;
 	    }
-	 i32 num;
-	 wf->read_i32 (&num);
+	 int32_t num;
+	 wf->read_int32_t (&num);
 	 if (wf->error ())
 	    {
 	    warn ("%s: error reading texture count\n", lump_name);
@@ -502,10 +502,10 @@ if (yg_level_format == YGLF_ALPHA)
 	    goto textures_done;
 	    }
 	 ntex = num;
-	 offset_table = new i32[ntex];
+	 offset_table = new int32_t[ntex];
 	 for (size_t n = 0; n < ntex; n++)
 	    {
-	    wf->read_i32 (offset_table + n);
+	    wf->read_int32_t (offset_table + n);
 	    if (wf->error ())
 	       {
 	       warn ("%s: error reading offsets table\n");
@@ -552,24 +552,24 @@ if (yg_level_format == YGLF_ALPHA)
       for (size_t n = 0; n < nlines; n++)
 	 {
 	 LDPtr ld = LineDefs + n;
-	 ld->start   = wf->read_i16 ();
-	 ld->end     = wf->read_i16 ();
-	 ld->flags   = wf->read_i16 ();
-	               wf->read_i16 ();  // Unused ?
-	 ld->type    = wf->read_i16 ();
-	 ld->tag     = wf->read_i16 ();
-	               wf->read_i16 ();  // Unused ?
-	 i16 sector1 = wf->read_i16 ();
-	 i16 xofs1   = wf->read_i16 ();
-	 i16 tex1m   = wf->read_i16 ();
-	 i16 tex1u   = wf->read_i16 ();
-	 i16 tex1l   = wf->read_i16 ();
-	               wf->read_i16 ();  // Unused ?
-	 i16 sector2 = wf->read_i16 ();
-	 i16 xofs2   = wf->read_i16 ();
-	 i16 tex2m   = wf->read_i16 ();
-	 i16 tex2u   = wf->read_i16 ();
-	 i16 tex2l   = wf->read_i16 ();
+	 ld->start   = wf->read_int16_t ();
+	 ld->end     = wf->read_int16_t ();
+	 ld->flags   = wf->read_int16_t ();
+	               wf->read_int16_t ();  // Unused ?
+	 ld->type    = wf->read_int16_t ();
+	 ld->tag     = wf->read_int16_t ();
+	               wf->read_int16_t ();  // Unused ?
+	 int16_t sector1 = wf->read_int16_t ();
+	 int16_t xofs1   = wf->read_int16_t ();
+	 int16_t tex1m   = wf->read_int16_t ();
+	 int16_t tex1u   = wf->read_int16_t ();
+	 int16_t tex1l   = wf->read_int16_t ();
+	               wf->read_int16_t ();  // Unused ?
+	 int16_t sector2 = wf->read_int16_t ();
+	 int16_t xofs2   = wf->read_int16_t ();
+	 int16_t tex2m   = wf->read_int16_t ();
+	 int16_t tex2u   = wf->read_int16_t ();
+	 int16_t tex2l   = wf->read_int16_t ();
 	 if (sector1 >= 0)			// Create first sidedef
 	    {
 	    ld->sidedef1 = s;
@@ -714,14 +714,14 @@ if (NumVertices > 0)
    MapMinY = 32767;
    for (long n = 0; n < NumVertices; n++)
       {
-      i16 val;
-      wf->read_i16 (&val);
+      int16_t val;
+      wf->read_int16_t (&val);
       if (val < MapMinX)
 	 MapMinX = val;
       if (val > MapMaxX)
 	 MapMaxX = val;
       Vertices[n].x = val;
-      wf->read_i16 (&val);
+      wf->read_int16_t (&val);
       if (val < MapMinY)
 	 MapMinY = val;
       if (val > MapMaxY)
@@ -752,7 +752,7 @@ if (yg_level_format != YGLF_ALPHA)
    if (dir)
       {
       NumSectors = (int) (dir->dir.size / WAD_SECTOR_BYTES);
-      if ((i32) (NumSectors * WAD_SECTOR_BYTES) != dir->dir.size)
+      if ((int32_t) (NumSectors * WAD_SECTOR_BYTES) != dir->dir.size)
 	 warn ("the %s lump has a weird size."
 	   " The wad might be corrupt.\n", lump_name);
       }
@@ -772,13 +772,13 @@ if (yg_level_format != YGLF_ALPHA)
 	 }
       for (long n = 0; n < NumSectors; n++)
 	 {
-	 wf->read_i16   (&Sectors[n].floorh);
-	 wf->read_i16   (&Sectors[n].ceilh);
+	 wf->read_int16_t   (&Sectors[n].floorh);
+	 wf->read_int16_t   (&Sectors[n].ceilh);
 	 wf->read_bytes (&Sectors[n].floort, WAD_FLAT_NAME);
 	 wf->read_bytes (&Sectors[n].ceilt,  WAD_FLAT_NAME);
-	 wf->read_i16   (&Sectors[n].light);
-	 wf->read_i16   (&Sectors[n].special);
-	 wf->read_i16   (&Sectors[n].tag);
+	 wf->read_int16_t   (&Sectors[n].light);
+	 wf->read_int16_t   (&Sectors[n].special);
+	 wf->read_int16_t   (&Sectors[n].tag);
 	 if (wf->error ())
 	    {
 	    err ("%s: error reading sector #%ld", lump_name, n);
@@ -790,9 +790,9 @@ if (yg_level_format != YGLF_ALPHA)
    }
 else  // Doom alpha--a wholly different SECTORS format
    {
-   i32  *offset_table = 0;
-   i32   nsectors     = 0;
-   i32   nflatnames   = 0;
+   int32_t  *offset_table = 0;
+   int32_t   nsectors     = 0;
+   int32_t   nflatnames   = 0;
    char *flatnames    = 0;
    if (dir == 0)
       {
@@ -808,7 +808,7 @@ else  // Doom alpha--a wholly different SECTORS format
       rc = 1;
       goto byebye;
       }
-   wf->read_i32 (&nsectors);
+   wf->read_int32_t (&nsectors);
    if (wf->error ())
       {
       err ("%s: error reading sector count", lump_name);
@@ -823,9 +823,9 @@ else  // Doom alpha--a wholly different SECTORS format
    NumSectors = nsectors;
    Sectors = (SPtr) GetFarMemory ((unsigned long) NumSectors
       * sizeof (struct Sector));
-   offset_table = new i32[nsectors];
+   offset_table = new int32_t[nsectors];
    for (size_t n = 0; n < (size_t) nsectors; n++)
-      wf->read_i32 (offset_table + n);
+      wf->read_int32_t (offset_table + n);
    if (wf->error ())
       {
       err ("%s: error reading offsets table", lump_name);
@@ -850,7 +850,7 @@ else  // Doom alpha--a wholly different SECTORS format
 	 warn ("%s: seek error\n", lump_name);
 	 goto flatname_done;
 	 }
-      wf->read_i32 (&nflatnames);
+      wf->read_int32_t (&nflatnames);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading flat name count\n", lump_name);
@@ -890,24 +890,24 @@ else  // Doom alpha--a wholly different SECTORS format
 	 rc = 1;
 	 goto sectors_alpha_done;
 	 }
-      i16 index;
-      wf->read_i16 (&Sectors[n].floorh);
-      wf->read_i16 (&Sectors[n].ceilh );
-      wf->read_i16 (&index);
+      int16_t index;
+      wf->read_int16_t (&Sectors[n].floorh);
+      wf->read_int16_t (&Sectors[n].ceilh );
+      wf->read_int16_t (&index);
       if (nflatnames && flatnames && index >= 0 && index < nflatnames)
 	 memcpy (Sectors[n].floort, flatnames + WAD_FLAT_NAME * index,
 	     WAD_FLAT_NAME);
       else
 	 strcpy (Sectors[n].floort, "unknown");
-      wf->read_i16 (&index);
+      wf->read_int16_t (&index);
       if (nflatnames && flatnames && index >= 0 && index < nflatnames)
 	 memcpy (Sectors[n].ceilt, flatnames + WAD_FLAT_NAME * index,
 	     WAD_FLAT_NAME);
       else
 	 strcpy (Sectors[n].ceilt, "unknown");
-      wf->read_i16 (&Sectors[n].light);
-      wf->read_i16 (&Sectors[n].special);
-      wf->read_i16 (&Sectors[n].tag);
+      wf->read_int16_t (&Sectors[n].light);
+      wf->read_int16_t (&Sectors[n].special);
+      wf->read_int16_t (&Sectors[n].tag);
       // Don't know what the tail is for. Ignore it.
       if (wf->error ())
 	 {
@@ -939,7 +939,7 @@ if (dir)
    BehaviorSize = (int)dir->dir.size;
    if (BehaviorSize > 0)
       {
-      Behavior = (u8*) GetFarMemory ((unsigned long) BehaviorSize );
+      Behavior = (uint8_t*) GetFarMemory ((unsigned long) BehaviorSize );
       const Wad_file *wf = dir->wadfile;
       wf->seek (dir->dir.start);
       if (wf->error ())
@@ -1101,8 +1101,8 @@ else
 
 // Write the pwad header
 WriteBytes (file, "PWAD", 4);		// Pwad file
-file_write_i32 (file, NumLumps);	// Number of entries = 11
-file_write_i32 (file, 0);		// Fix this up later
+file_write_int32_t (file, NumLumps);	// Number of entries = 11
+file_write_int32_t (file, 0);		// Fix this up later
 if (Level)
    dir = Level->next;
 else
@@ -1121,13 +1121,13 @@ for (n = 0; n < NumThings; n++)
    {
    if (yg_level_format == YGLF_HEXEN)
       {
-      file_write_i16 (file, Things[n].tid  );
-      file_write_i16 (file, Things[n].xpos );
-      file_write_i16 (file, Things[n].ypos );
-      file_write_i16 (file, Things[n].height);
-      file_write_i16 (file, Things[n].angle);
-      file_write_i16 (file, Things[n].type );
-      file_write_i16 (file, Things[n].when );
+      file_write_int16_t (file, Things[n].tid  );
+      file_write_int16_t (file, Things[n].xpos );
+      file_write_int16_t (file, Things[n].ypos );
+      file_write_int16_t (file, Things[n].height);
+      file_write_int16_t (file, Things[n].angle);
+      file_write_int16_t (file, Things[n].type );
+      file_write_int16_t (file, Things[n].when );
       WriteBytes     (file, &Things[n].special, 1);
       WriteBytes     (file, &Things[n].arg1, 1 );
       WriteBytes     (file, &Things[n].arg2, 1 );
@@ -1137,11 +1137,11 @@ for (n = 0; n < NumThings; n++)
 	  }
    else
       {
-      file_write_i16 (file, Things[n].xpos );
-      file_write_i16 (file, Things[n].ypos );
-      file_write_i16 (file, Things[n].angle);
-      file_write_i16 (file, Things[n].type );
-      file_write_i16 (file, Things[n].when );
+      file_write_int16_t (file, Things[n].xpos );
+      file_write_int16_t (file, Things[n].ypos );
+      file_write_int16_t (file, Things[n].angle);
+      file_write_int16_t (file, Things[n].type );
+      file_write_int16_t (file, Things[n].when );
       }
    }
 lump_size[l] = ftell (file) - lump_offset[l];
@@ -1156,29 +1156,29 @@ for (n = 0; n < NumLineDefs; n++)
    {
    if (yg_level_format == YGLF_HEXEN)
       {
-      u8 dummy[6];
+      uint8_t dummy[6];
       dummy[0] = LineDefs[n].type;
       dummy[1] = LineDefs[n].tag;
       dummy[2] = LineDefs[n].arg2;
       dummy[3] = LineDefs[n].arg3;
       dummy[4] = LineDefs[n].arg4;
       dummy[5] = LineDefs[n].arg5;
-      file_write_i16 (file, LineDefs[n].start   );
-      file_write_i16 (file, LineDefs[n].end     );
-      file_write_i16 (file, LineDefs[n].flags   );
+      file_write_int16_t (file, LineDefs[n].start   );
+      file_write_int16_t (file, LineDefs[n].end     );
+      file_write_int16_t (file, LineDefs[n].flags   );
       WriteBytes     (file, dummy, 6);
-      file_write_i16 (file, LineDefs[n].sidedef1);
-      file_write_i16 (file, LineDefs[n].sidedef2);
+      file_write_int16_t (file, LineDefs[n].sidedef1);
+      file_write_int16_t (file, LineDefs[n].sidedef2);
 	  }
    else
       {
-      file_write_i16 (file, LineDefs[n].start   );
-      file_write_i16 (file, LineDefs[n].end     );
-      file_write_i16 (file, LineDefs[n].flags   );
-      file_write_i16 (file, LineDefs[n].type    );
-      file_write_i16 (file, LineDefs[n].tag     );
-      file_write_i16 (file, LineDefs[n].sidedef1);
-      file_write_i16 (file, LineDefs[n].sidedef2);
+      file_write_int16_t (file, LineDefs[n].start   );
+      file_write_int16_t (file, LineDefs[n].end     );
+      file_write_int16_t (file, LineDefs[n].flags   );
+      file_write_int16_t (file, LineDefs[n].type    );
+      file_write_int16_t (file, LineDefs[n].tag     );
+      file_write_int16_t (file, LineDefs[n].sidedef1);
+      file_write_int16_t (file, LineDefs[n].sidedef2);
 	  }
    }
 lump_size[l] = ftell (file) - lump_offset[l];
@@ -1191,12 +1191,12 @@ lump_offset[l] = ftell (file);
 ObjectsNeeded (OBJ_SIDEDEFS, 0);
 for (n = 0; n < NumSideDefs; n++)
    {
-   file_write_i16 (file, SideDefs[n].xoff);
-   file_write_i16 (file, SideDefs[n].yoff);
+   file_write_int16_t (file, SideDefs[n].xoff);
+   file_write_int16_t (file, SideDefs[n].yoff);
    WriteBytes     (file, &(SideDefs[n].tex1), WAD_TEX_NAME);
    WriteBytes     (file, &(SideDefs[n].tex2), WAD_TEX_NAME);
    WriteBytes     (file, &(SideDefs[n].tex3), WAD_TEX_NAME);
-   file_write_i16 (file, SideDefs[n].sector);
+   file_write_int16_t (file, SideDefs[n].sector);
    }
 lump_size[l] = ftell (file) - lump_offset[l];
 if (Level)
@@ -1223,8 +1223,8 @@ else
    ObjectsNeeded (OBJ_VERTICES, 0);
    for (n = 0; n < NumVertices; n++)
       {
-      file_write_i16 (file, Vertices[n].x);
-      file_write_i16 (file, Vertices[n].y);
+      file_write_int16_t (file, Vertices[n].x);
+      file_write_int16_t (file, Vertices[n].y);
       }
    }
 lump_size[l] = ftell (file) - lump_offset[l];
@@ -1262,13 +1262,13 @@ lump_offset[l] = ftell (file);
 ObjectsNeeded (OBJ_SECTORS, 0);
 for (n = 0; n < NumSectors; n++)
    {
-   file_write_i16 (file, Sectors[n].floorh);
-   file_write_i16 (file, Sectors[n].ceilh );
+   file_write_int16_t (file, Sectors[n].floorh);
+   file_write_int16_t (file, Sectors[n].ceilh );
    WriteBytes     (file, Sectors[n].floort, WAD_FLAT_NAME);
    WriteBytes     (file, Sectors[n].ceilt,  WAD_FLAT_NAME);
-   file_write_i16 (file, Sectors[n].light  );
-   file_write_i16 (file, Sectors[n].special);
-   file_write_i16 (file, Sectors[n].tag    );
+   file_write_int16_t (file, Sectors[n].light  );
+   file_write_int16_t (file, Sectors[n].special);
+   file_write_int16_t (file, Sectors[n].tag    );
    }
 lump_size[l] = ftell (file) - lump_offset[l];
 if (Level)
@@ -1327,8 +1327,8 @@ if (yg_level_format == YGLF_HEXEN)
 long dir_offset = ftell (file);
 for (int L = 0; L < (int) NumLumps; L++)
    {
-   file_write_i32 (file, lump_offset[L]);
-   file_write_i32 (file, lump_size[L]);
+   file_write_int32_t (file, lump_offset[L]);
+   file_write_int32_t (file, lump_size[L]);
    if (L == (int) WAD_LL_LABEL)
       file_write_name (file, level_name);
    else
@@ -1346,7 +1346,7 @@ if (fseek (file, 8, SEEK_SET))
    fclose (file);
    return 1;
    }
-file_write_i32 (file, dir_offset);
+file_write_int32_t (file, dir_offset);
 
 /* Close the file */
 if (fclose (file))
@@ -1411,7 +1411,7 @@ void ReadWTextureNames ()
 {
 MDirPtr dir;
 int n;
-i32 val;
+int32_t val;
 
 verbmsg ("Reading texture names\n");
 
@@ -1434,7 +1434,7 @@ if (yg_texture_lumps == YGTL_TEXTURES
       warn ("%s: seek error\n", lump_name);
       goto textures04_done;
       }
-   wf->read_i32 (&val);
+   wf->read_int32_t (&val);
    if (wf->error ())
       {
       warn ("%s: error reading texture count\n", lump_name);
@@ -1466,7 +1466,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
 	  || yg_texture_format == YGTF_STRIFE11))
    {
    const char *lump_name = "TEXTURES";
-   i32 *offsets = 0;
+   int32_t *offsets = 0;
    dir = FindMasterDir (MasterDir, lump_name);
    if (dir == NULL)  // In theory it always exists, though
       {
@@ -1481,7 +1481,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
       warn ("%s: seek error\n", lump_name);
       goto textures05_done;
       }
-   wf->read_i32 (&val);
+   wf->read_int32_t (&val);
    if (wf->error ())
       {
       warn ("%s: error reading texture count\n", lump_name);
@@ -1489,8 +1489,8 @@ else if (yg_texture_lumps == YGTL_TEXTURES
       }
    NumWTexture = (int) val + 1;
    /* read in the offsets for texture1 names */
-   offsets = (i32 *) GetMemory ((long) NumWTexture * 4);
-   wf->read_i32 (offsets + 1, NumWTexture - 1);
+   offsets = (int32_t *) GetMemory ((long) NumWTexture * 4);
+   wf->read_int32_t (offsets + 1, NumWTexture - 1);
    if (wf->error ())
       {
       warn ("%s: error reading offsets table\n", lump_name);
@@ -1529,7 +1529,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	  || yg_texture_format == YGTF_STRIFE11))
    {
    const char *lump_name = "TEXTURE1";
-   i32 *offsets = 0;
+   int32_t *offsets = 0;
    dir = FindMasterDir (MasterDir, lump_name);
    if (dir != NULL)  // In theory it always exists, though
       {
@@ -1540,15 +1540,15 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 warn ("%s: seek error\n", lump_name);
 	 // FIXME
 	 }
-      wf->read_i32 (&val);
+      wf->read_int32_t (&val);
       if (wf->error ())
       {
 	// FIXME
       }
       NumWTexture = (int) val + 1;
       /* read in the offsets for texture1 names */
-      offsets = (i32 *) GetMemory ((long) NumWTexture * 4);
-      wf->read_i32 (offsets + 1, NumWTexture - 1);
+      offsets = (int32_t *) GetMemory ((long) NumWTexture * 4);
+      wf->read_int32_t (offsets + 1, NumWTexture - 1);
       {
 	// FIXME
       }
@@ -1585,14 +1585,14 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 warn ("%s: seek error\n", lump_name);
 	 // FIXME
 	 }
-      wf->read_i32 (&val);
+      wf->read_int32_t (&val);
       if (wf->error ())
       {
 	// FIXME
       }
       /* read in the offsets for texture2 names */
-      offsets = (i32 *) GetMemory ((long) val * 4);
-      wf->read_i32 (offsets, val);
+      offsets = (int32_t *) GetMemory ((long) val * 4);
+      wf->read_int32_t (offsets, val);
       if (wf->error ())
       {
 	// FIXME

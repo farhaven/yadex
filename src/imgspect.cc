@@ -38,7 +38,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 void spectrify_img (Img& img)
 {
 int x,y;
-u8 grey;
+uint8_t grey;
 
 // FIXME this is gross
 if (! strncmp (Game, "doom", 4))

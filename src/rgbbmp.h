@@ -4,7 +4,7 @@
  *
  *	This is a simple bitmap where each pixel is an RGB
  *	triplet. Each component is coded as an 8-bit unsigned
- *	integer (of type u8).
+ *	integer (of type uint8_t).
  *
  *	AYM 1999-06-06
  */
@@ -39,9 +39,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 typedef struct
 {
-  u8 r;
-  u8 g;
-  u8 b;
+  uint8_t r;
+  uint8_t g;
+  uint8_t b;
 } Rgbbmp_pixel_t;
 
 
@@ -96,46 +96,46 @@ class Rgbbmp
 	memset (pixel, 0, _width * _height * sizeof *pixel);
     }
 
-    void get (int x, int y, u8 &r, u8 &g, u8 &b) const
+    void get (int x, int y, uint8_t &r, uint8_t &g, uint8_t &b) const
     {
       r = pixel[y * _width + x].r;
       g = pixel[y * _width + x].g;
       b = pixel[y * _width + x].b;
     }
 
-    u8 get_r (int x, int y) const
+    uint8_t get_r (int x, int y) const
     {
       return pixel[y * _width + x].r;
     }
 
-    u8 get_g (int x, int y) const
+    uint8_t get_g (int x, int y) const
     {
       return pixel[y * _width + x].g;
     }
 
-    u8 get_b (int x, int y) const
+    uint8_t get_b (int x, int y) const
     {
       return pixel[y * _width + x].b;
     }
 
-    void set (int x, int y, u8 r, u8 g, u8 b)
+    void set (int x, int y, uint8_t r, uint8_t g, uint8_t b)
     {
       pixel[y * _width + x].r = r;
       pixel[y * _width + x].g = g;
       pixel[y * _width + x].b = b;
     }
 
-    void set_r (int x, int y, u8 r)
+    void set_r (int x, int y, uint8_t r)
     {
       pixel[y * _width + x].r = r;
     }
 
-    void set_g (int x, int y, u8 g)
+    void set_g (int x, int y, uint8_t g)
     {
       pixel[y * _width + x].g = g;
     }
 
-    void set_b (int x, int y, u8 b)
+    void set_b (int x, int y, uint8_t b)
     {
       pixel[y * _width + x].b = b;
     }

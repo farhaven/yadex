@@ -56,7 +56,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
 
-typedef u8 pv24_t[3];  // A 24-bit pixel value
+typedef uint8_t pv24_t[3];  // A 24-bit pixel value
 
 
 class Game_colour_24

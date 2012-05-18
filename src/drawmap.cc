@@ -560,7 +560,7 @@ static void draw_things_squares (edit_t *e)
 class Thing_npixels
 {
   public :
-    Thing_npixels (i16 thing_no, unsigned long npixels, wad_ttype_t type)
+    Thing_npixels (int16_t thing_no, unsigned long npixels, wad_ttype_t type)
       : thing_no (thing_no), npixels (npixels), type (type) { }
     bool operator< (const Thing_npixels& other) const
       { if (this->npixels > other.npixels  // Decreasing npixels major
@@ -569,7 +569,7 @@ class Thing_npixels
 	  return true;
 	return false;
       }
-    i16 thing_no;
+    int16_t thing_no;
     unsigned long npixels;
     wad_ttype_t type;
 };
@@ -593,7 +593,7 @@ class Thing_list_by_size
 	  wad_res.sprites.loc_by_root (sprite_root, loc);
 	else
 	  loc.len = 0;
-	a.push_back (Thing_npixels ((i16) n, loc.len, Things[n].type));
+	a.push_back (Thing_npixels ((int16_t) n, loc.len, Things[n].type));
       }
       sort (a.begin (), a.end ());
     }
@@ -618,7 +618,7 @@ struct sprite_dim_t
   unsigned short height;
 };
 
-typedef std::map <i16, sprite_dim_t> dim_map_t;
+typedef std::map <int16_t, sprite_dim_t> dim_map_t;
 static dim_map_t dim_map;  // FIXME there should be one for each game
 
 

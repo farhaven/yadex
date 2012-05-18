@@ -42,7 +42,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  *	The only public method of the palette viewer.
  */
 // One COLORMAP entry. Wrapped in struct to avoid array<->pointer problems
-typedef struct { u8 c[DOOM_COLOURS]; } colormap_entry_t;
+typedef struct { uint8_t c[DOOM_COLOURS]; } colormap_entry_t;
 
 void Palette_viewer::run ()
 {

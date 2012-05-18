@@ -147,9 +147,9 @@ static int SortLevels (const void *item1, const void *item2)
 // A table of the modes in the editor.
 typedef struct
 {
-    i8 obj_type;		// Corresponding object type
-    i8 item_no;		// # of item to tick in the "View" menu
-    i8 menu_no;		// # of flavour of the "Misc op." menu
+    int8_t obj_type;		// Corresponding object type
+    int8_t item_no;		// # of item to tick in the "View" menu
+    int8_t menu_no;		// # of flavour of the "Misc op." menu
 } editmode_t;
 
 const int NB_MODES = 4;
@@ -2155,7 +2155,7 @@ cancel_save_as:
                     FreeFarMemory(Behavior);
                     fseek(f, 0, SEEK_END);
                     BehaviorSize = ftell(f);
-                    Behavior = (u8*)GetFarMemory(BehaviorSize);
+                    Behavior = (uint8_t*)GetFarMemory(BehaviorSize);
                     fseek(f, 0, SEEK_SET);
                     int _ign = fread(Behavior, BehaviorSize, 1, f);
                     fclose(f);

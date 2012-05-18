@@ -48,7 +48,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #define OBJ_ANY		11
 
 // Special object numbers
-typedef i16  obj_no_t;
+typedef int16_t  obj_no_t;
 typedef char obj_type_t;
 #define OBJ_NO_NONE    -1
 #define OBJ_NO_CANVAS  -2

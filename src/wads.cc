@@ -38,11 +38,11 @@ Serial_num master_dir_serial;		// The revision# thereof
 
 
 /*
- *	file_read_i16 - read little-endian 16-bit signed integers from a file
+ *	file_read_int16_t - read little-endian 16-bit signed integers from a file
  *
  *	Return 0 on success, non-zero on failure.
  */
-int file_read_i16 (FILE *fp, i16 *buf, long count)
+int file_read_int16_t (FILE *fp, int16_t *buf, long count)
 {
   while (count-- > 0)
     *buf = getc (fp) | (getc (fp) << 8);
@@ -51,18 +51,18 @@ int file_read_i16 (FILE *fp, i16 *buf, long count)
 
 
 /*
- *	file_read_i32 - read little-endian 32-bit signed integers from a file
+ *	file_read_int32_t - read little-endian 32-bit signed integers from a file
  *
  *	Return 0 on success, non-zero on failure.
  */
-int file_read_i32 (FILE *fp, i32 *buf, long count)
+int file_read_int32_t (FILE *fp, int32_t *buf, long count)
 {
   while (count-- > 0)
   {
     *buf++ =    getc (fp)
       | (      getc (fp) << 8)
-      | ((i32) getc (fp) << 16)
-      | ((i32) getc (fp) << 24);
+      | ((int32_t) getc (fp) << 16)
+      | ((int32_t) getc (fp) << 24);
   }
   return feof (fp) || ferror (fp);
 }
@@ -108,11 +108,11 @@ int file_read_bytes (FILE *fp, void *buf, long count)
 
 
 /*
- *	file_write_i16 - write a little-endian 16-bit signed integer to a file
+ *	file_write_int16_t - write a little-endian 16-bit signed integer to a file
  *
  *	Does no error checking.
  */
-void file_write_i16 (FILE *fd, i16 buf)
+void file_write_int16_t (FILE *fd, int16_t buf)
 {
   putc (       buf & 0xff, fd);
   putc ((buf >> 8) & 0xff, fd);
@@ -120,14 +120,14 @@ void file_write_i16 (FILE *fd, i16 buf)
 
 
 /*
- *	file_write_i32 - write little-endian 32-bit signed integers to a file
+ *	file_write_int32_t - write little-endian 32-bit signed integers to a file
  *
  *	Does no error checking.
  */
-void file_write_i32 (FILE *fd, i32 buf, long count)
+void file_write_int32_t (FILE *fd, int32_t buf, long count)
 {
   /* It would probably be more efficient to swap bytes in-core
-     and write the whole i32 at once. */
+     and write the whole int32_t at once. */
   while (count-- > 0)
   {
     putc (        buf & 0xff, fd);

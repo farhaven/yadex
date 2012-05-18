@@ -119,11 +119,11 @@ class Wad_file
     bool        error       () const;
     const char *where       () const;
     void        seek        (long offset) const;
-    u8          read_u8     () const;
-    void        read_u8     (u8& buf) const;
-    i16         read_i16    () const;
-    void        read_i16    (i16 *buf) const;
-    void        read_i32    (i32 *buf, long count = 1) const;
+    uint8_t          read_uint8_t     () const;
+    void        read_uint8_t     (uint8_t& buf) const;
+    int16_t         read_int16_t    () const;
+    void        read_int16_t    (int16_t *buf) const;
+    void        read_int32_t    (int32_t *buf, long count = 1) const;
     void        read_bytes  (void *buf, long count) const;
     long        read_vbytes (void *buf, long count) const;
     const char *what        () const;
@@ -133,8 +133,8 @@ class Wad_file
     ygpf_t pic_format_;			// Picture format (usually PF_NORMAL)
     FILE *fp;				// C file stream information
     char type[4];			// Type of wad file ("IWAD" or "PWAD")
-    i32  dirsize;			// Entries in directory
-    i32  dirstart;			// Offset to start of directory
+    int32_t  dirsize;			// Entries in directory
+    int32_t  dirstart;			// Offset to start of directory
     DirPtr directory;			// Array of directory information
     mutable bool error_;		// I/O error occur since last error()
     mutable char where_[101];		// Static workspace for where()
@@ -203,14 +203,14 @@ inline void Wad_file::seek (long offset) const
 
 
 /*
- *	Wad_file::read_u8 - read a byte
+ *	Wad_file::read_uint8_t - read a byte
  *
  *	If an error occurs, set the error flag and the return
  *	value is undefined.
  */
-inline u8 Wad_file::read_u8 () const
+inline uint8_t Wad_file::read_uint8_t () const
 {
-  u8 v = u8 (getc (fp));
+  uint8_t v = uint8_t (getc (fp));
 
   if (feof (fp) || ferror (fp))
   {
@@ -223,12 +223,12 @@ inline u8 Wad_file::read_u8 () const
 
 
 /*
- *	Wad_file::read_u8 - read a byte
+ *	Wad_file::read_uint8_t - read a byte
  *
  *	If an error occurs, set the error flag and the contents
  *	of buf is undefined.
  */
-inline void Wad_file::read_u8 (u8& buf) const
+inline void Wad_file::read_uint8_t (uint8_t& buf) const
 {
   buf = getc (fp);
 
@@ -242,15 +242,15 @@ inline void Wad_file::read_u8 (u8& buf) const
 
 
 /*
- *	Wad_file::read_i16 - read a little-endian 16-bit signed integer
+ *	Wad_file::read_int16_t - read a little-endian 16-bit signed integer
  *
  *	If an error occurs, set the error flag and the return
  *	value is undefined.
  */
-inline i16 Wad_file::read_i16 () const
+inline int16_t Wad_file::read_int16_t () const
 {
   const size_t nbytes = 2;
-  u8 buf[nbytes];
+  uint8_t buf[nbytes];
 
   if (fread (buf, 1, nbytes, fp) != nbytes)
   {
@@ -264,12 +264,12 @@ inline i16 Wad_file::read_i16 () const
 
 
 /*
- *	Wad_file::read_i16 - read a little-endian 16-bit signed integer
+ *	Wad_file::read_int16_t - read a little-endian 16-bit signed integer
  *
  *	The value read is stored in *buf. If an error occurs,
  *	set the error flag and the contents of *buf is undefined.
  */
-inline void Wad_file::read_i16 (i16 *buf) const
+inline void Wad_file::read_int16_t (int16_t *buf) const
 {
   *buf = getc (fp) | (getc (fp) << 8);
 
@@ -283,20 +283,20 @@ inline void Wad_file::read_i16 (i16 *buf) const
 
 
 /*
- *	Wad_file::read_i32 - read little-endian 32-bit signed integers
+ *	Wad_file::read_int32_t - read little-endian 32-bit signed integers
  *
  *	Read <count> little-endian 32-bit signed integers from
  *	wad file <wadfile> into *buf. If an error occurs, set
  *	error_ and the contents of *buf is undefined.
  */
-inline void Wad_file::read_i32 (i32 *buf, long count) const
+inline void Wad_file::read_int32_t (int32_t *buf, long count) const
 {
   while (count-- > 0)
   {
     *buf++ =    getc (fp)
        | (      getc (fp) << 8)
-       | ((i32) getc (fp) << 16)
-       | ((i32) getc (fp) << 24);
+       | ((int32_t) getc (fp) << 16)
+       | ((int32_t) getc (fp) << 24);
   }
 
   if (feof (fp) || ferror (fp))

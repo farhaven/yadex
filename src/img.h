@@ -8,7 +8,7 @@
 #define YH_IMG
 
 
-typedef u8             img_pixel_t;
+typedef uint8_t             img_pixel_t;
 typedef unsigned short img_dim_t;
 class Img_priv;
 

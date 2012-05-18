@@ -39,14 +39,14 @@ class rgb_c
          }
 
       // Must be defined before rbg_c (r, g, b)
-      void set (u8 red, u8 green, u8 blue)
+      void set (uint8_t red, uint8_t green, uint8_t blue)
          {
          r = red;
          g = green;
          b = blue;
          }
 
-      rgb_c (u8 red, u8 green, u8 blue)
+      rgb_c (uint8_t red, uint8_t green, uint8_t blue)
          {
          set (red, green, blue);
          }
@@ -61,9 +61,9 @@ class rgb_c
          return abs (rgb2.r - r) + abs (rgb2.g - g) + abs (rgb2.b - b);
          }
 
-      u8 r;
-      u8 g;
-      u8 b;
+      uint8_t r;
+      uint8_t g;
+      uint8_t b;
    };
 
 

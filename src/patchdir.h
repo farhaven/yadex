@@ -109,8 +109,8 @@ class Patch_dir
     ~Patch_dir ();
     void refresh (MDirPtr master_dir);
     void loc_by_name (const char *name, Lump_loc& loc);
-    void loc_by_num (i16 num, Lump_loc& loc);
-    wad_pic_name_t *name_for_num (i16 num);
+    void loc_by_num (int16_t num, Lump_loc& loc);
+    wad_pic_name_t *name_for_num (int16_t num);
     void list (Patch_list& pl);
 
   private :

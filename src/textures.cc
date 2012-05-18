@@ -51,10 +51,10 @@ void DisplayWallTexture (hookfunc_comm_t *c)
 {
 MDirPtr  dir = 0;	// Main directory pointer to the TEXTURE* entries
 int      n;		// General counter
-i16      width, height;	// Size of the texture
-i16      npatches;	// Number of patches in the textures
-i32      numtex;	// number of texture names in TEXTURE* list
-i32      texofs;	// Offset in the wad file to the texture data
+int16_t      width, height;	// Size of the texture
+int16_t      npatches;	// Number of patches in the textures
+int32_t      numtex;	// number of texture names in TEXTURE* list
+int32_t      texofs;	// Offset in the wad file to the texture data
 char     tname[WAD_TEX_NAME + 1];	/* texture name */
 char     picname[WAD_PIC_NAME + 1];	/* wall patch name */
 bool     have_dummy_bytes;
@@ -108,7 +108,7 @@ if (yg_texture_lumps == YGTL_TEXTURES && yg_texture_format == YGTF_NAMELESS)
 	 warn ("%s: can't seek to lump\n", lump_name);
 	 goto alpha04_done;
 	 }
-      wf->read_i32 (&numtex);
+      wf->read_int32_t (&numtex);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading texture count\n", lump_name);
@@ -133,7 +133,7 @@ if (yg_texture_lumps == YGTL_TEXTURES && yg_texture_format == YGTF_NAMELESS)
 	       warn ("%s: can't seek to offsets table entry\n", lump_name);
 	       goto alpha04_done;
 	       }
-	    wf->read_i32 (&texofs);
+	    wf->read_int32_t (&texofs);
 	    if (wf->error ())
 	       {
 	       warn ("%s: error reading texture offset\n", lump_name);
@@ -154,7 +154,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
    dir = FindMasterDir (MasterDir, lump_name);
    if (dir != NULL)  // (Theoretically, it should always exist)
       {
-      i32 *offsets = NULL;  // Array of offsets to texture names
+      int32_t *offsets = NULL;  // Array of offsets to texture names
       const Wad_file *wf = dir->wadfile;
 
       wf->seek (dir->dir.start);
@@ -163,15 +163,15 @@ else if (yg_texture_lumps == YGTL_TEXTURES
 	 warn ("%s: can't seek to lump\n", lump_name);
 	 goto textures_done;
 	 }
-      wf->read_i32 (&numtex);
+      wf->read_int32_t (&numtex);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading texture count\n", lump_name);
 	 goto textures_done;
 	 }
       // Read in the offsets for texture1 names and info
-      offsets = (i32 *) GetMemory ((long) numtex * 4);
-      wf->read_i32 (offsets, numtex);
+      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      wf->read_int32_t (offsets, numtex);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading offsets table\n", lump_name);
@@ -211,7 +211,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
    if (dir != NULL)  // (Theoretically, it should always exist)
       {
       const Wad_file *wf = dir->wadfile;
-      i32 *offsets = NULL;  // Array of offsets to texture names
+      int32_t *offsets = NULL;  // Array of offsets to texture names
 
       wf->seek (dir->dir.start);
       if (wf->error ())
@@ -219,15 +219,15 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 warn ("%s: can't seek to lump\n", lump_name);
 	 goto texture1_done;
 	 }
-      wf->read_i32 (&numtex);
+      wf->read_int32_t (&numtex);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading texture count\n", lump_name);
 	 goto texture1_done;
 	 }
       // Read in the offsets for texture1 names and info
-      offsets = (i32 *) GetMemory ((long) numtex * 4);
-      wf->read_i32 (offsets, numtex);
+      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      wf->read_int32_t (offsets, numtex);
       if (wf->error ())
 	 {
 	 warn ("%s: error reading offsets table\n", lump_name);
@@ -260,7 +260,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
    if (texofs == 0)
       {
       const char *lump_name = "TEXTURE2";
-      i32 *offsets = NULL;  // Array of offsets to texture names
+      int32_t *offsets = NULL;  // Array of offsets to texture names
 
       dir = FindMasterDir (MasterDir, lump_name);
       if (dir != NULL)  // Doom II has no TEXTURE2
@@ -272,15 +272,15 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	    warn ("%s: can't seek to lump\n", lump_name);
 	    goto texture2_done;
 	    }
-	 wf->read_i32 (&numtex);
+	 wf->read_int32_t (&numtex);
 	 if (wf->error ())
 	    {
 	    warn ("%s: error reading texture count\n", lump_name);
 	    goto texture2_done;
 	    }
 	 // Read in the offsets for TEXTURE2 names
-	 offsets = (i32 *) GetMemory ((long) numtex * 4);
-	 wf->read_i32 (offsets, numtex);
+	 offsets = (int32_t *) GetMemory ((long) numtex * 4);
+	 wf->read_int32_t (offsets, numtex);
 	 if (wf->error ())
 	    {
 	    warn ("%s: error reading offsets table\n", lump_name);
@@ -318,24 +318,24 @@ if (texofs == 0)
    return;
 
 // Read the info for this texture
-i32 header_ofs;
+int32_t header_ofs;
 if (yg_texture_format == YGTF_NAMELESS)
    header_ofs = texofs;
 else
    header_ofs = texofs + WAD_TEX_NAME;
 dir->wadfile->seek     (header_ofs + 4);
 // FIXME
-dir->wadfile->read_i16 (&width);
+dir->wadfile->read_int16_t (&width);
 // FIXME
-dir->wadfile->read_i16 (&height);
+dir->wadfile->read_int16_t (&height);
 // FIXME
 if (have_dummy_bytes)
    {
-   i16 dummy;
-   dir->wadfile->read_i16 (&dummy);
-   dir->wadfile->read_i16 (&dummy);
+   int16_t dummy;
+   dir->wadfile->read_int16_t (&dummy);
+   dir->wadfile->read_int16_t (&dummy);
    }
-dir->wadfile->read_i16 (&npatches);
+dir->wadfile->read_int16_t (&npatches);
 // FIXME
 
 c->width    = width;
@@ -361,19 +361,19 @@ if (c->maxpatches != 0 && c->maxpatches <= npatches)
 for (n = 0; n < maxpatches; n++)
    {
    hookfunc_comm_t subc;
-   i16 xofs, yofs;	// Offset in texture space for the patch
-   i16 pnameind;	// Index of patch in PNAMES
+   int16_t xofs, yofs;	// Offset in texture space for the patch
+   int16_t pnameind;	// Index of patch in PNAMES
 
    dir->wadfile->seek (header_ofs + header_size + (long) n * item_size);
-   dir->wadfile->read_i16 (&xofs);
-   dir->wadfile->read_i16 (&yofs);
-   dir->wadfile->read_i16 (&pnameind);
+   dir->wadfile->read_int16_t (&xofs);
+   dir->wadfile->read_int16_t (&yofs);
+   dir->wadfile->read_int16_t (&pnameind);
    if (have_dummy_bytes)
       {
-      i16 stepdir;
-      i16 colormap;
-      dir->wadfile->read_i16 (&stepdir);   // Always 1, unused.
-      dir->wadfile->read_i16 (&colormap);  // Always 0, unused.
+      int16_t stepdir;
+      int16_t colormap;
+      dir->wadfile->read_int16_t (&stepdir);   // Always 1, unused.
+      dir->wadfile->read_int16_t (&colormap);  // Always 0, unused.
       }
 
    /* AYM 1998-08-08: Yes, that's weird but that's what Doom
@@ -429,13 +429,13 @@ c->disp_y1 = c->disp_y0 + height - 1;
 /*
    Function to get the size of a wall texture
 */
-void GetWallTextureSize (i16 *width, i16 *height, const char *texname)
+void GetWallTextureSize (int16_t *width, int16_t *height, const char *texname)
 {
 MDirPtr  dir = 0;			// Pointer in main directory to texname
-i32    *offsets;			// Array of offsets to texture names
+int32_t    *offsets;			// Array of offsets to texture names
 int      n;				// General counter
-i32      numtex;			// Number of texture names in TEXTURE*
-i32      texofs;			// Offset in wad for the texture data
+int32_t      numtex;			// Number of texture names in TEXTURE*
+int32_t      texofs;			// Offset in wad for the texture data
 char     tname[WAD_TEX_NAME + 1];	// Texture name
 
 // Offset for texture we want
@@ -447,7 +447,7 @@ if (yg_texture_lumps == YGTL_TEXTURES && yg_texture_format == YGTF_NAMELESS)
    if (dir != NULL)
       {
       dir->wadfile->seek (dir->dir.start);
-      dir->wadfile->read_i32 (&numtex);
+      dir->wadfile->read_int32_t (&numtex);
       if (WAD_TEX_NAME < 7) nf_bug ("WAD_TEX_NAME too small");  // Sanity
       if (! y_strnicmp (texname, "TEX", 3)
 	    && isdigit (texname[3])
@@ -461,7 +461,7 @@ if (yg_texture_lumps == YGTL_TEXTURES && yg_texture_format == YGTF_NAMELESS)
 	       && num >= 0 && num < numtex)
 	    {
 	    dir->wadfile->seek (dir->dir.start + 4 + 4 * num);
-	    dir->wadfile->read_i32 (&texofs);
+	    dir->wadfile->read_int32_t (&texofs);
 	    }
 	 }
       }
@@ -481,10 +481,10 @@ else if (yg_texture_format == YGTF_NORMAL
    if (dir != NULL)
       {
       dir->wadfile->seek (dir->dir.start);
-      dir->wadfile->read_i32 (&numtex);
+      dir->wadfile->read_int32_t (&numtex);
       // Read in the offsets for texture1 names and info
-      offsets = (i32 *) GetMemory ((long) numtex * 4);
-      dir->wadfile->read_i32 (offsets, numtex);
+      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      dir->wadfile->read_int32_t (offsets, numtex);
       for (n = 0; n < numtex && !texofs; n++)
 	 {
 	 dir->wadfile->seek (dir->dir.start + offsets[n]);
@@ -501,10 +501,10 @@ else if (yg_texture_format == YGTF_NORMAL
       if (dir != NULL)  // Doom II has no TEXTURE2
 	 {
 	 dir->wadfile->seek (dir->dir.start);
-	 dir->wadfile->read_i32 (&numtex);
+	 dir->wadfile->read_int32_t (&numtex);
 	 // Read in the offsets for texture2 names
-	 offsets = (i32 *) GetMemory ((long) numtex * 4);
-	 dir->wadfile->read_i32 (offsets);
+	 offsets = (int32_t *) GetMemory ((long) numtex * 4);
+	 dir->wadfile->read_int32_t (offsets);
 	 for (n = 0; n < numtex && !texofs; n++)
 	    {
 	    dir->wadfile->seek (dir->dir.start + offsets[n]);
@@ -526,8 +526,8 @@ if (texofs != 0)
       dir->wadfile->seek (texofs + 4L);
    else
       dir->wadfile->seek (texofs + 12L);
-   dir->wadfile->read_i16 (width);
-   dir->wadfile->read_i16 (height);
+   dir->wadfile->read_int16_t (width);
+   dir->wadfile->read_int16_t (height);
    }
 else
    {

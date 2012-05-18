@@ -61,23 +61,11 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 void check_types ()
 {
-  assert_size (u8,  1);
-  assert_size (i8,  1);
-  assert_size (u16, 2);
-  assert_size (i16, 2);
-  assert_size (u32, 4);
-  assert_size (i32, 4);
   assert_size (struct LineDef, 18);
   assert_size (struct Sector,  26);
   assert_size (struct SideDef, 30);
   assert_size (struct Thing,   20);
   assert_size (struct Vertex,   4);
-  assert_wrap (u8,          255,           0);
-  assert_wrap (i8,          127,        -128);
-  assert_wrap (u16,       65535,           0);
-  assert_wrap (i16,       32767,      -32768);
-  assert_wrap (u32, 4294967295u,           0);
-  assert_wrap (i32,  2147483647, -2147483648);
 }
 
 

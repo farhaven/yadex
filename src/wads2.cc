@@ -451,8 +451,8 @@ if (wf->fp == 0)
    }
 {
 bool e = file_read_bytes (wf->fp, wf->type, 4);
-e     |= file_read_i32   (wf->fp, &wf->dirsize);
-e     |= file_read_i32   (wf->fp, &wf->dirstart);
+e     |= file_read_int32_t   (wf->fp, &wf->dirsize);
+e     |= file_read_int32_t   (wf->fp, &wf->dirstart);
 if (e || memcmp (wf->type, "IWAD", 4) != 0 && memcmp (wf->type, "PWAD", 4) != 0)
    {
    printf ("%.128s: not a wad (bad header)\n", filename);
@@ -473,10 +473,10 @@ if (fseek (wf->fp, wf->dirstart, SEEK_SET) != 0)
    fail = true;
    goto byebye;
    }
-for (i32 n = 0; n < wf->dirsize; n++)
+for (int32_t n = 0; n < wf->dirsize; n++)
    {
-   bool e  = file_read_i32   (wf->fp, &wf->directory[n].start);
-   e      |= file_read_i32   (wf->fp, &wf->directory[n].size);
+   bool e  = file_read_int32_t   (wf->fp, &wf->directory[n].start);
+   e      |= file_read_int32_t   (wf->fp, &wf->directory[n].size);
    e      |= file_read_bytes (wf->fp, wf->directory[n].name, WAD_NAME);
    if (e)
       {
@@ -609,8 +609,8 @@ if (patchonly)
    WriteBytes (file, "PWAD", 4);
 else
    WriteBytes (file, "IWAD", 4);
-file_write_i32 (file, 0xdeadbeef);      /* put true value in later */
-file_write_i32 (file, 0xdeadbeef);      /* put true value in later */
+file_write_int32_t (file, 0xdeadbeef);      /* put true value in later */
+file_write_int32_t (file, 0xdeadbeef);      /* put true value in later */
 
 /* output the directory data chunks */
 const Wad_file *iwad = 0;	// FIXME unreliable way of knowing the iwad
@@ -641,10 +641,10 @@ for (cur = MasterDir; cur; cur = cur->next)
    if (dirnum % 100 == 0)
       printf ("Outputting directory %04ld...\r", dirnum);
    if (cur->dir.start)
-      file_write_i32 (file, counter);
+      file_write_int32_t (file, counter);
    else
-      file_write_i32 (file, 0);
-   file_write_i32 (file, cur->dir.size);
+      file_write_int32_t (file, 0);
+   file_write_int32_t (file, cur->dir.size);
    file_write_name (file, cur->dir.name);
    counter += cur->dir.size;
    dirnum++;
@@ -653,8 +653,8 @@ for (cur = MasterDir; cur; cur = cur->next)
 /* fix up the number of entries and directory start information */
 if (fseek (file, 4L, 0))
    fatal_error ("error writing to file");
-file_write_i32 (file, dirnum);
-file_write_i32 (file, dirstart);
+file_write_int32_t (file, dirnum);
+file_write_int32_t (file, dirstart);
 
 /* close the file */
 printf ("                            \r");
@@ -764,12 +764,12 @@ if (entry)
    {
    // Write the header
    WriteBytes (file, "PWAD", 4);	// Type = PWAD
-   file_write_i32 (file, 1);		// 1 entry in the directory
-   file_write_i32 (file, 12);		// The directory starts at offset 12
+   file_write_int32_t (file, 1);		// 1 entry in the directory
+   file_write_int32_t (file, 12);		// The directory starts at offset 12
 
    // Write the directory
-   file_write_i32 (file, 28);		// First entry starts at offset 28
-   file_write_i32 (file, entry->dir.size);	// Size of first entry
+   file_write_int32_t (file, 28);		// First entry starts at offset 28
+   file_write_int32_t (file, entry->dir.size);	// Size of first entry
    file_write_name (file, entry->dir.name);	// Name of first entry
 
    // Write the lump data
@@ -853,11 +853,11 @@ char    name8[WAD_NAME];
 
 // Write the header
 WriteBytes (file, "PWAD", 4);		// Type = PWAD
-file_write_i32 (file, 1);		// 1 entry in the directory
-file_write_i32 (file, 12);		// The directory starts at offset 12
+file_write_int32_t (file, 1);		// 1 entry in the directory
+file_write_int32_t (file, 12);		// The directory starts at offset 12
 
 // Write the directory
-file_write_i32 (file, 28);		// First entry starts at offset 28
+file_write_int32_t (file, 28);		// First entry starts at offset 28
 
 if (fseek (raw, 0L, SEEK_END) != 0)
    fatal_error ("error reading from raw file");
@@ -866,7 +866,7 @@ if (size < 0)
    fatal_error ("error reading from raw file");
 if (fseek (raw, 0L, SEEK_SET) != 0)
    fatal_error ("error reading from raw file");
-file_write_i32 (file, size);		// Size of first entry
+file_write_int32_t (file, size);		// Size of first entry
 
 memset (name8, '\0', WAD_NAME);
 strncpy (name8, entryname, WAD_NAME);

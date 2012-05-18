@@ -962,73 +962,73 @@ obj/0/ytime.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
 dobj/0/ytime.o: src/yerror.h src/ymemory.h src/aym.h src/windim.h src/wstructs.h
 obj/0/ytime.o: src/input.h src/ytime.h
 dobj/0/ytime.o: src/input.h src/ytime.h
-obj/0/acolours.o: src/colour.h
-dobj/0/acolours.o: src/colour.h
-obj/0/bitvec.o: src/yerror.h src/ymemory.h
-dobj/0/bitvec.o: src/yerror.h src/ymemory.h
-obj/0/disppic.o: src/lists.h src/img.h
-dobj/0/disppic.o: src/lists.h src/img.h
-obj/0/drawmap.o: src/_edit.h src/objid.h
-dobj/0/drawmap.o: src/_edit.h src/objid.h
-obj/0/_edit.o: src/objid.h
-dobj/0/_edit.o: src/objid.h
-obj/0/flats.o: src/lists.h src/img.h
-dobj/0/flats.o: src/lists.h src/img.h
-obj/0/game.o: src/rgb.h
-dobj/0/game.o: src/rgb.h
-obj/0/gamesky.o: src/wadname.h src/wstructs.h
-dobj/0/gamesky.o: src/wadname.h src/wstructs.h
-obj/0/gcolour1.o: src/colour.h
-dobj/0/gcolour1.o: src/colour.h
-obj/0/gcolour2.o: src/colour.h
-dobj/0/gcolour2.o: src/colour.h
-obj/0/gcolour3.o: src/colour.h
-dobj/0/gcolour3.o: src/colour.h
-obj/0/gfx3.o: src/rgbbmp.h
-dobj/0/gfx3.o: src/rgbbmp.h
-obj/0/highlt.o: src/edwidget.h src/objid.h
-dobj/0/highlt.o: src/edwidget.h src/objid.h
-obj/0/infobar.o: src/edwidget.h
-dobj/0/infobar.o: src/edwidget.h
-obj/0/levels.o: src/wstructs.h src/things.h
-dobj/0/levels.o: src/wstructs.h src/things.h
-obj/0/lists.o: src/img.h
-dobj/0/lists.o: src/img.h
-obj/0/l_super.o: src/levels.h src/wstructs.h src/things.h src/objid.h
-dobj/0/l_super.o: src/levels.h src/wstructs.h src/things.h src/objid.h
-obj/0/l_vertices.o: src/selectn.h
-dobj/0/l_vertices.o: src/selectn.h
-obj/0/menubar.o: src/edwidget.h
-dobj/0/menubar.o: src/edwidget.h
-obj/0/menu.o: src/edwidget.h
-dobj/0/menu.o: src/edwidget.h
-obj/0/modpopup.o: src/edwidget.h src/menu.h
-dobj/0/modpopup.o: src/edwidget.h src/menu.h
-obj/0/objects.o: src/objid.h
-dobj/0/objects.o: src/objid.h
-obj/0/objinfo.o: src/edwidget.h
-dobj/0/objinfo.o: src/edwidget.h
-obj/0/pic2img.o: src/img.h
-dobj/0/pic2img.o: src/img.h
-obj/0/s_centre.o: src/objid.h
-dobj/0/s_centre.o: src/objid.h
-obj/0/selbox.o: src/edwidget.h
-dobj/0/selbox.o: src/edwidget.h
-obj/0/spot.o: src/edwidget.h src/gfx.h
-dobj/0/spot.o: src/edwidget.h src/gfx.h
 obj/0/spritdir.o: src/lumpdir.h
 dobj/0/spritdir.o: src/lumpdir.h
-obj/0/s_vertices.o: src/selectn.h
-dobj/0/s_vertices.o: src/selectn.h
-obj/0/textures.o: src/lists.h src/img.h
-dobj/0/textures.o: src/lists.h src/img.h
-obj/0/things.o: src/wstructs.h
-dobj/0/things.o: src/wstructs.h
-obj/0/wadname.o: src/wstructs.h
-dobj/0/wadname.o: src/wstructs.h
 obj/0/wadres.o: src/spritdir.h src/lumpdir.h
 dobj/0/wadres.o: src/spritdir.h src/lumpdir.h
+obj/0/_edit.o: src/objid.h
+dobj/0/_edit.o: src/objid.h
+obj/0/s_centre.o: src/objid.h
+dobj/0/s_centre.o: src/objid.h
+obj/0/gcolour1.o: src/colour.h
+dobj/0/gcolour1.o: src/colour.h
+obj/0/selbox.o: src/edwidget.h
+dobj/0/selbox.o: src/edwidget.h
+obj/0/levels.o: src/wstructs.h src/things.h
+dobj/0/levels.o: src/wstructs.h src/things.h
+obj/0/disppic.o: src/lists.h src/img.h
+dobj/0/disppic.o: src/lists.h src/img.h
 obj/0/yadex.o: src/config.h atclib/atclib.h src/bitvec.h src/yerror.h
 dobj/0/yadex.o: src/config.h atclib/atclib.h src/bitvec.h src/yerror.h
 obj/0/yadex.o: src/ymemory.h src/aym.h src/windim.h src/wstructs.h src/input.h
 dobj/0/yadex.o: src/ymemory.h src/aym.h src/windim.h src/wstructs.h src/input.h
+obj/0/gcolour2.o: src/colour.h
+dobj/0/gcolour2.o: src/colour.h
+obj/0/objects.o: src/objid.h
+dobj/0/objects.o: src/objid.h
+obj/0/gfx3.o: src/rgbbmp.h
+dobj/0/gfx3.o: src/rgbbmp.h
+obj/0/l_vertices.o: src/selectn.h
+dobj/0/l_vertices.o: src/selectn.h
+obj/0/lists.o: src/img.h
+dobj/0/lists.o: src/img.h
+obj/0/textures.o: src/lists.h src/img.h
+dobj/0/textures.o: src/lists.h src/img.h
+obj/0/menubar.o: src/edwidget.h
+dobj/0/menubar.o: src/edwidget.h
+obj/0/drawmap.o: src/_edit.h src/objid.h
+dobj/0/drawmap.o: src/_edit.h src/objid.h
+obj/0/modpopup.o: src/edwidget.h src/menu.h
+dobj/0/modpopup.o: src/edwidget.h src/menu.h
+obj/0/objinfo.o: src/edwidget.h
+dobj/0/objinfo.o: src/edwidget.h
+obj/0/highlt.o: src/edwidget.h src/objid.h
+dobj/0/highlt.o: src/edwidget.h src/objid.h
+obj/0/pic2img.o: src/img.h
+dobj/0/pic2img.o: src/img.h
+obj/0/spot.o: src/edwidget.h src/gfx.h
+dobj/0/spot.o: src/edwidget.h src/gfx.h
+obj/0/acolours.o: src/colour.h
+dobj/0/acolours.o: src/colour.h
+obj/0/menu.o: src/edwidget.h
+dobj/0/menu.o: src/edwidget.h
+obj/0/l_super.o: src/levels.h src/wstructs.h src/things.h src/objid.h
+dobj/0/l_super.o: src/levels.h src/wstructs.h src/things.h src/objid.h
+obj/0/game.o: src/rgb.h
+dobj/0/game.o: src/rgb.h
+obj/0/things.o: src/wstructs.h
+dobj/0/things.o: src/wstructs.h
+obj/0/bitvec.o: src/yerror.h src/ymemory.h
+dobj/0/bitvec.o: src/yerror.h src/ymemory.h
+obj/0/wadname.o: src/wstructs.h
+dobj/0/wadname.o: src/wstructs.h
+obj/0/gcolour3.o: src/colour.h
+dobj/0/gcolour3.o: src/colour.h
+obj/0/infobar.o: src/edwidget.h
+dobj/0/infobar.o: src/edwidget.h
+obj/0/flats.o: src/lists.h src/img.h
+dobj/0/flats.o: src/lists.h src/img.h
+obj/0/s_vertices.o: src/selectn.h
+dobj/0/s_vertices.o: src/selectn.h
+obj/0/gamesky.o: src/wadname.h src/wstructs.h
+dobj/0/gamesky.o: src/wadname.h src/wstructs.h

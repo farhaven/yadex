@@ -59,28 +59,28 @@ Wad_file::~Wad_file ()
  *
  *	Return pointer to a per-Wad_file buffer.
  */
-const char *Wad_file::where () const
+const char
+*Wad_file::where () const
 {
-  const unsigned long offset       = ftell (fp);
-  const size_t        offset_len   =  + 3;
-  const size_t        name_len_max = sizeof where_ - 1 - offset_len;
+	const unsigned long offset       = ftell (fp);
+	const size_t        offset_len   =  + 3;
+	const size_t        name_len_max = sizeof where_ - 1 - offset_len;
 
-  if (name_len_max >= strlen (filename)) 
-    sprintf (where_, "%s(%lXh)", filename, offset);
-  else
-  {
-    const char  *ellipsis = "...";
-    const size_t total    = name_len_max - strlen (ellipsis);
-    const size_t left     = total / 2;
-    const size_t right    = total - left;
-    sprintf (where_, "%*s%s%*s(%lXh)",
-	left, filename,
-	ellipsis,
-	right, filename + total,
-	offset);
-  }
+	if (name_len_max >= strlen (filename)) 
+		snprintf (where_, sizeof(where_), "%s(%lXh)", filename, offset);
+	else {
+		const char  *ellipsis = "...";
+		const size_t total    = name_len_max - strlen (ellipsis);
+		const size_t left     = total / 2;
+		const size_t right    = total - left;
+		snprintf (where_, sizeof(where_), "%*s%s%*s(%lXh)",
+			left, filename,
+			ellipsis,
+			right, filename + total,
+			offset);
+	}
 
-  return where_;
+	return where_;
 }
 
 

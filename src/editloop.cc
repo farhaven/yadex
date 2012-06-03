@@ -1933,7 +1933,7 @@ cancel_save_as:
                             char msg[80];
 
                             Beep ();
-                            sprintf (msg, "Linedef #%d already has two sidedefs", cur->objnum);
+                            snprintf (msg, sizeof(msg), "Linedef #%d already has two sidedefs", cur->objnum);
                             Notify (-1, -1, "Error: cannot add the new sector", msg);
                             break;
                         }

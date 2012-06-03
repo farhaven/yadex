@@ -138,7 +138,7 @@ if (texno < 0)
 else
    if (yg_texture_format == YGTF_NAMELESS)
       {
-      sprintf (tex_name, "TEX%04u", (unsigned) texno);
+      snprintf (tex_name, sizeof(tex_name), "TEX%04u", (unsigned) texno);
       return tex_name;
       }
    else
@@ -1453,7 +1453,7 @@ if (yg_texture_lumps == YGTL_TEXTURES
 	 warn ("more than 10,000 textures. Ignoring excess.\n");
 	 break;
 	 }
-      sprintf (WTexture[n + 1], "TEX%04ld", n);
+      snprintf (WTexture[n + 1], WAD_TEX_NAME + 1, "TEX%04ld", n);
       }
    }
    textures04_done:

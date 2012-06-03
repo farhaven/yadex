@@ -84,7 +84,7 @@ const char *Menu_data_ldt::operator[] (size_t n) const
 {
   if (al_lseek (list, n, SEEK_SET) != 0)
   {
-    sprintf (buf, "BUG: al_lseek(%p, %lu): %s",
+    snprintf (buf, sizeof(buf), "BUG: al_lseek(%p, %lu): %s",
       (void *) list, 
       (unsigned long) n,
       al_astrerror (al_aerrno));
@@ -92,11 +92,11 @@ const char *Menu_data_ldt::operator[] (size_t n) const
   }
   const ldtdef_t **pptr = (const ldtdef_t **) al_lptr (list);
   if (pptr == NULL)
-    sprintf (buf, "BUG: al_lptr(%p): %s",
+    snprintf (buf, sizeof(buf), "BUG: al_lptr(%p): %s",
       (void *) list,
       al_astrerror (al_aerrno));
   else
-    sprintf (buf, "%3d - %.70s", (*pptr)->number, (*pptr)->longdesc);
+    snprintf (buf, sizeof(buf), "%3d - %.70s", (*pptr)->number, (*pptr)->longdesc);
   return buf;
 }
 
@@ -136,40 +136,40 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
     case 1:
       for (n = 0; n < 12; n++)
 	menustr[n] = (char *) GetMemory (60);
-      sprintf (menustr[11], "Edit linedef #%d", obj->objnum);
-      sprintf (menustr[0], "Change flags            (Current: %d)",
+      snprintf (menustr[11], 60, "Edit linedef #%d", obj->objnum);
+      snprintf (menustr[0], 60, "Change flags            (Current: %d)",
 	LineDefs[obj->objnum].flags);
-      sprintf (menustr[1], "Change type             (Current: %d)",
+      snprintf (menustr[1], 60, "Change type             (Current: %d)",
 	LineDefs[obj->objnum].type);
-      if (yg_level_format == YGLF_HEXEN)
-	{	sprintf (menustr[2], "Change starting vertex  (Current: #%d)",
+      if (yg_level_format == YGLF_HEXEN) {
+			snprintf (menustr[2], 60, "Change starting vertex  (Current: #%d)",
 			LineDefs[obj->objnum].start);
-		sprintf (menustr[3], "Change ending vertex    (Current: #%d)",
+		snprintf (menustr[3], 60, "Change ending vertex    (Current: #%d)",
 			LineDefs[obj->objnum].end);
-		sprintf (menustr[4], "Change 1st sidedef ref. (Current: #%d)",
+		snprintf (menustr[4], 60, "Change 1st sidedef ref. (Current: #%d)",
 			LineDefs[obj->objnum].sidedef1);
-      		sprintf (menustr[5], "Change 2nd sidedef ref. (Current: #%d)",
+      		snprintf (menustr[5], 60, "Change 2nd sidedef ref. (Current: #%d)",
 			LineDefs[obj->objnum].sidedef2);
-		sprintf (menustr[6], "Change %-17s(Current: %d)",
+		snprintf (menustr[6], 60, "Change %-17s(Current: %d)",
 			GetLineDefArgumentName(LineDefs[obj->objnum].type,1),LineDefs[obj->objnum].tag);
-      		sprintf (menustr[7], "Change %-17s(Current: %d)",
+      		snprintf (menustr[7], 60, "Change %-17s(Current: %d)",
 			GetLineDefArgumentName(LineDefs[obj->objnum].type,2),LineDefs[obj->objnum].arg2);
-      		sprintf (menustr[8], "Change %-17s(Current: %d)",
+      		snprintf (menustr[8], 60, "Change %-17s(Current: %d)",
 			GetLineDefArgumentName(LineDefs[obj->objnum].type,3),LineDefs[obj->objnum].arg3);
-      		sprintf (menustr[9], "Change %-17s(Current: %d)",
+      		snprintf (menustr[9], 60, "Change %-17s(Current: %d)",
 			GetLineDefArgumentName(LineDefs[obj->objnum].type,4),LineDefs[obj->objnum].arg4);
-      		sprintf (menustr[10], "Change %-17s(Current: %d)",
+      		snprintf (menustr[10], 60, "Change %-17s(Current: %d)",
 			GetLineDefArgumentName(LineDefs[obj->objnum].type,5),LineDefs[obj->objnum].arg5);
-	}else
-	{	sprintf (menustr[2], "Change sector tag       (Current: %d)",
+	} else {
+		snprintf (menustr[2], 60, "Change sector tag       (Current: %d)",
 			LineDefs[obj->objnum].tag);
-      		sprintf (menustr[3], "Change starting vertex  (Current: #%d)",
+      		snprintf (menustr[3], 60, "Change starting vertex  (Current: #%d)",
 			LineDefs[obj->objnum].start);
-      		sprintf (menustr[4], "Change ending vertex    (Current: #%d)",
+      		snprintf (menustr[4], 60, "Change ending vertex    (Current: #%d)",
 			LineDefs[obj->objnum].end);
-	  	sprintf (menustr[5], "Change 1st sidedef ref. (Current: #%d)",
+	  	snprintf (menustr[5], 60, "Change 1st sidedef ref. (Current: #%d)",
 			LineDefs[obj->objnum].sidedef1);
-      		sprintf (menustr[6], "Change 2nd sidedef ref. (Current: #%d)",
+      		snprintf (menustr[6], 60, "Change 2nd sidedef ref. (Current: #%d)",
 			LineDefs[obj->objnum].sidedef2);
       	}
 	if (yg_level_format == YGLF_HEXEN)
@@ -480,19 +480,19 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
       ObjectsNeeded (OBJ_SIDEDEFS, 0);
       for (n = 0; n < 7; n++)
 	menustr[n] = (char *) GetMemory (60);
-      sprintf (menustr[6], "Edit sidedef #%d", sdlist->objnum);
+      snprintf (menustr[6], 60, "Edit sidedef #%d", sdlist->objnum);
       texname[WAD_TEX_NAME] = '\0';
       strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
-      sprintf (menustr[0], "Change middle texture   (Current: %s)", texname);
+      snprintf (menustr[0], 60, "Change middle texture   (Current: %s)", texname);
       strncpy (texname, SideDefs[sdlist->objnum].tex1, WAD_TEX_NAME);
-      sprintf (menustr[1], "Change upper texture    (Current: %s)", texname);
+      snprintf (menustr[1], 60, "Change upper texture    (Current: %s)", texname);
       strncpy (texname, SideDefs[sdlist->objnum].tex2, WAD_TEX_NAME);
-      sprintf (menustr[2], "Change lower texture    (Current: %s)", texname);
-      sprintf (menustr[3], "Change texture X offset (Current: %d)",
+      snprintf (menustr[2], 60, "Change lower texture    (Current: %s)", texname);
+      snprintf (menustr[3], 60, "Change texture X offset (Current: %d)",
 	SideDefs[sdlist->objnum].xoff);
-      sprintf (menustr[4], "Change texture Y offset (Current: %d)",
+      snprintf (menustr[4], 60, "Change texture Y offset (Current: %d)",
 	SideDefs[sdlist->objnum].yoff);
-      sprintf (menustr[5], "Change sector ref.      (Current: #%d)",
+      snprintf (menustr[5], 60, "Change sector ref.      (Current: #%d)",
 	SideDefs[sdlist->objnum].sector);
       val = vDisplayMenu (x0 + 42, subwin_y0, menustr[6],
 	menustr[0], YK_, 0,
@@ -607,33 +607,33 @@ int    subwin_y0;
 
 for (n = 0; n < 14; n++)
    menustr[n] = (char *) GetMemory (60);
-sprintf (menustr[13], "Edit thing #%d", obj->objnum);
-sprintf (menustr[0], "Change type          (Current: %s)",
+snprintf (menustr[13], 60,"Edit thing #%d", obj->objnum);
+snprintf (menustr[0], 60,"Change type          (Current: %s)",
          get_thing_name (Things[obj->objnum].type));
-sprintf (menustr[1], "Change angle         (Current: %s)",
+snprintf (menustr[1], 60,"Change angle         (Current: %s)",
          GetAngleName (Things[obj->objnum].angle));
-sprintf (menustr[2], "Change flags         (Current: %s)",
+snprintf (menustr[2], 60,"Change flags         (Current: %s)",
          GetWhenName (Things[obj->objnum].when));
-sprintf (menustr[3], "Change X position    (Current: %d)",
+snprintf (menustr[3], 60,"Change X position    (Current: %d)",
          Things[obj->objnum].xpos);
-sprintf (menustr[4], "Change Y position    (Current: %d)",
+snprintf (menustr[4], 60,"Change Y position    (Current: %d)",
          Things[obj->objnum].ypos);
-sprintf (menustr[5], "Change Z position    (Current: %d)",
+snprintf (menustr[5], 60,"Change Z position    (Current: %d)",
          Things[obj->objnum].height);
-sprintf (menustr[6], "Change TID           (Current: %d)",
+snprintf (menustr[6], 60,"Change TID           (Current: %d)",
          Things[obj->objnum].tid);
-sprintf (menustr[7], "Change special       (Current: %d)",
+snprintf (menustr[7], 60,"Change special       (Current: %d)",
          Things[obj->objnum].special);
-if (yg_level_format == YGLF_HEXEN)
-{	sprintf (menustr[8], "Change %-14s(Current: %d)",
+if (yg_level_format == YGLF_HEXEN) {
+	snprintf (menustr[8], 60,"Change %-14s(Current: %d)",
         	GetLineDefArgumentName(Things[obj->objnum].special,1),Things[obj->objnum].arg1);
-	sprintf (menustr[9], "Change %-14s(Current: %d)",
+	snprintf (menustr[9], 60,"Change %-14s(Current: %d)",
          	GetLineDefArgumentName(Things[obj->objnum].special,2),Things[obj->objnum].arg2);
-	sprintf (menustr[10], "Change %-14s(Current: %d)",
+	snprintf (menustr[10], 60,"Change %-14s(Current: %d)",
          	GetLineDefArgumentName(Things[obj->objnum].special,3),Things[obj->objnum].arg3);
-	sprintf (menustr[11], "Change %-14s(Current: %d)",
+	snprintf (menustr[11], 60,"Change %-14s(Current: %d)",
          	GetLineDefArgumentName(Things[obj->objnum].special,4),Things[obj->objnum].arg4);
-	sprintf (menustr[12], "Change %-14s(Current: %d)",
+	snprintf (menustr[12], 60,"Change %-14s(Current: %d)",
          	GetLineDefArgumentName(Things[obj->objnum].special,5),Things[obj->objnum].arg5);
 }
 if (yg_level_format == YGLF_HEXEN)		// Hexen mode

@@ -218,7 +218,7 @@ char *GetWadFileName (const char *levelname)
       al_fbase_t base;
 
       al_fana (wf->filename, drv, path, base, 0);
-      sprintf (wf->filename, "%s%s%s.bak", drv, path, base);
+      snprintf (wf->filename, strlen(wf->filename), "%s%s%s.bak", drv, path, base);
       verbmsg ("setting wf->filename to %s\n", wf->filename);  // DEBUG
       /* Need to close, then reopen: problems with SHARE.EXE */
       verbmsg ("closing %p\n", wf->fp);				// DEBUG

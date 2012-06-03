@@ -64,7 +64,7 @@ InputInteger (int x0, int y0, int *valp, int minv, int maxv) {
 	DrawScreenBoxHollow (entry_out_x0, entry_out_y0, entry_out_x1, entry_out_y1,
 		BLACK);
 	long val = *valp;
-	sprintf (buf, "%d", *valp);    // FIXME what if we were in hex ?
+	snprintf (buf, bufmaxlen + 1, "%d", *valp);    // FIXME what if we were in hex ?
 	for (bool firstkey = true; ; firstkey = false) {
 		const char *checkp = buf;
 		bool ok = strgetl (checkp, val) == 0

@@ -47,34 +47,31 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "x_mirror.h"
 #include "x_rotate.h"
 
-
 /*
    ask for an object number and check for maximum valid number
    (this is just like InputIntegerValue, but with a different prompt)
 */
 
-int InputObjectNumber (int x0, int y0, int objtype, int curobj)
-{
-int val, key;
-char prompt[80];
+int
+InputObjectNumber (int x0, int y0, int objtype, int curobj) {
+	int val, key;
+	char prompt[80];
 
-sprintf (prompt, "Enter a %s number between 0 and %d:",
-   GetObjectTypeName (objtype), GetMaxObjectNum (objtype));
-if (x0 < 0)
-   x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
-if (y0 < 0)
-   y0 = (ScrMaxY - 55) / 2;
-DrawScreenBox3D (x0, y0, x0 + 25 + 8 * strlen (prompt), y0 + 55);
-set_colour (WHITE);
-DrawScreenText (x0 + 10, y0 + 8, prompt);
-val = curobj;
-while ((key
-       = InputInteger (x0 + 10, y0 + 28, &val, 0, GetMaxObjectNum (objtype)))
-       != YK_RETURN && key != YK_ESC)
-   Beep ();
-return val;
+	snprintf (prompt, sizeof(prompt), "Enter a %s number between 0 and %d:",
+			GetObjectTypeName (objtype), GetMaxObjectNum (objtype));
+	if (x0 < 0)
+		x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
+	if (y0 < 0)
+		y0 = (ScrMaxY - 55) / 2;
+	DrawScreenBox3D (x0, y0, x0 + 25 + 8 * strlen (prompt), y0 + 55);
+	set_colour (WHITE);
+	DrawScreenText (x0 + 10, y0 + 8, prompt);
+	val = curobj;
+	while ((key = InputInteger (x0 + 10, y0 + 28, &val, 0, GetMaxObjectNum (objtype)))
+			!= YK_RETURN && key != YK_ESC)
+		Beep ();
+	return val;
 }
-
 
 /*
  *	input_objid - ask for an object number of the specified	type
@@ -83,109 +80,102 @@ return val;
  *	and objid.num to whatever number the user entered. If
  *	the user hit [Esc], call nil() on objid.
  */
-void input_objid (Objid& objid, const Objid& init, int x0, int y0)
-{
-char prompt[80];
+void
+input_objid (Objid& objid, const Objid& init, int x0, int y0) {
+	char prompt[80];
 
-sprintf (prompt, "Enter a %s number between 0 and %d:",
-   GetObjectTypeName (init.type), GetMaxObjectNum (init.type));
-if (x0 < 0)
-   x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
-if (y0 < 0)
-   y0 = (ScrMaxY - 55) / 2;
-DrawScreenBox3D (x0, y0, x0 + 25 + 8 * strlen (prompt), y0 + 55);
-set_colour (WHITE);
-DrawScreenText (x0 + 10, y0 + 8, prompt);
-int  num = init.num;
-int  key;
-while ((key
-       = InputInteger (x0 + 10, y0 + 28, &num, 0, GetMaxObjectNum (init.type)))
-       != YK_RETURN && key != YK_ESC)
-   Beep ();
-if (key == YK_ESC)
-   objid.nil ();
-else if (key == YK_RETURN)
-   {
-   objid.type = init.type;
-   objid.num  = num;
-   }
-else
-   {
-   nf_bug ("input_objid: bad key %d", (int) key);  // Can't happen
-   objid.nil ();
-   }
+	snprintf(prompt, sizeof(prompt), "Enter a %s number between 0 and %d:",
+	GetObjectTypeName (init.type), GetMaxObjectNum (init.type));
+	if (x0 < 0)
+		x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
+	if (y0 < 0)
+		y0 = (ScrMaxY - 55) / 2;
+	DrawScreenBox3D (x0, y0, x0 + 25 + 8 * strlen (prompt), y0 + 55);
+	set_colour (WHITE);
+	DrawScreenText (x0 + 10, y0 + 8, prompt);
+	int  num = init.num;
+	int  key;
+	while ((key = InputInteger (x0 + 10, y0 + 28, &num, 0, GetMaxObjectNum (init.type)))
+			!= YK_RETURN && key != YK_ESC)
+		Beep ();
+	if (key == YK_ESC)
+		objid.nil ();
+	else if (key == YK_RETURN) {
+		objid.type = init.type;
+		objid.num  = num;
+	} else {
+		nf_bug ("input_objid: bad key %d", (int) key);  // Can't happen
+		objid.nil ();
+	}
 }
-
 
 /*
    ask for an object number and display a warning message
 */
 
-int InputObjectXRef (int x0, int y0, int objtype, bool allownone, int curobj)
-{
-const char *const msg1 = "Warning: modifying the cross-references";
-const char *const msg2 = "between some objects may crash the game.";
-char prompt[80];
-size_t maxlen = 0;
-int width;
-int height;
+int
+InputObjectXRef (int x0, int y0, int objtype, bool allownone, int curobj) {
+	const char *const msg1 = "Warning: modifying the cross-references";
+	const char *const msg2 = "between some objects may crash the game.";
+	char prompt[80];
+	size_t maxlen = 0;
+	int width;
+	int height;
 
-// Dimensions
-sprintf (prompt, "Enter a %s number between 0 and %d%c",
-  GetObjectTypeName (objtype),
-  GetMaxObjectNum (objtype), allownone ? ',' : ':');
-maxlen = 40;				// Why 40 ? -- AYM 2002-04-17
-if (strlen (prompt) > maxlen);
-   maxlen = strlen (prompt);
-if (strlen (msg1) > maxlen)
-   maxlen = strlen (msg1);
-if (strlen (msg2) > maxlen)
-   maxlen = strlen (msg2);
-int ya = 0 + BOX_BORDER + WIDE_VSPACING;
-int yb = ya;
-if (allownone)
-  yb += FONTH;
-int yc = yb + FONTH + WIDE_VSPACING;
-// FIXME should query InputInteger() instead
-int yd = yc + 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH + WIDE_VSPACING;
-int ye = yd + FONTH;
-int yf = ye + FONTH + WIDE_VSPACING + BOX_BORDER;
-width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + maxlen * FONTW;
-height = yf - 0;
+	// Dimensions
+	snprintf (prompt, sizeof(prompt), "Enter a %s number between 0 and %d%c",
+		GetObjectTypeName (objtype), GetMaxObjectNum (objtype), allownone ? ',' : ':');
+	maxlen = 40;				// Why 40 ? -- AYM 2002-04-17
+	if (strlen (prompt) > maxlen);
+		maxlen = strlen (prompt);
+	if (strlen (msg1) > maxlen)
+		maxlen = strlen (msg1);
+	if (strlen (msg2) > maxlen)
+		maxlen = strlen (msg2);
+	int ya = 0 + BOX_BORDER + WIDE_VSPACING;
+	int yb = ya;
+	if (allownone)
+		yb += FONTH;
+	int yc = yb + FONTH + WIDE_VSPACING;
+	// FIXME should query InputInteger() instead
+	int yd = yc + 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH + WIDE_VSPACING;
+	int ye = yd + FONTH;
+	int yf = ye + FONTH + WIDE_VSPACING + BOX_BORDER;
+	width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + maxlen * FONTW;
+	height = yf - 0;
 
-// Position
-if (x0 < 0)
-   x0 = (ScrMaxX - width) / 2;
-if (y0 < 0)
-   y0 = (ScrMaxY - height) / 2;
+	// Position
+	if (x0 < 0)
+		x0 = (ScrMaxX - width) / 2;
+	if (y0 < 0)
+		y0 = (ScrMaxY - height) / 2;
 
-DrawScreenBox3D (x0, y0, x0 + width, y0 + height);
-set_colour (WHITE);
-int x = x0 + BOX_BORDER + WIDE_HSPACING;
-DrawScreenText (x, y0 + ya, prompt);
-if (allownone)
-   DrawScreenText (x, y0 + yb, "or -1 for none:");
-set_colour (LIGHTRED);
-DrawScreenText (x, y0 + yd, msg1);
-DrawScreenText (x, y0 + ye, msg2);
+	DrawScreenBox3D (x0, y0, x0 + width, y0 + height);
+	set_colour (WHITE);
+	int x = x0 + BOX_BORDER + WIDE_HSPACING;
+	DrawScreenText (x, y0 + ya, prompt);
+	if (allownone)
+		DrawScreenText (x, y0 + yb, "or -1 for none:");
+	set_colour (LIGHTRED);
+	DrawScreenText (x, y0 + yd, msg1);
+	DrawScreenText (x, y0 + ye, msg2);
 
-int val = curobj;
-int key;
-int min = allownone ? -1 : 0;
-int max = GetMaxObjectNum (objtype);
-while (key = InputInteger (x, y0 + yc, &val, min, max),
-       key != YK_RETURN && key != YK_ESC)
-   Beep ();
-return val;
+	int val = curobj;
+	int key;
+	int min = allownone ? -1 : 0;
+	int max = GetMaxObjectNum (objtype);
+	while (key = InputInteger (x, y0 + yc, &val, min, max),
+			key != YK_RETURN && key != YK_ESC)
+		Beep ();
+	return val;
 }
-
-
 
 /*
    ask for two vertex numbers and check for maximum valid number
 */
 
-bool Input2VertexNumbers (int x0, int y0, const char *prompt1, int *v1, int *v2) {
+bool
+Input2VertexNumbers (int x0, int y0, const char *prompt1, int *v1, int *v2) {
 	char prompt2[80];
 	int key;
 	int maxlen, first;
@@ -269,8 +259,8 @@ bool Input2VertexNumbers (int x0, int y0, const char *prompt1, int *v1, int *v2)
    edit an object or a group of objects
 */
 
-void EditObjectsInfo (int x0, int y0, int objtype, SelPtr obj) /* SWAP! */
-{
+void
+EditObjectsInfo (int x0, int y0, int objtype, SelPtr obj) /* SWAP! */ {
 char  *menustr[3];
 int    n, val;
 SelPtr cur;
@@ -279,29 +269,22 @@ int    subwin_y0;
 ObjectsNeeded (objtype, 0);
 if (! obj)
    return;
-switch (objtype)
-   {
+switch (objtype) {
    case OBJ_THINGS:
       ThingProperties (x0, y0, obj);
       break;
-
    case OBJ_VERTICES:
-      for (n = 0; n < 3; n++)
-	 menustr[n] = (char *) GetMemory (60);
-      sprintf (menustr[2], "Edit Vertex #%d", obj->objnum);
-      sprintf (menustr[0], "Change X position (Current: %d)",
+		for (n = 0; n < 3; n++)
+			menustr[n] = (char *) GetMemory (60);
+      snprintf (menustr[2], 60, "Edit Vertex #%d", obj->objnum);
+      snprintf (menustr[0], 60, "Change X position (Current: %d)",
          Vertices[obj->objnum].x);
-      sprintf (menustr[1], "Change Y position (Current: %d)",
+      snprintf (menustr[1], 60, "Change Y position (Current: %d)",
          Vertices[obj->objnum].y);
-#ifdef OLDMEN
-      val = DisplayMenuArray (0, y0,
-         menustr[2], 2, NULL, menustr, NULL, NULL, NULL);
-#else
       val = vDisplayMenu (0, y0, menustr[2],
          menustr[0], YK_, 0,
          menustr[1], YK_, 0,
 	 NULL);
-#endif
       for (n = 0; n < 3; n++)
 	 FreeMemory (menustr[n]);
       subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
@@ -649,7 +632,7 @@ int    angle, scale;
 if (val > 1 && ! *list)
    {
    Beep ();
-   sprintf (msg, "You must select at least one %s", GetObjectTypeName (objtype));
+   snprintf (msg, sizeof(msg), "You must select at least one %s", GetObjectTypeName (objtype));
    Notify (-1, -1, msg, 0);
    return;
    }
@@ -660,29 +643,27 @@ switch (val)
    {
    case 1:
       // * -> First free tag number
-      sprintf (msg, "First free tag number: %d", FindFreeTag ());
+      snprintf (msg, sizeof(msg), "First free tag number: %d", FindFreeTag ());
       Notify (-1, -1, msg, 0);
       break;
 
    case 2:
       // * -> Rotate and scale
-      if ((objtype == OBJ_VERTICES) && ! (*list)->next)
-	 {
+      if ((objtype == OBJ_VERTICES) && ! (*list)->next) {
 	 Beep ();
-	 sprintf (msg, "You must select more than one %s",
+	 snprintf (msg, sizeof(msg), "You must select more than one %s",
             GetObjectTypeName (objtype));
 	 Notify (-1, -1, msg, 0);
 	 return;
 	 }
-      if (objtype != OBJ_THINGS)
-      {	angle = 0;
+      if (objtype != OBJ_THINGS) {	angle = 0;
       	scale = 100;
       	if (Input2Numbers (-1, -1, "rotation angle (°)", "scale (%)",
        	  360, 1000, &angle, &scale))
 		 RotateAndScaleObjects (objtype, *list, (double) angle * 0.0174533,
        	     (double) scale * 0.01);
-      }else
-      {	sprintf (msg, "First free TID: %d", FindFreeTID ());
+      } else {
+			snprintf (msg, sizeof(msg), "First free TID: %d", FindFreeTID ());
       		Notify (-1, -1, msg, 0);
       		break;
       }

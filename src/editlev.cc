@@ -76,10 +76,10 @@ char *find_level (const char *name_given)
         char *name1 = (char *) malloc (7);
         char *name2 = (char *) malloc (6);
         if (n > 99)
-            sprintf (name1, "E%dM%02d", n / 100, n % 100);
+            snprintf (name1, sizeof(name1), "E%dM%02d", n / 100, n % 100);
         else
-            sprintf (name1, "E%dM%d", n / 10, n % 10);
-        sprintf (name2, "MAP%02d", n);
+            snprintf (name1, sizeof(name1), "E%dM%d", n / 10, n % 10);
+        snprintf (name2, sizeof(name2), "MAP%02d", n);
         int match1 = FindMasterDir (MasterDir, name1) != NULL;
         int match2 = FindMasterDir (MasterDir, name2) != NULL;
         if (match1 && ! match2)       // Found only ExMy
@@ -233,27 +233,25 @@ done:
  *    WriteYadexLog - Keep track of time spent editing that wad file
  *    FIXME should be in a separate module
  */
-static void WriteYadexLog (const char *file, const char *level, time_t *t0, time_t *t1)
-{
-    al_fspec_t logname;
-    al_fdrv_t  drive;
-    al_fpath_t path;
-    al_fbase_t base;
+static void
+WriteYadexLog (const char *file, const char *level, time_t *t0, time_t *t1) {
+	al_fspec_t logname;
+	al_fdrv_t  drive;
+	al_fpath_t path;
+	al_fbase_t base;
 
-    al_fana (file, drive, path, base, 0);
-    sprintf (logname, "%s%s%s.yl", drive, path, base);
+	al_fana (file, drive, path, base, 0);
+	snprintf (logname, sizeof(logname), "%s%s%s.yl", drive, path, base);
 
-    /* if log file does not already exist, do _not_ create it */
-    if (al_fnature (logname) == 1)
-    {
-        FILE *logfd;
-        logfd = fopen (logname, "a");
-        if (logfd)
-        {
-            struct tm *tm = localtime (t0);
-            fprintf (logfd, "%04d%02d%02d\tedit\t%s\t%ld\n",
-            tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, level, (long)(*t1-*t0)/60);
-            fclose (logfd);
-        }
-    }
+	/* if log file does not already exist, do _not_ create it */
+	if (al_fnature (logname) == 1) {
+		FILE *logfd;
+		logfd = fopen (logname, "a");
+		if (logfd) {
+			struct tm *tm = localtime (t0);
+			fprintf (logfd, "%04d%02d%02d\tedit\t%s\t%ld\n",
+			tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, level, (long)(*t1-*t0)/60);
+			fclose (logfd);
+		}
+	}
 }

@@ -268,7 +268,7 @@ strncpy (texname, SideDefs[(*sdlist)->objnum].tex3, WAD_TEX_NAME);
 if (texname[0] == '-')
   {
   Beep ();
-  sprintf (errormessage, "No texture for sidedef #%d.", (*sdlist)->objnum);
+  snprintf (errormessage, sizeof(errormessage), "No texture for sidedef #%d.", (*sdlist)->objnum);
   Notify (-1, -1, errormessage, 0);
   return;
   }
@@ -283,7 +283,7 @@ if (type_off == 1)    /* source taken from InputObjectNumber */
    int  key;         /* holds value returned by InputInteger */
    char prompt[80];  /* prompt for inital offset input */
 
-   sprintf (prompt, "Enter initial offset between 0 and %d:", (int) texlength);
+   snprintf (prompt, sizeof(prompt), "Enter initial offset between 0 and %d:", (int) texlength);
 
    x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
    y0 = (ScrMaxY - 55) / 2;
@@ -341,7 +341,7 @@ while (*sdlist)  /* main processing loop */
      if (strncmp (SideDefs[(*sdlist)->objnum].tex3, texname,WAD_TEX_NAME))
        {
        Beep ();
-       sprintf (errormessage, "No texture for sidedef #%d.", (*sdlist)->objnum);
+       snprintf (errormessage, sizeof(errormessage), "No texture for sidedef #%d.", (*sdlist)->objnum);
        Notify (-1, -1, errormessage, 0);
        return;
        }
@@ -369,7 +369,7 @@ while (*sdlist)  /* main processing loop */
    if (vert1 != vert2 && vert2 != -1)
      {
      Beep ();
-     sprintf (errormessage, "Linedef #%d is not contiguous"
+     snprintf (errormessage, sizeof(errormessage), "Linedef #%d is not contiguous"
        " with the previous linedef, please reselect.", (*sdlist)->objnum);
      Notify (-1, -1, errormessage, 0);
      return;

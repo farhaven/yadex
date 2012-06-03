@@ -43,7 +43,7 @@ lump_loc_string (char *buf, size_t buf_size, const Lump_loc& lump_loc) {
 		return;
 	}
 	y_filename (buf, len + 1, lump_loc.wad->pathname ());
-	sprintf (buf + strlen (buf), "(%08lXh)",
+	snprintf (buf + strlen (buf), len, "(%08lXh)",
 	(unsigned long) lump_loc.ofs & 0xffffffff);
 }
 

@@ -185,87 +185,82 @@ return val;
    ask for two vertex numbers and check for maximum valid number
 */
 
-bool Input2VertexNumbers (int x0, int y0, const char *prompt1, int *v1, int *v2)
-{
-int  key;
-int  maxlen, first;
-char prompt2[80];
-int text_x0;
-int text_y0;
-int entry1_x0;
-int entry1_y0;
-int entry2_x0;
-int entry2_y0;
-// FIXME should let InputInteger() tell us
-const int entry_width  = 2 * HOLLOW_BORDER + 2 * NARROW_HSPACING + 7 * FONTW;
-const int entry_height = 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH;
+bool Input2VertexNumbers (int x0, int y0, const char *prompt1, int *v1, int *v2) {
+	char prompt2[80];
+	int key;
+	int maxlen, first;
+	int text_x0;
+	int text_y0;
+	int entry1_x0;
+	int entry1_y0;
+	int entry2_x0;
+	int entry2_y0;
+	// FIXME should let InputInteger() tell us
+	const int entry_width  = 2 * HOLLOW_BORDER + 2 * NARROW_HSPACING + 7 * FONTW;
+	const int entry_height = 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH;
 
-sprintf (prompt2, "Enter two numbers between 0 and %d:", NumVertices - 1);
+	snprintf (prompt2, sizeof(prompt2), "Enter two numbers between 0 and %d:", NumVertices - 1);
 
-if (strlen (prompt1) > strlen (prompt2))
-   maxlen = strlen (prompt1);
-else
-   maxlen = strlen (prompt2);
-if (x0 < 0)
-   x0 = (ScrMaxX - 25 - 8 * maxlen) / 2;
-if (y0 < 0)
-   y0 = (ScrMaxY - 75) / 2;
-text_x0 = x0 + BOX_BORDER + WIDE_HSPACING;
-text_y0 = y0 + BOX_BORDER + WIDE_VSPACING;
-entry1_x0 = text_x0 + 13 * FONTW;
-entry1_y0 = text_y0 + 3 * FONTH - HOLLOW_BORDER - NARROW_VSPACING;
-entry2_x0 = entry1_x0;
-entry2_y0 = text_y0 + 5 * FONTH - HOLLOW_BORDER - NARROW_VSPACING;
+	if (strlen (prompt1) > strlen (prompt2))
+		maxlen = strlen (prompt1);
+	else
+		maxlen = strlen (prompt2);
+	if (x0 < 0)
+		x0 = (ScrMaxX - 25 - 8 * maxlen) / 2;
+	if (y0 < 0)
+		y0 = (ScrMaxY - 75) / 2;
+	text_x0 = x0 + BOX_BORDER + WIDE_HSPACING;
+	text_y0 = y0 + BOX_BORDER + WIDE_VSPACING;
+	entry1_x0 = text_x0 + 13 * FONTW;
+	entry1_y0 = text_y0 + 3 * FONTH - HOLLOW_BORDER - NARROW_VSPACING;
+	entry2_x0 = entry1_x0;
+	entry2_y0 = text_y0 + 5 * FONTH - HOLLOW_BORDER - NARROW_VSPACING;
 
-DrawScreenBox3D (x0, y0,
-   x0 + 2 * BOX_BORDER + 2 * WIDE_HSPACING
-      + y_max (entry_width + 13 * FONTW, maxlen * FONTW) - 1,
-   y0 + 2 * BOX_BORDER + 2 * WIDE_VSPACING + 6 * FONTH - 1);
-set_colour (WHITE);
-DrawScreenText (text_x0, text_y0, prompt1);
-set_colour (WINFG);
-DrawScreenText (text_x0, text_y0 + FONTH, prompt2);
-DrawScreenText (text_x0, text_y0 + 3 * FONTH, "Start vertex");
-DrawScreenText (text_x0, text_y0 + 5 * FONTH, "End vertex");
+	DrawScreenBox3D (x0, y0,
+		x0 + 2 * BOX_BORDER + 2 * WIDE_HSPACING
+			+ y_max (entry_width + 13 * FONTW, maxlen * FONTW) - 1,
+		y0 + 2 * BOX_BORDER + 2 * WIDE_VSPACING + 6 * FONTH - 1);
+	set_colour (WHITE);
+	DrawScreenText (text_x0, text_y0, prompt1);
+	set_colour (WINFG);
+	DrawScreenText (text_x0, text_y0 + FONTH, prompt2);
+	DrawScreenText (text_x0, text_y0 + 3 * FONTH, "Start vertex");
+	DrawScreenText (text_x0, text_y0 + 5 * FONTH, "End vertex");
 
-first = 1;
-key = 0;
-for (;;)
-   {
-   DrawScreenBoxHollow (entry1_x0, entry1_y0,
-      entry1_x0 + entry_width - 1, entry1_y0 + entry_height - 1, BLACK);
-   set_colour (first ? WHITE : DARKGREY);
-   DrawScreenText (entry1_x0 + HOLLOW_BORDER + NARROW_HSPACING,
-      entry1_y0 + HOLLOW_BORDER + NARROW_VSPACING, "%d", *v1);
+	first = 1;
+	key = 0;
+	for (;;) {
+		DrawScreenBoxHollow (entry1_x0, entry1_y0,
+			entry1_x0 + entry_width - 1, entry1_y0 + entry_height - 1, BLACK);
+		set_colour (first ? WHITE : DARKGREY);
+		DrawScreenText (entry1_x0 + HOLLOW_BORDER + NARROW_HSPACING,
+			entry1_y0 + HOLLOW_BORDER + NARROW_VSPACING, "%d", *v1);
 
-   DrawScreenBoxHollow (entry2_x0, entry2_y0,
-      entry2_x0 + entry_width - 1, entry2_y0 + entry_height - 1, BLACK);
-   set_colour (! first ? WHITE : DARKGREY);
-   DrawScreenText (entry2_x0 + HOLLOW_BORDER + NARROW_HSPACING,
-      entry2_y0 + HOLLOW_BORDER + NARROW_VSPACING, "%d", *v2);
+		DrawScreenBoxHollow (entry2_x0, entry2_y0,
+			entry2_x0 + entry_width - 1, entry2_y0 + entry_height - 1, BLACK);
+		set_colour (! first ? WHITE : DARKGREY);
+		DrawScreenText (entry2_x0 + HOLLOW_BORDER + NARROW_HSPACING,
+			entry2_y0 + HOLLOW_BORDER + NARROW_VSPACING, "%d", *v2);
 
-   if (first)
-      key = InputInteger (entry1_x0, entry1_y0, v1, 0, NumVertices - 1);
-   else
-      key = InputInteger (entry2_x0, entry2_y0, v2, 0, NumVertices - 1);
-   if (key==YK_LEFT || key==YK_RIGHT || key==YK_TAB || key==YK_BACKTAB)
-      first = !first;
-   else if (key == YK_ESC)
-      break;
-   else if (key == YK_RETURN)
-      {
-      if (first)
-	 first = 0;
-      else if (*v1 < 0 || *v1 >= NumVertices
-            || *v2 < 0 || *v2 >= NumVertices)
-	 Beep ();
-      else
-	 break;
-      }
-   else
-      Beep ();
-   }
-return (key == YK_RETURN);
+		if (first)
+			key = InputInteger (entry1_x0, entry1_y0, v1, 0, NumVertices - 1);
+		else
+			key = InputInteger (entry2_x0, entry2_y0, v2, 0, NumVertices - 1);
+		if (key==YK_LEFT || key==YK_RIGHT || key==YK_TAB || key==YK_BACKTAB)
+			first = !first;
+		else if (key == YK_ESC)
+			break;
+		else if (key == YK_RETURN) {
+			if (first)
+				first = 0;
+			else if (*v1 < 0 || *v1 >= NumVertices || *v2 < 0 || *v2 >= NumVertices)
+				Beep ();
+			else
+				break;
+		} else
+			Beep ();
+		}
+	return (key == YK_RETURN);
 }
 
 

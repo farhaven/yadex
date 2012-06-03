@@ -137,7 +137,7 @@ static int things_table_cmp (const void *a, const void *b)
  *	attributes of the same thing type are queried in a row,
  *	the table search is done only once.
  */
-inline int lookup_thing (wad_ttype_t type)
+inline size_t lookup_thing (wad_ttype_t type)
 {
     if (last_table_idx < nthings && things_table[last_table_idx].type == type)
         return last_table_idx;

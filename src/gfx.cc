@@ -40,8 +40,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 /* Parameters set by the command line args and config file */
 const char *font_name = NULL;    // X: the name of the font to load
-Win_dim initial_window_width ("90%");    // X: the name says it all
-Win_dim initial_window_height ("90%");    // X: the name says it all
+Win_dim initial_window_width ("90%");
+Win_dim initial_window_height ("90%");
 int   no_pixmap;        // X: use no pixmap -- direct window output
 
 /* Global variables */
@@ -91,243 +91,105 @@ int      win_depth;     // The depth of win in bits
 int      x_server_big_endian = 0; // Is the X server big endian ?
 int      ximage_bpp;    // Number of bytes per pixels in XImages
 int      ximage_quantum;// Pad XImages lines to a multiple of that many bytes
-static pcolour_t *app_colour = 0; // Pixel values for the app. colours
+static pcolour_t *app_colour = NULL; // Pixel values for the app. colours
 static int DrawingMode    = 0;    // 0 = copy, 1 = xor
 static int LineThickness  = 0;    // 0 = thin, 1 = thick
 int      text_dot         = 0;    // DrawScreenText() debug flag
 static acolour_t colour_stack[4];
 static int       colour_stack_pointer = 0;
+static acolour_t current_acolour = 0; // Last application colour set by set_colour()
 static Font      font_xfont;
 static bool      default_font = true;
 
-/*
- *    Prototypes
- */
+void
+GfxCreateWindow(Display *dpy, int screen) {
+	int screen_width  = DisplayWidth  (dpy, scn);
+	int screen_height = DisplayHeight (dpy, scn);
 
-/*
- *    InitGfx - initialize the graphics display
- *
- *    Return 0 on success, non-zero on failure
- */
-int InitGfx (void)
-{
-    // Initialization is in fact not necessary
-    int width;
-    int height;
+	/*
+	*    Create the window
+	*/
+	int width  = initial_window_width.pixels  (screen_width);
+	int height = initial_window_height.pixels (screen_height);
+	win = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy),
+		10, 10, width, height, 0, 0, 0);
 
-    /*
-    *    Open display and get screen number
-    */
-    dpy = XOpenDisplay (0);
-    if (! dpy)
-    {
-        err ("Can't open display");
-        return 1;
-    }
-    scn = DefaultScreen (dpy);
-    {
-        verbmsg ("X: server endianness: ");
-        int r = ImageByteOrder (dpy);
-        if (r == LSBFirst)
-        {
-            verbmsg ("little-endian\n");
-            x_server_big_endian = 0;
-        } else if (r == MSBFirst)
-        {
-            verbmsg ("big-endian\n");
-            x_server_big_endian = 1;
-        } else // Can't happen
-        {
-            verbmsg ("unknown\n");
-            warn ("don't understand X server's endianness code %d\n", r);
-            warn ("assuming same endianness as CPU.\n");
-            x_server_big_endian = cpu_big_endian;
-        }
-        }
-        int screen_width  = DisplayWidth  (dpy, scn);
-        int screen_height = DisplayHeight (dpy, scn);
-        // On QNX 6, XFree returns silly values. Use a plausible default instead.
-        if (screen_width == 16383 && screen_height == 16383)
-        {
-            warn ("QNX XFree bug detected (width %d, height %d)\n",
-            screen_width, screen_height);
-            screen_width  = 1024;
-            screen_height = 768;
-        }
+	/* Set window attributes */
+	XWindowAttributes wa;
+	XVisualInfo model;
+	XVisualInfo *vis_info;
+	int nvisuals;
 
-        /*
-        *    Create the window
-        */
-        width  = initial_window_width.pixels  (screen_width);
-        height = initial_window_height.pixels (screen_height);
-        win = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy),
-                                   10, 10, width, height, 0, 0, 0);
-        //win = DefaultRootWindow (dpy);
-        {
-            XWindowAttributes wa;
-            XVisualInfo model;
-            XVisualInfo *vis_info;
-            int nvisuals;
+	XGetWindowAttributes (dpy, win, &wa);
+	win_vis   = wa.visual;
+	win_depth = wa.depth;
+	verbmsg ("X: window depth: %d b\n", win_depth);
 
-            XGetWindowAttributes (dpy, win, &wa);
-            win_vis   = wa.visual;
-            win_depth = wa.depth;
-            verbmsg ("X: window depth: %d b\n", win_depth);
+	/*
+	*    Retrieve info regarding win's visual
+	*/
+	model.visualid = XVisualIDFromVisual (win_vis);
+	vis_info = XGetVisualInfo (dpy, VisualIDMask, &model, &nvisuals);
+	if (!vis_info)
+		fatal_error ("XGetVisualInfo returned NULL for ID %d", model.visualid);
+	if (nvisuals != 1)
+		fatal_error ("XGetVisualInfo returned %d visuals", nvisuals);
+	if (vis_info->depth != win_depth)
+		fatal_error ("Visual depth %d <> win depth %d", vis_info->depth, win_depth);
+	win_vis_id    = vis_info->visualid;
+	win_vis_class = vis_info->c_class;
+	win_ncolours  = vis_info->colormap_size;
+	win_r_mask    = vis_info->red_mask;
+	win_g_mask    = vis_info->green_mask;
+	win_b_mask    = vis_info->blue_mask;
+	XFree (vis_info);
+	verbmsg ("X: visual: id %xh, class ", (unsigned) win_vis_id);
+	switch(win_vis_class) {
+		case PseudoColor:
+			verbmsg ("PseudoColor"); break;
+		case TrueColor:
+			verbmsg ("TrueColor"); break;
+		case DirectColor:
+			verbmsg ("DirectColor"); break;
+		case StaticColor:
+			verbmsg ("StaticColor"); break;
+		case GrayScale:
+			verbmsg ("GrayScale"); break;
+		case StaticGray:
+			verbmsg ("StaticGray");
+		default:
+			verbmsg ("unknown (%d)", win_vis_class);
+	}
+	verbmsg (", colours %d, masks %08lX %08lX %08lX\n",
+	win_ncolours, win_r_mask, win_g_mask, win_b_mask);
 
-            /*
-            *    Retrieve info regarding win's visual
-            */
-            model.visualid = XVisualIDFromVisual (win_vis);
-            vis_info = XGetVisualInfo (dpy, VisualIDMask, &model, &nvisuals);
-            if (! vis_info)
-                fatal_error ("XGetVisualInfo returned NULL for ID %d", model.visualid);
-            if (nvisuals != 1)
-                fatal_error ("XGetVisualInfo returned %d visuals", nvisuals);
-            if (vis_info->depth != win_depth)
-                fatal_error ("Visual depth %d <> win depth %d", vis_info->depth, win_depth);
-            win_vis_id    = vis_info->visualid;
-            // #if defined _cplusplus || defined __cplusplus
-            win_vis_class = vis_info->c_class;
-            /*#elif
-            win_vis_class = vis_info->class;
-#endif */
-            win_ncolours  = vis_info->colormap_size;
-            win_r_mask    = vis_info->red_mask;
-            win_g_mask    = vis_info->green_mask;
-            win_b_mask    = vis_info->blue_mask;
-            XFree (vis_info);
-            verbmsg ("X: visual: id %xh, class ", (unsigned) win_vis_id);
-            if (win_vis_class == PseudoColor)
-                verbmsg ("PseudoColor");
-            else if (win_vis_class == TrueColor)
-                verbmsg ("TrueColor");
-            else if (win_vis_class == DirectColor)
-                verbmsg ("DirectColor");
-            else if (win_vis_class == StaticColor)
-                verbmsg ("StaticColor");
-            else if (win_vis_class == GrayScale)
-                verbmsg ("GrayScale");
-            else if (win_vis_class == StaticGray)
-                verbmsg ("StaticGray");
-            else
-                verbmsg ("unknown (%d)", win_vis_class);
-            verbmsg (", colours %d, masks %08lX %08lX %08lX\n",
-            win_ncolours, win_r_mask, win_g_mask, win_b_mask);
-
-            // Compute win_[rgb]_bits and win_[rgb]_ofs
-            /* FIXME can enter infinite loop if MSb of either mask is set
-            and >> sign extends. */
-            if (win_r_mask)
-            {
-                xpv_t mask;
-                for (mask = win_r_mask, win_r_ofs = 0; ! (mask & 1); mask >>= 1)
-                    win_r_ofs++;
-                for (win_r_bits = 0; mask & 1; mask >>= 1)
-                    win_r_bits++;
-            }
-            if (win_g_mask)
-            {
-                xpv_t mask;
-                for (mask = win_g_mask, win_g_ofs = 0; ! (mask & 1); mask >>= 1)
-                    win_g_ofs++;
-                for (win_g_bits = 0; mask & 1; mask >>= 1)
-                    win_g_bits++;
-            }
-            if (win_b_mask)
-            {
-                xpv_t mask;
-                for (mask = win_b_mask, win_b_ofs = 0; ! (mask & 1); mask >>= 1)
-                    win_b_ofs++;
-                for (win_b_bits = 0; mask & 1; mask >>= 1)
-                    win_b_bits++;
-            }
-            verbmsg ("X: visual: "
-            "r_ofs %d, r_bits %d, ", win_r_ofs, win_r_bits);
-            verbmsg ("g_ofs %d, g_bits %d, ", win_g_ofs, win_g_bits);
-            verbmsg ("b_ofs %d, b_bits %d\n", win_b_ofs, win_b_bits);
-        }
-
-    /*
-    *    Get info relevant to XImages
-    */
-    ximage_bpp     = 0;
-    ximage_quantum = 0;
-    {
-        int nformats = 0;
-        XPixmapFormatValues *format = XListPixmapFormats (dpy, &nformats);
-        if (format == 0 || nformats < 1)
-        {
-            warn ("XListPixmapFormats() trouble (ret=%p, n=%d).\n", format, nformats);
-            goto ximage_done;
-        }
-        /* Pick the best possible pixmap format. Prefer one that has the
-        same depth as the drawable, as it is likely to be the fastest
-        one. Should there be several formats that satisfy that
-        requirement (I don't think that ever happens), prefer the one
-        where the line quantum is equal to the number of bits per
-        pixel, as that is easier to work with. */
-        {
-            const XPixmapFormatValues *best = 0;
-            for (int n = 0; n < nformats; n++)
-            {
-                const XPixmapFormatValues *current = format + n;
-                verbmsg ("X: pixmap format:"
-                " #%d, depth %2d, bits_per_pixel %2d, scanline_pad %2d\n",
-                n, current->depth, current->bits_per_pixel, current->scanline_pad);
-                if (best == 0)
-                {
-                    best = current;
-                    continue;
-                }
-                int cgoodness = 2 * (current->depth == win_depth)
-                                + 1 * (current->scanline_pad == current->bits_per_pixel);
-                int bgoodness = 2 * (best->depth == win_depth)
-                                + 1 * (best->scanline_pad == best->bits_per_pixel);
-                if (cgoodness > bgoodness)
-                    best = current;
-            }
-            verbmsg ("X: pixmap format: best is #%d\n", int (best - format));
-            if (best != 0)
-            {
-                int bits_per_pixel = best->bits_per_pixel;
-                if (bits_per_pixel % 8)  // Paranoia
-                {
-                    round_up (bits_per_pixel, 8);
-                    warn ("XImage format has bad bits_per_pixel %d. Rounding up to %d.\n",
-                          best->bits_per_pixel, bits_per_pixel);
-                }
-                int scanline_pad = best->scanline_pad;
-                if (best->scanline_pad % 8)  // Paranoia
-                {
-                    round_up (scanline_pad, 8);
-                    warn ("XImage format has bad scanline_pad %d. Rounding up to %d.\n",
-                          best->scanline_pad, scanline_pad);
-                }
-                ximage_bpp     = bits_per_pixel / 8;
-                ximage_quantum = scanline_pad   / 8;
-            }
-        }
-        if (ximage_bpp == 0 || ximage_quantum == 0)
-        {
-            warn ("XListPixmapFormats() returned no suitable formats.\n"); 
-            goto ximage_done;
-        }
-ximage_done:
-        if (format != 0)
-            XFree (format);
-    }
-    /* Could not obtain authoritative/good values. Warn and guess
-    plausible values. */
-    if (ximage_bpp == 0 || ximage_quantum == 0)
-    {
-        if (ximage_bpp == 0)
-            ximage_bpp = (win_depth + 7) / 8;
-        if (ximage_quantum == 0)
-            ximage_quantum = 4;
-        warn ("guessing format. Images will probably not be displayed correctly\n");
-    }
-    verbmsg ("X: pixmap format: %d B per pixel, %d B quantum.\n",
-    ximage_bpp, ximage_quantum);
+	// Compute win_[rgb]_bits and win_[rgb]_ofs
+	/* FIXME can enter infinite loop if MSb of either mask is set
+	and >> sign extends. */
+	if (win_r_mask) {
+		xpv_t mask;
+		for (mask = win_r_mask, win_r_ofs = 0; ! (mask & 1); mask >>= 1)
+			win_r_ofs++;
+		for (win_r_bits = 0; mask & 1; mask >>= 1)
+			win_r_bits++;
+	}
+	if (win_g_mask) {
+		xpv_t mask;
+		for (mask = win_g_mask, win_g_ofs = 0; ! (mask & 1); mask >>= 1)
+			win_g_ofs++;
+		for (win_g_bits = 0; mask & 1; mask >>= 1)
+			win_g_bits++;
+	}
+	if (win_b_mask) {
+		xpv_t mask;
+		for (mask = win_b_mask, win_b_ofs = 0; ! (mask & 1); mask >>= 1)
+			win_b_ofs++;
+		for (win_b_bits = 0; mask & 1; mask >>= 1)
+			win_b_bits++;
+	}
+	verbmsg ("X: visual: r_ofs %d, r_bits %d, ", win_r_ofs, win_r_bits);
+	verbmsg ("g_ofs %d, g_bits %d, ", win_g_ofs, win_g_bits);
+	verbmsg ("b_ofs %d, b_bits %d\n", win_b_ofs, win_b_bits);
 
     /*
     *    Further configure the window
@@ -340,59 +202,160 @@ ximage_done:
                   | EnterWindowMask | LeaveWindowMask
                   | ExposureMask
                   | StructureNotifyMask);
+}
 
-    /*
-    *    Possibly load and query the font
-    */
-    {
-        XFontStruct *xqf;
+void
+GfxSetImageEndianess(Display *dpy) {
+	verbmsg ("X: server endianness: ");
+	int r = ImageByteOrder (dpy);
+	if (r == LSBFirst) {
+		verbmsg ("little-endian\n");
+		x_server_big_endian = 0;
+	} else if (r == MSBFirst) {
+		verbmsg ("big-endian\n");
+		x_server_big_endian = 1;
+	} else // Can't happen
+	{
+		verbmsg ("unknown\n");
+		warn ("don't understand X server's endianness code %d\n", r);
+		warn ("assuming same endianness as CPU.\n");
+		x_server_big_endian = cpu_big_endian;
+	}
+}
 
-        // Load the font or use the default font.
-        default_font = true;
-        if (font_name != NULL)
-        {
-            x_catch_on ();  // Catch errors in XLoadFont()
-            font_xfont = XLoadFont (dpy, font_name);
-            if (const char *err_msg = x_error ())
-            {
-                warn("can't load font \"%s\" (%s).\n", font_name, err_msg);
-                warn("using default font instead.\n");
-            }
-            else
-                default_font = false;
-            x_catch_off ();
-        }
+void
+GfxSetupXImageParameters(Display *dpy) {
+	int nformats = 0;
+	ximage_bpp     = 0;
+	ximage_quantum = 0;
 
-        // Query the font we'll use for FONTW, FONTH and FONTYOFS.
-        xqf = XQueryFont (dpy,
-        default_font ? XGContextFromGC (DefaultGC (dpy, scn)) : font_xfont);
-        if (xqf->direction != FontLeftToRight)
-            warn ("this font is not left-to-right !\n");
-        if (xqf->min_byte1 != 0 || xqf->max_byte1 != 0)
-            warn ("this is not a single-byte font !\n");
-        if (xqf->min_char_or_byte2 > 32 || xqf->max_char_or_byte2 < 126)
-            warn ("this font does not support the ASCII character set !\n");
-        if (xqf->min_bounds.width != xqf->max_bounds.width)
-            warn ("this is not a fixed-width font !\n");
-        FONTW     = xqf->max_bounds.width;
-        FONTH     = xqf->ascent + xqf->descent;
-        font_xofs = xqf->min_bounds.lbearing;
-        font_yofs = xqf->max_bounds.ascent;
-        XFreeFontInfo (NULL, xqf, 1);
-        verbmsg ("X: font: metrics: %dx%d, xofs %d, yofs %d\n",
-        FONTW, FONTH, font_xofs, font_yofs);
+	XPixmapFormatValues *format = XListPixmapFormats (dpy, &nformats);
+
+	if (format == NULL || nformats < 1) {
+		warn ("XListPixmapFormats() trouble (ret=%p, n=%d).\n", format, nformats);
+	} else {
+		/* Pick the best possible pixmap format. Prefer one that has the
+		same depth as the drawable, as it is likely to be the fastest
+		one. Should there be several formats that satisfy that
+		requirement (I don't think that ever happens), prefer the one
+		where the line quantum is equal to the number of bits per
+		pixel, as that is easier to work with. */
+		const XPixmapFormatValues *best = 0;
+		for (int n = 0; n < nformats; n++) {
+			 const XPixmapFormatValues *current = format + n;
+			 verbmsg ("X: pixmap format: #%d, depth %2d, bits_per_pixel %2d, scanline_pad %2d\n",
+			 n, current->depth, current->bits_per_pixel, current->scanline_pad);
+			 if (best == 0) {
+				  best = current;
+				  continue;
+			 }
+			 int cgoodness = 2 * (current->depth == win_depth)
+								  + 1 * (current->scanline_pad == current->bits_per_pixel);
+			 int bgoodness = 2 * (best->depth == win_depth)
+								  + 1 * (best->scanline_pad == best->bits_per_pixel);
+			 if (cgoodness > bgoodness)
+				  best = current;
+		}
+		verbmsg ("X: pixmap format: best is #%d\n", int (best - format));
+		if (best != 0) {
+			 int bits_per_pixel = best->bits_per_pixel;
+			 if (bits_per_pixel % 8) {
+				  round_up (bits_per_pixel, 8);
+				  warn ("XImage format has bad bits_per_pixel %d. Rounding up to %d.\n",
+						  best->bits_per_pixel, bits_per_pixel);
+			 }
+			 int scanline_pad = best->scanline_pad;
+			 if (best->scanline_pad % 8) {
+				  round_up (scanline_pad, 8);
+				  warn ("XImage format has bad scanline_pad %d. Rounding up to %d.\n",
+						  best->scanline_pad, scanline_pad);
+			 }
+			 ximage_bpp     = bits_per_pixel / 8;
+			 ximage_quantum = scanline_pad   / 8;
+		}
+	}
+	if (ximage_bpp == 0 || ximage_quantum == 0) {
+		warn ("XListPixmapFormats() returned no suitable formats.\n"); 
+	}
+	if (format != 0)
+		XFree (format);
+
+	/* Could not obtain authoritative/good values. Warn and guess
+	plausible values. */
+	if (ximage_bpp == 0 || ximage_quantum == 0) {
+	  if (ximage_bpp == 0)
+			ximage_bpp = (win_depth + 7) / 8;
+	  if (ximage_quantum == 0)
+			ximage_quantum = 4;
+	  warn ("guessing format. Images will probably not be displayed correctly\n");
+	}
+	verbmsg ("X: pixmap format: %d B per pixel, %d B quantum.\n", ximage_bpp, ximage_quantum);
+}
+
+void
+GfxSetupFont(Display *dpy) {
+	XFontStruct *xqf;
+
+	// Load the font or use the default font.
+	default_font = true;
+	if (font_name != NULL) {
+		x_catch_on ();  // Catch errors in XLoadFont()
+		font_xfont = XLoadFont (dpy, font_name);
+		if (const char *err_msg = x_error ()) {
+		warn("can't load font \"%s\" (%s).\n", font_name, err_msg);
+		warn("using default font instead.\n");
+		} else
+			default_font = false;
+		x_catch_off ();
+	}
+
+	// Query the font we'll use for FONTW, FONTH and FONTYOFS.
+	xqf = XQueryFont (dpy, default_font ? XGContextFromGC (DefaultGC (dpy, scn)) : font_xfont);
+	if (xqf->direction != FontLeftToRight)
+		warn ("this font is not left-to-right !\n");
+	if (xqf->min_byte1 != 0 || xqf->max_byte1 != 0)
+		warn ("this is not a single-byte font !\n");
+	if (xqf->min_char_or_byte2 > 32 || xqf->max_char_or_byte2 < 126)
+		warn ("this font does not support the ASCII character set !\n");
+	if (xqf->min_bounds.width != xqf->max_bounds.width)
+		warn ("this is not a fixed-width font !\n");
+	FONTW     = xqf->max_bounds.width;
+	FONTH     = xqf->ascent + xqf->descent;
+	font_xofs = xqf->min_bounds.lbearing;
+	font_yofs = xqf->max_bounds.ascent;
+	XFreeFontInfo (NULL, xqf, 1);
+	verbmsg ("X: font: metrics: %dx%d, xofs %d, yofs %d\n", FONTW, FONTH, font_xofs, font_yofs);
+}
+
+/*
+ *    InitGfx - initialize the graphics display
+ *
+ *    Return 0 on success, non-zero on failure
+ */
+int
+InitGfx (void) {
+	int width = 0, height = 0;
+
+    dpy = XOpenDisplay (0);
+    if (!dpy) {
+        err ("Can't open display");
+        return 1;
     }
+    scn = DefaultScreen (dpy);
+	 GfxSetImageEndianess(dpy);
+	 GfxCreateWindow(dpy, scn);
+	 GfxSetupXImageParameters(dpy);
+	 GfxSetupFont(dpy);
+
 
     /*
     *    Get/create the colormap
     *    and allocate the colours.
     */
-    if (win_vis_class == PseudoColor)
-    {
+    if (win_vis_class == PseudoColor) {
         verbmsg ("X: running on PseudoColor visual, using private Colormap\n");
         cmap = XCreateColormap (dpy, win, win_vis, AllocNone);
-    }
-    else
+    } else
         cmap = DefaultColormap (dpy, scn);
 
     XSetWindowColormap (dpy, win, cmap);
@@ -409,8 +372,7 @@ ximage_done:
         unsigned long mask;
 
         mask = GCForeground | GCFunction | GCLineWidth;
-        if (! default_font)
-        {
+        if (!default_font) {
             mask |= GCFont;
             gcv.font = font_xfont;
         }
@@ -431,8 +393,7 @@ ximage_done:
     // Unless no_pixmap is set, create the pixmap and its own pet GC.
     if (no_pixmap)
         drw = win;
-    else
-    {
+    else {
         XGCValues gcv;
 
         pixmap = XCreatePixmap (dpy, win, width, height, win_depth);
@@ -453,15 +414,13 @@ ximage_done:
 /*
  *    TermGfx - terminate the graphics display
  */
-void TermGfx ()
-{
+void
+TermGfx () {
     verbmsg ("TermGfx: GfxMode=%d\n", GfxMode);
-    if (GfxMode)
-    {
+    if (GfxMode) {
         int r;
 
-        if (! no_pixmap)
-        {
+        if (!no_pixmap) {
             XFreePixmap (dpy, pixmap);
             XFreeGC     (dpy, pixmap_gc);
         }
@@ -470,14 +429,12 @@ void TermGfx ()
         free_game_colours (game_colour);
         game_colour = 0;
         uncommit_app_colours (app_colour);
-        app_colour = 0;
-        if (cmap != DefaultColormap (dpy, scn))
-        {
+        app_colour = NULL;
+        if (cmap != DefaultColormap (dpy, scn)) {
             verbmsg ("X: freeing Colormap\n");
             XFreeColormap  (dpy, cmap);
         }
-        if (! default_font)
-        {
+        if (!default_font) {
             verbmsg ("X: unloading font\n");
             XUnloadFont (dpy, font_xfont);
         }
@@ -492,8 +449,8 @@ void TermGfx ()
 /*
  *    SetWindowSize - set the size of the edit window
  */
-void SetWindowSize (int width, int height)
-{
+void
+SetWindowSize (int width, int height) {
     // Am I called uselessly ?
     if (width == ScrMaxX + 1 && height == ScrMaxY + 1)
         return;
@@ -504,8 +461,7 @@ void SetWindowSize (int width, int height)
     ScrCenterY = ScrMaxY / 2;
 
     // Replace the old pixmap by another of the new size
-    if (! no_pixmap)
-    {
+    if (! no_pixmap) {
         XFreePixmap (dpy, pixmap);
         pixmap = XCreatePixmap (dpy, win, width, height, win_depth);
         drw = pixmap;
@@ -515,12 +471,11 @@ void SetWindowSize (int width, int height)
 /*
  *    ClearScreen - clear the screen
  */
-void ClearScreen ()
-{
+void
+ClearScreen () {
     if (no_pixmap)
         XClearWindow (dpy, win);
-    else
-    {
+    else {
         XFillRectangle (dpy, pixmap, pixmap_gc, 0, 0, ScrMaxX + 1, ScrMaxY + 1);
         drw = pixmap;  // Redisplaying from scratch so let's use the pixmap
     }
@@ -538,20 +493,12 @@ void ClearScreen ()
  *    the window, not on the pixmap so no need to copy the
  *    pixmap onto the window.
  */
-void update_display ()
-{
-    //if (drw_mods == 0)  // Nothing to do, display is already up to date
-    //   return;
-    //printf (" [");
-    //fflush (stdout);
-    if (! no_pixmap && drw == pixmap)
-    {
-        //putchar ('*');
+void
+update_display () {
+    if (!no_pixmap && drw == pixmap) {
         XCopyArea (dpy, pixmap, win, pixmap_gc, 0, 0, ScrMaxX+1, ScrMaxY+1, 0, 0);
     }
     XFlush (dpy);
-    //printf ("] ");
-    //fflush (stdout);
     drw_mods = 0;
     drw = win;  // If they don't like it, they can call ClearScreen() [HHOS]
 }
@@ -564,8 +511,8 @@ void update_display ()
  *
  *    FIXME this is not a clean way to do things.
  */
-void force_window_not_pixmap ()
-{
+void
+force_window_not_pixmap () {
     drw = win;
 }
 
@@ -574,19 +521,16 @@ void force_window_not_pixmap ()
  *
  *    <colour> must be a physical colour number (a.k.a. pixel value).
  */
-void set_pcolour (pcolour_t colour)
-{
+void
+set_pcolour (pcolour_t colour) {
     XSetForeground (dpy, gc, (xpv_t) colour);
 }
-
-// Last application colour set by set_colour()
-static acolour_t current_acolour = 0;
 
 /*
  *    get_colour - get the current drawing colour
  */
-acolour_t get_colour ()
-{
+acolour_t
+get_colour () {
     return current_acolour;
 }
 
@@ -595,10 +539,8 @@ acolour_t get_colour ()
  *
  *    <colour> must be an application colour number.
  */
-void set_colour (acolour_t colour)
-{
-    if (colour != current_acolour)
-    {
+void set_colour (acolour_t colour) {
+    if (colour != current_acolour) {
         current_acolour = colour;
         XSetForeground (dpy, gc, app_colour[colour]);
     }
@@ -610,10 +552,9 @@ void set_colour (acolour_t colour)
  *    Like set_colour() except that it will only last until
  *    the next call to pop_colour().
  */
-void push_colour (acolour_t colour)
-{
-    if (colour_stack_pointer >= (int) (sizeof colour_stack / sizeof *colour_stack))
-    {
+void
+push_colour (acolour_t colour) {
+    if (colour_stack_pointer >= (int) (sizeof colour_stack / sizeof *colour_stack)) {
         nf_bug ("Colour stack overflow");
         return;
     }
@@ -627,10 +568,9 @@ void push_colour (acolour_t colour)
  *
  *    Cancel the effect of the last call to push_colour().
  */
-void pop_colour (void)
-{
-    if (colour_stack_pointer < 1)
-    {
+void
+pop_colour (void) {
+    if (colour_stack_pointer < 1) {
         nf_bug ("Colour stack underflow");
         return;
     }
@@ -641,10 +581,9 @@ void pop_colour (void)
 /*
  *    SetLineThickness - set the line style (thin or thick)
  */
-void SetLineThickness (int thick)
-{
-    if (!! thick != LineThickness)
-    {
+void
+SetLineThickness (int thick) {
+    if (!! thick != LineThickness) {
         LineThickness = !! thick;
         XGCValues gcv;
         gcv.line_width = LineThickness ? 3 : (DrawingMode ? 1 : 0);
@@ -657,10 +596,9 @@ void SetLineThickness (int thick)
 /*
  *    SetDrawingMode - set the drawing mode (copy or xor)
  */
-void SetDrawingMode (int _xor)
-{
-    if (!! _xor != DrawingMode)
-    {
+void
+SetDrawingMode (int _xor) {
+    if (!! _xor != DrawingMode) {
         DrawingMode = !! _xor;
         XGCValues gcv;
         gcv.function = DrawingMode ? GXxor : GXcopy;
@@ -676,8 +614,8 @@ void SetDrawingMode (int _xor)
  *
  *    The point is drawn at display coordinates (<x>, <y>).
  */
-void draw_point (int x, int y)
-{
+void
+draw_point (int x, int y) {
     XDrawPoint (dpy, drw, gc, x, y);
 }
 
@@ -686,8 +624,8 @@ void draw_point (int x, int y)
  *
  *    The point is drawn at map coordinates (<mapx>, <mapy>)
  */
-void draw_map_point (int mapx, int mapy)
-{
+void
+draw_map_point (int mapx, int mapy) {
     XDrawPoint (dpy, drw, gc, SCREENX (mapx), SCREENY (mapy));
     drw_mods++;
 }
@@ -695,18 +633,18 @@ void draw_map_point (int mapx, int mapy)
 /*
  *    DrawMapLine - draw a line on the screen from map coords
  */
-void DrawMapLine (int mapx1, int mapy1, int mapx2, int mapy2)
-{
+void
+DrawMapLine (int mapx1, int mapy1, int mapx2, int mapy2) {
     XDrawLine (dpy, drw, gc, SCREENX (mapx1), SCREENY (mapy1),
-    SCREENX (mapx2), SCREENY (mapy2));
+		 SCREENX (mapx2), SCREENY (mapy2));
     drw_mods++;
 }
 
 /*
  *    DrawMapCircle - draw a circle on the screen from map coords
  */
-void DrawMapCircle (int mapx, int mapy, int mapradius)
-{
+void
+DrawMapCircle (int mapx, int mapy, int mapradius) {
     XDrawArc (dpy, drw, gc, SCREENX (mapx - mapradius), SCREENY (mapy + mapradius),
               (unsigned int) (2 * mapradius * Scale),
               (unsigned int) (2 * mapradius * Scale), 0, 360*64);
@@ -716,8 +654,8 @@ void DrawMapCircle (int mapx, int mapy, int mapradius)
 /*
  *    DrawMapVector - draw an arrow on the screen from map coords
  */
-void DrawMapVector (int mapx1, int mapy1, int mapx2, int mapy2)
-{
+void
+DrawMapVector (int mapx1, int mapy1, int mapx2, int mapy2) {
     int    scrx1   = SCREENX (mapx1);
     int    scry1   = SCREENY (mapy1);
     int    scrx2   = SCREENX (mapx2);
@@ -738,8 +676,8 @@ void DrawMapVector (int mapx1, int mapy1, int mapx2, int mapy2)
 /*
  *    DrawMapArrow - draw an arrow on the screen from map coords and angle (0 - 65535)
  */
-void DrawMapArrow (int mapx1, int mapy1, unsigned angle)
-{
+void
+DrawMapArrow (int mapx1, int mapy1, unsigned angle) {
     int    mapx2   = mapx1 + (int) (50 * cos (angle / 10430.37835));
     int    mapy2   = mapy1 + (int) (50 * sin (angle / 10430.37835));
     int    scrx1   = SCREENX (mapx1);
@@ -762,8 +700,8 @@ void DrawMapArrow (int mapx1, int mapy1, unsigned angle)
 /*
  *    DrawScreenLine - draw a line on the screen from screen coords
  */
-void DrawScreenLine (int Xstart, int Ystart, int Xend, int Yend)
-{
+void
+DrawScreenLine (int Xstart, int Ystart, int Xend, int Yend) {
     XDrawLine (dpy, drw, gc, Xstart, Ystart, Xend, Yend);
     drw_mods++;
 }
@@ -771,8 +709,8 @@ void DrawScreenLine (int Xstart, int Ystart, int Xend, int Yend)
 /*
  *    DrawScreenLineLen - draw a line on the screen
  */
-void DrawScreenLineLen (int x, int y, int width, int height)
-{
+void
+DrawScreenLineLen (int x, int y, int width, int height) {
     if (width > 0)
         width--;
     else if (width < 0)
@@ -791,8 +729,8 @@ void DrawScreenLineLen (int x, int y, int width, int height)
  *    Unlike most functions here, the 3rd and 4th parameters
  *    specify lengths, not coordinates.
  */
-void DrawScreenRect (int x, int y, int width, int height)
-{
+void
+DrawScreenRect (int x, int y, int width, int height) {
     XDrawRectangle (dpy, drw, gc, x, y, width - 1, height - 1);
     drw_mods++;
 }
@@ -804,8 +742,8 @@ void DrawScreenRect (int x, int y, int width, int height)
  *    (scrx2, scry2) is the bottom right corner
  *    If scrx2 < scrx1 or scry2 < scry1, the function does nothing.
  */
-void DrawScreenBox (int scrx1, int scry1, int scrx2, int scry2)
-{
+void
+DrawScreenBox (int scrx1, int scry1, int scrx2, int scry2) {
     if (scrx2 < scrx1 || scry2 < scry1)
         return;
     // FIXME missing gc fill_style
@@ -821,8 +759,8 @@ void DrawScreenBox (int scrx1, int scry1, int scrx2, int scry2)
  *    (width, height) is the obvious
  *    If width < 1 or height < 1, does nothing.
  */
-void DrawScreenBoxwh (int scrx0, int scry0, int width, int height)
-{
+void
+DrawScreenBoxwh (int scrx0, int scry0, int width, int height) {
     if (width < 1 || height < 1)
         return;
     // FIXME missing gc fill_style
@@ -835,8 +773,8 @@ void DrawScreenBoxwh (int scrx0, int scry0, int width, int height)
  *
  *    The 3D border is rather wide (BOX_BORDER pixels wide).
  */
-void DrawScreenBox3D (int scrx1, int scry1, int scrx2, int scry2)
-{
+void
+DrawScreenBox3D (int scrx1, int scry1, int scrx2, int scry2) {
     DrawScreenBox3DShallow (scrx1, scry1, scrx2, scry2);
 
     push_colour (WINBG_DARK);
@@ -857,8 +795,8 @@ void DrawScreenBox3D (int scrx1, int scry1, int scrx2, int scry2)
  *    Same thing as DrawScreenBox3D but shallow (the 3D border
  *    is NARROW_BORDER pixels wide).
  */
-void DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2)
-{
+void
+DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2) {
     push_colour (WINBG);
     XFillRectangle (dpy, drw, gc, scrx1+1, scry1+1, scrx2-scrx1, scry2-scry1);
     set_colour (WINBG_DARK);
@@ -879,51 +817,49 @@ void DrawScreenBox3DShallow (int scrx1, int scry1, int scrx2, int scry2)
  *    (thickness) is the thickness of the border in pixels.
  *    (raised) is zero for depressed, non-zero for raised.
  */
-void draw_box_border (int x, int y, int width, int height,
-      int thickness, int raised)
-{
-    int n;
-    XPoint points[3];
+void
+draw_box_border (int x, int y, int width, int height,
+		int thickness, int raised) {
+	int n;
+	XPoint points[3];
 
-    // We want offsets, not distances
-    width--;
-    height--;
+	// We want offsets, not distances
+	width--;
+	height--;
 
-    // Draw the right and bottom edges
-    push_colour (raised ? WINBG_DARK : WINBG_LIGHT);
-    points[0].x = x + width;
-    points[0].y = y;
-    points[1].x = 0;
-    points[1].y = height;
-    points[2].x = -width;
-    points[2].y = 0;
-    for (n = 0; n < thickness; n++)
-    {
-        XDrawLines (dpy, drw, gc, points, 3, CoordModePrevious);
-        points[0].x--;
-        points[0].y++;
-        points[1].y--;
-        points[2].x++;
-    }
+	// Draw the right and bottom edges
+	push_colour (raised ? WINBG_DARK : WINBG_LIGHT);
+	points[0].x = x + width;
+	points[0].y = y;
+	points[1].x = 0;
+	points[1].y = height;
+	points[2].x = -width;
+	points[2].y = 0;
+	for (n = 0; n < thickness; n++) {
+		XDrawLines (dpy, drw, gc, points, 3, CoordModePrevious);
+		points[0].x--;
+		points[0].y++;
+		points[1].y--;
+		points[2].x++;
+	}
 
-    // Draw the left and top edges
-    set_colour (raised ? WINBG_LIGHT : WINBG_DARK);
-    points[0].x = x;
-    points[0].y = y + height;
-    points[1].x = 0;
-    points[1].y = -height;
-    points[2].x = width;
-    points[2].y = 0;
-    for (n = 0; n < thickness; n++)
-    {
-        XDrawLines (dpy, drw, gc, points, 3, CoordModePrevious);
-        points[0].x++;
-        points[0].y--;
-        points[1].y++;
-        points[2].x--;
-    }
+	// Draw the left and top edges
+	set_colour (raised ? WINBG_LIGHT : WINBG_DARK);
+	points[0].x = x;
+	points[0].y = y + height;
+	points[1].x = 0;
+	points[1].y = -height;
+	points[2].x = width;
+	points[2].y = 0;
+	for (n = 0; n < thickness; n++) {
+		XDrawLines (dpy, drw, gc, points, 3, CoordModePrevious);
+		points[0].x++;
+		points[0].y--;
+		points[1].y++;
+		points[2].x--;
+	}
 
-    pop_colour ();
+	pop_colour ();
 }
 
 /*
@@ -931,8 +867,8 @@ void draw_box_border (int x, int y, int width, int height,
  *
  *    The 3D border is HOLLOW_BORDER pixels wide.
  */
-void DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t colour)
-{
+void
+DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t colour) {
       push_colour (colour);
       XFillRectangle (dpy, drw, gc,
           scrx1 + HOLLOW_BORDER, scry1 + HOLLOW_BORDER,
@@ -952,8 +888,8 @@ void DrawScreenBoxHollow (int scrx1, int scry1, int scrx2, int scry2, acolour_t 
  *
  *    In a hollow box; max. value = 1.0
  */
-void DrawScreenMeter (int scrx1, int scry1, int scrx2, int scry2, float value)
-{
+void
+DrawScreenMeter (int scrx1, int scry1, int scrx2, int scry2, float value) {
     printf ("DrawScreenMeter()\n");  // FIXME
 }
 

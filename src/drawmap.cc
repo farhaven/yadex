@@ -740,27 +740,11 @@ static void draw_things_sprites (edit_t *e)
 
 /*
  *	draw_obj_no - draw a number at screen coordinates (x, y)
- *
- *	FIXME too slow.
  */
 static void draw_obj_no (int x, int y, int obj_no, acolour_t c)
 {
-  push_colour (BLACK);
-#if 1
-  DrawScreenText (x - 2, y,     "%d", obj_no);
-  DrawScreenText (x - 1, y,     "%d", obj_no);
-  DrawScreenText (x + 1, y,     "%d", obj_no);
-  DrawScreenText (x + 2, y,     "%d", obj_no);
-  DrawScreenText (x,     y + 1, "%d", obj_no);
-  DrawScreenText (x,     y - 1, "%d", obj_no);
-#else
-  DrawScreenText (x + 1, y + 1, "%d", obj_no);
-  DrawScreenText (x + 1, y - 1, "%d", obj_no);
-  DrawScreenText (x - 1, y + 1, "%d", obj_no);
-  DrawScreenText (x - 1, y - 1, "%d", obj_no);
-#endif
-  set_colour (c);
-  DrawScreenText (x,     y,     "%d", obj_no);
-  pop_colour ();
+	push_colour(c);
+	DrawScreenText (x, y, "%d", obj_no);
+	pop_colour ();
 }
 

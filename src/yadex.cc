@@ -907,7 +907,7 @@ static void MainLoop ()
             if (out)
                 *out = '\0';
             out = (char *) GetMemory (strlen (com) + 1);
-            strcpy (out, com);
+            strncpy (out, com, strlen(com));
             OpenPatchWad (out);
             CloseUnusedWadFiles ();
         }
@@ -1096,7 +1096,7 @@ viewtex_end:;
             fclose (file);
         }
         /* user asked to encapsulate a raw file in a pwad file */
-        else if (strcmp (com, "insert") == 0 || strcmp (com, "i") == 0)
+        else if (strncmp (com, "insert", sizeof("insert")) == 0 || strncmp (com, "i", sizeof("i")) == 0)
         {
             com = strtok (NULL, " ");
             if (com == NULL)

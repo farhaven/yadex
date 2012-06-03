@@ -838,13 +838,13 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
             switch (o->opt_type)
             {
                 case OPT_BOOLEAN:
-                    if (! strcmp (value, "yes") || ! strcmp (value, "true")
-                        || ! strcmp (value, "on") || ! strcmp (value, "1"))
+                    if (! strncmp (value, "yes", sizeof("yes")) || ! strncmp (value, "true", sizeof("true"))
+                        || ! strncmp (value, "on", sizeof("on")) || ! strncmp (value, "1", sizeof("1")))
                     {
                         if (o->data_ptr)
                             *((bool *) (o->data_ptr)) = true;
-                    } else if (! strcmp (value, "no") || ! strcmp (value, "false")
-                             || ! strcmp (value, "off") || ! strcmp (value, "0"))
+                    } else if (! strncmp (value, "no", sizeof("no")) || ! strncmp (value, "false", sizeof("false"))
+                             || ! strncmp (value, "off", sizeof("off")) || ! strncmp (value, "0", sizeof("0")))
                     {
                         if (o->data_ptr)
                             *((bool *) (o->data_ptr)) = false;

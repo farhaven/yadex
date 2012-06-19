@@ -24,7 +24,9 @@ Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-
+#ifdef __linux__
+#include <linux/stat.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 

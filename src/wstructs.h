@@ -34,7 +34,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_WSTRUCTS	// To prevent multiple inclusion
 #define YH_WSTRUCTS	// To prevent multiple inclusion
 
-
+#include <stdint.h>
 // FIXME: all identifiers should start with wad_ or WAD_...
 
 

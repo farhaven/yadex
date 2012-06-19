@@ -68,6 +68,7 @@ GC       gc;         // Default GC as set by set_colour(), SetDrawingMode()
 GC       pixmap_gc;  // The GC used to clear the pixmap
 Window   win;        // The X window
 Pixmap   pixmap;     // The X pixmap (if any)
+int width, height;   // Window width and height
 Drawable drw;        // Points to either <win> or <pixmap>
 int      drw_mods;   // Number of modifications to drw since last call to
                      // update_display(). Number of modifications to drw
@@ -109,8 +110,8 @@ GfxCreateWindow(Display *dpy, int screen) {
 	/*
 	*    Create the window
 	*/
-	int width  = initial_window_width.pixels  (screen_width);
-	int height = initial_window_height.pixels (screen_height);
+	width  = initial_window_width.pixels  (screen_width);
+	height = initial_window_height.pixels (screen_height);
 	win = XCreateSimpleWindow (dpy, DefaultRootWindow (dpy),
 		10, 10, width, height, 0, 0, 0);
 
@@ -334,18 +335,16 @@ GfxSetupFont(Display *dpy) {
  */
 int
 InitGfx (void) {
-	int width = 0, height = 0;
-
-    dpy = XOpenDisplay (0);
-    if (!dpy) {
-        err ("Can't open display");
-        return 1;
-    }
-    scn = DefaultScreen (dpy);
-	 GfxSetImageEndianess(dpy);
-	 GfxCreateWindow(dpy, scn);
-	 GfxSetupXImageParameters(dpy);
-	 GfxSetupFont(dpy);
+	dpy = XOpenDisplay (0);
+	if (!dpy) {
+		err ("Can't open display");
+		return 1;
+	}
+	scn = DefaultScreen (dpy);
+	GfxSetImageEndianess(dpy);
+	GfxCreateWindow(dpy, scn);
+	GfxSetupXImageParameters(dpy);
+	GfxSetupFont(dpy);
 
 
     /*

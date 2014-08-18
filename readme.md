@@ -16,14 +16,14 @@ PREREQUISITES
 
 You need:
 
-* Some flavour of Unix (known to work with AIX, FreeBSD, HP-UX,
-  Irix, Linux, NetBSD, OpenBSD, OpenUnix, QNX and Solaris),
-* X11R6 or X11R5 and a display of at least 640x480,
+* Some flavour of Unix (known to work with FreeBSD, Linux, NetBSD, OpenBSD)
+* X11R6/Xorg and a display of at least 640x480,
 * a Doom/Doom II/Heretic/Strife iwad (shareware/demo is OK),
-* GNU make (vanilla make won't do),
+* GNU make (BSD Make won't do),
 * a standard C compiler (ISO 9899:1990),
 * a standard C++ compiler,
 * `hypot()` and either `nanosleep()` or `usleep()`.
+* the links web browser to build the FAQ
 
 BUILDING AND INSTALLING
 -----------------------
@@ -46,8 +46,8 @@ To force the use of a particular C/C++ compiler :
     make
     make install
 
-Got problems getting Yadex to compile ? See doc/faq.html.
-Got no problem ? Read the FAQ anyway. See doc/faq.html.
+Got problems getting Yadex to compile? See doc/faq.html.
+Got no problem? Read the FAQ anyway. See doc/faq.html.
 
 Beware, the installation OVERWRITES the following files (assuming
 you're installing in /usr/local) :
@@ -117,6 +117,7 @@ LEGAL
 
 Yadex
 :
+    Parts copyright Gregor Best 2010-2014, GNU GPL v2
     Parts copyright Andrew Apted 2000-2001, GNU GPL v2
     Parts copyright André Majorel 1997-2003, GNU GPL v2
     Parts copyright Matthew W. Miller 2000, GNU GPL v2

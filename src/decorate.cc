@@ -76,7 +76,8 @@ parse_line(void) {
 // this function pushes a thing definition onto the stack of things
 // this is done only if buf.number is set,which means we are talking
 // about a complete new,placable thing
-void update_thingdefs(void) {
+void
+update_thingdefs(void) {
     if (buf.number) {
         if (al_lwrite (thingdef, &buf))
              fatal_error ("LGD4 (%s)", al_astrerror (al_aerrno));
@@ -92,7 +93,8 @@ void update_thingdefs(void) {
     buf.scale      = 1;
 }
 
-void read_decorate (void) {
+void
+read_decorate (void) {
     // FIXME:
     // the decorate lump should directly be read from the
     // wad and not from a temporary file

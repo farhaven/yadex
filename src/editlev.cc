@@ -76,10 +76,10 @@ char *find_level (const char *name_given)
         char *name1 = (char *) malloc (7);
         char *name2 = (char *) malloc (6);
         if (n > 99)
-            snprintf (name1, sizeof(name1), "E%dM%02d", n / 100, n % 100);
+            snprintf (name1, 7, "E%dM%02d", n / 100, n % 100);
         else
-            snprintf (name1, sizeof(name1), "E%dM%d", n / 10, n % 10);
-        snprintf (name2, sizeof(name2), "MAP%02d", n);
+            snprintf (name1, 7, "E%dM%d", n / 10, n % 10);
+        snprintf (name2, 6, "MAP%02d", n);
         int match1 = FindMasterDir (MasterDir, name1) != NULL;
         int match2 = FindMasterDir (MasterDir, name2) != NULL;
         if (match1 && ! match2)       // Found only ExMy

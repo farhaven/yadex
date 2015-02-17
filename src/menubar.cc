@@ -229,8 +229,8 @@ void menubar_c::clear ()
 void menubar_c::draw ()
 {
     // Draw the menu bar itself
-    if (bar_visible && ! bar_visible_disp
-        || highlighted_no != highlighted_no_disp)
+    if ((bar_visible && ! bar_visible_disp)
+        || (highlighted_no != highlighted_no_disp))
     {
         if (stale_x0_x1)
             compute_x0_x1 ();

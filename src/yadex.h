@@ -434,7 +434,6 @@ const char *GetLineDefTypeLongName (int);
 const char *GetLineDefFlagsName (int);
 const char *GetLineDefFlagsLongName (int);
 const char *GetLineDefArgumentName(int,int);
-const char *GetSectorTypeName (int);
 
 // nop.cc
 void nop (...);

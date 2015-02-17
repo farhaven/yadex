@@ -71,8 +71,8 @@ const char
 	else {
 		const char  *ellipsis = "...";
 		const size_t total    = name_len_max - strlen (ellipsis);
-		const size_t left     = total / 2;
-		const size_t right    = total - left;
+		const int left     = total / 2;
+		const int right    = total - left;
 		snprintf (where_, sizeof(where_), "%*s%s%*s(%lXh)",
 			left, filename,
 			ellipsis,

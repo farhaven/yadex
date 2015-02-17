@@ -854,13 +854,13 @@ bool CheckStartingPos () /* SWAP! */
     {
         if (dm == 0)
             snprintf (msg1, sizeof(msg1), "Warning: there are no deathmatch starts."
-                           " You need at least %d", DOOM_MIN_DEATHMATCH_STARTS);
+                           " You need at least %lu", DOOM_MIN_DEATHMATCH_STARTS);
         else if (dm == 1)
             snprintf (msg1, sizeof(msg2), "Warning: there is only one deathmatch start."
-                           " You need at least %d", DOOM_MIN_DEATHMATCH_STARTS);
+                           " You need at least %lu", DOOM_MIN_DEATHMATCH_STARTS);
         else
-            snprintf (msg1, sizeof(msg1), "Warning: there are only %d deathmatch starts."
-                           " You need at least %d", dm, DOOM_MIN_DEATHMATCH_STARTS);
+            snprintf (msg1, sizeof(msg1), "Warning: there are only %lu deathmatch starts."
+                           " You need at least %lu", dm, DOOM_MIN_DEATHMATCH_STARTS);
             snprintf (msg2, sizeof(msg2), "deathmatch starts to play deathmatch games."
                            " Save anyway ?");
         if (! Confirm (-1, -1, msg1, msg2))

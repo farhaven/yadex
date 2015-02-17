@@ -43,14 +43,13 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 bitvec_c *linedefs_of_sector (obj_no_t s)
 {
-bitvec_c *linedefs = new bitvec_c (NumLineDefs);
-for (int n = 0; n < NumLineDefs; n++)
-   if (is_sidedef (LineDefs[n].sidedef1)
-       && SideDefs[LineDefs[n].sidedef1].sector == s
-    || is_sidedef (LineDefs[n].sidedef2)
-       && SideDefs[LineDefs[n].sidedef2].sector == s)
-      linedefs->set (n);
-return linedefs;
+	bitvec_c *linedefs = new bitvec_c (NumLineDefs);
+	for (int n = 0; n < NumLineDefs; n++) {
+		if ((is_sidedef (LineDefs[n].sidedef1) && SideDefs[LineDefs[n].sidedef1].sector == s)
+				|| (is_sidedef (LineDefs[n].sidedef2) && SideDefs[LineDefs[n].sidedef2].sector == s))
+			linedefs->set (n);
+	}
+	return linedefs;
 }
 
 
@@ -61,16 +60,15 @@ return linedefs;
  */
 bitvec_c *linedefs_of_sectors (SelPtr list)
 {
-bitvec_c *sectors  = list_to_bitvec (list, NumSectors);
-bitvec_c *linedefs = new bitvec_c (NumLineDefs);
-for (int n = 0; n < NumLineDefs; n++)
-   if (   is_sidedef (LineDefs[n].sidedef1)
-          && sectors->get (SideDefs[LineDefs[n].sidedef1].sector)
-       || is_sidedef (LineDefs[n].sidedef2)
-          && sectors->get (SideDefs[LineDefs[n].sidedef2].sector))
-      linedefs->set (n);
-delete sectors;
-return linedefs;
+	bitvec_c *sectors  = list_to_bitvec (list, NumSectors);
+	bitvec_c *linedefs = new bitvec_c (NumLineDefs);
+	for (int n = 0; n < NumLineDefs; n++) {
+		if ((is_sidedef (LineDefs[n].sidedef1) && sectors->get (SideDefs[LineDefs[n].sidedef1].sector))
+				|| (is_sidedef (LineDefs[n].sidedef2) && sectors->get (SideDefs[LineDefs[n].sidedef2].sector)))
+			linedefs->set (n);
+	}
+	delete sectors;
+	return linedefs;
 }
 
 
@@ -84,25 +82,22 @@ return linedefs;
  */
 int linedefs_of_sector (obj_no_t s, obj_no_t *&array)
 {
-int count = 0;
-for (int n = 0; n < NumLineDefs; n++)
-   if (   is_sidedef (LineDefs[n].sidedef1)
-          && SideDefs[LineDefs[n].sidedef1].sector == s
-       || is_sidedef (LineDefs[n].sidedef2)
-          && SideDefs[LineDefs[n].sidedef2].sector == s)
-      count++;
-if (count > 0)
-   {
-   array = new obj_no_t[count];
-   count = 0;
-   for (int n = 0; n < NumLineDefs; n++)
-      if (   is_sidedef (LineDefs[n].sidedef1)
-	     && SideDefs[LineDefs[n].sidedef1].sector == s
-	  || is_sidedef (LineDefs[n].sidedef2)
-	     && SideDefs[LineDefs[n].sidedef2].sector == s)
-	 array[count++] = n;
-   }
-return count;
+	int count = 0;
+	for (int n = 0; n < NumLineDefs; n++) {
+		if ((is_sidedef (LineDefs[n].sidedef1) && SideDefs[LineDefs[n].sidedef1].sector == s)
+				|| (is_sidedef (LineDefs[n].sidedef2) && SideDefs[LineDefs[n].sidedef2].sector == s))
+			count++;
+	}
+	if (count > 0) {
+		array = new obj_no_t[count];
+		count = 0;
+		for (int n = 0; n < NumLineDefs; n++) {
+			if ((is_sidedef (LineDefs[n].sidedef1) && SideDefs[LineDefs[n].sidedef1].sector == s)
+					|| (is_sidedef (LineDefs[n].sidedef2) && SideDefs[LineDefs[n].sidedef2].sector == s))
+				array[count++] = n;
+		}
+	}
+	return count;
 }
 
 

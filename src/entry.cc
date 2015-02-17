@@ -97,11 +97,12 @@ InputInteger (int x0, int y0, int *valp, int minv, int maxv) {
 			*valp = IIV_CANCEL;    // Return an out of range value
 			break;
 		} else if (is_ordinary (key) && strlen (buf) < bufmaxlen) {
-			if (firstkey)
+			if (firstkey) {
 				if (key == ' ')    // Kludge : hit space to append to initial value
 					continue;
-			else
+			} else {
 				*buf = '\0';
+			}
 			al_sapc (buf, key, bufmaxlen);
 		} else
 			Beep ();

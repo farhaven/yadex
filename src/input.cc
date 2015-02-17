@@ -127,7 +127,7 @@ void get_input_status ()
     {
         // No event ? Wait for <idle_sleep_ms> ms before polling again.
 #if defined Y_NANOSLEEP
-        struct timespec treq = { 0, 1000000ul * idle_sleep_ms };
+        struct timespec treq = { 0, 1000000l * idle_sleep_ms };
         struct timespec trem;
         nanosleep (&treq, &trem);
 #elif defined Y_USLEEP

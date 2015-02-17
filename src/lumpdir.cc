@@ -154,9 +154,8 @@ void Lump_dir::refresh ()
 	break;
       }
       // Ended by X_END or, if started by XX_START, XX_END.
-      if (! x_end.cmp (dir->dir.name)
-	|| end_label == xx_end.name && ! xx_end.cmp (dir->dir.name))
-      {
+		if (! x_end.cmp (dir->dir.name)
+				|| (end_label == xx_end.name && ! xx_end.cmp (dir->dir.name))) {
 	if (dir->dir.size != 0)
 	  warn ("%.128s: label %.*s has non-zero size %ld\n",
 	      dir->wadfile->pathname (),

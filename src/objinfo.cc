@@ -40,6 +40,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "imgspect.h"
 #include "l_super.h"
 #include "levels.h"
+#include "names.h"
 #include "objid.h"
 #include "objinfo.h"
 #include "pic2img.h"
@@ -107,7 +108,7 @@ void objinfo_c::draw ()
   int  height;
 
   // Am I already drawn ?
-  if (! is_obj (obj_no) || obj_no == obj_no_disp && obj_type == obj_type_disp)
+  if (! is_obj (obj_no) || (obj_no == obj_no_disp && obj_type == obj_type_disp))
     return;
 
   // Does the box need to be redrawn ?
@@ -507,10 +508,10 @@ void objinfo_c::draw ()
 	  set_colour (WINTITLE);
 	  DrawScreenString (ix0, iy0, "Superimposed");
 	  set_colour (WINFG);
-	  iy0 += int (1.5 * FONTH);
+	  iy0 += (int)(1.5 * FONTH);
 	  while (l != -1)
 	  {
-	    if (iy0 + FONTH - 1 <= iy1)
+	    if ((signed)(iy0 + FONTH - 1) <= iy1)
 	      DrawScreenText (ix0, iy0, "#%d", l);
 	    /* Too many linedefs, replace the last one by "(more)".
 	       Not elegant, but it makes the code simpler. */
@@ -619,7 +620,7 @@ void objinfo_c::draw ()
       DrawScreenText (-1, -1, "\1Ceiling:\2  %.*s", WAD_FLAT_NAME, sec->ceilt);
       DrawScreenText (-1, -1, "\1Light:\2    %d",   sec->light);
       DrawScreenText (-1, -1, "\1Type:\2 %3d %.14s",
-	sec->special, GetSectorTypeName (sec->special));
+	sec->special, GetSectorTypeName (sec->special).c_str());
       {
 	int tag       = sec->tag;
 	int first_ld  = NumLineDefs;

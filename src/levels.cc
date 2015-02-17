@@ -245,7 +245,6 @@ if (NumThings > 0)
    if (yg_level_format == YGLF_HEXEN)		// Hexen mode
       for (long n = 0; n < NumThings; n++)
 	 {
-         uint8_t dummy2[6];
 	 wf->read_int16_t   (&Things[n].tid  );
 	 wf->read_int16_t   (&Things[n].xpos );
 	 wf->read_int16_t   (&Things[n].ypos );

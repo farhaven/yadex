@@ -310,10 +310,10 @@ static void draw_linedefs (edit_t *e)
 	register int x2 = Vertices[LineDefs[n].end  ].x;
 	register int y1 = Vertices[LineDefs[n].start].y;
 	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if (x1 < mapx0 && x2 < mapx0
-	 || x1 > mapx9 && x2 > mapx9
-	 || y1 < mapy0 && y2 < mapy0
-	 || y1 > mapy9 && y2 > mapy9)
+	if ((x1 < mapx0 && x2 < mapx0)
+			|| (x1 > mapx9 && x2 > mapx9)
+			|| (y1 < mapy0 && y2 < mapy0)
+			|| (y1 > mapy9 && y2 > mapy9))
 	  continue;
 	if (LineDefs[n].flags & 1)
 	  new_colour = WHITE;
@@ -334,10 +334,10 @@ static void draw_linedefs (edit_t *e)
 	register int x2 = Vertices[LineDefs[n].end  ].x;
 	register int y1 = Vertices[LineDefs[n].start].y;
 	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if (x1 < mapx0 && x2 < mapx0
-	 || x1 > mapx9 && x2 > mapx9
-	 || y1 < mapy0 && y2 < mapy0
-	 || y1 > mapy9 && y2 > mapy9)
+	if ((x1 < mapx0 && x2 < mapx0)
+			||(x1 > mapx9 && x2 > mapx9)
+			||(y1 < mapy0 && y2 < mapy0)
+			||(y1 > mapy9 && y2 > mapy9))
 	  continue;
 	DrawMapVector (x1, y1, x2, y2);
       }
@@ -354,11 +354,11 @@ static void draw_linedefs (edit_t *e)
 	register int x2 = Vertices[LineDefs[n].end  ].x;
 	register int y1 = Vertices[LineDefs[n].start].y;
 	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if (x1 < mapx0 && x2 < mapx0
-	 || x1 > mapx9 && x2 > mapx9
-	 || y1 < mapy0 && y2 < mapy0
-	 || y1 > mapy9 && y2 > mapy9)
-	  continue;
+	if ((x1 < mapx0 && x2 < mapx0)
+			|| (x1 > mapx9 && x2 > mapx9)
+			|| (x1 < mapy0 && y2 < mapy0)
+			|| (y1 > mapy9 && y2 > mapy9))
+		continue;
 	if (LineDefs[n].type != 0)  /* AYM 19980207: was "> 0" */
 	{
 	  if (LineDefs[n].tag != 0)  /* AYM 19980207: was "> 0" */
@@ -416,10 +416,10 @@ static void draw_linedefs (edit_t *e)
 	register int x2 = Vertices[LineDefs[n].end  ].x;
 	register int y1 = Vertices[LineDefs[n].start].y;
 	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if (x1 < mapx0 && x2 < mapx0
-	 || x1 > mapx9 && x2 > mapx9
-	 || y1 < mapy0 && y2 < mapy0
-	 || y1 > mapy9 && y2 > mapy9)
+	if ((x1 < mapx0 && x2 < mapx0)
+			|| (x1 > mapx9 && x2 > mapx9)
+			|| (y1 < mapy0 && y2 < mapy0)
+			|| (y1 > mapy9 && y2 > mapy9))
 	  continue;
 	int sd1 = OBJ_NO_NONE;
 	int sd2 = OBJ_NO_NONE;
@@ -430,8 +430,7 @@ static void draw_linedefs (edit_t *e)
 	if ((sd1 = LineDefs[n].sidedef1) < 0 || sd1 >= NumSideDefs
 	  || (s1 = SideDefs[sd1].sector) < 0 || s1 >= NumSectors
 	  || (sd2 = LineDefs[n].sidedef2) >= NumSideDefs
-	  || sd2 >= 0 && ((s2 = SideDefs[sd2].sector) < 0
-			|| s2 >= NumSectors))
+	  || (sd2 >= 0 && ((s2 = SideDefs[sd2].sector) < 0 || s2 >= NumSectors)))
 	{
 	  new_colour = LIGHTRED;
 	}
@@ -556,19 +555,19 @@ static void draw_things_squares (edit_t *e)
 
 class Thing_npixels
 {
-  public :
-    Thing_npixels (int16_t thing_no, unsigned long npixels, wad_ttype_t type)
-      : thing_no (thing_no), npixels (npixels), type (type) { }
-    bool operator< (const Thing_npixels& other) const
-      { if (this->npixels > other.npixels  // Decreasing npixels major
-	    || this->npixels == other.npixels  // Increasing type minor
-	       && this->type < other.type)
-	  return true;
-	return false;
-      }
-    int16_t thing_no;
-    unsigned long npixels;
-    wad_ttype_t type;
+	public :
+		Thing_npixels (int16_t thing_no, unsigned long npixels, wad_ttype_t type)
+			: thing_no (thing_no), npixels (npixels), type (type) { }
+		bool operator< (const Thing_npixels& other) const {
+			if (this->npixels > other.npixels  // Decreasing npixels major
+					|| (this->npixels == other.npixels  // Increasing type minor
+						&& this->type < other.type))
+				return true;
+			return false;
+		}
+		int16_t thing_no;
+		unsigned long npixels;
+		wad_ttype_t type;
 };
 
 

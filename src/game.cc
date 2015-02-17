@@ -110,9 +110,7 @@ for (lineno = 2; fgets (readbuf, sizeof readbuf, ygdfile); lineno++)
    const char *iptr;
    char       *optr;
    char       *buf;
-   char	      *dump;
-   const char *const bad_arg_count =
-                                "%s(%d): directive \"%s\" takes %d parameters";
+   const char *const bad_arg_count = "%s(%d): directive \"%s\" takes %d parameters";
 
    /* duplicate the buffer */
    buf = (char *) malloc (strlen (readbuf) + 1);

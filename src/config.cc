@@ -2,7 +2,7 @@
 
 #include "config.h"
 
-extern const char *yadex_etc_path[] =
+const char *yadex_etc_path[] =
 {
   ".",
   "~/.yadex/%v",
@@ -12,7 +12,7 @@ extern const char *yadex_etc_path[] =
   0
 };
 
-extern const char *yadex_share_path[] =
+const char *yadex_share_path[] =
 {
   ".",
   "~/.yadex/%v",

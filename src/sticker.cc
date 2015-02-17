@@ -369,8 +369,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
 	  *buf_ptr++ = (uint32_t) (
 	      (game_colour[*image_ptr] >> 24)  // Assume game_colour unsigned
-	    | (game_colour[*image_ptr] >> 8) & 0x0000ff00
-	    | (game_colour[*image_ptr] << 8) & 0x00ff0000
+	    | ((game_colour[*image_ptr] >> 8) & 0x0000ff00)
+	    | ((game_colour[*image_ptr] << 8) & 0x00ff0000)
 	    | (game_colour[*image_ptr] << 24));
       }
       else
@@ -383,8 +383,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 	  for (; image_ptr < image_line_end; image_ptr++)
 	    *buf_ptr++ = (uint32_t) (
 		(game_colour[*image_ptr] >> 24)  // Assume game_colour uns.
-	      | (game_colour[*image_ptr] >> 8) & 0x0000ff00
-	      | (game_colour[*image_ptr] << 8) & 0x00ff0000
+	      | ((game_colour[*image_ptr] >> 8) & 0x0000ff00)
+	      | ((game_colour[*image_ptr] << 8) & 0x00ff0000)
 	      | (game_colour[*image_ptr] << 24));
 	  buf_ptr = (uint32_t *) ((char *) buf_ptr + padding);  // Line padding
 	}
@@ -401,8 +401,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   }
   else
   {
-    if (ximage->byte_order == LSBFirst && ! x_server_big_endian
-     || ximage->byte_order == MSBFirst && x_server_big_endian)
+    if ((ximage->byte_order == LSBFirst && ! x_server_big_endian)
+     || (ximage->byte_order == MSBFirst && x_server_big_endian))
       ;  // OK
     else
       warn ("image byte_order %d doesn't match X server endianness\n",

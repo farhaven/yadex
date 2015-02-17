@@ -98,7 +98,6 @@ inline obj_no_t Superimposed_ld::get ()
 
   if (! is_linedef (refldno))
     return -1;
-  const struct LineDef *const pmax = LineDefs + NumLineDefs;
   const struct LineDef *const pref = LineDefs + refldno;
 
   const wad_vn_t refv0 = pref->start;
@@ -120,8 +119,8 @@ inline obj_no_t Superimposed_ld::get ()
     obj_no_t y0 = Vertices[p->start].y;
     obj_no_t x1 = Vertices[p->end].x;
     obj_no_t y1 = Vertices[p->end].y;
-    if ( x0 == refx0 && y0 == refy0 && x1 == refx1 && y1 == refy1
-      || x0 == refx1 && y0 == refy1 && x1 == refx0 && y1 == refy0)
+    if ((x0 == refx0 && y0 == refy0 && x1 == refx1 && y1 == refy1)
+      || (x0 == refx1 && y0 == refy1 && x1 == refx0 && y1 == refy0))
     {
       if (ldno == refldno)
 	continue;

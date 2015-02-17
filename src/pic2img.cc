@@ -208,8 +208,8 @@ int LoadPicture (
     }
 
     // Read first column data, and subsequent column data
-    if (long_offsets && NeededOffsets[0] != 8 + (long) pic_width_ * 4
-        || !long_offsets && NeededOffsets[0] != 4 + (long) pic_width_ * 2)
+    if ((long_offsets && (NeededOffsets[0] != 8 + (long) pic_width_ * 4))
+        || (!long_offsets && (NeededOffsets[0] != 4 + (long) pic_width_ * 2)))
     {
         dir->wadfile->seek (dir->dir.start + NeededOffsets[0]);
         if (dir->wadfile->error ())

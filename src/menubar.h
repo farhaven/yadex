@@ -73,12 +73,11 @@ class menubar_c : public edwidget_c
       void undraw () { }  // I can't undraw myself
       int can_undraw () { return 0; }  // I can't undraw myself
 
-      int need_to_clear ()
-         {
-         return bar_visible_disp && ! bar_visible
-            || pulled_down_no_disp && ! pulled_down_no
-            || pulled_down_menu_disp != pulled_down_menu;
-         }
+		int need_to_clear () {
+			return (bar_visible_disp && ! bar_visible)
+				|| (pulled_down_no_disp && ! pulled_down_no)
+				|| (pulled_down_menu_disp != pulled_down_menu);
+		}
 
       void clear ();
 

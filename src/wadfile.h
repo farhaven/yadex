@@ -271,7 +271,9 @@ inline int16_t Wad_file::read_int16_t () const
  */
 inline void Wad_file::read_int16_t (int16_t *buf) const
 {
-  *buf = getc (fp) | (getc (fp) << 8);
+	uint8_t c1 = getc(fp);
+	uint8_t c2 = getc(fp);
+	*buf = c1 | (c2 << 8);
 
   if (feof (fp) || ferror (fp))
   {
@@ -291,20 +293,23 @@ inline void Wad_file::read_int16_t (int16_t *buf) const
  */
 inline void Wad_file::read_int32_t (int32_t *buf, long count) const
 {
-  while (count-- > 0)
-  {
-    *buf++ =    getc (fp)
-       | (      getc (fp) << 8)
-       | ((int32_t) getc (fp) << 16)
-       | ((int32_t) getc (fp) << 24);
-  }
+	while (count-- > 0)
+	{
+		uint8_t c[4];
+		*buf = 0;
+		for (uint i = 0; i < sizeof(c); i++) {
+			c[i] = getc(fp);
+			*buf |= (c[i] << (8 * i));
+		}
+		buf++;
+	}
 
-  if (feof (fp) || ferror (fp))
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-  }
+	if (feof (fp) || ferror (fp))
+	{
+		if (! error_)
+			err ("%s: read error", where ());
+		error_ = true;
+	}
 }
 
 

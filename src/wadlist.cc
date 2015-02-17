@@ -26,18 +26,19 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <memory>
+#include <list>
 
 #include "yadex.h"
 #include "wadfile.h"
 #include "wadlist.h"
-#include <list>
-#include <boost/smart_ptr.hpp>
 
+using std::shared_ptr;
 
 Wad_list wad_list;			// One global instance
 
 
-typedef std::list<boost::shared_ptr<Wad_file> > list_t;
+typedef std::list<shared_ptr<Wad_file> > list_t;
 
 
 class Wad_list_priv
@@ -139,7 +140,7 @@ bool Wad_list::get (const Wad_file *& wf) const
  */
 void Wad_list::insert (Wad_file *wf)
 {
-  priv->list.insert (priv->iter, boost::shared_ptr<Wad_file> (wf));
+  priv->list.insert (priv->iter, shared_ptr<Wad_file> (wf));
 }
 
 

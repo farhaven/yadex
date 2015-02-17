@@ -110,9 +110,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   obj_no_t l2start = LineDefs[linedef2].start;
   obj_no_t l2end   = LineDefs[linedef2].end;
 
-  if (l1start == l2start && l1end == l2end
-    || l1start == l2end && l1end == l2start)
-  {
+  if ((l1start == l2start && l1end == l2end) || (l1start == l2end && l1end == l2start)) {
     char buf[100];
     snprintf (buf, sizeof buf, "Linedefs %d and %d are superimposed", int (linedef1), int (linedef2));
     Notify (-1, -1, buf, 0);
@@ -221,22 +219,18 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   }
 
   // Verify that there's no linedef already between linedef1 and linedef2
-  {
-    for (int n = 0; n < NumLineDefs; n++)
-    {
-      if (n == linedef1 || n == linedef2)
-	continue;
-      if (LineDefs[n].start == la0 && LineDefs[n].end == la1
-       || LineDefs[n].start == la1 && LineDefs[n].end == la0
-       || LineDefs[n].start == lb0 && LineDefs[n].end == lb1
-       || LineDefs[n].start == lb1 && LineDefs[n].end == lb0)
-      {
-	char buf[100];
-	snprintf (buf, sizeof buf, "A linedef already exists between linedefs %d and %d (linedef %d)", linedef1, linedef2, n);
-	Notify (-1, -1, buf, 0);
-	return;
-      }
-    }
+  for (int n = 0; n < NumLineDefs; n++) {
+	  if (n == linedef1 || n == linedef2)
+		  continue;
+	  if ((LineDefs[n].start == la0 && LineDefs[n].end == la1)
+			  || (LineDefs[n].start == la1 && LineDefs[n].end == la0)
+			  || (LineDefs[n].start == lb0 && LineDefs[n].end == lb1)
+			  || (LineDefs[n].start == lb1 && LineDefs[n].end == lb0)) {
+		  char buf[100];
+		  snprintf (buf, sizeof buf, "A linedef already exists between linedefs %d and %d (linedef %d)", linedef1, linedef2, n);
+		  Notify (-1, -1, buf, 0);
+		  return;
+	  }
   }
   
   // Create new sector

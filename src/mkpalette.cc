@@ -92,7 +92,7 @@ int make_gimp_palette (int playpalnum, const char *filename)
     goto byebye;
   }
   for (size_t n = 0; n < DOOM_COLOURS; n++)
-    fprintf (output_fp, "%3d %3d %3d  Index = %d (%02Xh)   RGB = %d, %d, %d\n",
+    fprintf (output_fp, "%3d %3d %3d  Index = %lu (%02lXh)   RGB = %d, %d, %d\n",
       dpal[3 * n],
       dpal[3 * n + 1],
       dpal[3 * n + 2],

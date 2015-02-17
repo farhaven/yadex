@@ -147,21 +147,18 @@ switch (objtype)
       const int mapy0 = MAPY (ScrMaxY);
       const int mapx1 = MAPX (ScrMaxX);
       const int mapy1 = MAPY (0);
-      for (n = 0; n < NumLineDefs; n++)
-	 if (LineDefs[n].sidedef1 != -1
-	     && SideDefs[LineDefs[n].sidedef1].sector == objnum
-	  || LineDefs[n].sidedef2 != -1
-	     && SideDefs[LineDefs[n].sidedef2].sector == objnum)
-	 {
-	    const struct Vertex *v1 = Vertices + LineDefs[n].start;
-	    const struct Vertex *v2 = Vertices + LineDefs[n].end;
-	    if (v1->x < mapx0 && v2->x < mapx0
-	     || v1->x > mapx1 && v2->x > mapx1
-	     || v1->y < mapy0 && v2->y < mapy0
-	     || v1->y > mapy1 && v2->y > mapy1)
-	       continue;  // Off-screen
-	    DrawMapLine (v1->x, v1->y, v2->x, v2->y);
-	 }
+		for (n = 0; n < NumLineDefs; n++)
+			if ((LineDefs[n].sidedef1 != -1 && SideDefs[LineDefs[n].sidedef1].sector == objnum)
+					|| (LineDefs[n].sidedef2 != -1 && SideDefs[LineDefs[n].sidedef2].sector == objnum)) {
+				const struct Vertex *v1 = Vertices + LineDefs[n].start;
+				const struct Vertex *v2 = Vertices + LineDefs[n].end;
+				if ((v1->x < mapx0 && v2->x < mapx0)
+						|| (v1->x > mapx1 && v2->x > mapx1)
+						|| (v1->y < mapy0 && v2->y < mapy0)
+						|| (v1->y > mapy1 && v2->y > mapy1))
+					continue;  // Off-screen
+				DrawMapLine (v1->x, v1->y, v2->x, v2->y);
+			}
       if (colour != LIGHTRED && Sectors[objnum].tag > 0)
 	 {
 	 for (m = 0; m < NumLineDefs; m++)

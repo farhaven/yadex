@@ -177,10 +177,10 @@ static const Close_obj& get_cur_linedef (int x, int y)
     /* Skip all lines of which all points are more than <mapslack>
        units away from (x,y). In a typical level, this test will
        filter out all the linedefs but a handful. */
-    if (x0 < xmin && x1 < xmin
-     || x0 > xmax && x1 > xmax
-     || y0 < ymin && y1 < ymin
-     || y0 > ymax && y1 > ymax)
+	 if ((x0 < xmin && x1 < xmin)
+			 || (x0 > xmax && x1 > xmax)
+			 || (y0 < ymin && y1 < ymin)
+			 || (y0 > ymax && y1 > ymax))
       continue;
 
     /* This is where it gets ugly. We're trying to calculate the

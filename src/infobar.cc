@@ -85,15 +85,15 @@ if (! visible)
    return;
 
 redraw_from_scratch =
-   visible && ! visible_disp
-   || file_name_disp        != file_name
-   || level_name_disp       != level_name
-   || obj_type_disp         != obj_type
-   || changes_disp          != changes
-   || grid_snap_disp        != grid_snap
-   || grid_step_locked_disp != grid_step_locked
-   || scale_disp            != scale
-   || grid_step_disp        != grid_step;
+   (visible && ! visible_disp)
+   || (file_name_disp        != file_name)
+   || (level_name_disp       != level_name)
+   || (obj_type_disp         != obj_type)
+   || (changes_disp          != changes)
+   || (grid_snap_disp        != grid_snap)
+   || (grid_step_locked_disp != grid_step_locked)
+   || (scale_disp            != scale)
+   || (grid_step_disp        != grid_step);
 
 if (redraw_from_scratch)
    {
@@ -204,19 +204,17 @@ if (redraw_from_scratch || grid_snap_disp != grid_snap)
 x += 6 * FONTW;
 
 // The current pointer coordinates.
-if ((flags & pointer_disp_set)
-   && ! (flags & pointer_set)
-      || pointer_x_disp != pointer_x
-      || pointer_y_disp != pointer_y)
+if (((flags & pointer_disp_set) && !(flags & pointer_set))
+		|| pointer_x_disp != pointer_x
+		|| pointer_y_disp != pointer_y)
    {
    set_colour (WINBG);
    DrawScreenBox (x, text_y0, x + 14 * FONTW - 1, text_y1);
    flags &= ~ pointer_disp_set;
    }
-if ((flags & pointer_set)
-   && ! (flags & pointer_disp_set)
-      || pointer_x_disp != pointer_x
-      || pointer_y_disp != pointer_y)
+if (((flags & pointer_set) && !(flags & pointer_disp_set))
+		|| pointer_x_disp != pointer_x
+		|| pointer_y_disp != pointer_y)
    {
    set_colour (WINFG);
    /* FIXME pointer_x/y are not significant the first time. */

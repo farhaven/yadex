@@ -44,8 +44,11 @@ Serial_num master_dir_serial;		// The revision# thereof
  */
 int file_read_int16_t (FILE *fp, int16_t *buf, long count)
 {
-  while (count-- > 0)
-    *buf = getc (fp) | (getc (fp) << 8);
+  while (count-- > 0) {
+	  uint8_t c1 = getc(fp);
+	  uint8_t c2 = getc(fp);
+    *buf = c1 | (c2 << 8);
+  }
   return feof (fp) || ferror (fp);
 }
 
@@ -57,14 +60,16 @@ int file_read_int16_t (FILE *fp, int16_t *buf, long count)
  */
 int file_read_int32_t (FILE *fp, int32_t *buf, long count)
 {
-  while (count-- > 0)
-  {
-    *buf++ =    getc (fp)
-      | (      getc (fp) << 8)
-      | ((int32_t) getc (fp) << 16)
-      | ((int32_t) getc (fp) << 24);
-  }
-  return feof (fp) || ferror (fp);
+	while (count-- > 0) {
+		uint8_t c[4];
+		*buf = 0;
+		for (unsigned int i = 0; i < sizeof(c); i++) {
+			c[i] = getc(fp);
+			*buf |= c[i] << (i * 8);
+		}
+		buf++;
+	}
+	return feof (fp) || ferror (fp);
 }
 
 
@@ -230,7 +235,7 @@ void WriteBytes (FILE *file, const void *buf, long size)
  *	source file, 2 if there was a write error on destination
  *	file.
  */
-int copy_bytes (FILE *dest, FILE *source, long size)
+int copy_bytes (FILE *dest, FILE *source, size_t size)
 {
   int          rc      = 0;
   void        *data    = 0;

@@ -890,19 +890,13 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
                         /* strtoul() sets errno to ERANGE if overflow. In
                         addition, we don't want any non-zero negative
                         numbers. In terms of regexp, /^(0x)?0*$/i. */
-                        if
-                        (
-                            errno != 0
-                            || neg
-                            && !
-                            (
-                                strspn (value + 1, "0") == strlen (value + 1)
-                                || value[1] == '0'
-                                && tolower (value[2]) == 'x'
-                                && strspn (value + 3, "0") == strlen (value + 3)
-                            )
-                        )
-                        {
+								if (errno != 0 || (neg && ! (strspn (value + 1, "0") == strlen (value + 1)
+																	  || (value[1] == '0'
+																		  && tolower (value[2]) == 'x'
+																		  && strspn (value + 3, "0") == strlen (value + 3))
+																	 ))
+									)
+									{
                             err ("%s(%u,%d): unsigned integer out of range",
                             filename, lnum, 1 + (int) (value - line));
                             RETURN_FAILURE;
@@ -1007,9 +1001,9 @@ int parse_command_line_options (int argc, const char *const *argv, int pass)
                     err ("invalid option: \"%s\"", argv[0]);
                     return 1;
                 }
-                if (o->short_name && ! strcmp (argv[0]+1, o->short_name)
-                    || o->long_name  && ! strcmp (argv[0]+1, o->long_name))
-                    break;
+					 if ((o->short_name && ! strcmp (argv[0]+1, o->short_name))
+							 || (o->long_name  && ! strcmp (argv[0]+1, o->long_name)))
+						 break;
                 }
 
                 // If this option has the "1" flag but pass is not 1
@@ -1086,19 +1080,13 @@ int parse_command_line_options (int argc, const char *const *argv, int pass)
                             /* strtoul() sets errno to ERANGE if overflow. In
                             addition, we don't want any non-zero negative
                             numbers. In terms of regexp, /^(0x)?0*$/i. */
-                            if
-                            (
-                                errno != 0
-                                || neg
-                                && !
-                                (
-                                    strspn (value + 1, "0") == strlen (value + 1)
-                                    || value[1] == '0'
-                                    && tolower (value[2]) == 'x'
-                                    && strspn (value + 3, "0") == strlen (value + 3)
-                                )
-                            )
-                            {
+									 if (errno != 0 || (neg && ! (strspn (value + 1, "0") == strlen (value + 1)
+													 || (value[1] == '0'
+														 && tolower (value[2]) == 'x'
+														 && strspn (value + 3, "0") == strlen (value + 3))
+													 ))
+										 )
+									 {
                                 err ("unsigned integer out of range \"%s\"", value);
                                 return 1;
                             }

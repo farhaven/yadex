@@ -745,8 +745,8 @@ static void MainLoop ()
                 {
                     printf ("Level %s not found.", com);
                     // Hint absent-minded users
-                    if (tolower (*com) == 'e' && yg_level_name == YGLN_MAP01
-                        || tolower (*com) == 'm' && yg_level_name == YGLN_E1M1)
+                    if ((tolower (*com) == 'e' && yg_level_name == YGLN_MAP01)
+                        || (tolower (*com) == 'm' && yg_level_name == YGLN_E1M1))
                         printf (" You are in %s mode.", Game);
                     else if (tolower (*com) == 'e' && com[1] > '1' && ! Registered)
                         printf (" You have the shareware iwad.");

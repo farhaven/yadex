@@ -79,21 +79,25 @@ endif
 #CXX =
 
 # Options used when compiling Atclib.
-CFLAGS = -O
+CFLAGS = -fPIC
 
 # Options used when compiling and linking Yadex.
 # ld is invoked through the C++ compiler so
 # LDFLAGS should not contain options that mean
 # something to the C++ compiler.
-CXXFLAGS = -O -std=c++11
+CXXFLAGS  = -fPIC -std=c++11
+CXXFLAGS += -pedantic
+CXXFLAGS += -Wall
+CXXFLAGS += -Werror
+CXXFLAGS += -Wno-variadic-macros
 #CXXFLAGS += -DWHITE_BACKGROUND
-#LDFLAGS  =
+LDFLAGS  = -g -fPIC
 
 # Options used to compile and link the debugging
 # targets. Not used by normal end-user targets.
 # Unlike CFLAGS, CXXFLAGS and LDFLAGS, assume
 # GCC/EGCS.
-DCFLAGS		= -g -O
+DCFLAGS		= -g
 DCFLAGS		+= -Wall			# GCC warnings
 DCFLAGS		+= -pedantic			# GCC warnings
 DCFLAGS		+= -Wno-parentheses		# GCC warnings
@@ -104,25 +108,10 @@ DCFLAGS		+= -Wwrite-strings		# GCC warnings
 DCFLAGS		+= -Wmissing-declarations	# GCC warnings
 DCFLAGS		+= -Wmissing-prototypes		# GCC warnings
 DCFLAGS		+= -Winline			# GCC warnings
-DCFLAGS		+= -pg				# Profiling
 
-DCXXFLAGS	= -g -O
-DCXXFLAGS	+= -Wall			# GCC warnings
-DCXXFLAGS	+= -pedantic			# GCC warnings
-DCXXFLAGS	+= -Wno-parentheses		# GCC warnings
-DCXXFLAGS	+= -Wpointer-arith		# GCC warnings
-DCXXFLAGS	+= -Wcast-qual			# GCC warnings
-DCXXFLAGS	+= -Wcast-align			# GCC warnings
-DCXXFLAGS	+= -Wwrite-strings		# GCC warnings
-DCXXFLAGS	+= -Wmissing-declarations	# GCC warnings
-DCXXFLAGS	+= -Wmissing-prototypes		# GCC warnings
-#DCXXFLAGS	+= -Winline			# GCC warnings
-DCXXFLAGS	+= -pg				# Profiling
+DCXXFLAGS	= $(CXXFLAGS) -g
 
-DLDFLAGS	=
-DLDFLAGS	+= -pg				# Profiling
-#DLDFLAGS	+= -lefence			# Electric Fence
-
+DLDFLAGS	= -g
 
 ########################################################################
 #

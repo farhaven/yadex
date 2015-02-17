@@ -106,27 +106,23 @@ oldscale = Scale;
    most well-constituted sectors. It does not work so well for
    unclosed sectors, though (but it's partly GetCurObject()'s
    fault). */
-if (objid.type == OBJ_SECTORS && sector_under_pointer () != objid.num)
-   {
-   /* restore the Scale */
-   Scale = oldscale;
-   for (int n = 0; n < NumLineDefs; n++)
-      {
-      sd1 = LineDefs[n].sidedef1;
-      sd2 = LineDefs[n].sidedef2;
-      if (sd1 >= 0 && SideDefs[sd1].sector == objid.num
-	|| sd2 >= 0 && SideDefs[sd2].sector == objid.num)
-	 {
-	 GetObjectCoords (OBJ_LINEDEFS, n, &xpos2, &ypos2);
-	 int d = ComputeDist (abs (xpos - xpos2), abs (ypos - ypos2)) / 7;
-	 if (d <= 1)
-	   d = 2;
-	 xpos = xpos2 + (xpos - xpos2) / d;
-	 ypos = ypos2 + (ypos - ypos2) / d;
-	 focus_on_map_coords (xpos, ypos);
-	 if (sector_under_pointer () == objid.num)
-	    break;
-	 }
-      }
-   }
+if (objid.type == OBJ_SECTORS && sector_under_pointer () != objid.num) {
+	/* restore the Scale */
+	Scale = oldscale;
+	for (int n = 0; n < NumLineDefs; n++) {
+		sd1 = LineDefs[n].sidedef1;
+		sd2 = LineDefs[n].sidedef2;
+		if ((sd1 >= 0 && SideDefs[sd1].sector == objid.num) || (sd2 >= 0 && SideDefs[sd2].sector == objid.num)) {
+			GetObjectCoords (OBJ_LINEDEFS, n, &xpos2, &ypos2);
+			int d = ComputeDist (abs (xpos - xpos2), abs (ypos - ypos2)) / 7;
+			if (d <= 1)
+				d = 2;
+			xpos = xpos2 + (xpos - xpos2) / d;
+			ypos = ypos2 + (ypos - ypos2) / d;
+			focus_on_map_coords (xpos, ypos);
+			if (sector_under_pointer () == objid.num)
+				break;
+		}
+	}
+}
 }

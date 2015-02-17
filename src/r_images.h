@@ -26,11 +26,8 @@ public:
 
    static std::string WadToString(const wad_flat_name_t& fname)
    {
-      int len;
-
-      for (len = 0; len < WAD_NAME && fname[len]; len++)
-      { }
-        
+		unsigned int len = 0;
+      for (; len < WAD_NAME && fname[len]; len++);
       return std::string(fname, len);
    }
 

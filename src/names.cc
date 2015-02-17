@@ -150,22 +150,20 @@ const char *GetLineDefFlagsLongName (int flags)
 }
 
 /*
-   get a short (14 char.) description of the type of a sector
-*/
-const char *GetSectorTypeName (int type)
+	get a short (14 char.) description of the type of a sector
+	*/
+string GetSectorTypeName (int type)
 {
-    /* KLUDGE: To avoid the last element which is bogus */
-    if (al_ltell (stdef) == al_lcount (stdef) - 1)
-        al_lrewind (stdef);
+	/* KLUDGE: To avoid the last element which is bogus */
+	if (al_ltell (stdef) == al_lcount (stdef) - 1)
+		al_lrewind (stdef);
 
-    if (CUR_STDEF != NULL && CUR_STDEF->number == type)
-        return CUR_STDEF->shortdesc;
-    for (al_lrewind (stdef); ! al_leol (stdef); al_lstep (stdef))
-        if (CUR_STDEF->number == type)
-            return CUR_STDEF->shortdesc;
-    static char buf[30];
-    sprintf (buf, "UNKNOWN (%d)", type);
-    return buf;
+	if (CUR_STDEF != NULL && CUR_STDEF->number == type)
+		return string(CUR_STDEF->shortdesc);
+	for (al_lrewind (stdef); ! al_leol (stdef); al_lstep (stdef))
+		if (CUR_STDEF->number == type)
+			return string(CUR_STDEF->shortdesc);
+	return "UNKNOWN (" + to_string(type) + ")";
 }
 
 /*

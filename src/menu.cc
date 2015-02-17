@@ -43,7 +43,7 @@ function returns.
 #include "menudata.h"
 
 
-extern const char *MI_SEPARATION = "";
+const char *MI_SEPARATION = "";
 
 const unsigned char MIF_MACTIVE = 0x03;
 const unsigned char MIF_MTICK = 0x0c;
@@ -999,12 +999,12 @@ void Menu_priv::draw ()
     geom ();
 
   // Do we need to redraw everything from scratch ?
-  if (visible && ! visible_disp
-    || ox0    != ox0_disp
-    || oy0    != oy0_disp
-    || width  != width_disp
-    || height != height_disp)
-    from_scratch = true;
+  if ((visible && ! visible_disp)
+		  || (ox0    != ox0_disp)
+		  || (oy0    != oy0_disp)
+		  || (width  != width_disp)
+		  || (height != height_disp))
+	  from_scratch = true;
 
   // Display the static part of the menu
   if (from_scratch)
@@ -1216,7 +1216,7 @@ int Menu::can_undraw ()
 
 int Menu::need_to_clear ()
 {
-  return ! priv->visible && priv->visible_disp || priv->need_geom;
+  return (!priv->visible && priv->visible_disp) || priv->need_geom;
 }
 
 

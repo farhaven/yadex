@@ -68,10 +68,9 @@ static void WriteYadexLog (const char *file, const char *level,
 char *find_level (const char *name_given)
 {
     // Is it a shorthand name ? ("1", "23", ...)
-    if (al_sisnum (name_given)
-        && (atoi (name_given) <= 99
-        || atoi (name_given) <= 999 && yg_level_name == YGLN_E1M10))
-    {
+	if ((al_sisnum (name_given) && (atoi (name_given) <= 99))
+		|| (atoi (name_given) <= 999 && yg_level_name == YGLN_E1M10))
+	{
         int n = atoi (name_given);
         char *name1 = (char *) malloc (7);
         char *name2 = (char *) malloc (6);

@@ -402,20 +402,15 @@ Entry2::fill_in_widgets_info (const char *fmt, va_list args) {
 				}
 			}
 			// Get the optional modifier (hh, h, l or Z)
-			_field_flags_t size = FF_INT;
 			if (*p == 'h') {
 				if (p[1] == 'h') {
-					size = FF_CHAR;
 					p += 2;
 				} else {
-					size = FF_SHORT;
 					p++;
 				}
 			} else if (*p == 'Z') {
-				size = FF_SIZE_T;
 				p++;
 			} else if (*p == 'l') {
-				size = FF_LONG;
 				p++;
 			}
 			// Get the type (diousSxX)

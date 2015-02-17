@@ -453,8 +453,7 @@ if (wf->fp == 0)
 bool e = file_read_bytes (wf->fp, wf->type, 4);
 e     |= file_read_int32_t   (wf->fp, &wf->dirsize);
 e     |= file_read_int32_t   (wf->fp, &wf->dirstart);
-if (e || memcmp (wf->type, "IWAD", 4) != 0 && memcmp (wf->type, "PWAD", 4) != 0)
-   {
+if (e || (memcmp (wf->type, "IWAD", 4) != 0 && memcmp (wf->type, "PWAD", 4) != 0)) {
    printf ("%.128s: not a wad (bad header)\n", filename);
    fail = true;
    goto byebye;
@@ -468,7 +467,7 @@ wf->directory = (DirPtr) malloc((long) sizeof (struct Directory)
    * wf->dirsize);
 if (fseek (wf->fp, wf->dirstart, SEEK_SET) != 0)
    {
-   printf ("%.128s: can't seek to directory at %08lXh\n",
+   printf ("%.128s: can't seek to directory at %08Xh\n",
       filename, wf->dirstart);
    fail = true;
    goto byebye;
@@ -517,8 +516,8 @@ fprintf (file, "NAME____  FILE______________________________________________"
 for (dir = MasterDir; dir; dir = dir->next)
    {
    strncpy (dataname, dir->dir.name, WAD_NAME);
-   fprintf (file, "%-*s  %-50s  %6ld  x%08lx\n",
-    WAD_NAME, dataname, dir->wadfile->pathname (),
+   fprintf (file, "%-*s  %-50s  %6d  x%08x\n",
+    (int)WAD_NAME, dataname, dir->wadfile->pathname (),
     dir->dir.size, dir->dir.start);
    if (file == stdout && lines++ > screen_lines - 4)
       {
@@ -554,8 +553,8 @@ fprintf (file, "NAME____  SIZE__  START____  END______\n");
 for (n = 0; n < wad->dirsize; n++)
    {
    strncpy (dataname, wad->directory[n].name, WAD_NAME);
-   fprintf (file, "%-*s  %6ld  x%08lx  x%08lx\n",
-     WAD_NAME, dataname,
+   fprintf (file, "%-*s  %6d  x%08x  x%08x\n",
+     (int)WAD_NAME, dataname,
      wad->directory[n].size,
      wad->directory[n].start,
      wad->directory[n].size + wad->directory[n].start - 1);
@@ -682,8 +681,7 @@ for (MDirPtr entry = MasterDir; entry != 0; entry = entry->next)
       continue;
    strncpy (dataname, entry->dir.name, WAD_NAME);
    dataname[WAD_NAME] = '\0';
-   fprintf (file, "Contents of entry %s (size = %ld bytes):\n",
-      dataname, entry->dir.size);
+   fprintf (file, "Contents of entry %s (size = %d bytes):\n", dataname, entry->dir.size);
    const Wad_file *wf = entry->wadfile;
    wf->seek (entry->dir.start);
    for (n = 0; n < entry->dir.size;)

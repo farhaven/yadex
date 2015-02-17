@@ -70,13 +70,13 @@ genc () {
     echo
     echo '#include "config.h"'
     echo
-    echo 'extern const char *yadex_etc_path[] ='
+    echo 'const char *yadex_etc_path[] ='
     echo '{'
     sed 's/\\/\\\\/g; s/"/\\"/g; s/^.*/  "&",/;' $BUILDDIR/config.etc
     echo '  0'
     echo '};'
     echo
-    echo 'extern const char *yadex_share_path[] ='
+    echo 'const char *yadex_share_path[] ='
     echo '{'
     sed 's/\\/\\\\/g; s/"/\\"/g; s/^.*/  "&",/;' $BUILDDIR/config.share
     echo '  0'

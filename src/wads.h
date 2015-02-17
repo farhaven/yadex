@@ -16,6 +16,6 @@ void file_write_int16_t   (FILE *,  int16_t buf);
 void file_write_int32_t   (FILE *,  int32_t buf, long count = 1);
 void file_write_name  (FILE *, const char *name);
 void WriteBytes       (FILE *, const void *, long);
-int  copy_bytes       (FILE *dest, FILE *source, long size);
+int  copy_bytes       (FILE *dest, FILE *source, size_t size);
 
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

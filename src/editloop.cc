@@ -192,7 +192,6 @@ void EditorLoop (const char *levelname) /* SWAP! */
     /* FIXME : all these variables should be moved to edit_t : */
     int    RedrawMap;
     bool   DragObject = false;
-    int    oldbuttons;
 
     bool   StretchSelBox = false;  // FIXME apparently not used anymore...
 
@@ -245,13 +244,11 @@ void EditorLoop (const char *levelname) /* SWAP! */
 
     if (zoom_default == 0)
         zoom_fit (e);
-    else
-    {
+    else {
         int r = edit_set_zoom (&e, zoom_default / 100.0);
         if (r == 0)
         CenterMapAroundCoords ((MapMinX + MapMaxX) / 2, (MapMinY + MapMaxY) / 2);
     }
-    oldbuttons = 0;
 
     /* Create the menu bar */
     {
@@ -631,9 +628,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                 int r = (e.modpopup->get ())->process_event (&is);
 
                 // [Esc] or click outside the popup menu. Close it.
-                if (r == MEN_CANCEL
-                    || r == MEN_INVALID && is.key == YE_BUTL_PRESS)
-                {
+                if (r == MEN_CANCEL || (r == MEN_INVALID && is.key == YE_BUTL_PRESS)) {
                     e.modpopup->unset ();
                     goto done2;
                 }
@@ -678,9 +673,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                 int r = (e.modpopup->get ())->process_event (&is);
 
                 // [Esc] or click outside the popup menu. Close it.
-                if (r == MEN_CANCEL
-                    || r == MEN_INVALID && is.key == YE_BUTL_PRESS)
-                {
+                if (r == MEN_CANCEL || (r == MEN_INVALID && is.key == YE_BUTL_PRESS)) {
                     e.modpopup->unset ();
                     goto done2;
                 }
@@ -723,9 +716,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                 int r = (e.modpopup->get ())->process_event (&is);
 
                 // [Esc] or click outside the popup menu. Close it.
-                if (r == MEN_CANCEL
-                    || r == MEN_INVALID && is.key == YE_BUTL_PRESS)
-                {
+                if (r == MEN_CANCEL || (r == MEN_INVALID && is.key == YE_BUTL_PRESS)) {
                     e.modpopup->unset ();
                     goto done2;
                 }
@@ -775,9 +766,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                 int r = (e.modpopup->get ())->process_event (&is);
 
                 // [Esc] or click outside the popup menu. Close it.
-                if (r == MEN_CANCEL
-                    || r == MEN_INVALID && is.key == YE_BUTL_PRESS)
-                {
+                if (r == MEN_CANCEL || (r == MEN_INVALID && is.key == YE_BUTL_PRESS)) {
                     e.modpopup->unset ();
                     goto done2;
                 }
@@ -2150,7 +2139,7 @@ cancel_save_as:
                     BehaviorSize = ftell(f);
                     Behavior = (uint8_t*)malloc(BehaviorSize);
                     fseek(f, 0, SEEK_SET);
-                    int _ign = fread(Behavior, BehaviorSize, 1, f);
+                    (void) fread(Behavior, BehaviorSize, 1, f);
                     fclose(f);
                 }
                 RedrawMap = 1;

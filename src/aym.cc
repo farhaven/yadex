@@ -239,7 +239,7 @@ int is_one_of (const char *needle, ...)
     for (;;)
     {
         const char *haystack = va_arg (args, const char *);
-        if (haystack == Y_NULL)
+        if (haystack == NULL)
             break;
         if (! strcmp (needle, haystack))
             return 1;

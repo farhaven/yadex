@@ -45,12 +45,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include <limits.h>
 #include <errno.h>
 #include <unistd.h>
-#define far
-#define huge
-#define farmalloc  malloc
-#define farrealloc realloc
-#define farfree    free
-
 
 /*
  *	Additional libraries
@@ -60,7 +54,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "yerror.h"
 #include "aym.h"     /* Needs yerror.h */
 #include "windim.h"
-
 
 /*
  *	Platform-independant types and formats.
@@ -77,11 +70,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #define F_I32_D "ld"
 #define F_I32_H "lX"
 
-
 const int Y_PATH      = 255;
 const int Y_FILE_NAME = 255;
 typedef char y_file_name_t[Y_FILE_NAME + 1];
-
 
 /*
  *	Constants of the universe.
@@ -97,8 +88,6 @@ const double ANSWER = 42;
  */
 #define y_min(a,b) ((a) < (b) ? (a) : (b))
 #define y_max(a,b) ((a) > (b) ? (a) : (b))
-const char *const Y_NULL = 0;  // NULL (const char *)
-
 
 /*
  *	To avoid including certain headers.

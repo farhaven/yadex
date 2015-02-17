@@ -115,7 +115,7 @@ void huge *SwapIn (SwapHandle handle, unsigned long size)
 void huge *ptr;
 #ifdef SWAP_TO_XMS
 /* allocate a new memory block (in lower RAM) */
-ptr = GetFarMemory (size);
+ptr = malloc(size);
 /* read the data from XMS */
 ...
 /* free the XMS memory block */
@@ -141,7 +141,7 @@ strcpy (oldhandle, handle);
 /* invalidate the handle (must be before "GetFarMemory") */
 strcpy (handle, INVALID_HANDLE);
 /* allocate a new memory block (in lower RAM) */
-ptr = GetFarMemory (size);
+ptr = malloc(size);
 /* read the data from the temporary file */
 file = fopen (oldhandle, "rb");
 data = (char huge *) ptr;
@@ -227,7 +227,7 @@ if (fclose (file))
       handle, strerror (errno));
 #endif /* !SWAP_TO_XMS */
 /* free the data block (in lower RAM) */
-FreeFarMemory (ptr);
+free(ptr);
 }
 
 

@@ -49,14 +49,14 @@ void ChooseFloorTexture (int x0, int y0, const char *prompt, int listsize, char 
   (void) list;
   (void) listsize;
   // Build a list of char *, for InputNameFromListWithFunc()'s sake
-  char **flat_names = (char **) GetMemory (NumFTexture * sizeof *flat_names);
+  char **flat_names = (char **) malloc (NumFTexture * sizeof *flat_names);
   for (size_t n = 0; n < NumFTexture; n++)
     flat_names[n] = flat_list[n].name;
 
   InputNameFromListWithFunc (x0, y0, prompt, (size_t) NumFTexture, flat_names,
     5, name, 64, 64, DisplayFloorTexture);
 
-  FreeMemory (flat_names);
+  free (flat_names);
 }
 
 

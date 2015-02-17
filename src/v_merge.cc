@@ -319,7 +319,7 @@ confirm_flag = YC_ASK_ONCE;
 linedef_t *linedefs;
 
 /* Copy the linedefs into array 'linedefs' and sort it */
-linedefs = (linedef_t *) GetMemory (NumLineDefs * sizeof (linedef_t));
+linedefs = (linedef_t *) malloc(NumLineDefs * sizeof (linedef_t));
 for (ld = 0; ld < NumLineDefs; ld++)
   {
   linedefs[ld].vertexl = y_min (LineDefs[ld].start, LineDefs[ld].end);
@@ -390,7 +390,7 @@ for (ld = 0; ld+1 < NumLineDefs; ld++)
       }
    }
 
-FreeMemory (linedefs);
+free(linedefs);
 }
 
 return redraw;

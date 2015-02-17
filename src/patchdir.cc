@@ -58,8 +58,7 @@ Patch_dir::Patch_dir ()
  */
 Patch_dir::~Patch_dir ()
 {
-  if (pnames != 0)
-    FreeMemory (pnames);
+ free(pnames);
   if (! patch_lumps.empty ())
     patch_lumps.clear ();
 }
@@ -72,12 +71,9 @@ void Patch_dir::refresh (MDirPtr master_dir)
 {
   /* refresh() can be called more than once on the same object.
      And usually is ! */
-  if (pnames != 0)
-  {
-    FreeMemory (pnames);
-    pnames = 0;
-    npnames = 0;
-  }
+ free(pnames);
+ pnames = NULL;
+ npnames = NULL;
   if (! patch_lumps.empty ())
     patch_lumps.clear ();
 
@@ -141,7 +137,7 @@ void Patch_dir::refresh (MDirPtr master_dir)
 	    lump_name, (unsigned long) npnames);
 	npnames = 32767;
       }
-      pnames = (char *) GetMemory (npnames * WAD_PIC_NAME);
+      pnames = (char *) malloc(npnames * WAD_PIC_NAME);
       wf->read_bytes (pnames, npnames * WAD_PIC_NAME);
       if (wf->error ())
       {

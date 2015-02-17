@@ -57,7 +57,7 @@ if (x0 < 0)
 if (y0 < 0)
    y0 = (ScrMaxY + 1 - height) / 2;
 for (n = 0; n < 9; n++)
-   menustr[n] = (char *) GetMemory (80);
+   menustr[n] = (char *) malloc(80);
 sprintf (menustr[8], "Preferences");
 sprintf (menustr[0], "Change default middle texture  (Current: %.*s)",
    (int) WAD_TEX_NAME, default_middle_texture);
@@ -86,7 +86,7 @@ val = vDisplayMenu (x0, y0, menustr[8],
   menustr[7], YK_, 0,
   NULL);
 for (n = 0; n < 9; n++)
-   FreeMemory (menustr[n]);
+   free(menustr[n]);
 int subwin_x0 = x0 + BOX_BORDER + WIDE_HSPACING;
 int subwin_y0 = y0 + BOX_BORDER + WIDE_VSPACING + (int) ((1.5 + val) * FONTH);
 switch (val)
@@ -115,13 +115,12 @@ switch (val)
    case 4:
       {
       strcpy (flatname, default_floor_texture);
-      char ** flat_names
-	= (char **) GetMemory (NumFTexture * sizeof *flat_names);
+      char ** flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
       for (size_t n = 0; n < NumFTexture; n++)
 	 flat_names[n] = flat_list[n].name;
       ChooseFloorTexture (subwin_x0, subwin_y0, "Choose a floor texture",
         NumFTexture, flat_names, flatname);
-      FreeMemory (flat_names);
+      free(flat_names);
       if (strlen (flatname) > 0)
 	 strcpy (default_floor_texture, flatname);
       break;
@@ -129,13 +128,12 @@ switch (val)
    case 5:
       {
       strcpy (flatname, default_ceiling_texture);
-      char ** flat_names
-	= (char **) GetMemory (NumFTexture * sizeof *flat_names);
+      char ** flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
       for (size_t n = 0; n < NumFTexture; n++)
 	 flat_names[n] = flat_list[n].name;
       ChooseFloorTexture (subwin_x0, subwin_y0, "Choose a ceiling texture",
         NumFTexture, flat_names, flatname);
-      FreeMemory (flat_names);
+      free(flat_names);
       if (strlen (flatname) > 0)
 	 strcpy (default_ceiling_texture, flatname);
       break;

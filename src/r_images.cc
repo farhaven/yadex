@@ -180,7 +180,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
       dir->wadfile->seek (dir->dir.start);
       dir->wadfile->read_int32_t (&numtex);
       /* read in the offsets for texture1 names and info. */
-      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      offsets = (int32_t *) malloc((long) numtex * 4);
       dir->wadfile->read_int32_t (offsets, numtex);
       for (n = 0; n < numtex && !texofs; n++)
          {
@@ -189,7 +189,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
          if (!y_strnicmp (tname, name, WAD_TEX_NAME))
             texofs = dir->dir.start + offsets[n];
          }
-      FreeMemory (offsets);
+      free(offsets);
       }
    }
 // Other iwads : "TEXTURE1" and "TEXTURE2"
@@ -203,7 +203,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
       dir->wadfile->seek (dir->dir.start);
       dir->wadfile->read_int32_t (&numtex);
       /* read in the offsets for texture1 names and info. */
-      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      offsets = (int32_t *) malloc((long) numtex * 4);
       dir->wadfile->read_int32_t (offsets, numtex);
       for (n = 0; n < numtex && !texofs; n++)
          {
@@ -212,7 +212,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
          if (!y_strnicmp (tname, name, WAD_TEX_NAME))
             texofs = dir->dir.start + offsets[n];
          }
-      FreeMemory (offsets);
+      free(offsets);
       }
    // Well, then is it in TEXTURE2 ?
    if (texofs == 0)
@@ -223,7 +223,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
          dir->wadfile->seek (dir->dir.start);
          dir->wadfile->read_int32_t (&numtex);
          /* read in the offsets for texture2 names */
-         offsets = (int32_t *) GetMemory ((long) numtex * 4);
+         offsets = (int32_t *) malloc((long) numtex * 4);
          dir->wadfile->read_int32_t (offsets, numtex);
          for (n = 0; n < numtex && !texofs; n++)
             {
@@ -232,7 +232,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
             if (!y_strnicmp (tname, name, WAD_TEX_NAME))
                texofs = dir->dir.start + offsets[n];
             }
-         FreeMemory (offsets);
+         free(offsets);
          }
       }
    }

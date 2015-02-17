@@ -70,7 +70,6 @@ parse_line(void) {
         else if (in_token)
             *optr++ = *iptr;
     }
-	 free(buffer);
 }
 
 // this function pushes a thing definition onto the stack of things

@@ -67,7 +67,7 @@ if (strncmp (wf->type, "IWAD", 4))
 lastp = NULL;
 for (n = 0; n < wf->dirsize; n++)
    {
-   newp = (MDirPtr) GetMemory (sizeof (struct MasterDirectory));
+   newp = (MDirPtr) malloc(sizeof (struct MasterDirectory));
    newp->next = NULL;
    newp->wadfile = wf;
    memcpy (&(newp->dir), &(wf->directory[n]), sizeof (struct Directory));
@@ -131,7 +131,7 @@ if (real_name == NULL)
 printf ("Loading pwad: %s...\n", real_name);
 // By default, assume pwads use the normal picture format.
 wad = BasicWadOpen (real_name, YGPF_NORMAL);
-FreeMemory (real_name);
+free(real_name);
 if (! wad)
    return 1;
 if (strncmp (wad->type, "PWAD", 4))
@@ -305,7 +305,7 @@ for (n = 0; n < wad->dirsize; n++)
       mdir = MasterDir;
       while (mdir->next)
 	 mdir = mdir->next;
-      mdir->next = (MDirPtr) GetMemory (sizeof (struct MasterDirectory));
+      mdir->next = (MDirPtr) malloc(sizeof (struct MasterDirectory));
       mdir = mdir->next;
       mdir->next = NULL;
       }
@@ -377,7 +377,7 @@ MasterDir = NULL;
 while (curd)
    {
    nextd = curd->next;
-   FreeMemory (curd);
+   free(curd);
    curd = nextd;
    }
 master_dir_serial.bump ();
@@ -438,7 +438,7 @@ bool fail = false;
 Wad_file *wf = new Wad_file;
 wf->pic_format_ = pic_format;
 wf->directory   = 0;
-wf->filename    = (char *) GetMemory (strlen (filename) + 1);
+wf->filename    = (char *) malloc(strlen (filename) + 1);
 strcpy (wf->filename, filename);
 
 // Open the wad and read its header.
@@ -464,7 +464,7 @@ verbmsg ("  Type %.4s, directory has %ld entries at offset %08lXh\n",
    wf->type, (long) wf->dirsize, (long) wf->dirstart);
 
 // Load the directory of the wad
-wf->directory = (DirPtr) GetMemory ((long) sizeof (struct Directory)
+wf->directory = (DirPtr) malloc((long) sizeof (struct Directory)
    * wf->dirsize);
 if (fseek (wf->fp, wf->dirstart, SEEK_SET) != 0)
    {
@@ -890,7 +890,7 @@ if (r != 0)
 /*
  *	locate_pwad
  *	Look for a PWAD in the standard directories
- *	and returns its name in a GetMemory'd buffer
+ *	and returns its name in a malloc'd buffer
  *	(or NULL if not found). It's up to the caller
  *	to free the buffer after use.
  */
@@ -922,27 +922,27 @@ al_fana (filename, NULL, NULL, NULL, ext);
 // If it's an absolute name, stop there.
 if (is_absolute (filename))
    {
-   real_name = (char *) GetMemory (strlen (filename) + 1 + (*ext ? 0 : 4));
+   real_name = (char *) malloc(strlen (filename) + 1 + (*ext ? 0 : 4));
    strcpy (real_name, filename);
    if (! *ext)
       strcat (real_name, ".wad");
    bool r = file_exists (real_name);
    if (! r)
       {
-      FreeMemory (real_name);
+      free(real_name);
       return 0;
       }
    return real_name;
    }
 
 // It's a relative name. If no extension given, append ".wad"
-real_basename = (char *) GetMemory (strlen (filename) + 1 + (*ext ? 0 : 4));
+real_basename = (char *) malloc(strlen (filename) + 1 + (*ext ? 0 : 4));
 strcpy (real_basename, filename);
 if (! *ext)
    strcat (real_basename, ".wad");
 
 // Then search for a file of that name in the standard directories.
-real_name = (char *) GetMemory (Y_FILE_NAME + 1);
+real_name = (char *) malloc(Y_FILE_NAME + 1);
 for (dirname = standard_directories; *dirname; dirname++)
    {
    if (! strcmp (*dirname, "~/"))
@@ -960,13 +960,13 @@ for (dirname = standard_directories; *dirname; dirname++)
    if (file_exists (real_name))
       {
       verbmsg ("right on !\n");
-      FreeMemory (real_basename);
+      free(real_basename);
       return real_name;
       }
    verbmsg ("nuts\n");
    }
-FreeMemory (real_name);
-FreeMemory (real_basename);
+free(real_name);
+free(real_basename);
 return NULL;
 }
 

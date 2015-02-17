@@ -38,7 +38,7 @@ Wad_file::~Wad_file ()
 {
   if (directory != 0)
   {
-    FreeMemory (directory);
+    free (directory);
     directory = 0;			// Catch bugs
   }
   if (fp != 0)
@@ -48,7 +48,7 @@ Wad_file::~Wad_file ()
   }
   if (filename != 0)
   {
-    FreeMemory (filename);
+    free (filename);
     filename = 0;			// Catch bugs
   }
 }

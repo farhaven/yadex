@@ -186,9 +186,8 @@ int LoadPicture (
     (255 x 5 + 1) = 1276 bytes per column. */
 #define TEX_COLUMNSIZE  1300
 
-    ColumnData    = (uint8_t *) GetMemory (TEX_COLUMNBUFFERSIZE);
-    /* FIXME DOS and pic_width_ > 16000 */
-    NeededOffsets = (int32_t *) GetMemory ((long) pic_width_ * 4);
+    ColumnData    = (uint8_t *) malloc(TEX_COLUMNBUFFERSIZE);
+    NeededOffsets = (int32_t *) malloc((long) pic_width_ * 4);
 
     if (long_offsets)
         dir->wadfile->read_int32_t (NeededOffsets, pic_width_);
@@ -203,8 +202,8 @@ int LoadPicture (
     {
         warn ("picture %.*s: read error in offset table, giving up\n",
         WAD_PIC_NAME, picname);
-        FreeMemory (ColumnData);
-        FreeMemory (NeededOffsets);
+        free(ColumnData);
+        free(NeededOffsets);
         return 1;
     }
 
@@ -217,8 +216,8 @@ int LoadPicture (
         {
             warn ("picture %.*s: can't seek to header, giving up\n",
                 WAD_PIC_NAME, picname);
-            FreeMemory (ColumnData);
-            FreeMemory (NeededOffsets);
+            free(ColumnData);
+            free(NeededOffsets);
             return 1;
         }
     }
@@ -257,12 +256,12 @@ int LoadPicture (
             Column = ColumnData + CurrentOffset - NeededOffsets[0];
         else
         {
-            Column = (uint8_t *) GetFarMemory (TEX_COLUMNSIZE);
+            Column = (uint8_t *) malloc(TEX_COLUMNSIZE);
             dir->wadfile->seek (dir->dir.start + CurrentOffset);
             if (dir->wadfile->error ())
             {
                 int too_many = add_msg (_MT_BADOFS, (short) pic_x);
-                FreeFarMemory (Column);
+                free(Column);
                 if (too_many)		// This picture has too many errors. Give up.
                     goto pic_end;
                 continue;			// Give up on this column
@@ -292,7 +291,7 @@ int LoadPicture (
                     if (too_many)		// This picture has too many errors. Give up.
                     {
                         if (! ColumnInMemory)
-                            FreeFarMemory (Column);
+                            free(Column);
                         goto pic_end;
                     }
                     break;				// Give up on this column
@@ -347,12 +346,12 @@ int LoadPicture (
         next_column :
 #endif
         if (!ColumnInMemory)
-        FreeFarMemory (Column);
+			  free(Column);
     }  // Column loop
 
 pic_end:
-    FreeMemory (ColumnData);
-    FreeMemory (NeededOffsets);
+    free(ColumnData);
+    free(NeededOffsets);
     flush_msg (picname);
     if (pic_width)
         *pic_width  = pic_width_;

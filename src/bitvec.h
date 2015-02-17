@@ -33,7 +33,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include <limits.h>
 
 #include "yerror.h"
-#include "ymemory.h"
 
 typedef enum
 {
@@ -49,14 +48,14 @@ class bitvec_c
     public :
         bitvec_c (size_t n_elements)
         { 
-            a = (char *) GetMemory (n_elements / CHAR_BIT + 1);
+            a = (char *) malloc(n_elements / CHAR_BIT + 1);
             memset (a, 0, n_elements / CHAR_BIT + 1);
             _n_elements = n_elements;
         }
 
         ~bitvec_c ()
         {
-            FreeMemory (a);
+            free (a);
         }
 
         size_t nelements () const  // Return the number of elements

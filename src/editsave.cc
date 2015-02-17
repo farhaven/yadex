@@ -170,7 +170,7 @@ try_again :
 char *GetWadFileName (const char *levelname)
 {
 #define BUFSZ 79
-  char *outfile = (char *) GetMemory (BUFSZ + 1);
+  char *outfile = (char *) malloc (BUFSZ + 1);
 
   /* get the file name */
   // If no name, find a default one
@@ -202,7 +202,7 @@ char *GetWadFileName (const char *levelname)
   /* escape */
   if (outfile[0] == '\0')
   {
-    FreeMemory (outfile);
+    free (outfile);
     return 0;
   }
   /* if the wad file already exists, rename it to "*.bak" */

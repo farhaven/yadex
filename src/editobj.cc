@@ -275,7 +275,7 @@ switch (objtype) {
       break;
    case OBJ_VERTICES:
 		for (n = 0; n < 3; n++)
-			menustr[n] = (char *) GetMemory (60);
+			menustr[n] = (char *) malloc (60);
       snprintf (menustr[2], 60, "Edit Vertex #%d", obj->objnum);
       snprintf (menustr[0], 60, "Change X position (Current: %d)",
          Vertices[obj->objnum].x);
@@ -286,7 +286,7 @@ switch (objtype) {
          menustr[1], YK_, 0,
 	 NULL);
       for (n = 0; n < 3; n++)
-	 FreeMemory (menustr[n]);
+	 free (menustr[n]);
       subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
       switch (val)
 	 {

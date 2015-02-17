@@ -92,7 +92,7 @@ switch (objtype)
       signed char *sector_status;
       LDPtr ld;
 
-      sector_status = (signed char *) GetMemory (NumSectors);
+      sector_status = (signed char *) malloc(NumSectors);
       memset (sector_status, 0, NumSectors);
       for (n = 0, ld = LineDefs; n < NumLineDefs; n++, ld++)
          {
@@ -142,7 +142,7 @@ switch (objtype)
       for (n = 0; n < NumSectors; n++)
          if (sector_status[n] > 0)
             SelectObject (list, n);
-      FreeMemory (sector_status);
+      free(sector_status);
       }
       break;
    }

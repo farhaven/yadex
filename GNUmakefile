@@ -152,7 +152,7 @@ MODULES_YADEX =								\
 	input		l_align		l_centre	l_flags		\
 	l_misc		l_prop		l_unlink	l_vertices	\
 	levels		lists		locate		lumpdir		\
-	macro		memory		menubar		menu		\
+	macro		menubar		menu		\
 	mkpalette	names		nop						\
 	objects		objinfo		oldmenus	palview		\
 	patchdir	pic2img		prefer		s_centre	\

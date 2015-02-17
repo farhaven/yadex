@@ -228,13 +228,12 @@ switch (objtype)
 	    {
 	    for (n = objnum; n < NumThings; n++)
 	       Things[n] = Things[n + 1];
-	    Things = (TPtr) ResizeFarMemory (Things,
-	       NumThings * sizeof (struct Thing));
+	    Things = (TPtr) realloc(Things, NumThings * sizeof (struct Thing));
 	    }
 	 else
 	    {
-	    FreeFarMemory (Things);
-	    Things = 0;
+	    free(Things);
+	    Things = NULL;
 	    }
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
@@ -276,13 +275,12 @@ switch (objtype)
 	    {
 	    for (n = objnum; n < NumVertices; n++)
 	       Vertices[n] = Vertices[n + 1];
-	    Vertices = (VPtr) ResizeFarMemory (Vertices,
-	      NumVertices * sizeof (struct Vertex));
+	    Vertices = (VPtr) realloc(Vertices, NumVertices * sizeof (struct Vertex));
 	    }
 	 else
 	    {
-	    FreeFarMemory (Vertices);
-	    Vertices = 0;
+	    free(Vertices);
+	    Vertices = NULL;
 	    }
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
@@ -319,13 +317,12 @@ switch (objtype)
 	    {
 	    for (n = objnum; n < NumLineDefs; n++)
 	       LineDefs[n] = LineDefs[n + 1];
-	    LineDefs = (LDPtr) ResizeFarMemory (LineDefs,
-	      NumLineDefs * sizeof (struct LineDef));
+	    LineDefs = (LDPtr) realloc(LineDefs, NumLineDefs * sizeof (struct LineDef));
 	    }
 	 else
 	    {
-	    FreeFarMemory (LineDefs);
-	    LineDefs = 0;
+	    free(LineDefs);
+	    LineDefs = NULL;
 	    }
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
@@ -366,13 +363,12 @@ switch (objtype)
 	    {
 	    for (n = objnum; n < NumSideDefs; n++)
 	       SideDefs[n] = SideDefs[n + 1];
-	    SideDefs = (SDPtr) ResizeFarMemory (SideDefs,
-	       NumSideDefs * sizeof (struct SideDef));
+	    SideDefs = (SDPtr) realloc(SideDefs, NumSideDefs * sizeof (struct SideDef));
 	    }
 	 else
 	    {
-	    FreeFarMemory (SideDefs);
-	    SideDefs = 0;
+	    free(SideDefs);
+	    SideDefs = NULL;
 	    }
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
@@ -405,13 +401,12 @@ switch (objtype)
 	   {
 	   for (n = objnum; n < NumSectors; n++)
 	      Sectors[n] = Sectors[n + 1];
-	   Sectors = (SPtr) ResizeFarMemory (Sectors,
-	      NumSectors * sizeof (struct Sector));
+	   Sectors = (SPtr) realloc(Sectors, NumSectors * sizeof (struct Sector));
 	   }
 	else
 	   {
-	   FreeFarMemory (Sectors);
-	   Sectors = 0;
+	   free(Sectors);
+	   Sectors = NULL;
 	   }
 	for (cur = (*list)->next; cur; cur = cur->next)
 	   if (cur->objnum > objnum)
@@ -452,10 +447,9 @@ switch (objtype)
    case OBJ_THINGS:
       last = NumThings++;
       if (last > 0)
-	 Things = (TPtr) ResizeFarMemory (Things,
-	   (unsigned long) NumThings * sizeof (struct Thing));
+	 Things = (TPtr) realloc(Things, (unsigned long) NumThings * sizeof (struct Thing));
       else
-	 Things = (TPtr) GetFarMemory (sizeof (struct Thing));
+	 Things = (TPtr) malloc(sizeof (struct Thing));
       Things[last].xpos = xpos;
       Things[last].ypos = ypos;
       things_angles++;
@@ -493,10 +487,9 @@ switch (objtype)
    case OBJ_VERTICES:
       last = NumVertices++;
       if (last > 0)
-	 Vertices = (VPtr) ResizeFarMemory (Vertices,
-	   (unsigned long) NumVertices * sizeof (struct Vertex));
+	 Vertices = (VPtr) realloc(Vertices, (unsigned long) NumVertices * sizeof (struct Vertex));
       else
-	 Vertices = (VPtr) GetFarMemory (sizeof (struct Vertex));
+	 Vertices = (VPtr) malloc(sizeof (struct Vertex));
       Vertices[last].x = xpos;
       Vertices[last].y = ypos;
       if (Vertices[last].x < MapMinX)
@@ -513,10 +506,9 @@ switch (objtype)
    case OBJ_LINEDEFS:
       last = NumLineDefs++;
       if (last > 0)
-	 LineDefs = (LDPtr) ResizeFarMemory (LineDefs,
-	   (unsigned long) NumLineDefs * sizeof (struct LineDef));
+	 LineDefs = (LDPtr) realloc(LineDefs, (unsigned long) NumLineDefs * sizeof (struct LineDef));
       else
-	 LineDefs = (LDPtr) GetFarMemory (sizeof (struct LineDef));
+	 LineDefs = (LDPtr) malloc(sizeof (struct LineDef));
       if (is_obj (copyfrom))
 	 {
 	 LineDefs[last].start = LineDefs[copyfrom].start;
@@ -548,10 +540,9 @@ switch (objtype)
    case OBJ_SIDEDEFS:
       last = NumSideDefs++;
       if (last > 0)
-	 SideDefs = (SDPtr) ResizeFarMemory (SideDefs,
-	   (unsigned long) NumSideDefs * sizeof (struct SideDef));
+	 SideDefs = (SDPtr) realloc(SideDefs, (unsigned long) NumSideDefs * sizeof (struct SideDef));
       else
-	 SideDefs = (SDPtr) GetFarMemory (sizeof (struct SideDef));
+	 SideDefs = (SDPtr) malloc(sizeof (struct SideDef));
       if (is_obj (copyfrom))
 	 {
 	 SideDefs[last].xoff = SideDefs[copyfrom].xoff;
@@ -576,10 +567,9 @@ switch (objtype)
    case OBJ_SECTORS:
       last = NumSectors++;
       if (last > 0)
-	 Sectors = (SPtr) ResizeFarMemory (Sectors,
-			  (unsigned long) NumSectors * sizeof (struct Sector));
+	 Sectors = (SPtr) realloc(Sectors, (unsigned long) NumSectors * sizeof (struct Sector));
       else
-	 Sectors = (SPtr) GetFarMemory (sizeof (struct Sector));
+	 Sectors = (SPtr) malloc(sizeof (struct Sector));
       if (is_obj (copyfrom))
 	 {
 	 Sectors[last].floorh  = Sectors[copyfrom].floorh;

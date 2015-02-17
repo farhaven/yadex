@@ -74,7 +74,7 @@ pcolour_t *alloc_game_colours (int playpalnum)
         playpalnum = 0;
     }
 
-    dpal = (uint8_t *) GetFarMemory (3 * DOOM_COLOURS);
+    dpal = (uint8_t *) malloc(3 * DOOM_COLOURS);
     dir->wadfile->seek (dir->dir.start);
     if (dir->wadfile->error ())
     {
@@ -134,7 +134,7 @@ pcolour_t *alloc_game_colours (int playpalnum)
         verbmsg ("Sky Colour remapped to %d (delta %d)\n", sky_colour, smallest_delta);
     }
 
-    FreeFarMemory (dpal);
+    free(dpal);
     return game_colours;
 }
 

@@ -135,7 +135,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
   {
     case 1:
       for (n = 0; n < 12; n++)
-	menustr[n] = (char *) GetMemory (60);
+	menustr[n] = (char *) malloc (60);
       snprintf (menustr[11], 60, "Edit linedef #%d", obj->objnum);
       snprintf (menustr[0], 60, "Change flags            (Current: %d)",
 	LineDefs[obj->objnum].flags);
@@ -197,7 +197,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	menustr[6], YK_, 0,
 	NULL);
       for (n = 0; n < 12; n++)
-	FreeMemory (menustr[n]);
+	free (menustr[n]);
       subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
       switch (val)
       {
@@ -479,7 +479,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
       }
       ObjectsNeeded (OBJ_SIDEDEFS, 0);
       for (n = 0; n < 7; n++)
-	menustr[n] = (char *) GetMemory (60);
+	menustr[n] = (char *) malloc (60);
       snprintf (menustr[6], 60, "Edit sidedef #%d", sdlist->objnum);
       texname[WAD_TEX_NAME] = '\0';
       strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
@@ -503,7 +503,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	menustr[5], YK_, 0,
 	NULL);
       for (n = 0; n < 7; n++)
-	FreeMemory (menustr[n]);
+	free (menustr[n]);
       subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
       switch (val)
       {
@@ -606,7 +606,7 @@ SelPtr cur;
 int    subwin_y0;
 
 for (n = 0; n < 14; n++)
-   menustr[n] = (char *) GetMemory (60);
+   menustr[n] = (char *) malloc (60);
 snprintf (menustr[13], 60,"Edit thing #%d", obj->objnum);
 snprintf (menustr[0], 60,"Change type          (Current: %s)",
          get_thing_name (Things[obj->objnum].type));
@@ -661,7 +661,7 @@ val = vDisplayMenu (x0, y0, menustr[13],
    menustr[4], YK_, 0,
    NULL);
 for (n = 0; n < 14; n++)
-   FreeMemory (menustr[n]);
+   free (menustr[n]);
 subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
 switch (val)
   {

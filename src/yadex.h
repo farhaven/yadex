@@ -60,7 +60,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "yerror.h"
 #include "aym.h"     /* Needs yerror.h */
 #include "windim.h"
-#include "ymemory.h"
 
 
 /*

@@ -111,9 +111,9 @@ const char *SelectLevel (int levelno)
             && (levelno==0 || levelname2levelno (dir->dir.name) % 1000 == levelno))
         {
             if (n == 0)
-                levels = (char **) GetMemory (sizeof (char *));
+                levels = (char **) malloc (sizeof (char *));
             else
-                levels = (char **) ResizeMemory (levels, (n + 1) * sizeof (char *));
+                levels = (char **) realloc (levels, (n + 1) * sizeof (char *));
             levels[n] = dir->dir.name;
             n++;
         }
@@ -130,7 +130,7 @@ const char *SelectLevel (int levelno)
     if (n == 1)
         return name;
     InputNameFromList (-1, -1, "Level name :", n, levels, name);
-    FreeMemory (levels);
+    free (levels);
     return name;
 }
 
@@ -2152,10 +2152,10 @@ cancel_save_as:
                 FILE* f = fopen(acsfile, "rb");
                 if (f)
                 {
-                    FreeFarMemory(Behavior);
+                    free(Behavior);
                     fseek(f, 0, SEEK_END);
                     BehaviorSize = ftell(f);
-                    Behavior = (uint8_t*)GetFarMemory(BehaviorSize);
+                    Behavior = (uint8_t*)malloc(BehaviorSize);
                     fseek(f, 0, SEEK_SET);
                     int _ign = fread(Behavior, BehaviorSize, 1, f);
                     fclose(f);
@@ -2309,7 +2309,7 @@ static int zoom_fit (edit_t& e)
 static char *GetBehaviorFileName (const char *levelname)
 {
 #define BUFSZ 79
-    char *outfile = (char *) GetMemory (BUFSZ + 1);
+    char *outfile = (char *) malloc (BUFSZ + 1);
 
     /* get the file name */
     // If no name, find a default one
@@ -2322,7 +2322,7 @@ static char *GetBehaviorFileName (const char *levelname)
     /* escape */
     if (outfile[0] == '\0')
     {
-        FreeMemory (outfile);
+        free (outfile);
         return 0;
     }
     return outfile;

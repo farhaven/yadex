@@ -906,7 +906,7 @@ static void MainLoop ()
             out = strtok (NULL, " ");
             if (out)
                 *out = '\0';
-            out = (char *) GetMemory (strlen (com) + 1);
+            out = (char *) malloc(strlen (com) + 1);
             strncpy (out, com, strlen(com));
             OpenPatchWad (out);
             CloseUnusedWadFiles ();
@@ -982,15 +982,14 @@ v_end:;
                 strncat (buf, com, sizeof buf - 1);
             ReadFTextureNames ();
             {
-                char **flat_names =
-                (char **) GetMemory (NumFTexture * sizeof *flat_names);
+                char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
 
                 for (size_t n = 0; n < NumFTexture; n++)
                     flat_names[n] = flat_list[n].name;
 
                 ChooseFloorTexture (-1, -1, "Flat viewer",
                 NumFTexture, flat_names, buf);
-                FreeMemory (flat_names);
+                free(flat_names);
             }
             ForgetFTextureNames ();
             TermGfx ();

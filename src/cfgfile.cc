@@ -926,7 +926,7 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
 
                 case OPT_STRINGPTR:
                     {
-                        char *dup = (char *) GetMemory (strlen (value) + 1);
+                        char *dup = (char *) malloc (strlen (value) + 1);
                         strcpy (dup, value);
                         if (o->data_ptr)
                             *((char **) (o->data_ptr)) = dup;
@@ -935,7 +935,7 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
 
                 case OPT_STRINGPTRACC:
                     {
-                        char *dup = (char *) GetMemory (strlen (value) + 1);
+                        char *dup = (char *) malloc (strlen (value) + 1);
                         strcpy (dup, value);
                         if (o->data_ptr)
                             append_item_to_list ((const char ***) o->data_ptr, dup);
@@ -948,7 +948,7 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
                         char *v = value;
                         while (*v != '\0' && ! isspace ((unsigned char) *v))
                             v++;
-                        char *dup = (char *) GetMemory (v - value + 1);
+                        char *dup = (char *) malloc (v - value + 1);
                         memcpy (dup, value, v - value);
                         dup[v - value] = '\0';
                         if (o->data_ptr)
@@ -1363,11 +1363,11 @@ static void append_item_to_list (const char ***list, const char *item)
         while ((*list)[i] != 0)
             i++;
         // Expand the list
-        *list = (const char **) ResizeMemory (*list, (i + 2) * sizeof **list);
+        *list = (const char **) realloc (*list, (i + 2) * sizeof **list);
     } else
     {
         // Create a new list
-        *list = (const char **) GetMemory (2 * sizeof **list);
+        *list = (const char **) malloc (2 * sizeof **list);
     }
     // Append the new element
     (*list)[i] = item;

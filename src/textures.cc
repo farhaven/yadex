@@ -170,7 +170,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
 	 goto textures_done;
 	 }
       // Read in the offsets for texture1 names and info
-      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      offsets = (int32_t *) malloc((long) numtex * 4);
       wf->read_int32_t (offsets, numtex);
       if (wf->error ())
 	 {
@@ -197,7 +197,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
 	 }
       textures_done:
       if (offsets != NULL)
-	 FreeMemory (offsets);
+	 free(offsets);
       }
    }
 // Other iwads : "TEXTURE1" and "TEXTURE2"
@@ -226,7 +226,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 goto texture1_done;
 	 }
       // Read in the offsets for texture1 names and info
-      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      offsets = (int32_t *) malloc((long) numtex * 4);
       wf->read_int32_t (offsets, numtex);
       if (wf->error ())
 	 {
@@ -253,7 +253,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 }
       texture1_done:
       if (offsets != NULL)
-	 FreeMemory (offsets);
+	 free(offsets);
       }
    }
    // Well, then is it in TEXTURE2 ?
@@ -279,7 +279,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	    goto texture2_done;
 	    }
 	 // Read in the offsets for TEXTURE2 names
-	 offsets = (int32_t *) GetMemory ((long) numtex * 4);
+	 offsets = (int32_t *) malloc((long) numtex * 4);
 	 wf->read_int32_t (offsets, numtex);
 	 if (wf->error ())
 	    {
@@ -305,8 +305,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	       texofs = dir->dir.start + offsets[n];
 	    }
 	 texture2_done:
-	 if (offsets != NULL)
-	    FreeMemory (offsets);
+	    free(offsets);
 	 }
       }
    }
@@ -483,7 +482,7 @@ else if (yg_texture_format == YGTF_NORMAL
       dir->wadfile->seek (dir->dir.start);
       dir->wadfile->read_int32_t (&numtex);
       // Read in the offsets for texture1 names and info
-      offsets = (int32_t *) GetMemory ((long) numtex * 4);
+      offsets = (int32_t *) malloc((long) numtex * 4);
       dir->wadfile->read_int32_t (offsets, numtex);
       for (n = 0; n < numtex && !texofs; n++)
 	 {
@@ -492,7 +491,7 @@ else if (yg_texture_format == YGTF_NORMAL
 	 if (!y_strnicmp (tname, texname, WAD_TEX_NAME))
 	    texofs = dir->dir.start + offsets[n];
 	 }
-      FreeMemory (offsets);
+      free(offsets);
       }
    if (texofs == 0 && yg_texture_lumps == YGTL_NORMAL)
       {
@@ -503,7 +502,7 @@ else if (yg_texture_format == YGTF_NORMAL
 	 dir->wadfile->seek (dir->dir.start);
 	 dir->wadfile->read_int32_t (&numtex);
 	 // Read in the offsets for texture2 names
-	 offsets = (int32_t *) GetMemory ((long) numtex * 4);
+	 offsets = (int32_t *) malloc((long) numtex * 4);
 	 dir->wadfile->read_int32_t (offsets);
 	 for (n = 0; n < numtex && !texofs; n++)
 	    {
@@ -512,7 +511,7 @@ else if (yg_texture_format == YGTF_NORMAL
 	    if (!y_strnicmp (tname, texname, WAD_TEX_NAME))
 	       texofs = dir->dir.start + offsets[n];
 	    }
-	 FreeMemory (offsets);
+	 free(offsets);
 	 }
       }
    }

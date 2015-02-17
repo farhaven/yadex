@@ -232,7 +232,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
     bytes_per_line++;
     padding++;
   }
-  uint8_t *buf = (uint8_t *) GetMemory ((unsigned long) bytes_per_line * height);
+  uint8_t *buf = (uint8_t *) malloc((unsigned long) bytes_per_line * height);
   if (! buf)
   {
     err ("Not enough memory to display %dx%d image", width, height);
@@ -397,7 +397,7 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   if (ximage == 0)
   {
     err ("XCreateImage() returned NULL");
-    FreeMemory (buf);
+    free(buf);
   }
   else
   {
@@ -432,7 +432,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   const size_t bitmap_pad     = BitmapPad (dpy);
   const size_t bytes_per_line = (width + bitmap_pad - 1) / bitmap_pad
 				* bitmap_pad / CHAR_BIT;
-  uint8_t *buf = (uint8_t *) GetMemory ((unsigned long) bytes_per_line * height);
+  uint8_t *buf = (uint8_t *) malloc((unsigned long) bytes_per_line * height);
   if (! buf)
   {
     err ("Not enough memory to display %dx%d image", width, height);
@@ -523,7 +523,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   if (ximage == 0)
   {
     err ("XCreateImage() returned NULL");
-    FreeMemory (buf);
+    free(buf);
     return 0;
   }
   return ximage;

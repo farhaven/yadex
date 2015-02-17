@@ -229,7 +229,7 @@ bool CheckFailed (int x0, int y0, char *prompt1, char *prompt2, bool fatal,
 /*
    check if all sectors are closed
 */
-void CheckSectors () /* SWAP! */
+void CheckSectors ()
 {
     int        s, n, sd;
     char huge *ends;
@@ -239,7 +239,7 @@ void CheckSectors () /* SWAP! */
     CheckingObjects ();
     LogMessage ("\nVerifying Sectors...\n");
     ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
-    ends = (char huge *) GetFarMemory (NumVertices);
+    ends = (char *) malloc(NumVertices);
     for (s = 0; s < NumSectors; s++)
     {
         /* clear the "ends" array */
@@ -288,7 +288,7 @@ void CheckSectors () /* SWAP! */
             }
         }
     }
-    FreeFarMemory (ends);
+    free(ends);
 
 /*
     Note from RQ:

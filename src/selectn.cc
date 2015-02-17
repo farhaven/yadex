@@ -79,7 +79,7 @@ void SelectObject (SelPtr *list, int objnum)
 
   if (! is_obj (objnum))
     fatal_error ("BUG: SelectObject called with %d", objnum);
-  cur = (SelPtr) GetMemory (sizeof (struct SelectionList));
+  cur = (SelPtr) malloc(sizeof (struct SelectionList));
   cur->next = *list;
   cur->objnum = objnum;
   *list = cur;
@@ -107,7 +107,7 @@ for (prev = NULL, cur = *list; cur != NULL; prev = cur, cur = cur->next)
       prev->next = cur->next;
     else
       *list = cur->next;
-    FreeMemory (cur);
+    free(cur);
     if (prev != NULL)
       cur = prev->next;
     else
@@ -116,7 +116,7 @@ for (prev = NULL, cur = *list; cur != NULL; prev = cur, cur = cur->next)
   }
 
   // Not selected: select it.
-  cur = (SelPtr) GetMemory (sizeof (struct SelectionList));
+  cur = (SelPtr) malloc(sizeof (struct SelectionList));
   cur->next = *list;
   cur->objnum = objnum;
   *list = cur;
@@ -144,7 +144,7 @@ void UnSelectObject (SelPtr *list, int objnum)
 	prev->next = cur->next;
       else
 	*list = cur->next;
-      FreeMemory (cur);
+      free(cur);
       if (prev)
 	cur = prev->next;
       else
@@ -173,7 +173,7 @@ void ForgetSelection (SelPtr *list)
   {
     prev = cur;
     cur = cur->next;
-    FreeMemory (prev);
+    free(prev);
   }
   *list = 0;
 }

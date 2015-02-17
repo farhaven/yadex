@@ -118,7 +118,7 @@ NumVertices = 0;
 if (yg_level_format == YGLF_HEXEN)
    {
       BehaviorSize = sizeof(DefaultBehavior);
-      Behavior = (uint8_t*) GetFarMemory ((unsigned long) BehaviorSize );
+      Behavior = (uint8_t*) malloc(BehaviorSize );
       memcpy(Behavior, DefaultBehavior, BehaviorSize);
    }
 }
@@ -236,8 +236,7 @@ things_angles++;
 things_types++;
 if (NumThings > 0)
    {
-   Things = (TPtr) GetFarMemory ((unsigned long) NumThings
-      * sizeof (struct Thing));
+   Things = (TPtr) malloc((unsigned long) NumThings * sizeof (struct Thing));
    const Wad_file *wf = dir->wadfile;
    wf->seek (offset);
    if (wf->error ())
@@ -317,8 +316,7 @@ if (yg_level_format != YGLF_ALPHA)
       }
    if (NumLineDefs > 0)
       {
-      LineDefs = (LDPtr) GetFarMemory ((unsigned long) NumLineDefs
-	 * sizeof (struct LineDef));
+      LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs * sizeof (struct LineDef));
       const Wad_file *wf = dir->wadfile;
       wf->seek (dir->dir.start);
       if (wf->error ())
@@ -386,8 +384,7 @@ else
    NumSideDefs = 0;
 if (NumSideDefs > 0)
    {
-   SideDefs = (SDPtr) GetFarMemory ((unsigned long) NumSideDefs
-      * sizeof (struct SideDef));
+   SideDefs = (SDPtr) malloc((unsigned long) NumSideDefs * sizeof (struct SideDef));
    const Wad_file *wf = dir->wadfile;
    wf->seek (dir->dir.start);
    if (wf->error ())
@@ -465,9 +462,9 @@ if (yg_level_format == YGLF_ALPHA)
       const size_t nlines = dir->dir.size / 36;
       NumLineDefs = nlines;
       NumSideDefs = 2 * nlines;  // Worst case. We'll adjust later.
-      LineDefs = (LDPtr) GetFarMemory ((unsigned long) NumLineDefs
+      LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs
 	 * sizeof (struct LineDef));
-      SideDefs = (SDPtr) GetFarMemory ((unsigned long) NumSideDefs
+      SideDefs = (SDPtr) malloc((unsigned long) NumSideDefs
 	 * sizeof (struct SideDef));
       // Read TEXTURES
       if (yg_texture_format != YGTF_NAMELESS)
@@ -512,7 +509,7 @@ if (yg_level_format == YGLF_ALPHA)
 	       goto textures_done;
 	       }
 	    }
-	 tex_list = (char *) GetMemory (ntex * WAD_TEX_NAME);
+	 tex_list = (char *) malloc (ntex * WAD_TEX_NAME);
 	 for (size_t n = 0; n < ntex; n++)
 	    {
 	    const long offset = d->dir.start + offset_table[n];
@@ -609,11 +606,10 @@ if (yg_level_format == YGLF_ALPHA)
       if ((size_t) NumSideDefs > s)  // Almost always true.
          {
 	 NumSideDefs = s;
-         SideDefs = (SDPtr) ResizeFarMemory (SideDefs,
-	     (unsigned long) NumSideDefs * sizeof (struct SideDef));
+         SideDefs = (SDPtr) realloc(SideDefs, (unsigned long) NumSideDefs * sizeof (struct SideDef));
          }
       if (tex_list)
-         FreeMemory (tex_list);
+         free (tex_list);
       tex_list = 0;
       ntex = 0;
       }
@@ -690,8 +686,7 @@ NumVertices = last_used_vertex + 1;
 if (NumVertices > 0)
    {
    const char *lump_name = "BUG";
-   Vertices = (VPtr) GetFarMemory ((unsigned long) NumVertices
-      * sizeof (struct Vertex));
+   Vertices = (VPtr) malloc((unsigned long) NumVertices * sizeof (struct Vertex));
    if (yg_level_format == YGLF_ALPHA)  // Doom alpha
       lump_name = "POINTS";
    else
@@ -760,8 +755,7 @@ if (yg_level_format != YGLF_ALPHA)
       NumSectors = 0;
    if (NumSectors > 0)
       {
-      Sectors = (SPtr) GetFarMemory ((unsigned long) NumSectors
-	 * sizeof (struct Sector));
+      Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
       const Wad_file *wf = dir->wadfile;
       wf->seek (dir->dir.start);
       if (wf->error ())
@@ -821,8 +815,7 @@ else  // Doom alpha--a wholly different SECTORS format
       nsectors = 0;
       }
    NumSectors = nsectors;
-   Sectors = (SPtr) GetFarMemory ((unsigned long) NumSectors
-      * sizeof (struct Sector));
+   Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
    offset_table = new int32_t[nsectors];
    for (size_t n = 0; n < (size_t) nsectors; n++)
       wf->read_int32_t (offset_table + n);
@@ -939,7 +932,7 @@ if (dir)
    BehaviorSize = (int)dir->dir.size;
    if (BehaviorSize > 0)
       {
-      Behavior = (uint8_t*) GetFarMemory ((unsigned long) BehaviorSize );
+      Behavior = (uint8_t*) malloc((unsigned long) BehaviorSize );
       const Wad_file *wf = dir->wadfile;
       wf->seek (dir->dir.start);
       if (wf->error ())
@@ -996,39 +989,34 @@ void ForgetLevelData () /* SWAP! */
 /* forget the things */
 ObjectsNeeded (OBJ_THINGS, 0);
 NumThings = 0;
-if (Things != 0)
-   FreeFarMemory (Things);
-Things = 0;
+free(Things);
+Things = NULL;
 things_angles++;
 things_types++;
 
 /* forget the vertices */
 ObjectsNeeded (OBJ_VERTICES, 0);
 NumVertices = 0;
-if (Vertices != 0)
-   FreeFarMemory (Vertices);
-Vertices = 0;
+free(Vertices);
+Vertices = NULL;
 
 /* forget the linedefs */
 ObjectsNeeded (OBJ_LINEDEFS, 0);
 NumLineDefs = 0;
-if (LineDefs != 0)
-   FreeFarMemory (LineDefs);
-LineDefs = 0;
+free(LineDefs);
+LineDefs = NULL;
 
 /* forget the sidedefs */
 ObjectsNeeded (OBJ_SIDEDEFS, 0);
 NumSideDefs = 0;
-if (SideDefs != 0)
-   FreeFarMemory (SideDefs);
-SideDefs = 0;
+free(SideDefs);
+SideDefs = NULL;
 
 /* forget the sectors */
 ObjectsNeeded (OBJ_SECTORS, 0);
 NumSectors = 0;
-if (Sectors != 0)
-   FreeFarMemory (Sectors);
-Sectors = 0;
+free(Sectors);
+Sectors = NULL;
 ObjectsNeeded (0);
 }
 
@@ -1441,13 +1429,13 @@ if (yg_texture_lumps == YGTL_TEXTURES
       goto textures04_done;
       }
    NumWTexture = (int) val + 1;
-   WTexture = (char **) GetMemory ((long) NumWTexture * sizeof *WTexture);
-   WTexture[0] = (char *) GetMemory (WAD_TEX_NAME + 1);
+   WTexture = (char **) malloc((long) NumWTexture * sizeof *WTexture);
+   WTexture[0] = (char *) malloc(WAD_TEX_NAME + 1);
    strcpy (WTexture[0], "-");
    if (WAD_TEX_NAME < 7) nf_bug ("WAD_TEX_NAME too small");  // Sanity
    for (long n = 0; n < val; n++)
       {
-      WTexture[n + 1] = (char *) GetMemory (WAD_TEX_NAME + 1);
+      WTexture[n + 1] = (char *) malloc (WAD_TEX_NAME + 1);
       if (n > 9999)
 	 {
 	 warn ("more than 10,000 textures. Ignoring excess.\n");
@@ -1489,7 +1477,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
       }
    NumWTexture = (int) val + 1;
    /* read in the offsets for texture1 names */
-   offsets = (int32_t *) GetMemory ((long) NumWTexture * 4);
+   offsets = (int32_t *) malloc ((long) NumWTexture * 4);
    wf->read_int32_t (offsets + 1, NumWTexture - 1);
    if (wf->error ())
       {
@@ -1497,12 +1485,12 @@ else if (yg_texture_lumps == YGTL_TEXTURES
       goto textures05_done;
       }
    /* read in the actual names */
-   WTexture = (char **) GetMemory ((long) NumWTexture * sizeof (char *));
-   WTexture[0] = (char *) GetMemory (WAD_TEX_NAME + 1);
+   WTexture = (char **) malloc ((long) NumWTexture * sizeof (char *));
+   WTexture[0] = (char *) malloc (WAD_TEX_NAME + 1);
    strcpy (WTexture[0], "-");
    for (n = 1; n < NumWTexture; n++)
       {
-      WTexture[n] = (char *) GetMemory (WAD_TEX_NAME + 1);
+      WTexture[n] = (char *) malloc (WAD_TEX_NAME + 1);
       long offset = dir->dir.start + offsets[n];
       wf->seek (offset);
       if (wf->error ())
@@ -1521,7 +1509,7 @@ else if (yg_texture_lumps == YGTL_TEXTURES
    }
    textures05_done:
    if (offsets != 0)
-      FreeMemory (offsets);
+      free (offsets);
    }
 // Other iwads : "TEXTURE1" and possibly "TEXTURE2"
 else if (yg_texture_lumps == YGTL_NORMAL
@@ -1547,18 +1535,18 @@ else if (yg_texture_lumps == YGTL_NORMAL
       }
       NumWTexture = (int) val + 1;
       /* read in the offsets for texture1 names */
-      offsets = (int32_t *) GetMemory ((long) NumWTexture * 4);
+      offsets = (int32_t *) malloc ((long) NumWTexture * 4);
       wf->read_int32_t (offsets + 1, NumWTexture - 1);
       {
 	// FIXME
       }
       /* read in the actual names */
-      WTexture = (char **) GetMemory ((long) NumWTexture * sizeof (char *));
-      WTexture[0] = (char *) GetMemory (WAD_TEX_NAME + 1);
+      WTexture = (char **) malloc ((long) NumWTexture * sizeof (char *));
+      WTexture[0] = (char *) malloc (WAD_TEX_NAME + 1);
       strcpy (WTexture[0], "-");
       for (n = 1; n < NumWTexture; n++)
 	 {
-	 WTexture[n] = (char *) GetMemory (WAD_TEX_NAME + 1);
+	 WTexture[n] = (char *) malloc (WAD_TEX_NAME + 1);
 	 wf->seek (dir->dir.start + offsets[n]);
 	 if (wf->error ())
 	    {
@@ -1572,7 +1560,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	    }
 	 WTexture[n][WAD_TEX_NAME] = '\0';
 	 }
-      FreeMemory (offsets);
+      free (offsets);
       }
    {
    dir = FindMasterDir (MasterDir, "TEXTURE2");
@@ -1591,18 +1579,17 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	// FIXME
       }
       /* read in the offsets for texture2 names */
-      offsets = (int32_t *) GetMemory ((long) val * 4);
+      offsets = (int32_t *) malloc ((long) val * 4);
       wf->read_int32_t (offsets, val);
       if (wf->error ())
       {
 	// FIXME
       }
       /* read in the actual names */
-      WTexture = (char **) ResizeMemory (WTexture,
-	 (NumWTexture + val) * sizeof (char *));
+      WTexture = (char **) realloc(WTexture, (NumWTexture + val) * sizeof (char *));
       for (n = 0; n < val; n++)
 	 {
-	 WTexture[NumWTexture + n] = (char *) GetMemory (WAD_TEX_NAME + 1);
+	 WTexture[NumWTexture + n] = (char *) malloc (WAD_TEX_NAME + 1);
 	 wf->seek (dir->dir.start + offsets[n]);
 	 if (wf->error ())
 	    {
@@ -1615,7 +1602,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 	 WTexture[NumWTexture + n][WAD_TEX_NAME] = '\0';
 	 }
       NumWTexture += val;
-      FreeMemory (offsets);
+      free (offsets);
       }
    }
    }
@@ -1638,11 +1625,11 @@ int n;
 
 /* forget all names */
 for (n = 0; n < NumWTexture; n++)
-   FreeMemory (WTexture[n]);
+   free (WTexture[n]);
 
 /* forget the array */
 NumWTexture = 0;
-FreeMemory (WTexture);
+free (WTexture);
 }
 
 
@@ -1706,8 +1693,7 @@ for (dir = MasterDir; (dir = FindMasterDir (dir, "F_START", "FF_START"));)
       warn ("this wad uses FF_END. That won't work with Doom."
 	 " Use F_END instead.\n");
    /* get the actual names from master dir. */
-   flat_list = (flat_list_entry_t *) ResizeMemory (flat_list,
-      (NumFTexture + n) * sizeof *flat_list);
+   flat_list = (flat_list_entry_t *) realloc(flat_list, (NumFTexture + n) * sizeof *flat_list);
    for (size_t m = NumFTexture; m < NumFTexture + n; dir0 = dir0->next)
       {
       // Skip all labels.
@@ -1780,7 +1766,7 @@ int is_flat_name_in_list (const char *name)
 void ForgetFTextureNames ()
 {
 NumFTexture = 0;
-FreeMemory (flat_list);
+free (flat_list);
 flat_list = 0;
 }
 

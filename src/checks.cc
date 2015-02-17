@@ -238,7 +238,6 @@ void CheckSectors ()
 
     CheckingObjects ();
     LogMessage ("\nVerifying Sectors...\n");
-    ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
     ends = (char *) malloc(NumVertices);
     for (s = 0; s < NumSectors; s++)
     {
@@ -309,12 +308,10 @@ void CheckSectors ()
 /* now check if all SideDefs are facing a sidedef with the same Sector number */
     for (n = 0; n < NumLineDefs; n++)
     {
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
         sd = LineDefs[n].sidedef1;
         if (sd >= 0)
         {
             s = GetOppositeSector (n, 1);
-            ObjectsNeeded (OBJ_SIDEDEFS, 0);
             if (s < 0 || SideDefs[sd].sector != s)
             {
                 if (s < 0)
@@ -335,12 +332,10 @@ void CheckSectors ()
                 }
             }
         }
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
         sd = LineDefs[n].sidedef2;
         if (sd >= 0)
         {
             s = GetOppositeSector (n, 0);
-            ObjectsNeeded (OBJ_SIDEDEFS, 0);
             if (s < 0 || SideDefs[sd].sector != s)
             {
                 if (s < 0)
@@ -376,7 +371,6 @@ void CheckCrossReferences () /* SWAP! */
 
     CheckingObjects ();
     LogMessage ("\nVerifying cross-references...\n");
-    ObjectsNeeded (OBJ_LINEDEFS, 0);
     for (n = 0; n < NumLineDefs; n++)
     {
         /* Check for missing first sidedefs */
@@ -499,7 +493,6 @@ void CheckCrossReferences () /* SWAP! */
                                 "Do you want to delete these unused Vertices?")))
     {
         DeleteObjects (OBJ_VERTICES, &cur);
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
     }else
         ForgetSelection (&cur);
 
@@ -534,14 +527,10 @@ void CheckCrossReferences () /* SWAP! */
     /* unselect Sectors bound to a sidedef */
     for (n = 0; n < NumLineDefs; n++)
     {
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
         m = LineDefs[n].sidedef1;
-        ObjectsNeeded (OBJ_SIDEDEFS, 0);
         if (cur && m >= 0 /* && SideDefs[m].sector >= 0 AYM 1998-06-13 */)
             UnSelectObject (&cur, SideDefs[m].sector);
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
         m = LineDefs[n].sidedef2;
-        ObjectsNeeded (OBJ_SIDEDEFS, 0);
         if (cur && m >= 0 /* && SideDefs[m].sector >= 0 AYM 1998-06-13 */)
             UnSelectObject (&cur, SideDefs[m].sector);
         continue;
@@ -569,7 +558,6 @@ void CheckTextures () /* SWAP! */
 
     CheckingObjects ();
     LogMessage ("\nVerifying textures...\n");
-    ObjectsNeeded (OBJ_SECTORS, 0);
     for (n = 0; n < NumSectors; n++)
     {
         if (strcmp (Sectors[n].ceilt, "-") == 0
@@ -606,10 +594,8 @@ void CheckTextures () /* SWAP! */
 
     for (n = 0; n < NumLineDefs; n++)
     {
-        ObjectsNeeded (OBJ_LINEDEFS, 0);
         sd1 = LineDefs[n].sidedef1;
         sd2 = LineDefs[n].sidedef2;
-        ObjectsNeeded (OBJ_SIDEDEFS, OBJ_SECTORS, 0);
         if (sd1 >= 0)
             s1 = SideDefs[sd1].sector;
         else
@@ -742,7 +728,6 @@ void CheckTextureNames () /* SWAP! */
     if (! FindMasterDir (MasterDir, "F2_START"))
         NumThings--;
 
-    ObjectsNeeded (OBJ_SECTORS, 0);
     for (n = 0; n < NumSectors; n++)
     {
         if (! is_flat_name_in_list (Sectors[n].ceilt))
@@ -770,7 +755,6 @@ void CheckTextureNames () /* SWAP! */
             CheckingObjects ();
         }
     }
-    ObjectsNeeded (OBJ_SIDEDEFS, 0);
     for (n = 0; n < NumSideDefs; n++)
     {
         if (! IsTextureNameInList (SideDefs[n].tex1, WTexture, NumWTexture))
@@ -825,7 +809,6 @@ bool CheckStartingPos () /* SWAP! */
     size_t dm = 0;
     int  t;
 
-    ObjectsNeeded (OBJ_THINGS, 0);
     for (t = 0; t < NumThings; t++)
     {
         if (Things[t].type == THING_PLAYER1)

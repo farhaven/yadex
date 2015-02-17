@@ -1473,7 +1473,6 @@ cancel_save_as:
                     {
                         int l, sd;
 
-                        ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
                         NewSel = 0;
                         for (l = 0; l < NumLineDefs; l++)
                         {
@@ -1493,7 +1492,6 @@ cancel_save_as:
                     /* select all Vertices bound to the selected linedefs */
                     else if (PrevMode == OBJ_LINEDEFS && e.obj_type == OBJ_VERTICES)
                     {
-                        ObjectsNeeded (OBJ_LINEDEFS, 0);
                         NewSel = 0;
                         while (e.Selected)
                         {
@@ -1510,7 +1508,6 @@ cancel_save_as:
                     {
                         int l, sd;
 
-                        ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
                         NewSel = 0;
                         /* select all sectors... */
                         for (l = 0; l < NumSectors; l++)
@@ -1534,7 +1531,6 @@ cancel_save_as:
                     {
                         int l;
 
-                        ObjectsNeeded (OBJ_LINEDEFS, 0);
                         NewSel = 0;
                         for (l = 0; l < NumLineDefs; l++)
                             if (IsSelected (e.Selected, LineDefs[l].start)
@@ -1866,7 +1862,6 @@ cancel_save_as:
                     int firstv;
                     int obj_no = OBJ_NO_NONE;
 
-                    ObjectsNeeded (OBJ_LINEDEFS, 0);
                     if (e.Selected->next->next)
                         firstv = e.Selected->objnum;
                     else
@@ -1925,7 +1920,6 @@ cancel_save_as:
                 add new sidedefs and one sector */
                 else if (e.obj_type == OBJ_LINEDEFS && e.Selected)
                 {
-                    ObjectsNeeded (OBJ_LINEDEFS, 0);
                     for (cur = e.Selected; cur; cur = cur->next)
                         if (LineDefs[cur->objnum].sidedef1 >= 0
                             && LineDefs[cur->objnum].sidedef2 >= 0)
@@ -1947,7 +1941,6 @@ cancel_save_as:
                             {
                                 InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
                                 SideDefs[NumSideDefs - 1].sector = e.highlighted.num;
-                                ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
                                 if (LineDefs[cur->objnum].sidedef1 >= 0)
                                 {
                                     int s;

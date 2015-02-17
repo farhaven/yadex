@@ -52,12 +52,10 @@ s = 0;
 /* build lists of linedefs that border the sector */
 for (n = 0; n < NumLineDefs; n++)
 {
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    sd1 = LineDefs[n].sidedef1;
    sd2 = LineDefs[n].sidedef2;
    if (sd1 >= 0 && sd2 >= 0)
    {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (SideDefs[sd2].sector == sector)
       {
 	 SelectObject (&ldok, n); /* already ok */
@@ -71,7 +69,6 @@ for (n = 0; n < NumLineDefs; n++)
    }
    else if (sd1 >= 0 && sd2 < 0)
    {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (SideDefs[sd1].sector == sector)
 	 SelectObject (&ld1s, n); /* wall (one-sided) */
    }
@@ -107,14 +104,12 @@ while (ldflip != NULL)
 while (ldok != NULL)
 {
    /* give the "normal door" type and flags to the linedef */
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    n = ldok->objnum;
    LineDefs[n].type = 1;
    LineDefs[n].flags = 0x04;
    sd1 = LineDefs[n].sidedef1; /* outside */
    sd2 = LineDefs[n].sidedef2; /* inside */
    /* adjust the textures for the sidedefs */
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    if (strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
    {
       if (!strncmp (SideDefs[sd1].tex1, "-", WAD_TEX_NAME))
@@ -129,12 +124,10 @@ while (ldok != NULL)
 while (ld1s != NULL)
 {
    /* give the "door side" flags to the linedef */
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    n = ld1s->objnum;
    LineDefs[n].flags = 0x11;
    sd1 = LineDefs[n].sidedef1;
    /* adjust the textures for the sidedef */
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
       strncpy (SideDefs[sd1].tex3, "DOORTRAK", WAD_TEX_NAME);
    strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);
@@ -142,7 +135,6 @@ while (ld1s != NULL)
    UnSelectObject (&ld1s, n);
 }
 /* adjust the ceiling height */
-ObjectsNeeded (OBJ_SECTORS, 0);
 Sectors[sector].ceilh = Sectors[sector].floorh;
 }
 

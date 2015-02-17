@@ -166,14 +166,12 @@ void SectorProperties (int x0, int y0, SelPtr obj)
       {
 	*texname = '\0';
 	strncat (texname, Sectors[obj->objnum].floort, WAD_FLAT_NAME);
-	ObjectsNeeded (0);
 	char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
 	for (size_t n = 0; n < NumFTexture; n++)
 	  flat_names[n] = flat_list[n].name;
 	ChooseFloorTexture (x0 + 42, subwin_y0, "Choose a floor texture",
 	  NumFTexture, flat_names, texname);
 	free(flat_names);
-	ObjectsNeeded (OBJ_SECTORS, 0);
 	if (strlen (texname) > 0)
 	{
 	  for (cur = obj; cur; cur = cur->next)
@@ -187,14 +185,12 @@ void SectorProperties (int x0, int y0, SelPtr obj)
       {
       *texname = '\0';
       strncat (texname, Sectors[obj->objnum].ceilt, WAD_FLAT_NAME);
-      ObjectsNeeded (0);
       char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
       for (size_t n = 0; n < NumFTexture; n++)
 	flat_names[n] = flat_list[n].name;
       ChooseFloorTexture (x0 + 42, subwin_y0, "Choose a ceiling texture",
 	NumFTexture, flat_names, texname);
       free(flat_names);
-      ObjectsNeeded (OBJ_SECTORS, 0);
       if (strlen (texname) > 0)
       {
 	for (cur = obj; cur; cur = cur->next)

@@ -479,11 +479,6 @@ void SectorProperties (int x0, int y0, SelPtr obj);
 void SplitSector (int, int); /* SWAP! */
 void SplitLineDefsAndSector (int, int); /* SWAP! */
 
-// swapmem.cc
-void InitSwap (void);
-void FreeSomeMemory (void);
-void ObjectsNeeded (int, ...);
-
 // scrnshot.cc
 void ScreenShot (void);
 

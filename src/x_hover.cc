@@ -164,7 +164,6 @@ static const Close_obj& get_cur_linedef (int x, int y)
   int xmax = (int) (x + mapslack + 0.5);
   int ymin = (int) (y - mapslack + 0.5);
   int ymax = (int) (y + mapslack + 0.5);
-  ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
   object.nil ();
   for (int n = 0; n < NumLineDefs; n++)
   {
@@ -268,7 +267,6 @@ static const Close_obj& get_cur_sector (int x, int y)
   static Close_obj object;
   int best_match = -1;
   int curx = 32767;  // Oh yes, one more hard-coded constant!
-  ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
   for (int n = 0; n < NumLineDefs; n++)
     if ((Vertices[LineDefs[n].start].y > y)
      != (Vertices[LineDefs[n].end].y > y))
@@ -297,7 +295,6 @@ static const Close_obj& get_cur_sector (int x, int y)
       best_match = LineDefs[best_match].sidedef2;
     if (best_match >= 0)
     {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       object.obj.type = OBJ_SECTORS;
       object.obj.num  = SideDefs[best_match].sector;
       object.distance = 0;	// Not meaningful for sectors
@@ -327,7 +324,6 @@ static const Close_obj& get_cur_thing (int x, int y)
   int ymin = y - max_radius;
   int ymax = y + max_radius;
 
-  ObjectsNeeded (OBJ_THINGS, 0);
   closest.nil ();
   for (int n = 0; n < NumThings; n++)
   {
@@ -394,7 +390,6 @@ static const Close_obj& get_cur_vertex (int x, int y)
   int ymin = (int) (y - mapslack + 0.5);
   int ymax = (int) (y + mapslack + 0.5);
 
-  ObjectsNeeded (OBJ_VERTICES, 0);
   object.nil ();
   for (int n = 0; n < NumVertices; n++)
   {

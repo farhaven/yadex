@@ -61,8 +61,6 @@ bitvec_c sd_used_out (NumSideDefs);
 SelPtr cur;
 int n;
 
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
-
 // Put in sd_used_in a list of all sidedefs
 // that are used by linedefs in <linedefs>.
 // and in sd_used_out a list of all sidedefs

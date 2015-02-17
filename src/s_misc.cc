@@ -45,8 +45,6 @@ void DistributeSectorFloors (SelPtr obj) /* SWAP! */
 SelPtr cur;
 int    n, num, floor1h, floor2h;
 
-ObjectsNeeded (OBJ_SECTORS, 0);
-
 num = 0;
 for (cur = obj; cur->next; cur = cur->next)
    num++;
@@ -73,8 +71,6 @@ void DistributeSectorCeilings (SelPtr obj) /* SWAP! */
 {
 SelPtr cur;
 int    n, num, ceil1h, ceil2h;
-
-ObjectsNeeded (OBJ_SECTORS, 0);
 
 num = 0;
 for (cur = obj; cur->next; cur = cur->next)
@@ -123,7 +119,6 @@ while (1)
 if (key == YK_ESC)
   return;
 
-ObjectsNeeded (OBJ_SECTORS, 0);
 for (cur = obj; cur != NULL; cur = cur->next)
   {
   Sectors[cur->objnum].ceilh += delta;
@@ -162,7 +157,6 @@ while (1)
 if (key == YK_ESC)
   return;
 
-ObjectsNeeded (OBJ_SECTORS, 0);
 for (cur = obj; cur != NULL; cur = cur->next)
   {
   int light;

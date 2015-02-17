@@ -304,7 +304,6 @@ static void draw_linedefs (edit_t *e)
       int current_colour = INT_MIN;  /* Some impossible colour no. */
       int new_colour;
       
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
       for (int n = 0; n < NumLineDefs; n++)
       {
 	register int x1 = Vertices[LineDefs[n].start].x;
@@ -328,7 +327,6 @@ static void draw_linedefs (edit_t *e)
     }
 
     case OBJ_VERTICES:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
       set_colour (LIGHTGREY);
       for (int n = 0; n < NumLineDefs; n++)
       {
@@ -350,7 +348,6 @@ static void draw_linedefs (edit_t *e)
       int current_colour = INT_MIN;  /* Some impossible colour no. */
       int new_colour;
 
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
       for (int n = 0; n < NumLineDefs; n++)
       {
 	register int x1 = Vertices[LineDefs[n].start].x;

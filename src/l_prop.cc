@@ -415,7 +415,6 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 
     // Edit or add the first sidedef
     case 2:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
       if (LineDefs[obj->objnum].sidedef1 >= 0)
       {
 	// Build a new selection list with the first sidedefs
@@ -460,7 +459,6 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	    if (LineDefs[cur->objnum].sidedef1 == -1)
 	    {
 	      InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-	      ObjectsNeeded (OBJ_LINEDEFS, 0);
 	      LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
 	    }
 	    else if (LineDefs[cur->objnum].sidedef2 == -1)
@@ -469,7 +467,6 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	      InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
 	      strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
 	      strncpy (SideDefs[n].tex3, "-", WAD_TEX_NAME);
-	      ObjectsNeeded (OBJ_LINEDEFS, 0);
 	      LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
 	      LineDefs[cur->objnum].flags ^= 4;  // Set the 2S bit
 	      LineDefs[cur->objnum].flags &= ~1;  // Clear the Im bit
@@ -477,7 +474,6 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	  break;
 	}
       }
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       for (n = 0; n < 7; n++)
 	menustr[n] = (char *) malloc (60);
       snprintf (menustr[6], 60, "Edit sidedef #%d", sdlist->objnum);
@@ -509,10 +505,8 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
       {
 	case 1:
 	  strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
-	  ObjectsNeeded (0);
 	  ChooseWallTexture (x0 + 84, subsubwin_y0 ,
 	    "Choose a wall texture", NumWTexture, WTexture, texname);
-	  ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	  if (strlen (texname) > 0)
 	  {
 	    for (cur = sdlist; cur; cur = cur->next)
@@ -524,10 +518,8 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 
 	case 2:
 	  strncpy (texname, SideDefs[sdlist->objnum].tex1, WAD_TEX_NAME);
-	  ObjectsNeeded (0);
 	  ChooseWallTexture (x0 + 84, subsubwin_y0,
 	     "Choose a wall texture", NumWTexture, WTexture, texname);
-	  ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	  if (strlen (texname) > 0)
 	  {
 	    for (cur = sdlist; cur; cur = cur->next)
@@ -539,10 +531,8 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 
 	case 3:
 	  strncpy (texname, SideDefs[sdlist->objnum].tex2, WAD_TEX_NAME);
-	  ObjectsNeeded (0);
 	  ChooseWallTexture (x0 + 84, subsubwin_y0,
 	    "Choose a wall texture", NumWTexture, WTexture, texname);
-	  ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	  if (strlen (texname) > 0)
 	  {
 	    for (cur = sdlist; cur; cur = cur->next)

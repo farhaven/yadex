@@ -69,7 +69,6 @@ if (s < 0)
 /* Check if there is a closed path from <vertex1> to <vertex2>,
    along the edge of sector <s>. To make it faster, I scan only
    the set of linedefs that face sector <s>. */
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
 obj_no_t *ld_numbers;
 int nlinedefs = linedefs_of_sector (s, ld_numbers);
 if (nlinedefs < 1)  // Can't happen
@@ -144,7 +143,6 @@ SideDefs[NumSideDefs - 1].sector = s;
 strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
 InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
 strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
 LineDefs[NumLineDefs - 1].sidedef1 = NumSideDefs - 2;
 LineDefs[NumLineDefs - 1].sidedef2 = NumSideDefs - 1;
 
@@ -159,14 +157,12 @@ while (llist)
 }
 
 /* second check... useful for sectors within sectors */
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
 for (l = 0; l < NumLineDefs; l++)
 {
    sd = LineDefs[l].sidedef1;
    if (sd >= 0 && SideDefs[sd].sector == s)
    {
       curv = GetOppositeSector (l, 1);
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
       if (curv == NumSectors - 1)
 	 SideDefs[sd].sector = NumSectors - 1;
    }
@@ -174,7 +170,6 @@ for (l = 0; l < NumLineDefs; l++)
    if (sd >= 0 && SideDefs[sd].sector == s)
    {
       curv = GetOppositeSector (l, 0);
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
       if (curv == NumSectors - 1)
 	 SideDefs[sd].sector = NumSectors - 1;
    }
@@ -197,12 +192,10 @@ int    s1, s2, s3, s4;
 char   msg[80];
 
 /* check if the two linedefs are adjacent to the same sector */
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 s1 = LineDefs[linedef1].sidedef1;
 s2 = LineDefs[linedef1].sidedef2;
 s3 = LineDefs[linedef2].sidedef1;
 s4 = LineDefs[linedef2].sidedef2;
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 if (s1 >= 0)
    s1 = SideDefs[s1].sector;
 if (s2 >= 0)

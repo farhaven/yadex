@@ -48,7 +48,6 @@ void FlipLineDefs ( SelPtr obj, bool swapvertices) /* SWAP! */
 SelPtr cur;
 int    tmp;
 
-ObjectsNeeded ( OBJ_LINEDEFS, 0);
 for (cur = obj; cur; cur = cur->next)
 {
    if (swapvertices)
@@ -77,7 +76,6 @@ void SplitLineDefs ( SelPtr obj) /* SWAP! */
 SelPtr cur;
 int    vstart, vend;
 
-ObjectsNeeded ( OBJ_LINEDEFS, 0);
 for (cur = obj; cur; cur = cur->next)
   {
   vstart = LineDefs[cur->objnum].start;
@@ -108,7 +106,6 @@ void MakeRectangularNook (SelPtr obj, int width, int depth, int convex) /* SWAP!
 {
 SelPtr cur;
 
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 for (cur = obj; cur; cur = cur->next)
   {
   int vstart, vend;
@@ -188,14 +185,12 @@ for (prev_ld_no = linedefno; times > 0; times--, prev_ld_no = NumLineDefs-1)
   if (sd >= 0)
     {
     InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-    ObjectsNeeded (OBJ_LINEDEFS, 0);
     LineDefs[NumLineDefs-1].sidedef1 = NumSideDefs - 1;
     }
   sd = LineDefs[linedefno].sidedef2;
   if (sd >= 0)
     {
     InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-    ObjectsNeeded (OBJ_LINEDEFS, 0);
     LineDefs[NumLineDefs-1].sidedef2 = NumSideDefs - 1;
     }
   }
@@ -210,7 +205,6 @@ void SetLinedefLength (SelPtr obj, int length, int move_2nd_vertex)
 {
 SelPtr cur;
 
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 for (cur = obj; cur; cur = cur->next)
   {
   VPtr vertex1 = Vertices + LineDefs[cur->objnum].start;

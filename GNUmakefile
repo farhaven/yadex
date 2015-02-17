@@ -160,7 +160,7 @@ MODULES_YADEX =								\
 	s_misc		s_prop		s_slice		s_split		\
 	s_swapf		s_vertices	sanity				    \
 	selbox		selectn		selpath		selrect		\
-	serialnum	spritdir	sticker		swapmem		\
+	serialnum	spritdir	sticker		\
  	r_render	r_images							\
 	t_centre	t_flags		t_prop		t_spin		\
 	textures	things		trace		v_centre	\

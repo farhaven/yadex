@@ -49,7 +49,6 @@ void RotateAndScaleObjects (int objtype, SelPtr obj, double angle, double scale)
 
     if (obj == NULL)
         return;
-    ObjectsNeeded (objtype, 0);
 
     switch (objtype)
     {
@@ -87,7 +86,6 @@ void RotateAndScaleObjects (int objtype, SelPtr obj, double angle, double scale)
             break;
 
         case OBJ_SECTORS:
-            ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
             vertices = list_vertices_of_sectors (obj);
             RotateAndScaleObjects (OBJ_VERTICES, vertices, angle, scale);
             ForgetSelection (&vertices);

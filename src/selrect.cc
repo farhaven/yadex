@@ -58,21 +58,18 @@ if (y1 < y0)
 switch (objtype)
    {
    case OBJ_THINGS:
-      ObjectsNeeded (OBJ_THINGS, 0);
       for (n = 0; n < NumThings; n++)
 	 if (Things[n].xpos >= x0 && Things[n].xpos <= x1
 	  && Things[n].ypos >= y0 && Things[n].ypos <= y1)
             select_unselect_obj (list, n);
       break;
    case OBJ_VERTICES:
-      ObjectsNeeded (OBJ_VERTICES, 0);
       for (n = 0; n < NumVertices; n++)
 	 if (Vertices[n].x >= x0 && Vertices[n].x <= x1
 	  && Vertices[n].y >= y0 && Vertices[n].y <= y1)
             select_unselect_obj (list, n);
       break;
    case OBJ_LINEDEFS:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
       for (n = 0; n < NumLineDefs; n++)
 	 {
 	 /* the two ends of the line must be in the box */

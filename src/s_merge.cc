@@ -48,7 +48,6 @@ int    n, olds, news;
 /* save the first Sector number */
 news = (*slist)->objnum;
 UnSelectObject (slist, news);
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 
 /* change all SideDefs references to the other Sectors */
 for (cur = *slist; cur; cur = cur->next)
@@ -84,7 +83,6 @@ char   msg[80];
 /* first, do the tests for all LineDefs */
 for (cur = *ldlist; cur; cur = cur->next)
    {
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    sd1 = LineDefs[cur->objnum].sidedef1;
    sd2 = LineDefs[cur->objnum].sidedef2;
    if (sd1 < 0 || sd2 < 0)
@@ -94,7 +92,6 @@ for (cur = *ldlist; cur; cur = cur->next)
       Notify (-1, -1, msg, NULL);
       return;
       }
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    s1 = SideDefs[sd1].sector;
    s2 = SideDefs[sd2].sector;
    if (s1 < 0 || s2 < 0)
@@ -109,10 +106,8 @@ for (cur = *ldlist; cur; cur = cur->next)
 /* then join the Sectors and delete the LineDefs */
 for (cur = *ldlist; cur; cur = cur->next)
    {
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    sd1 = LineDefs[cur->objnum].sidedef1;
    sd2 = LineDefs[cur->objnum].sidedef2;
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    s1 = SideDefs[sd1].sector;
    s2 = SideDefs[sd2].sector;
    slist = NULL;

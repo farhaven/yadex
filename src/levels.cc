@@ -161,9 +161,6 @@ int rc = 0;
 MDirPtr dir;
 int OldNumVertices;
 
-/* No objects are needed: they may be swapped after they have been read */
-ObjectsNeeded (0);
-
 /* Find the various level information from the master directory */
 DisplayMessage (-1, -1, "Reading data for level %s...", levelname);
 Level = FindMasterDir (MasterDir, levelname);
@@ -987,7 +984,6 @@ return rc;
 void ForgetLevelData () /* SWAP! */
 {
 /* forget the things */
-ObjectsNeeded (OBJ_THINGS, 0);
 NumThings = 0;
 free(Things);
 Things = NULL;
@@ -995,29 +991,24 @@ things_angles++;
 things_types++;
 
 /* forget the vertices */
-ObjectsNeeded (OBJ_VERTICES, 0);
 NumVertices = 0;
 free(Vertices);
 Vertices = NULL;
 
 /* forget the linedefs */
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 NumLineDefs = 0;
 free(LineDefs);
 LineDefs = NULL;
 
 /* forget the sidedefs */
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 NumSideDefs = 0;
 free(SideDefs);
 SideDefs = NULL;
 
 /* forget the sectors */
-ObjectsNeeded (OBJ_SECTORS, 0);
 NumSectors = 0;
 free(Sectors);
 Sectors = NULL;
-ObjectsNeeded (0);
 }
 
 
@@ -1104,7 +1095,6 @@ lump_size[l]   =  0;		// By definition
 // Write the THINGS lump
 l = WAD_LL_THINGS;
 lump_offset[l] = ftell (file);
-ObjectsNeeded (OBJ_THINGS, 0);
 for (n = 0; n < NumThings; n++)
    {
    if (yg_level_format == YGLF_HEXEN)
@@ -1139,7 +1129,6 @@ if (Level)
 // Write the LINEDEFS lump
 l = WAD_LL_LINEDEFS;
 lump_offset[WAD_LL_LINEDEFS] = ftell (file);
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 for (n = 0; n < NumLineDefs; n++)
    {
    if (yg_level_format == YGLF_HEXEN)
@@ -1176,7 +1165,6 @@ if (Level)
 // Write the SIDEDEFS lump
 l = WAD_LL_SIDEDEFS;
 lump_offset[l] = ftell (file);
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 for (n = 0; n < NumSideDefs; n++)
    {
    file_write_int16_t (file, SideDefs[n].xoff);
@@ -1196,7 +1184,6 @@ lump_offset[WAD_LL_VERTEXES] = ftell (file);
 if (reuse_nodes)
    {
    /* Copy the vertices */
-   ObjectsNeeded (0);
    const Wad_file *wf = dir->wadfile;
    wf->seek (dir->dir.start);
    if (wf->error ())
@@ -1208,7 +1195,6 @@ if (reuse_nodes)
 else
    {
    /* Write the vertices */
-   ObjectsNeeded (OBJ_VERTICES, 0);
    for (n = 0; n < NumVertices; n++)
       {
       file_write_int16_t (file, Vertices[n].x);
@@ -1247,7 +1233,6 @@ for (n = 0; n < 3; n++)
 // Write the SECTORS lump
 l = WAD_LL_SECTORS;
 lump_offset[l] = ftell (file);
-ObjectsNeeded (OBJ_SECTORS, 0);
 for (n = 0; n < NumSectors; n++)
    {
    file_write_int16_t (file, Sectors[n].floorh);
@@ -1268,7 +1253,6 @@ lump_offset[l] = ftell (file);
 if (reuse_nodes)
    {
    /* Copy the REJECT data */
-   ObjectsNeeded (0);
    const Wad_file *wf = dir->wadfile;
    wf->seek (dir->dir.start);
    if (wf->error ())
@@ -1286,7 +1270,6 @@ l = WAD_LL_BLOCKMAP;
 lump_offset[l] = ftell (file);
 if (reuse_nodes)
    {
-   ObjectsNeeded (0);
    const Wad_file *wf = dir->wadfile;
    wf->seek (dir->dir.start);
    if (wf->error ())
@@ -1352,7 +1335,6 @@ if (! Level || MadeMapChanges)
    remind_to_build_nodes = 1;
 MadeChanges = 0;
 MadeMapChanges = 0;
-ObjectsNeeded (0);
 
 /* Update pointers in Master Directory */
 OpenPatchWad (outfile);
@@ -1362,7 +1344,6 @@ CloseUnusedWadFiles ();
 
 /* Update MapMinX, MapMinY, MapMaxX, MapMaxY */
 // Probably not necessary anymore -- AYM 1999-04-05
-ObjectsNeeded (OBJ_VERTICES, 0);
 update_level_bounds ();
 return 0;
 }

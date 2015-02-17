@@ -55,12 +55,10 @@ sect = NULL;
 /* build lists of linedefs that border the Sector */
 for (n = 0; n < NumLineDefs; n++)
 {
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    sd1 = LineDefs[n].sidedef1;
    sd2 = LineDefs[n].sidedef2;
    if (sd1 >= 0 && sd2 >= 0)
    {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (SideDefs[sd2].sector == sector)
       {
 	 SelectObject (&ldok, n); /* already ok */
@@ -78,7 +76,6 @@ for (n = 0; n < NumLineDefs; n++)
    }
    else if (sd1 >= 0 && sd2 < 0)
    {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (SideDefs[sd1].sector == sector)
 	 SelectObject (&ld1s, n); /* wall (one-sided) */
    }
@@ -108,7 +105,6 @@ while (ldflip != NULL)
 tag = FindFreeTag ();
 
 /* find the minimum and maximum altitudes */
-ObjectsNeeded (OBJ_SECTORS, 0);
 minh = 32767;
 maxh = -32767;
 for (curs = sect; curs; curs = curs->next)
@@ -135,7 +131,6 @@ Sectors[sector].tag = tag;
 while (ldok != NULL)
    {
    /* give the "lower lift" type and flags to the linedef */
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    n = ldok->objnum;
    LineDefs[n].type = 62; /* lower lift (switch) */
    LineDefs[n].flags = 0x04;
@@ -143,7 +138,6 @@ while (ldok != NULL)
    sd1 = LineDefs[n].sidedef1; /* outside */
    sd2 = LineDefs[n].sidedef2; /* inside */
    /* adjust the textures for the sidedef visible from the outside */
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    if (strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
       {
       if (!strncmp (SideDefs[sd1].tex2, "-", WAD_TEX_NAME))
@@ -155,10 +149,8 @@ while (ldok != NULL)
    /* adjust the textures for the sidedef visible from the lift */
    strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
    s = SideDefs[sd1].sector;
-   ObjectsNeeded (OBJ_SECTORS, 0);
    if (Sectors[s].floorh > minh)
       {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (strncmp (SideDefs[sd2].tex3, "-", WAD_TEX_NAME))
       {
 	 if (!strncmp (SideDefs[sd2].tex2, "-", WAD_TEX_NAME))
@@ -170,23 +162,18 @@ while (ldok != NULL)
       }
    else
       {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       strncpy (SideDefs[sd2].tex2, "-", WAD_TEX_NAME);
       }
    strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
-   ObjectsNeeded (OBJ_SECTORS, 0);
    /* if the ceiling of the sector is lower than that of the lift */
    if (Sectors[s].ceilh < Sectors[sector].ceilh)
       {
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (strncmp (SideDefs[sd2].tex1, "-", WAD_TEX_NAME))
 	 strncpy (SideDefs[sd2].tex1, default_upper_texture, WAD_TEX_NAME);
       }
-   ObjectsNeeded (OBJ_SECTORS, 0);
    /* if the floor of the sector is above the lift */
    if (Sectors[s].floorh >= Sectors[sector].floorh)
       {
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
       LineDefs[n].type = 88; /* lower lift (walk through) */
       /* flip it, just for fun */
       curs = NULL;
@@ -201,12 +188,10 @@ while (ldok != NULL)
 while (ld1s != NULL)
    {
    /* these are the lift walls (one-sided) */
-   ObjectsNeeded (OBJ_LINEDEFS, 0);
    n = ld1s->objnum;
    LineDefs[n].flags = 0x01;
    sd1 = LineDefs[n].sidedef1;
    /* adjust the textures for the sidedef */
-   ObjectsNeeded (OBJ_SIDEDEFS, 0);
    if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
       strncpy (SideDefs[sd1].tex3, default_middle_texture, WAD_TEX_NAME);
    strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);

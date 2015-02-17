@@ -49,7 +49,6 @@ int l, sector;
 int otherside = OBJ_NO_NONE;
 
 /* find the sidedef on the other side of the LineDef, if any */
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 for (l = 0; l < NumLineDefs; l++)
   {
   if (LineDefs[l].sidedef1 == sidedef)
@@ -64,7 +63,6 @@ for (l = 0; l < NumLineDefs; l++)
     }
   }
 /* get the Sector number */
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 sector = SideDefs[sidedef].sector;
 /* if the upper texture is displayed,
    then the reference is taken from the other Sector */
@@ -73,14 +71,12 @@ if (otherside >= 0)
   l = SideDefs[otherside].sector;
   if (l > 0)
     {
-    ObjectsNeeded (OBJ_SECTORS, 0);
     if (Sectors[l].ceilh < Sectors[sector].ceilh
      && Sectors[l].ceilh > Sectors[sector].floorh)
       sector = l;
     }
   }
 /* return the altitude of the ceiling */
-ObjectsNeeded (OBJ_SECTORS, 0);
 if (sector >= 0)
   return Sectors[sector].ceilh; /* textures are drawn from the ceiling down */
 else
@@ -110,7 +106,6 @@ if (! *sdlist)
 
 /* get the reference height from the first sidedef */
 refh = GetTextureRefHeight ((*sdlist)->objnum);
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 SideDefs[(*sdlist)->objnum].yoff = 0;
 UnSelectObject (sdlist, (*sdlist)->objnum);
 
@@ -118,7 +113,6 @@ UnSelectObject (sdlist, (*sdlist)->objnum);
 while (*sdlist)
   {
   h = GetTextureRefHeight ((*sdlist)->objnum);
-  ObjectsNeeded (OBJ_SIDEDEFS, 0);
   SideDefs[(*sdlist)->objnum].yoff = (refh - h) % 128;
   UnSelectObject (sdlist, (*sdlist)->objnum);
   }
@@ -259,8 +253,6 @@ if (type_sd == 2) /* throw out all 1st SideDefs untill a 2nd is found */
     }
   }
 
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
-
 /* get texture name of the sidedef in the *sdlist) */
 strncpy (texname, SideDefs[(*sdlist)->objnum].tex3, WAD_TEX_NAME);
 
@@ -337,7 +329,6 @@ while (*sdlist)  /* main processing loop */
    /* do we test for same textures for the sidedef in question?? */
    if (type_tex == 1)
      {
-     ObjectsNeeded (OBJ_SIDEDEFS, 0);
      if (strncmp (SideDefs[(*sdlist)->objnum].tex3, texname,WAD_TEX_NAME))
        {
        Beep ();
@@ -349,8 +340,6 @@ while (*sdlist)  /* main processing loop */
 
    sd1 = (*sdlist)->objnum;
    ldef = 0;
-
-   ObjectsNeeded (OBJ_LINEDEFS,0);
 
    /* find out which linedef holds that sidedef */
    if (type_sd == 1)
@@ -390,7 +379,6 @@ while (*sdlist)  /* main processing loop */
 
    /* calculate length of linedef */
    vert2 = LineDefs[ldef].end;
-   ObjectsNeeded (OBJ_VERTICES, 0);
    length = ComputeDist (Vertices[vert2].x - Vertices[vert1].x,
 			 Vertices[vert2].y - Vertices[vert1].y);
 

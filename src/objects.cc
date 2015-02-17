@@ -90,7 +90,6 @@ set_colour (colour);
 switch (objtype)
    {
    case OBJ_THINGS:
-      ObjectsNeeded (OBJ_THINGS, 0);
       m = (get_thing_radius (Things[objnum].type) * 3) / 2;
       DrawMapLine (Things[objnum].xpos - m, Things[objnum].ypos - m,
 		   Things[objnum].xpos - m, Things[objnum].ypos + m);
@@ -105,7 +104,6 @@ switch (objtype)
       break;
 
    case OBJ_LINEDEFS:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
       n = (Vertices[LineDefs[objnum].start].x
 	 + Vertices[LineDefs[objnum].end].x) / 2;
       m = (Vertices[LineDefs[objnum].start].y
@@ -129,7 +127,6 @@ switch (objtype)
       break;
 
    case OBJ_VERTICES:
-      ObjectsNeeded (OBJ_VERTICES, 0);
       {
       int r = vertex_radius (Scale) * 3 / 2;
       int scrx0 = SCREENX (Vertices[objnum].x) - r;
@@ -145,7 +142,6 @@ switch (objtype)
 
    case OBJ_SECTORS:
       {
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, OBJ_VERTICES, 0);
       SetLineThickness (1);
       const int mapx0 = MAPX (0);
       const int mapy0 = MAPY (ScrMaxY);
@@ -208,7 +204,6 @@ MadeChanges = 1;
 switch (objtype)
    {
    case OBJ_THINGS:
-      ObjectsNeeded (OBJ_THINGS, 0);
       if (*list)
 	 {
 	 things_angles++;
@@ -255,7 +250,6 @@ switch (objtype)
 	    goto next_vertex;
 	 }
 	 // Delete the linedefs bound to this vertex and change the references
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 for (n = 0; n < NumLineDefs; n++)
 	    {
 	    if (LineDefs[n].start == objnum || LineDefs[n].end == objnum)
@@ -269,7 +263,6 @@ switch (objtype)
 	       }
 	    }
 	 // Delete the vertex
-	 ObjectsNeeded (OBJ_VERTICES, 0);
 	 NumVertices--;
 	 if (NumVertices > 0)
 	    {
@@ -304,7 +297,6 @@ switch (objtype)
          take care of that. */
       while (*list)
 	 {
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 objnum = (*list)->objnum;
 	 if (objnum < 0 || objnum >= NumLineDefs)  // Paranoia
 	 {
@@ -344,7 +336,6 @@ switch (objtype)
 	    goto next_sidedef;
 	 }
 	 /* change the linedefs references */
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 for (n = 0; n < NumLineDefs; n++)
 	    {
 	    if (LineDefs[n].sidedef1 == objnum)
@@ -357,7 +348,6 @@ switch (objtype)
 	       LineDefs[n].sidedef2--;
 	    }
 	 /* delete the sidedef */
-	 ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	 NumSideDefs--;
 	 if (NumSideDefs > 0)
 	    {
@@ -388,14 +378,12 @@ switch (objtype)
 	 }
 	// Delete the sidedefs bound to this sector and change the references
 	// AYM 19980203: Hmm, hope this is OK with multiply used sidedefs...
-	ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	for (n = 0; n < NumSideDefs; n++)
 	   if (SideDefs[n].sector == objnum)
 	      DeleteObject (Objid (OBJ_SIDEDEFS, n--));
 	   else if (SideDefs[n].sector >= objnum)
 	      SideDefs[n].sector--;
 	/* delete the sector */
-	ObjectsNeeded (OBJ_SECTORS, 0);
 	NumSectors--;
 	if (NumSectors > 0)
 	   {
@@ -440,7 +428,6 @@ void InsertObject (obj_type_t objtype, obj_no_t copyfrom, int xpos, int ypos)
 {
 int last;
 
-ObjectsNeeded (objtype, 0);
 MadeChanges = 1;
 switch (objtype)
    {
@@ -657,7 +644,6 @@ int ld2, dist;
 int bestld, bestdist, bestmdist;
 
 /* get the coords for this LineDef */
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_VERTICES, 0);
 x0  = Vertices[LineDefs[ld1].start].x;
 y0  = Vertices[LineDefs[ld1].start].y;
 dx0 = Vertices[LineDefs[ld1].end].x - x0;
@@ -805,7 +791,6 @@ if (x0 < 0)
    return -1;
 
 /* OK, we got it -- return the Sector number */
-ObjectsNeeded (OBJ_SIDEDEFS, 0);
 return SideDefs[x0].sector;
 }
 
@@ -823,7 +808,6 @@ SelPtr     ref1, ref2;
 
 if (! obj)
    return;
-ObjectsNeeded (objtype, 0);
 /* copy the object(s) */
 switch (objtype)
    {
@@ -902,7 +886,6 @@ switch (objtype)
 
       // Create the vertices
       CopyObjects (OBJ_VERTICES, list2);
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
 
       // Update the references to the vertices
       for (ref1 = list1, ref2 = list2;
@@ -922,7 +905,6 @@ switch (objtype)
       break;
 
    case OBJ_SECTORS:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
       list1 = 0;
       list2 = 0;
       // Create the linedefs (and vertices)
@@ -941,7 +923,6 @@ switch (objtype)
 	 }
       CopyObjects (OBJ_LINEDEFS, list2);
       /* create the sidedefs */
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
       for (ref1 = list1, ref2 = list2;
 	   ref1 && ref2;
 	   ref1 = ref1->next, ref2 = ref2->next)
@@ -950,14 +931,12 @@ switch (objtype)
 	    {
 	    InsertObject (OBJ_SIDEDEFS, n, 0, 0);
 	    n = NumSideDefs - 1;
-	    ObjectsNeeded (OBJ_LINEDEFS, 0);
 	    LineDefs[ref2->objnum].sidedef1 = n;
 	    }
 	 if ((m = LineDefs[ref1->objnum].sidedef2) >= 0)
 	    {
 	    InsertObject (OBJ_SIDEDEFS, m, 0, 0);
 	    m = NumSideDefs - 1;
-	    ObjectsNeeded (OBJ_LINEDEFS, 0);
 	    LineDefs[ref2->objnum].sidedef2 = m;
 	    }
 	 ref1->objnum = n;
@@ -967,7 +946,6 @@ switch (objtype)
       for (cur = obj; cur; cur = cur->next)
 	 {
 	 InsertObject (OBJ_SECTORS, cur->objnum, 0, 0);
-	 ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	 for (ref1 = list1, ref2 = list2;
 	      ref1 && ref2;
 	      ref1 = ref1->next, ref2 = ref2->next)
@@ -1013,7 +991,6 @@ int        dx, dy;
 SelPtr     cur, vertices;
 static int refx, refy; /* previous position */
 
-ObjectsNeeded (objtype, 0);
 if (grid > 0)
    {
    newx = (newx + grid / 2) & ~(grid - 1);
@@ -1068,7 +1045,6 @@ switch (objtype)
       break;
 
    case OBJ_SECTORS:
-      ObjectsNeeded (OBJ_LINEDEFS, OBJ_SIDEDEFS, 0);
       vertices = list_vertices_of_sectors (obj);
       MoveObjectsToCoords (OBJ_VERTICES, vertices, newx, newy, grid);
       ForgetSelection (&vertices);
@@ -1097,7 +1073,6 @@ switch (objtype)
 	 *ypos = 0;
 	 return;
 	 }
-      ObjectsNeeded (OBJ_THINGS, 0);
       *xpos = Things[objnum].xpos;
       *ypos = Things[objnum].ypos;
       break;
@@ -1110,7 +1085,6 @@ switch (objtype)
 	 *ypos = 0;
 	 return;
 	 }
-      ObjectsNeeded (OBJ_VERTICES, 0);
       *xpos = Vertices[objnum].x;
       *ypos = Vertices[objnum].y;
       break;
@@ -1123,10 +1097,8 @@ switch (objtype)
 	 *ypos = 0;
 	 return;
 	 }
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
       v1 = LineDefs[objnum].start;
       v2 = LineDefs[objnum].end;
-      ObjectsNeeded (OBJ_VERTICES, 0);
       *xpos = (Vertices[v1].x + Vertices[v2].x) / 2;
       *ypos = (Vertices[v1].y + Vertices[v2].y) / 2;
       break;
@@ -1139,13 +1111,11 @@ switch (objtype)
 	 *ypos = 0;
 	 return;
 	 }
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
       for (n = 0; n < NumLineDefs; n++)
 	 if (LineDefs[n].sidedef1 == objnum || LineDefs[n].sidedef2 == objnum)
 	    {
 	    v1 = LineDefs[n].start;
 	    v2 = LineDefs[n].end;
-	    ObjectsNeeded (OBJ_VERTICES, 0);
 	    *xpos = (Vertices[v1].x + Vertices[v2].x) / 2;
 	    *ypos = (Vertices[v1].y + Vertices[v2].y) / 2;
 	    return;
@@ -1167,16 +1137,13 @@ switch (objtype)
       num = 0L;
       for (n = 0; n < NumLineDefs; n++)
 	 {
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 sd1 = LineDefs[n].sidedef1;
 	 sd2 = LineDefs[n].sidedef2;
 	 v1 = LineDefs[n].start;
 	 v2 = LineDefs[n].end;
-	 ObjectsNeeded (OBJ_SIDEDEFS, 0);
 	 if ((sd1 >= 0 && SideDefs[sd1].sector == objnum)
 	       || (sd2 >= 0 && SideDefs[sd2].sector == objnum))
 	    {
-	    ObjectsNeeded (OBJ_VERTICES, 0);
 	    /* if the Sector is closed, all Vertices will be counted twice */
 	    accx += (long) Vertices[v1].x;
 	    accy += (long) Vertices[v1].y;
@@ -1215,7 +1182,6 @@ int FindFreeTag () /* SWAP! */
 int  tag, n;
 bool ok;
 
-ObjectsNeeded (OBJ_LINEDEFS, OBJ_SECTORS, 0);
 tag = 1;
 ok = false;
 while (! ok)

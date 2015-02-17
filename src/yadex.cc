@@ -179,9 +179,6 @@ int main (int argc, char *argv[])
     if (screen_lines == 0)
        screen_lines = 24;
 
-    // InitSwap must be called before any call to GetMemory(), etc.
-    InitSwap ();
-
     // First detect manually --help and --version
     // because parse_command_line_options() cannot.
     if (argc == 2 && strcmp (argv[1], "--help") == 0)

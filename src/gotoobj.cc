@@ -112,10 +112,8 @@ if (objid.type == OBJ_SECTORS && sector_under_pointer () != objid.num)
    Scale = oldscale;
    for (int n = 0; n < NumLineDefs; n++)
       {
-      ObjectsNeeded (OBJ_LINEDEFS, 0);
       sd1 = LineDefs[n].sidedef1;
       sd2 = LineDefs[n].sidedef2;
-      ObjectsNeeded (OBJ_SIDEDEFS, 0);
       if (sd1 >= 0 && SideDefs[sd1].sector == objid.num
 	|| sd2 >= 0 && SideDefs[sd2].sector == objid.num)
 	 {

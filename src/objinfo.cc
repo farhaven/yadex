@@ -118,7 +118,6 @@ void objinfo_c::draw ()
   if (! out_y1)
     return;
 
-  ObjectsNeeded (obj_type, 0);
   switch (obj_type)
   {
     case OBJ_THINGS:
@@ -291,7 +290,6 @@ void objinfo_c::draw ()
 			GetLineDefTypeName (LineDefs[obj_no].type));
 	int tag,first_sector,second_sector;
 	
-	ObjectsNeeded (OBJ_SIDEDEFS, OBJ_SECTORS, 0);
 	if (yg_level_format != YGLF_HEXEN)
 	{	tag           = LineDefs[obj_no].tag;
 	  	first_sector  = NumSectors;
@@ -320,7 +318,6 @@ void objinfo_c::draw ()
 		s1 = LineDefs[obj_no].start;
 		s2 = LineDefs[obj_no].end;
 		DrawScreenText (-1, -1, "\1Vertices:\2 (#%d, #%d)", s1, s2);
-		ObjectsNeeded (OBJ_VERTICES, 0);
 		n = ComputeDist (Vertices[s2].x - Vertices[s1].x,
 			 Vertices[s2].y - Vertices[s1].y);
 		DrawScreenText (-1, -1, "\1Length:\2   %d", n);
@@ -339,7 +336,6 @@ void objinfo_c::draw ()
 	}else
 	{	s1 = LineDefs[obj_no].start;
 		s2 = LineDefs[obj_no].end;
-		ObjectsNeeded (OBJ_VERTICES, 0);
 		n = ComputeDist (Vertices[s2].x - Vertices[s1].x,Vertices[s2].y - Vertices[s1].y);
 		DrawScreenText (-1, -1, "\1Length\2       %d", n);
 		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,1),LineDefs[obj_no].tag);
@@ -629,7 +625,6 @@ void objinfo_c::draw ()
 	int first_ld  = NumLineDefs;
 	int second_ld = NumLineDefs;
 
-	ObjectsNeeded (OBJ_LINEDEFS, 0);
 	if (tag != 0)
 	{
 	  for (n = 0; n < NumLineDefs; n++)
@@ -739,7 +734,6 @@ void objinfo_c::draw ()
 	  }
 	  DrawScreenText (-1, -1, "\1Shadow:\2 %d",   dsec->light);
 	  DrawScreenText (-1, -1, "\1Type:\2   %d",   dsec->special);
-	  ObjectsNeeded (OBJ_LINEDEFS, 0);
 	  if (thick)
 	    DrawScreenText (-1, -1, "\1Side:\2   %.*s", WAD_TEX_NAME, i.tex);
 	  {

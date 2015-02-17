@@ -266,7 +266,6 @@ int    n, val;
 SelPtr cur;
 int    subwin_y0;
 
-ObjectsNeeded (objtype, 0);
 if (! obj)
    return;
 switch (objtype) {
@@ -494,7 +493,6 @@ switch (choice)
 	    if (sector >= 0)
 	       SideDefs[NumSideDefs - 1].sector = sector;
 	    }
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 if (sector >= 0)
 	    {
 	    LineDefs[NumLineDefs - 4].start = NumVertices - 4;
@@ -539,7 +537,6 @@ switch (choice)
 	    if (sector >= 0)
 	       SideDefs[NumSideDefs - 1].sector = sector;
 	    }
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 if (sector >= 0)
 	    {
 	    LineDefs[NumLineDefs - 1].start = NumVertices - 1;
@@ -570,7 +567,6 @@ switch (choice)
 	 {
 	 if (a < 2)
 	    a = 2;
-	 ObjectsNeeded (OBJ_SECTORS, 0);
 	 n = Sectors[sector].ceilh;
 	 h = Sectors[sector].floorh;
 	 if (a * b < n - h)
@@ -599,7 +595,6 @@ switch (choice)
 	    SideDefs[NumSideDefs - 1].sector = sector;
 	    InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
 
-	    ObjectsNeeded (OBJ_LINEDEFS, 0);
 	    LineDefs[NumLineDefs - 4].start = NumVertices - 4;
 	    LineDefs[NumLineDefs - 4].end = NumVertices - 3;
 	    LineDefs[NumLineDefs - 3].start = NumVertices - 3;
@@ -840,7 +835,6 @@ switch (val)
 	 SelPtr sdlist, cur;
 
 	 /* select all sidedefs */
-	 ObjectsNeeded (OBJ_LINEDEFS);
 	 sdlist = 0;
 	 for (cur = *list; cur; cur = cur->next)
 	    {
@@ -866,7 +860,6 @@ switch (val)
 	 SelPtr sdlist, cur;
 
 	 /* select all sidedefs */
-	 ObjectsNeeded (OBJ_LINEDEFS,0);
 	 sdlist = 0;
 	 for (cur = *list; cur; cur = cur->next)
 	    {
@@ -891,7 +884,6 @@ switch (val)
       if (objtype == OBJ_LINEDEFS)
 	 {
 	 SelPtr cur;
-	 ObjectsNeeded (OBJ_LINEDEFS, 0);
 	 for (cur = *list; cur; cur = cur->next)
 	    {
 	    struct LineDef *l = LineDefs + cur->objnum;

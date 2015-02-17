@@ -57,7 +57,6 @@ int    lstart, lend, l;
 SelPtr cur;
 char   msg[80];
 
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 while (obj != NULL)
    {
    cur = obj;
@@ -108,7 +107,6 @@ void MergeVertices (SelPtr *list)
 {
 int    v, l;
 
-ObjectsNeeded (OBJ_LINEDEFS, 0);
 v = (*list)->objnum;
 UnSelectObject (list, v);
 if (*list == NULL)
@@ -134,7 +132,6 @@ for (l = 0; l < NumLineDefs; l++)
       }
    }
 /* delete the vertices (and some linedefs too) */
-DeleteObjects (OBJ_VERTICES, list);
 MadeChanges = 1;
 MadeMapChanges = 1;
 }
@@ -170,7 +167,6 @@ confirm_t confirm_flag;
 if (obj_type != OBJ_VERTICES)
    return false;
 
-ObjectsNeeded (OBJ_VERTICES, 0);
 redraw = false;
 mergedone = false;
 isldend = false;
@@ -205,8 +201,6 @@ while (ref)
 	    SelectObject (&cur, refv);
 	    SelectObject (&cur, v);
 	    MergeVertices (&cur);
-	    /* not useful but safer... */
-	    ObjectsNeeded (OBJ_VERTICES, 0);
 	    /* update the references in the selection list */
 	    for (cur = *list; cur; cur = cur->next)
 	       if (cur->objnum > refv)
@@ -245,7 +239,6 @@ while (ref)
    /* check if this vertex is on a linedef */
    for (ld = 0; ld < oldnumld; ld++)
       {
-      ObjectsNeeded (OBJ_VERTICES, OBJ_LINEDEFS, 0);
       if (LineDefs[ld].start == refv || LineDefs[ld].end == refv)
          {
 	 /* one vertex had a linedef bound to it -- check it later */
@@ -272,14 +265,12 @@ while (ref)
 	    if (sd >= 0)
 	       {
 	       InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-	       ObjectsNeeded (OBJ_LINEDEFS, 0);
 	       LineDefs[NumLineDefs - 1].sidedef1 = NumSideDefs - 1;
 	       }
  	    sd = LineDefs[ld].sidedef2;
 	    if (sd >= 0)
 	       {
 	       InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-	       ObjectsNeeded (OBJ_LINEDEFS, 0);
 	       LineDefs[NumLineDefs - 1].sidedef2 = NumSideDefs - 1;
 	       }
 	    MadeChanges = 1;

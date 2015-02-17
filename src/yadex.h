@@ -125,7 +125,7 @@ class Wad_file;
 
 /* The master directory structure is used to build a complete directory
    of all the data blocks from all the various wad files. */
-typedef struct MasterDirectory huge *MDirPtr;
+typedef struct MasterDirectory *MDirPtr;
 struct MasterDirectory
    {
    MDirPtr next;		// Next in list

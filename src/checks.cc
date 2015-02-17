@@ -231,10 +231,10 @@ bool CheckFailed (int x0, int y0, char *prompt1, char *prompt2, bool fatal,
 */
 void CheckSectors ()
 {
-    int        s, n, sd;
-    char huge *ends;
-    char       msg1[80], msg2[80];
-    bool       first_time = true;
+    int  s, n, sd;
+    char *ends;
+    char msg1[80], msg2[80];
+    bool first_time = true;
 
     CheckingObjects ();
     LogMessage ("\nVerifying Sectors...\n");

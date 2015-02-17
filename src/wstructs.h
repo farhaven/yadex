@@ -41,7 +41,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 // Directory
 const size_t WAD_NAME = 8;		// Length of a directory entry name
 typedef char wad_name_t[WAD_NAME];
-typedef struct Directory huge *DirPtr;
+typedef struct Directory *DirPtr;
 struct Directory
 {
   int32_t        start;			// Offset to start of data
@@ -122,7 +122,7 @@ typedef struct
   uint8_t               arg4;
   uint8_t               arg5;
 } wad_hexen_thing_t;
-typedef struct Thing huge *TPtr;
+typedef struct Thing *TPtr;
 
 
 // Linedefs
@@ -168,7 +168,7 @@ typedef struct
   wad_sdn_t     sidedef1;
   wad_sdn_t     sidedef2;
 } wad_hexen_linedef_t;
-typedef struct LineDef huge *LDPtr;
+typedef struct LineDef *LDPtr;
 
 
 // Sidedefs
@@ -183,7 +183,7 @@ struct SideDef
   wad_sn_t       sector;		// # of adjacent sector
 };
 // (it's the same for Hexen)
-typedef struct SideDef huge *SDPtr;
+typedef struct SideDef *SDPtr;
 
 
 // Vertices
@@ -194,7 +194,7 @@ struct Vertex
   wad_coord_t y;
 };
 // (it's the same for Hexen)
-typedef struct Vertex huge *VPtr;
+typedef struct Vertex *VPtr;
 
 
 // Sectors
@@ -210,7 +210,7 @@ struct Sector
   wad_stype_t     special;		// FIXME rename to "type"
   wad_tag_t       tag;
 };
-typedef struct Sector huge *SPtr;
+typedef struct Sector *SPtr;
 
 
 // The 11 lumps that constitute a Doom/Heretic/Strife level

@@ -336,10 +336,6 @@ extern const char *Iwad8;	// Name of the Doom alpha 0.5 iwad
 extern const char *Iwad9;	// Name of the Doom press release iwad
 extern const char *Iwad10;	// Name of the Strife 1.0 iwad
 extern const char *MainWad;	// Name of the main wad file
-#ifdef AYM_MOUSE_HACKS
-extern int   MouseMickeysH; 
-extern int   MouseMickeysV; 
-#endif
 extern char **PatchWads;	// List of pwad files
 extern bool  Quiet;		// Don't beep when an object is selected
 extern bool  Quieter;		// Don't beep, even on error

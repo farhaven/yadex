@@ -123,10 +123,6 @@ const char *Iwad8   = NULL;
 const char *Iwad9   = NULL;
 const char *Iwad10  = NULL;
 const char *MainWad = NULL;
-#ifdef AYM_MOUSE_HACKS
-int       MouseMickeysH            = 5;
-int       MouseMickeysV            = 5;
-#endif
 char **   PatchWads = NULL;
 bool      Quiet     = false;
 bool      Quieter   = false;

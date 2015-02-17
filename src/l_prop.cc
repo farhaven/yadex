@@ -35,14 +35,15 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "gfx.h"
 #include "levels.h"
 #include "menudata.h"
+#include "names.h"
 #include "objects.h"
 #include "objid.h"
 #include "oldmenus.h"
 #include "game.h"
 #include "selectn.h"
 #include "textures.h"
-
 #include "things.h"
+
 /*
  *	Menu_data_ldt - Menu_data class for the linedef type
  */
@@ -151,15 +152,15 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
       		snprintf (menustr[5], 60, "Change 2nd sidedef ref. (Current: #%d)",
 			LineDefs[obj->objnum].sidedef2);
 		snprintf (menustr[6], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type,1),LineDefs[obj->objnum].tag);
+			GetLineDefArgumentName(LineDefs[obj->objnum].type, 1).c_str(), LineDefs[obj->objnum].tag);
       		snprintf (menustr[7], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type,2),LineDefs[obj->objnum].arg2);
+			GetLineDefArgumentName(LineDefs[obj->objnum].type, 2).c_str(), LineDefs[obj->objnum].arg2);
       		snprintf (menustr[8], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type,3),LineDefs[obj->objnum].arg3);
+			GetLineDefArgumentName(LineDefs[obj->objnum].type, 3).c_str(), LineDefs[obj->objnum].arg3);
       		snprintf (menustr[9], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type,4),LineDefs[obj->objnum].arg4);
+			GetLineDefArgumentName(LineDefs[obj->objnum].type, 4).c_str(), LineDefs[obj->objnum].arg4);
       		snprintf (menustr[10], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type,5),LineDefs[obj->objnum].arg5);
+			GetLineDefArgumentName(LineDefs[obj->objnum].type, 5).c_str(), LineDefs[obj->objnum].arg5);
 	} else {
 		snprintf (menustr[2], 60, "Change sector tag       (Current: %d)",
 			LineDefs[obj->objnum].tag);
@@ -616,15 +617,15 @@ snprintf (menustr[7], 60,"Change special       (Current: %d)",
          Things[obj->objnum].special);
 if (yg_level_format == YGLF_HEXEN) {
 	snprintf (menustr[8], 60,"Change %-14s(Current: %d)",
-        	GetLineDefArgumentName(Things[obj->objnum].special,1),Things[obj->objnum].arg1);
+        	GetLineDefArgumentName(Things[obj->objnum].special, 1).c_str(),Things[obj->objnum].arg1);
 	snprintf (menustr[9], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,2),Things[obj->objnum].arg2);
+         	GetLineDefArgumentName(Things[obj->objnum].special,2).c_str(),Things[obj->objnum].arg2);
 	snprintf (menustr[10], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,3),Things[obj->objnum].arg3);
+         	GetLineDefArgumentName(Things[obj->objnum].special,3).c_str(),Things[obj->objnum].arg3);
 	snprintf (menustr[11], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,4),Things[obj->objnum].arg4);
+         	GetLineDefArgumentName(Things[obj->objnum].special,4).c_str(),Things[obj->objnum].arg4);
 	snprintf (menustr[12], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,5),Things[obj->objnum].arg5);
+         	GetLineDefArgumentName(Things[obj->objnum].special,5).c_str(),Things[obj->objnum].arg5);
 }
 if (yg_level_format == YGLF_HEXEN)		// Hexen mode
 val = vDisplayMenu (x0, y0, menustr[13],
@@ -1078,7 +1079,7 @@ static char *GetTaggedLineDefFlag (int linedefnum, int flagndx)
     strcpy (ldstr[flagndx - 1], "* ");
   else
     strcpy (ldstr[flagndx - 1], "  ");
-  strcat (ldstr[flagndx - 1], GetLineDefFlagsLongName (0x01 << (flagndx - 1)));
+  strcat (ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str());
   return ldstr[flagndx - 1];
 }
 

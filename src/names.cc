@@ -60,7 +60,7 @@ string GetObjectTypeName (int objtype)
 /*
    what are we editing?
 */
-const char *GetEditModeName (int objtype)
+string GetEditModeName (int objtype)
 {
     switch (objtype)
     {
@@ -79,49 +79,39 @@ const char *GetEditModeName (int objtype)
 /*
    get a short (16 char.) description of the type of a linedef
 */
-const char *GetLineDefTypeName (int type)
+string GetLineDefTypeName (int type)
 {
     if (CUR_LDTDEF != NULL && CUR_LDTDEF->number == type)
-        return CUR_LDTDEF->shortdesc;
+        return string(CUR_LDTDEF->shortdesc);
     for (al_lrewind (ldtdef); ! al_leol (ldtdef); al_lstep (ldtdef))
         if (CUR_LDTDEF->number == type)
-            return CUR_LDTDEF->shortdesc;
+            return string(CUR_LDTDEF->shortdesc);
     return "UNKNOWN";
 }
 
-/*
-   get a short description of the flags of a linedef
-*/
-const char *GetLineDefFlagsName (int flags)
-{
-    static char buf[20];
-    // "P" is a Boom extension ("pass through")
-    // "T" is for Strife ("translucent")
-    const char *flag_chars_ = "-BABMPPANBSLU2MI";
+/* get a short description of the flags of a linedef */
+string GetLineDefFlagsName (int flags) {
+	// "P" is a Boom extension ("pass through")
+	// "T" is for Strife ("translucent")
+	const char *flag_chars_ = "-BABMPPANBSLU2MI";
+	string rv = "";
 
-    int n;
-
-    char *p = buf;
-    for (n = 0; n < 16; n++)
-    {
-        if (n != 0 && n % 4 == 0)
-            *p++ = ' ';
-        if (flags & (0x8000u >> n))
-            *p++ = flag_chars_[n];
-        else
-            *p++ = '-';
-    }
-    *p = '\0';
-    return buf;
+	for (int n = 0; n < 16; n++) {
+		if (n != 0 && n % 4 == 0)
+			rv += ' ';
+		if (flags & (0x8000u >> n))
+			rv += flag_chars_[n];
+		else
+			rv += '-';
+	}
+	return rv;
 }
 
 /*
    get a long description of one linedef flag
 */
-const char *GetLineDefFlagsLongName (int flags)
-{
-    if (yg_level_format == YGLF_HEXEN)
-    {
+string GetLineDefFlagsLongName (int flags) {
+    if (yg_level_format == YGLF_HEXEN) {
         if (flags & 0x200) return "Can be activated more than once";
         if (flags & 0x400) return "Activated by player";
         if (flags & 0x800) return "Activated by monster";
@@ -132,8 +122,7 @@ const char *GetLineDefFlagsLongName (int flags)
         if (flags & 0x2000) return "Activated by players and monsters";
         if (flags & 0x4000) return "Blocks all";
         if (flags & 0x8000) return "UNKNOWN";
-    }else
-    {
+    } else {
         if (flags & 0x1000) return "Translucent [Strife]";
         if (flags & 0x200) return "Pass-through [Boom]";
     }
@@ -169,49 +158,46 @@ string GetSectorTypeName (int type)
 /*
    get a long description of the type of a sector
 */
-string GetSectorTypeLongName(int type)
-{
-    /* KLUDGE: To avoid the last element which is bogus */
-    if (al_ltell (stdef) == al_lcount (stdef) - 1)
-        al_lrewind (stdef);
+string GetSectorTypeLongName(int type) {
+	/* KLUDGE: To avoid the last element which is bogus */
+	if (al_ltell (stdef) == al_lcount (stdef) - 1)
+		al_lrewind (stdef);
 
-    if (CUR_STDEF != NULL && CUR_STDEF->number == type)
-        return string(CUR_STDEF->longdesc);
-    for (al_lrewind (stdef); ! al_leol (stdef); al_lstep (stdef))
-        if (CUR_STDEF->number == type)
-            return string(CUR_STDEF->longdesc);
-	 return "UNKNOWN (" + to_string(type) + ")";
+	if (CUR_STDEF != NULL && CUR_STDEF->number == type)
+		return string(CUR_STDEF->longdesc);
+	for (al_lrewind (stdef); ! al_leol (stdef); al_lstep (stdef))
+		if (CUR_STDEF->number == type)
+			return string(CUR_STDEF->longdesc);
+	return "UNKNOWN (" + to_string(type) + ")";
 }
 
-const char *GetLineDefArgumentName (int type,int argument)
-{
-    if (CUR_LDTDEF != NULL && CUR_LDTDEF->number == type)
-    {
-        if (argument == 1 && CUR_LDTDEF->argument1 != NULL)
-            return CUR_LDTDEF->argument1;
-        if (argument == 2 && CUR_LDTDEF->argument2 != NULL)
-            return CUR_LDTDEF->argument2;
-        if (argument == 3 && CUR_LDTDEF->argument3 != NULL)
-            return CUR_LDTDEF->argument3;
-        if (argument == 4 && CUR_LDTDEF->argument4 != NULL)
-            return CUR_LDTDEF->argument4;
-        if (argument == 5 && CUR_LDTDEF->argument5 != NULL)
-            return CUR_LDTDEF->argument5;
-        return "UNKNOWN";
-    }
-    for (al_lrewind (ldtdef); ! al_leol (ldtdef); al_lstep (ldtdef))
-        if (CUR_LDTDEF->number == type)
-        {
-            if (argument == 1 && CUR_LDTDEF->argument1 != NULL)
-                return CUR_LDTDEF->argument1;
-            if (argument == 2 && CUR_LDTDEF->argument2 != NULL)
-                return CUR_LDTDEF->argument2;
-            if (argument == 3 && CUR_LDTDEF->argument3 != NULL)
-                return CUR_LDTDEF->argument3;
-            if (argument == 4 && CUR_LDTDEF->argument4 != NULL)
-                return CUR_LDTDEF->argument4;
-            if (argument == 5 && CUR_LDTDEF->argument5 != NULL)
-                return CUR_LDTDEF->argument5;
-        }  
-    return "UNKNOWN";
+string GetLineDefArgumentName (int type, int argument) {
+	if (CUR_LDTDEF != NULL && CUR_LDTDEF->number == type) {
+		if (argument == 1 && CUR_LDTDEF->argument1 != NULL)
+			return string(CUR_LDTDEF->argument1);
+		if (argument == 2 && CUR_LDTDEF->argument2 != NULL)
+			return string(CUR_LDTDEF->argument2);
+		if (argument == 3 && CUR_LDTDEF->argument3 != NULL)
+			return string(CUR_LDTDEF->argument3);
+		if (argument == 4 && CUR_LDTDEF->argument4 != NULL)
+			return string(CUR_LDTDEF->argument4);
+		if (argument == 5 && CUR_LDTDEF->argument5 != NULL)
+			return string(CUR_LDTDEF->argument5);
+		return "UNKNOWN";
+	}
+	for (al_lrewind (ldtdef); ! al_leol (ldtdef); al_lstep (ldtdef)) {
+		if (CUR_LDTDEF->number == type) {
+			if (argument == 1 && CUR_LDTDEF->argument1 != NULL)
+				return string(CUR_LDTDEF->argument1);
+			if (argument == 2 && CUR_LDTDEF->argument2 != NULL)
+				return string(CUR_LDTDEF->argument2);
+			if (argument == 3 && CUR_LDTDEF->argument3 != NULL)
+				return string(CUR_LDTDEF->argument3);
+			if (argument == 4 && CUR_LDTDEF->argument4 != NULL)
+				return string(CUR_LDTDEF->argument4);
+			if (argument == 5 && CUR_LDTDEF->argument5 != NULL)
+				return string(CUR_LDTDEF->argument5);
+		}  
+	}
+	return "UNKNOWN";
 }

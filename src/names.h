@@ -24,6 +24,11 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 using std::string;
 
+string GetEditModeName (int);
+string GetLineDefArgumentName(int,int);
+string GetLineDefFlagsLongName (int);
+string GetLineDefFlagsName (int);
+string GetLineDefTypeName (int);
 string GetObjectTypeName(int);
-string GetSectorTypeName (int);
 string GetSectorTypeLongName (int);
+string GetSectorTypeName (int);

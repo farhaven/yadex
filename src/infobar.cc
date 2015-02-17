@@ -39,6 +39,7 @@ specially ; since it changes very often, it can undraw itself.
 
 
 #include "yadex.h"
+#include "names.h"
 #include "gfx.h"
 #include "infobar.h"
 #include "objid.h"
@@ -149,11 +150,10 @@ level_name_disp = level_name;
 }
 
 // Type of objects being edited.
-if (redraw_from_scratch || obj_type_disp != obj_type)
-   {
-   DrawScreenText (x, text_y0, "%s", GetEditModeName (obj_type));
-   obj_type_disp = obj_type;
-   }
+if (redraw_from_scratch || obj_type_disp != obj_type) {
+	DrawScreenText(x, text_y0, "%s", GetEditModeName(obj_type).c_str());
+	obj_type_disp = obj_type;
+}
 x += 10 * FONTW;
 
 // Any changes made ?

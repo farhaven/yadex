@@ -183,26 +183,31 @@ void objinfo_c::draw ()
       DrawScreenText (-1, -1, "\1Flags:\2  %s",
 	GetWhenName (Things[obj_no].when));
 
-      if (yg_level_format == YGLF_HEXEN)
-      { x0 += width;
-      	width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + 40 * FONTW;
-      	ix0 = x0 + BOX_BORDER + WIDE_HSPACING;
-      	y0 = out_y1 - height + 1;
-      	DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
-      	
-	DrawScreenText (ix0, iy0, "\1TID\2          %d", Things[obj_no].tid);
-	if (Things[obj_no].special != 0)
-        	DrawScreenText (-1, -1, "\1Special\2     %d %s",Things[obj_no].special,GetLineDefTypeName (Things[obj_no].special));
-	else
-		DrawScreenText (-1, -1, "\1Special\2      none");
-	
-	DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(Things[obj_no].special,1),Things[obj_no].arg1);
-	DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(Things[obj_no].special,2),Things[obj_no].arg2);
-	DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(Things[obj_no].special,3),Things[obj_no].arg3);
-	DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(Things[obj_no].special,4),Things[obj_no].arg4);
-	DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(Things[obj_no].special,5),Things[obj_no].arg5);
+		if (yg_level_format == YGLF_HEXEN) {
+			x0 += width;
+			width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + 40 * FONTW;
+			ix0 = x0 + BOX_BORDER + WIDE_HSPACING;
+			y0 = out_y1 - height + 1;
+			DrawScreenBox3D (x0, y0, x0 + width - 1, y0 + height - 1);
 
-      }
+			DrawScreenText (ix0, iy0, "\1TID\2          %d", Things[obj_no].tid);
+			if (Things[obj_no].special != 0) {
+				DrawScreenText (-1, -1, "\1Special\2     %d %s",
+						Things[obj_no].special, GetLineDefTypeName(Things[obj_no].special).c_str());
+			} else
+				DrawScreenText (-1, -1, "\1Special\2      none");
+
+			DrawScreenText (-1, -1, "\1%-12s\2 %d",
+					GetLineDefArgumentName(Things[obj_no].special,1).c_str(),Things[obj_no].arg1);
+			DrawScreenText (-1, -1, "\1%-12s\2 %d",
+					GetLineDefArgumentName(Things[obj_no].special,2).c_str(),Things[obj_no].arg2);
+			DrawScreenText (-1, -1, "\1%-12s\2 %d",
+					GetLineDefArgumentName(Things[obj_no].special,3).c_str(),Things[obj_no].arg3);
+			DrawScreenText (-1, -1, "\1%-12s\2 %d",
+					GetLineDefArgumentName(Things[obj_no].special,4).c_str(),Things[obj_no].arg4);
+			DrawScreenText (-1, -1, "\1%-12s\2 %d",
+					GetLineDefArgumentName(Things[obj_no].special,5).c_str(),Things[obj_no].arg5);
+		}
       // Show the corresponding sprite
       {
 	int sx1 = ix1 + 1 - HOLLOW_BORDER;
@@ -278,17 +283,16 @@ void objinfo_c::draw ()
 	set_colour (WINTITLE);
 	DrawScreenText (ix0, iy0, "Linedef #%d", obj_no);
 	set_colour (WINFG);
-	if (yg_level_format != YGLF_HEXEN)
-	DrawScreenText (-1, iy0 + (int) (1.5 * FONTH),
-			"\1Flags\2     %.19s",
-			GetLineDefFlagsName (LineDefs[obj_no].flags));
-	else
-	DrawScreenText (-1, iy0 + (int) (1 * FONTH),
-			"\1Flags\2     %.19s",
-			GetLineDefFlagsName (LineDefs[obj_no].flags));
-	DrawScreenText (-1, -1, "\1Type\2   %3d %.19s",
-			LineDefs[obj_no].type,
-			GetLineDefTypeName (LineDefs[obj_no].type));
+	if (yg_level_format != YGLF_HEXEN) {
+		DrawScreenText (-1, iy0 + (int) (1.5 * FONTH),
+				"\1Flags\2     %.19s",
+				GetLineDefFlagsName (LineDefs[obj_no].flags).c_str());
+	} else {
+		DrawScreenText (-1, iy0 + (int) (1 * FONTH),
+				"\1Flags\2     %.19s",
+				GetLineDefFlagsName (LineDefs[obj_no].flags).c_str());
+	}
+	DrawScreenText (-1, -1, "\1Type\2   %3d %.19s", LineDefs[obj_no].type, GetLineDefTypeName (LineDefs[obj_no].type).c_str());
 	int tag,first_sector,second_sector;
 	
 	if (yg_level_format != YGLF_HEXEN)
@@ -334,16 +338,21 @@ void objinfo_c::draw ()
 	  		s2 = SideDefs[sd2].sector;
 		else
 	  		s2 = -1;
-	}else
-	{	s1 = LineDefs[obj_no].start;
+	} else {
+		s1 = LineDefs[obj_no].start;
 		s2 = LineDefs[obj_no].end;
 		n = ComputeDist (Vertices[s2].x - Vertices[s1].x,Vertices[s2].y - Vertices[s1].y);
 		DrawScreenText (-1, -1, "\1Length\2       %d", n);
-		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,1),LineDefs[obj_no].tag);
-		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,2),LineDefs[obj_no].arg2);
-		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,3),LineDefs[obj_no].arg3);
-		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,4),LineDefs[obj_no].arg4);
-		DrawScreenText (-1, -1, "\1%-12s\2 %d",GetLineDefArgumentName(LineDefs[obj_no].type,5),LineDefs[obj_no].arg5);
+		DrawScreenText (-1, -1, "\1%-12s\2 %d",
+				GetLineDefArgumentName(LineDefs[obj_no].type,1).c_str(),LineDefs[obj_no].tag);
+		DrawScreenText (-1, -1, "\1%-12s\2 %d",
+				GetLineDefArgumentName(LineDefs[obj_no].type,2).c_str(),LineDefs[obj_no].arg2);
+		DrawScreenText (-1, -1, "\1%-12s\2 %d",
+				GetLineDefArgumentName(LineDefs[obj_no].type,3).c_str(),LineDefs[obj_no].arg3);
+		DrawScreenText (-1, -1, "\1%-12s\2 %d",
+				GetLineDefArgumentName(LineDefs[obj_no].type,4).c_str(),LineDefs[obj_no].arg4);
+		DrawScreenText (-1, -1, "\1%-12s\2 %d",
+				GetLineDefArgumentName(LineDefs[obj_no].type,5).c_str(),LineDefs[obj_no].arg5);
 
 		sd1 = LineDefs[obj_no].sidedef1;
 		sd2 = LineDefs[obj_no].sidedef2;
@@ -356,14 +365,12 @@ void objinfo_c::draw ()
 		else
 	  		s2 = -1;
 	}
-      }
-      else
-      {
-	const char *message = "(no linedef selected)";
-	set_colour (WINFG_DIM);
-	DrawScreenText (x0 + (width - FONTW * strlen (message)) / 2,
-	  y0 + (height - FONTH) / 2, message);
-      }
+		} else {
+			const char *message = "(no linedef selected)";
+			set_colour (WINFG_DIM);
+			DrawScreenText (x0 + (width - FONTW * strlen (message)) / 2,
+					y0 + (height - FONTH) / 2, message);
+		}
 
       // 1st sidedef
       x0 += width;

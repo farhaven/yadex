@@ -28,11 +28,10 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"
 #include "levels.h"
+#include "names.h"
 #include "selectn.h"
-
 
 void xref_sidedef ()
 {
@@ -76,7 +75,7 @@ void secret_sectors ()
 void unknown_linedef_type (SelPtr *list)
 {
   for (int n = 0; n < NumLineDefs; n++)
-    if (*GetLineDefTypeName (LineDefs[n].type) == '?')
+    if (GetLineDefTypeName(LineDefs[n].type)[0] == '?')
       SelectObject (list, n);
 }
 

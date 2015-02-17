@@ -427,14 +427,6 @@ int is_flat_name_in_list (const char *name);
 void ReadFTextureNames (void);
 void ForgetWTextureNames (void);
 
-// names.cc
-const char *GetEditModeName (int);
-const char *GetLineDefTypeName (int);
-const char *GetLineDefTypeLongName (int);
-const char *GetLineDefFlagsName (int);
-const char *GetLineDefFlagsLongName (int);
-const char *GetLineDefArgumentName(int,int);
-
 // nop.cc
 void nop (...);
 

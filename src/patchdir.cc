@@ -73,7 +73,7 @@ void Patch_dir::refresh (MDirPtr master_dir)
      And usually is ! */
  free(pnames);
  pnames = NULL;
- npnames = NULL;
+ npnames = 0;
   if (! patch_lumps.empty ())
     patch_lumps.clear ();
 

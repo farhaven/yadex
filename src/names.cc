@@ -26,14 +26,20 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+
+#include "names.h"
 #include "yadex.h"
 #include "game.h"
 #include "objid.h"
 
+using std::string;
+using std::to_string;
+
 /*
    get the name of an object type
 */
-const char *GetObjectTypeName (int objtype)
+string GetObjectTypeName (int objtype)
 {
     switch (objtype)
     {
@@ -165,20 +171,18 @@ const char *GetSectorTypeName (int type)
 /*
    get a long description of the type of a sector
 */
-const char *GetSectorTypeLongName (int type)
+string GetSectorTypeLongName(int type)
 {
     /* KLUDGE: To avoid the last element which is bogus */
     if (al_ltell (stdef) == al_lcount (stdef) - 1)
         al_lrewind (stdef);
 
     if (CUR_STDEF != NULL && CUR_STDEF->number == type)
-        return CUR_STDEF->longdesc;
+        return string(CUR_STDEF->longdesc);
     for (al_lrewind (stdef); ! al_leol (stdef); al_lstep (stdef))
         if (CUR_STDEF->number == type)
-            return CUR_STDEF->longdesc;
-    static char buf[30];
-    sprintf (buf, "UNKNOWN (%d)", type);
-    return buf;
+            return string(CUR_STDEF->longdesc);
+	 return "UNKNOWN (" + to_string(type) + ")";
 }
 
 const char *GetLineDefArgumentName (int type,int argument)

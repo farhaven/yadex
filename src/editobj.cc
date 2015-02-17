@@ -37,6 +37,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "game.h"
 #include "gfx.h"
 #include "levels.h"
+#include "names.h"
 #include "objects.h"
 #include "objid.h"
 #include "oldmenus.h"
@@ -58,7 +59,7 @@ InputObjectNumber (int x0, int y0, int objtype, int curobj) {
 	char prompt[80];
 
 	snprintf (prompt, sizeof(prompt), "Enter a %s number between 0 and %d:",
-			GetObjectTypeName (objtype), GetMaxObjectNum (objtype));
+			GetObjectTypeName(objtype).c_str(), GetMaxObjectNum (objtype));
 	if (x0 < 0)
 		x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
 	if (y0 < 0)
@@ -85,7 +86,7 @@ input_objid (Objid& objid, const Objid& init, int x0, int y0) {
 	char prompt[80];
 
 	snprintf(prompt, sizeof(prompt), "Enter a %s number between 0 and %d:",
-	GetObjectTypeName (init.type), GetMaxObjectNum (init.type));
+		GetObjectTypeName(init.type).c_str(), GetMaxObjectNum (init.type));
 	if (x0 < 0)
 		x0 = (ScrMaxX - 25 - 8 * strlen (prompt)) / 2;
 	if (y0 < 0)
@@ -124,7 +125,7 @@ InputObjectXRef (int x0, int y0, int objtype, bool allownone, int curobj) {
 
 	// Dimensions
 	snprintf (prompt, sizeof(prompt), "Enter a %s number between 0 and %d%c",
-		GetObjectTypeName (objtype), GetMaxObjectNum (objtype), allownone ? ',' : ':');
+		GetObjectTypeName(objtype).c_str(), GetMaxObjectNum (objtype), allownone ? ',' : ':');
 	maxlen = 40;				// Why 40 ? -- AYM 2002-04-17
 	if (strlen (prompt) > maxlen);
 		maxlen = strlen (prompt);
@@ -626,7 +627,7 @@ int    angle, scale;
 if (val > 1 && ! *list)
    {
    Beep ();
-   snprintf (msg, sizeof(msg), "You must select at least one %s", GetObjectTypeName (objtype));
+   snprintf (msg, sizeof(msg), "You must select at least one %s", GetObjectTypeName(objtype).c_str());
    Notify (-1, -1, msg, 0);
    return;
    }
@@ -645,8 +646,7 @@ switch (val)
       // * -> Rotate and scale
       if ((objtype == OBJ_VERTICES) && ! (*list)->next) {
 	 Beep ();
-	 snprintf (msg, sizeof(msg), "You must select more than one %s",
-            GetObjectTypeName (objtype));
+	 snprintf (msg, sizeof(msg), "You must select more than one %s", GetObjectTypeName(objtype).c_str());
 	 Notify (-1, -1, msg, 0);
 	 return;
 	 }

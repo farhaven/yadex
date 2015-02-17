@@ -253,7 +253,7 @@ public:
    DrawSurf lower;
    DrawSurf floor;
 
-   static const double IZ_EPSILON = 0.000001;
+   static constexpr double IZ_EPSILON = 0.000001;
 
    /* PREDICATES */
 
@@ -422,7 +422,7 @@ public:
    int open_y1;
    int open_y2;
 
-   static const double Y_SLOPE = 1.70;
+   static constexpr double Y_SLOPE = 1.70;
 
    static void DeleteWall (DrawWall *P)
       {

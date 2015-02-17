@@ -311,27 +311,17 @@ if [ -n "$CXX" ]
 then
   printf ' using user-supplied value:'
 else
-  CXX=g++
-  if type $CXX >/dev/null 2>&1
-  then
-    :
-  else
-    CXX=c++
-    if type $CXX >/dev/null 2>&1
-    then
-      :
-    else
-      CXX=cxx
-      if type $CXX >/dev/null 2>&1
-      then
-	:
-      else
-	echo " none"
-	echo "error: none of (g++, c++, cxx) work, is your PATH set right?" 1>&2
-	exit 1
-      fi
-    fi
-  fi
+	CXX=
+	for c in eg++ g++ c++ cxx; do
+		if type $c >/dev/null 2>&1; then
+			CXX=$c
+			break
+		fi
+	done
+	if [ "x$CXX" == "x" ]; then
+		echo "error: none of (eg++, g++, c++, cxx) work, is your PATH set right?" 1>&2
+		exit 1
+	fi
 fi
 echo " $CXX"
 

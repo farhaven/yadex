@@ -85,7 +85,7 @@ CFLAGS = -O
 # ld is invoked through the C++ compiler so
 # LDFLAGS should not contain options that mean
 # something to the C++ compiler.
-CXXFLAGS = -O
+CXXFLAGS = -O -std=c++11
 #CXXFLAGS += -DWHITE_BACKGROUND
 #LDFLAGS  =
 

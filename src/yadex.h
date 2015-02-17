@@ -428,7 +428,6 @@ void ReadFTextureNames (void);
 void ForgetWTextureNames (void);
 
 // names.cc
-const char *GetObjectTypeName (int);
 const char *GetEditModeName (int);
 const char *GetLineDefTypeName (int);
 const char *GetLineDefTypeLongName (int);
@@ -436,7 +435,6 @@ const char *GetLineDefFlagsName (int);
 const char *GetLineDefFlagsLongName (int);
 const char *GetLineDefArgumentName(int,int);
 const char *GetSectorTypeName (int);
-const char *GetSectorTypeLongName (int);
 
 // nop.cc
 void nop (...);

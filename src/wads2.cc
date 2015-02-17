@@ -954,7 +954,7 @@ for (dirname = standard_directories; *dirname; dirname++)
       else
 	 continue;
    else
-      y_snprintf (real_name, Y_FILE_NAME + 1, *dirname, Game ? Game : "");
+      snprintf (real_name, Y_FILE_NAME + 1, *dirname, Game ? Game : "");
    al_saps (real_name, real_basename, Y_FILE_NAME);
    verbmsg ("  Trying \"%s\"... ", real_name);
    if (file_exists (real_name))

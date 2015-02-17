@@ -586,7 +586,6 @@ showconf:
 	@echo "ETCDIRNV           \"$(ETCDIRNV)\""
 	@echo "HAVE_GETTIMEOFDAY  \"$(HAVE_GETTIMEOFDAY)\""
 	@echo "HAVE_NANOSLEEP     \"$(HAVE_NANOSLEEP)\""
-	@echo "HAVE_SNPRINTF      \"$(HAVE_SNPRINTF)\""
 	@echo "HAVE_USLEEP        \"$(HAVE_USLEEP)\""
 	@echo "LDFLAGS            \"$(LDFLAGS)\""
 	@echo "MANDIR             \"$(MANDIR)\""

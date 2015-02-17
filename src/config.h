@@ -2,7 +2,6 @@
 
 #define Y_GETTIMEOFDAY
 #define Y_NANOSLEEP
-#define Y_SNPRINTF
 #define Y_USLEEP
 
 extern const char *yadex_etc_path[];

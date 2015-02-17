@@ -39,9 +39,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 const char *what ()
 {
-static char buf[40];
-y_snprintf (buf, sizeof buf, "Yadex %s (%s)", yadex_version, yadex_source_date);
-return buf;
+	static char buf[40];
+	snprintf (buf, sizeof buf, "Yadex %s (%s)", yadex_version, yadex_source_date);
+	return buf;
 }
 
 

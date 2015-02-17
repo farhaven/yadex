@@ -287,7 +287,7 @@ InputNameFromListWithFunc (
 		if ((c.flags & HOOK_SIZE_VALID) && (c.flags & HOOK_DISP_SIZE)) {
 			set_colour (WINFG);
 			char size_buf[100];  // Slack
-			y_snprintf (size_buf, sizeof size_buf, "%dx%d", c.width, c.height);
+			snprintf (size_buf, sizeof size_buf, "%dx%d", c.width, c.height);
 			if (strlen (size_buf) > size_chars)
 				strcpy (size_buf + size_chars - 1, ">");
 			DrawScreenString (size_x0, size_y0, size_buf);

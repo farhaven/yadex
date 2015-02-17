@@ -1058,8 +1058,8 @@ if ((file = fopen (outfile, "wb")) == NULL)
    {
    char buf1[81];
    char buf2[81];
-   y_snprintf (buf1, sizeof buf1, "Can't open \"%.64s\"", outfile);
-   y_snprintf (buf2, sizeof buf1, "for writing (%.64s)",  strerror (errno));
+   snprintf (buf1, sizeof buf1, "Can't open \"%.64s\"", outfile);
+   snprintf (buf2, sizeof buf1, "for writing (%.64s)",  strerror (errno));
    Notify (-1, -1, buf1, buf2);
    return 1;
    }
@@ -1311,8 +1311,8 @@ if (fseek (file, 8, SEEK_SET))
    {
    char buf1[81];
    char buf2[81];
-   y_snprintf (buf1, sizeof buf1, "%.64s: seek error", outfile);
-   y_snprintf (buf2, sizeof buf2, "(%.64s)",           strerror (errno));
+   snprintf (buf1, sizeof buf1, "%.64s: seek error", outfile);
+   snprintf (buf2, sizeof buf2, "(%.64s)",           strerror (errno));
    Notify (-1, -1, buf1, buf2);
    fclose (file);
    return 1;
@@ -1324,8 +1324,8 @@ if (fclose (file))
    {
    char buf1[81];
    char buf2[81];
-   y_snprintf (buf1, sizeof buf1, "%.64s: write error", outfile);
-   y_snprintf (buf2, sizeof buf2, "(%.64s)",            strerror (errno));
+   snprintf (buf1, sizeof buf1, "%.64s: write error", outfile);
+   snprintf (buf2, sizeof buf2, "(%.64s)",            strerror (errno));
    Notify (-1, -1, buf1, buf2);
    return 1;
    }

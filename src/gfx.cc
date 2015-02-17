@@ -937,7 +937,7 @@ void DrawScreenText (int scrx, int scry, const char *msg, ...)
     }
 
     va_start (args, msg);
-    y_vsnprintf (temp, sizeof temp, msg, args);
+    vsnprintf (temp, sizeof temp, msg, args);
     DrawScreenString (scrx, scry, temp);
 }
 

@@ -105,8 +105,8 @@ int Win_dim::pixels (int ref_pixels)
 void Win_dim::string (char *buf, size_t buf_size)
 {
   if (p->relative)
-    y_snprintf (buf, buf_size, "%d%%", p->value);
+    snprintf (buf, buf_size, "%d%%", p->value);
   else
-    y_snprintf (buf, buf_size, "%d", p->value);
+    snprintf (buf, buf_size, "%d", p->value);
 }
 

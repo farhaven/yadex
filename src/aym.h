@@ -35,8 +35,6 @@ const char *spec_path (const char *spec);
 int is_absolute (const char *filename);
 int y_stricmp (const char *s1, const char *s2);
 int y_strnicmp (const char *s1, const char *s2, size_t len);
-int y_snprintf (char *buf, size_t size, const char *fmt, ...);
-int y_vsnprintf (char *buf, size_t size, const char *fmt, va_list args);
 void y_strupr (char *string);
 int is_one_of (const char *needle, ...);
 bool file_exists (const char *);

@@ -185,34 +185,6 @@ int y_strnicmp (const char *s1, const char *s2, size_t len)
 }
 
 /*
- *	y_snprintf
- *	If available, snprintf(). Else sprintf().
- */
-int y_snprintf (char *buf, size_t size, const char *fmt, ...)
-{
-    va_list args;
-    va_start (args, fmt);
-#ifdef Y_SNPRINTF
-    return vsnprintf (buf, size, fmt, args);
-#else
-    return vsprintf (buf, fmt, args);
-#endif
-}
-
-/*
- *	y_vsnprintf
- *	If available, vsnprintf(). Else vsprintf().
- */
-int y_vsnprintf (char *buf, size_t size, const char *fmt, va_list args)
-{
-#ifdef Y_SNPRINTF
-    return vsnprintf (buf, size, fmt, args);
-#else
-    return vsprintf (buf, fmt, args);
-#endif
-}
-
-/*
  *	y_strupr
  *	Upper-case a string
  */

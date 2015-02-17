@@ -231,9 +231,8 @@ char *GetWadFileName (const char *levelname)
 	{
 	  char buf1[81];
 	  char buf2[81];
-	  y_snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"",
-	    wf->filename);
-	  y_snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
+	  snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"", wf->filename);
+	  snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
 	  Notify (-1, -1, buf1, buf2);
 	  return 0;
 	}
@@ -242,10 +241,8 @@ char *GetWadFileName (const char *levelname)
 	{
 	  char buf1[81];
 	  char buf2[81];
-	  y_snprintf (buf1, sizeof buf1, "Could not rename \"%.64s\"",
-	    outfile);
-	  y_snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)",
-	    wf->filename, strerror (errno));
+	  snprintf (buf1, sizeof buf1, "Could not rename \"%.64s\"", outfile);
+	  snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)", wf->filename, strerror (errno));
 	  Notify (-1, -1, buf1, buf2);
 	  return 0;
 	}
@@ -256,9 +253,8 @@ char *GetWadFileName (const char *levelname)
       {
 	char buf1[81];
 	char buf2[81];
-	y_snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"",
-	  wf->filename);
-	y_snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
+	snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"", wf->filename);
+	snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
 	Notify (-1, -1, buf1, buf2);
 	return 0;
       }

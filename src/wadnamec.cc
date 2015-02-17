@@ -45,7 +45,7 @@ Wad_name_c::Wad_name_c (const char *fmt, ...)
 {
   va_list list;
   va_start (list, fmt);
-  y_vsnprintf (name, sizeof name, fmt, list);
+  vsnprintf (name, sizeof name, fmt, list);
   va_end (list);
   y_strupr (name);
 }

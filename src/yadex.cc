@@ -549,7 +549,7 @@ void nf_bug (const char *fmt, ...)
 
     va_list args;
     va_start (args, fmt);
-    y_vsnprintf (msg, sizeof msg, fmt, args);
+    vsnprintf (msg, sizeof msg, fmt, args);
     if (first_time || strncmp (msg, msg_prev, sizeof msg))
     {
         fflush (stdout);

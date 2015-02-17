@@ -196,7 +196,7 @@ void debmes (const char *fmt, ...)
     if (Debug != 1)
         return;
     va_start (arglist, fmt);
-    y_vsnprintf (buf, sizeof buf, fmt, arglist);
+    vsnprintf (buf, sizeof buf, fmt, arglist);
     Notify (-1, -1, buf, NULL);
 }
 
@@ -209,7 +209,7 @@ void DisplayMessage (int x0, int y0, const char *msg, ...)
     va_list args;
 
     va_start (args, msg);
-    y_vsnprintf (prompt, sizeof prompt, msg, args);
+    vsnprintf (prompt, sizeof prompt, msg, args);
     int width = 2 * BOX_BORDER + 2 * WIDE_HSPACING + FONTW * strlen (prompt);
     int height = 2 * BOX_BORDER + 2 * WIDE_VSPACING + FONTH;
 

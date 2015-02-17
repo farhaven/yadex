@@ -28,7 +28,6 @@ CC=
 CXX=
 HAVE_GETTIMEOFDAY=
 HAVE_NANOSLEEP=
-HAVE_SNPRINTF=
 HAVE_USLEEP=
 INTERFACE=x11				# "bgi" or "x11"
 PLATFORM=unix				# "dos" or "unix"
@@ -112,7 +111,6 @@ genh () {
     echo
     genbool GETTIMEOFDAY
     genbool NANOSLEEP
-    genbool SNPRINTF
     genbool USLEEP
     echo
     echo 'extern const char *yadex_etc_path[];'
@@ -291,19 +289,6 @@ int main (int argc, char *argv[])
 ' || true
 
 #
-#	Do we have snprintf() ?
-#
-check "for snprintf" HAVE_SNPRINTF '
-#include <stdio.h>
-int main (int argc, char *argv[])
-{
-  char buf[1];
-  int n = snprintf (buf, sizeof buf, "%d", 42);
-  return n;
-}
-' || true
-
-#
 #	Do we have usleep() ?
 #
 check "for usleep" HAVE_USLEEP '
@@ -431,7 +416,6 @@ echo generating $BUILDDIR/Makefile.config
   echo "ETCDIRNV          = $ETCDIRNV"
   echo "HAVE_GETTIMEOFDAY = $HAVE_GETTIMEOFDAY"
   echo "HAVE_NANOSLEEP    = $HAVE_NANOSLEEP"
-  echo "HAVE_SNPRINTF     = $HAVE_SNPRINTF"
   echo "HAVE_USLEEP       = $HAVE_USLEEP"
   echo "INTERFACE         = $INTERFACE"
   echo "MANDIR            = $MANDIR"

@@ -347,8 +347,7 @@ char prompt[80];
 int  entry_width  = 2 * HOLLOW_BORDER + 2 * NARROW_HSPACING + 7 * FONTW;
 int  entry_height = 2 * HOLLOW_BORDER + 2 * NARROW_VSPACING + FONTH;
 
-y_snprintf (prompt, sizeof prompt, "Give the %s and %s for the object:",
-   name1, name2);
+snprintf (prompt, sizeof prompt, "Give the %s and %s for the object:", name1, name2);
 maxlen = strlen (prompt);
 
 int title_x0       = BOX_BORDER + FONTW;

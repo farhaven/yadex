@@ -210,7 +210,7 @@ static inline int vwidth (char c)
 void draw_vint (int number, int x, int y, double scale)
 {
   char buf[20];
-  y_snprintf (buf, sizeof buf, "%d", number);
+  snprintf (buf, sizeof buf, "%d", number);
   draw_vstring (buf, x, y, scale);
 }
 

@@ -328,8 +328,7 @@ for (ld = 0; ld+1 < NumLineDefs; ld++)
    int ld1 = linedefs[ld].linedefno;
    int ld2 = linedefs[ld+1].linedefno;
    char prompt[81];
-   y_snprintf (prompt, sizeof prompt, "Linedefs %d and %d are superimposed",
-      ld1, ld2);
+   snprintf (prompt, sizeof prompt, "Linedefs %d and %d are superimposed", ld1, ld2);
    redraw = true;
    if (Expert || Confirm2 (-1, -1, &confirm_flag,
       prompt, "(and perhaps others too). Merge them ?"))

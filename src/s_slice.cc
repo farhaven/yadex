@@ -84,8 +84,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (! is_linedef (linedef1))		// Paranoia
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf,
-	"First argument is not a valid linedef number");
+    snprintf (buf, sizeof buf, "First argument is not a valid linedef number");
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -93,8 +92,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (! is_linedef (linedef2))		// Paranoia
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf,
-	"Second argument is not a valid linedef number");
+    snprintf (buf, sizeof buf, "Second argument is not a valid linedef number");
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -102,7 +100,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (linedef1 == linedef2)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf, "Both arguments are the same linedef");
+    snprintf (buf, sizeof buf, "Both arguments are the same linedef");
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -116,8 +114,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
     || l1start == l2end && l1end == l2start)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf, "Linedefs %d and %d are superimposed",
-        int (linedef1), int (linedef2));
+    snprintf (buf, sizeof buf, "Linedefs %d and %d are superimposed", int (linedef1), int (linedef2));
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -135,8 +132,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (is_sector (l1sr) && is_sector (l1sl) && l1sr == l1sl)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf, "Linedef %d has both sides in the same sector",
-	int (linedef1));
+    snprintf (buf, sizeof buf, "Linedef %d has both sides in the same sector", linedef1);
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -144,8 +140,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (is_sector (l2sr) && is_sector (l2sl) && l2sr == l2sl)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf, "Linedef %d has both sides in the same sector",
-	int (linedef2));
+    snprintf (buf, sizeof buf, "Linedef %d has both sides in the same sector", linedef2);
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -174,18 +169,14 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
   if (count < 1)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf,
-	"Linedefs %d and %d don't face the same sector",
-	int (linedef1), int (linedef2));
+    snprintf (buf, sizeof buf, "Linedefs %d and %d don't face the same sector", linedef1, linedef2);
     Notify (-1, -1, buf, 0);
     return;
   }
   if (count > 1)
   {
     char buf[100];
-    y_snprintf (buf, sizeof buf,
-	"Linedefs %d and %d have more than one sector in common",
-	int (linedef1), int (linedef2));
+    snprintf (buf, sizeof buf, "Linedefs %d and %d have more than one sector in common",linedef1, linedef2);
     Notify (-1, -1, buf, 0);
     return;
   }
@@ -241,9 +232,7 @@ void sector_slice (obj_no_t linedef1, obj_no_t linedef2)
        || LineDefs[n].start == lb1 && LineDefs[n].end == lb0)
       {
 	char buf[100];
-	y_snprintf (buf, sizeof buf,
-	    "A linedef already exists between linedefs %d and %d (linedef %d)",
-	    int (linedef1), int (linedef2), int (n));
+	snprintf (buf, sizeof buf, "A linedef already exists between linedefs %d and %d (linedef %d)", linedef1, linedef2, n);
 	Notify (-1, -1, buf, 0);
 	return;
       }

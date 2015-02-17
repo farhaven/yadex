@@ -230,7 +230,7 @@ opt_desc_t options[] =        // Description of the command line options
         OPT_STRINGBUF8,
         0,
         "Default lower texture",
-        default_lower_texture
+        &default_lower_texture
     },
     {
         "default_middle_texture",
@@ -238,7 +238,15 @@ opt_desc_t options[] =        // Description of the command line options
         OPT_STRINGBUF8,
         0,
         "Default middle texture",
-        default_middle_texture
+        &default_middle_texture
+    },
+    {
+        "default_upper_texture",
+        0,
+        OPT_STRINGBUF8,
+        0,
+        "Default upper texture",
+        &default_upper_texture
     },
     {
         "default_thing",
@@ -247,14 +255,6 @@ opt_desc_t options[] =        // Description of the command line options
         0,
         "Default thing number",
         &default_thing
-    },
-    {
-        "default_upper_texture",
-        0,
-        OPT_STRINGBUF8,
-        0,
-        "Default upper texture",
-        default_upper_texture
     },
     {
         "digit_zoom_base",

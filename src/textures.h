@@ -13,7 +13,7 @@
 
 /* textures.cc */
 void DisplayPic (hookfunc_comm_t *c);
-void ChooseWallTexture (int, int, const char *, int, char **, char *);
+string ChooseWallTexture (int, int, const char *, int, char **, string);
 void GetWallTextureSize (int16_t *, int16_t *, const char *);
 
 

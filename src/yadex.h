@@ -36,6 +36,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 /*
  *	Standard headers
  */
+#include <string>
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +56,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "yerror.h"
 #include "aym.h"     /* Needs yerror.h */
 #include "windim.h"
+
+using std::string;
 
 /*
  *	Platform-independant types and formats.
@@ -307,10 +311,10 @@ extern char  default_ceiling_texture[WAD_FLAT_NAME + 1];// For new sectors
 extern int   default_floor_height;			// For new sectors
 extern char  default_floor_texture[WAD_FLAT_NAME + 1];	// For new sectors
 extern int   default_light_level;			// For new sectors
-extern char  default_lower_texture[WAD_TEX_NAME + 1];	// For new linedefs
-extern char  default_middle_texture[WAD_TEX_NAME + 1];	// For new linedefs
+extern string default_lower_texture;	// For new linedefs
+extern string default_middle_texture;	// For new linedefs
+extern string default_upper_texture;	// For new linedefs
 extern int   default_thing;				// For new THINGS
-extern char  default_upper_texture[WAD_TEX_NAME + 1];	// For new linedefs
 extern int   double_click_timeout;// Max ms between clicks of double click.
 extern bool  Expert;		// Don't ask for confirmation for some ops.
 extern const char *Game;	// Name of game "doom", "doom2", "heretic", ...

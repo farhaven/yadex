@@ -103,8 +103,8 @@ const int HOOK_LOC_VALID  = 1 << 6;	// lump_loc is valid
 const int HOOK_ROOT       = 1 << 7;	// .name is the prefix. Use loc_by_root
 
 
-void InputNameFromListWithFunc (int, int, const char *, size_t,
-  const char *const *, size_t, char *, int, int,
+string InputNameFromListWithFunc (int, int, const char *, size_t,
+  const char *const *, size_t, string name, int, int,
   void (*hookfunc)(hookfunc_comm_t *),
   char flags_to_pass_to_callback = 0);
 void InputNameFromList (int, int, const char *, size_t, const char *const *,

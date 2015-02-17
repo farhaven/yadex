@@ -166,11 +166,10 @@ while (ldok != NULL)
       }
    strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
    /* if the ceiling of the sector is lower than that of the lift */
-   if (Sectors[s].ceilh < Sectors[sector].ceilh)
-      {
-      if (strncmp (SideDefs[sd2].tex1, "-", WAD_TEX_NAME))
-	 strncpy (SideDefs[sd2].tex1, default_upper_texture, WAD_TEX_NAME);
-      }
+	if (Sectors[s].ceilh < Sectors[sector].ceilh) {
+		if (strncmp (SideDefs[sd2].tex1, "-", WAD_TEX_NAME))
+			strncpy (SideDefs[sd2].tex1, default_upper_texture.c_str(), WAD_TEX_NAME);
+	}
    /* if the floor of the sector is above the lift */
    if (Sectors[s].floorh >= Sectors[sector].floorh)
       {
@@ -185,19 +184,18 @@ while (ldok != NULL)
    UnSelectObject (&ldok, n);
    }
 
-while (ld1s != NULL)
-   {
-   /* these are the lift walls (one-sided) */
-   n = ld1s->objnum;
-   LineDefs[n].flags = 0x01;
-   sd1 = LineDefs[n].sidedef1;
-   /* adjust the textures for the sidedef */
-   if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
-      strncpy (SideDefs[sd1].tex3, default_middle_texture, WAD_TEX_NAME);
-   strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);
-   strncpy (SideDefs[sd1].tex2, "-", WAD_TEX_NAME);
-   UnSelectObject (&ld1s, n);
-   }
+while (ld1s != NULL) {
+	/* these are the lift walls (one-sided) */
+	n = ld1s->objnum;
+	LineDefs[n].flags = 0x01;
+	sd1 = LineDefs[n].sidedef1;
+	/* adjust the textures for the sidedef */
+	if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
+		strncpy (SideDefs[sd1].tex3, default_middle_texture.c_str(), WAD_TEX_NAME);
+	strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);
+	strncpy (SideDefs[sd1].tex2, "-", WAD_TEX_NAME);
+	UnSelectObject (&ld1s, n);
+}
 }
 
 

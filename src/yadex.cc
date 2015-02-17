@@ -26,6 +26,8 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+
 #include "yadex.h"
 #include <time.h>
 #include "acolours.h"
@@ -54,6 +56,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadname.h"
 #include "wadres.h"
 #include "wads2.h"
+
+using std::string;
 
 /*
  *    Constants (declared in yadex.h)
@@ -93,9 +97,9 @@ char      default_ceiling_texture[WAD_FLAT_NAME + 1] = "CEIL3_5";
 int       default_floor_height   = 0;
 char      default_floor_texture[WAD_FLAT_NAME + 1]   = "FLOOR4_8";
 int       default_light_level    = 144;
-char      default_lower_texture[WAD_TEX_NAME + 1]    = "STARTAN3";
-char      default_middle_texture[WAD_TEX_NAME + 1]   = "STARTAN3";
-char      default_upper_texture[WAD_TEX_NAME + 1]    = "STARTAN3";
+string    default_lower_texture   = "STARTAN3";
+string    default_middle_texture  = "STARTAN3";
+string    default_upper_texture   = "STARTAN3";
 int       default_thing          = 3004;
 int       double_click_timeout   = 200;
 bool      Expert                 = false;

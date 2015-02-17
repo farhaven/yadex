@@ -895,7 +895,7 @@ switch (val)
 	       struct SideDef *s = SideDefs + l->sidedef1;
 	       strcpy (s->tex1, "-");
 	       strcpy (s->tex2, "-");
-	       strcpy (s->tex3, default_middle_texture);
+	       strcpy (s->tex3, default_middle_texture.c_str());
 	       }
 	    /* Don't delete the 2nd sidedef, it could be used
                by another linedef. And if it isn't, the next

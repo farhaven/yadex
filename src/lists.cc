@@ -71,12 +71,12 @@ AYM 1998-02-12 : if hookfunc is <> NULL, a message "Press shift-F1 to save
 static bool disp_lump_loc = false;
 #endif
 
-void
+string
 InputNameFromListWithFunc (
 		int x0, int y0,
 		const char *prompt,
 		size_t listsize, const char *const *list, size_t listdisp,
-		char *name,
+		string name,
 		int width, int height,
 		void (*hookfunc)(hookfunc_comm_t *),
 		char flags_to_pass_to_callback) {
@@ -118,10 +118,12 @@ InputNameFromListWithFunc (
 	for (n = 0; n < listsize; n++)
 		if (strlen (list[n]) > maxlen)
 		maxlen = strlen (list[n]);
-	for (n = strlen (name) + 1; n <= maxlen; n++)
+	for (n = name.length() + 1; n <= maxlen; n++)
 		name[n] = '\0';
-	char *namedisp = new char[maxlen + 1];
-	memset (namedisp, '\xff', maxlen + 1);  // Always != from name
+	string namedisp = "";
+	for (unsigned int idx = 0; idx < maxlen; idx++) {
+		namedisp += '\xff';
+	}
 
 	// Compute the minimum width of the dialog box
 	l0 = 12;
@@ -201,16 +203,17 @@ InputNameFromListWithFunc (
 	hookfunc_comm_t c;
 
 	// Reset maxpatches every time when change texture
-	if (strcmp (name, namedisp) != 0)
-	maxpatches = 0;
+	if (name == namedisp)
+		maxpatches = 0;
 
 	// Is "name" in the list ?
-	for (n = 0; n < listsize; n++)
-		if (y_stricmp (name, list[n]) <= 0)
+	for (n = 0; n < listsize; n++) {
+		if (y_stricmp (name.c_str(), list[n]) <= 0)
 			break;
+	}
 
 	if (yg_level_format != YGLF_HEXEN)
-		ok = n < listsize ? ! y_stricmp (name, list[n]) : false;
+		ok = n < listsize ? ! y_stricmp (name.c_str(), list[n]) : false;
 	else
 		ok = true;
 	if (n >= listsize)
@@ -245,7 +248,7 @@ InputNameFromListWithFunc (
 			set_colour (WHITE);
 		else
 			set_colour (WINFG);
-		DrawScreenText (entry_text_x0, entry_text_y0, name);
+		DrawScreenText (entry_text_x0, entry_text_y0, name.c_str());
 
 		// Call the function to display the picture, if any
 		if (hookfunc) {
@@ -254,7 +257,7 @@ InputNameFromListWithFunc (
 		c.y0         = y1;
 		c.x1         = x2;
 		c.y1         = y2;
-		c.name       = name;
+		c.name       = name.c_str();
 		c.xofs       = 0;
 		c.yofs       = 0;
 		c.flags      = flags_to_pass_to_callback;
@@ -273,7 +276,7 @@ InputNameFromListWithFunc (
 			c.disp_x1 = c.disp_x0 - 1;
 			c.disp_y1 = c.disp_y0 - 1;
 		}
-		strcpy (namedisp, name);
+		namedisp = name;
 
 		// Display the (unclipped) size of the picture
 		const size_t size_chars = 11;
@@ -364,17 +367,15 @@ shortcut:
 		name[i] = '\0';
 	}
 	firstkey = false;
-	size_t len = strlen (name);
+	size_t len = name.length();
 	if (len < maxlen && key >= 'a' && key <= 'z') {
-		name[len] = key + 'A' - 'a';
-		name[len + 1] = '\0';
+		name += key + 'A' - 'a';
 	} else if (len < maxlen && is_ordinary (key) && key != ' ') {
-		name[len] = key;
-		name[len + 1] = '\0';
+		name += key;
 	} else if (len > 0 && key == YK_BACKSPACE)		// BS
-		name[len - 1] = '\0';
+		name.resize(len - 1);
 	else if (key == 21 || key == 23)			// ^U, ^W
-		*name = '\0';
+		name = "";
 	else if (key == YK_DOWN) {			// [Down]
 		/* Look for the next item in the list that has a
 		different name. Why not just use the next item ?
@@ -385,7 +386,7 @@ shortcut:
 		while (m < listsize && ! y_stricmp (list[n], list[m]))
 			m++;
 		if (m < listsize)
-			strcpy (name, list[m]);
+			name = string(list[m]);
 		else
 			Beep ();
 	} else if (key == YK_UP) {		// [Up]
@@ -394,19 +395,19 @@ shortcut:
 		while (m >= 0 && ! y_stricmp (list[n], list[m]))
 			m--;
 		if (m >= 0)
-			strcpy (name, list[m]);
+			name = string(list[m]);
 		else
 			Beep ();
 	} else if (key == YK_PD || key == 6 || key == 22)	{ // [Pgdn], ^F, ^V
 		if (n < listsize - listdisp)
-			strcpy (name, list[y_min (n + listdisp, listsize - 1)]);
+			name = list[y_min (n + listdisp, listsize - 1)];
 		else
 			Beep ();
 	} else if ((key == YK_PU || key == 2) && n > 0) {	// [Pgup], ^B
 		if (n > listdisp)
-			strcpy (name, list[n - listdisp]);
+			name = list[n - listdisp];
 		else
-			strcpy (name, list[0]);
+			name = list[0];
 	} else if (key == 14) {					// ^N
 		if (n + 1 >= listsize) {
 			Beep ();
@@ -418,7 +419,7 @@ shortcut:
 				break;
 		}
 
-		strcpy (name, list[n]);
+		name = string(list[n]);
 	} else if (key == 16) {		// ^P
 		if (n < 1) {
 			Beep ();
@@ -433,30 +434,30 @@ shortcut:
 			while (n > 0 && ! y_strnicmp (list[n], list[n - 1], 4))
 				n--;
 		}
-		strcpy (name, list[n]);
+		name = string(list[n]);
 	} else if (key == (YK_CTRL | YK_PD) || key == YK_END) {	// [Ctrl][Pgdn], [End]
 		if (n + 1 >= listsize) {
 			Beep ();
 			goto done_with_event;
 		}
-		strcpy (name, list[listsize - 1]);
+		name = string(list[listsize - 1]);
 	} else if (key == (YK_CTRL | YK_PU) || key == YK_HOME){ // [Ctrl][Pgup], [Home]
 		if (n < 1) {
 			Beep ();
 			goto done_with_event;
 		}
-		strcpy (name, list[0]);
+		name = string(list[0]);
 	} else if (key == YK_TAB)				// [Tab]
-		strcpy (name, list[n]);
+		name = list[n];
 	else if (key == YK_F1 && c.flags & HOOK_LOC_VALID) {	// [F1]: print location
 		printf ("%.8s: %s(%08lXh)\n",
-			name, c.lump_loc.wad->pathname (), (unsigned long) c.lump_loc.ofs);
+			name.c_str(), c.lump_loc.wad->pathname (), (unsigned long) c.lump_loc.ofs);
 	} else if (key == YK_F1 + YK_SHIFT	// [Shift][F1] : dump image to file
 			&& hookfunc != NULL
 			&& (c.flags & HOOK_DRAWN)) {
-		const size_t size = strlen (name) + 4 + 1;
+		const size_t size = name.length() + 4 + 1;
 		char *filename = new char[size];
-		al_scpslower (filename, name,   size - 1);
+		al_scpslower (filename, name.c_str(), size - 1);
 		al_saps      (filename, ".ppm", size - 1);
 		if (c.img.save (filename) != 0) {
 			if (errno == ECHILD)
@@ -464,7 +465,7 @@ shortcut:
 			else
 				err ("%s: %s", filename, strerror (errno));
 		} else
-			printf ("Saved %s as %s\n", name, filename);
+			printf ("Saved %s as %s\n", name.c_str(), filename);
 		delete[] filename;
 	} else if (key == 1) {					// ^A: more patches
 		if (maxpatches + 1 < c.npatches)
@@ -488,7 +489,8 @@ shortcut:
 done_with_event:
 	;
 	}
-	delete[] namedisp;
+
+	return name;
 }
 
 /*

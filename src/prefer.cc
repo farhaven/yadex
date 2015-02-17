@@ -26,6 +26,8 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include "entry.h"
@@ -36,15 +38,28 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "prefer.h"
 #include "textures.h"
 
+using std::string;
+using std::to_string;
+using std::vector;
 
 /*
    display a "Preferences" menu (change default textures, etc.)
 */
 
 void Preferences (int x0, int y0) {
-	char *menustr[9];
-	int  n, val;
-	char texname[WAD_TEX_NAME + 1];
+	vector<string> menustr = {
+		"Change default middle texture  (Current: " + string(default_middle_texture) + ")",
+		"Change default upper texture   (Current: " + string(default_upper_texture) + ")",
+		"Change default lower texture   (Current: " + string(default_lower_texture) + ")",
+		"Change default floor texture   (Current: " + string(default_floor_texture) + ")",
+		"Change default ceiling texture (Current: " + string(default_ceiling_texture) + ")",
+		"Change default floor height    (Current: " + to_string(default_floor_height) + ")",
+		"Change default ceiling height  (Current: " + to_string(default_ceiling_height) + ")",
+		"Change default light level     (Current: " + to_string(default_light_level) + ")",
+	};
+
+	int  val;
+	string texname;
 	char flatname[WAD_FLAT_NAME + 1];
 	int  width, height;
 
@@ -54,60 +69,37 @@ void Preferences (int x0, int y0) {
 		x0 = (ScrMaxX + 1 - width) / 2;
 	if (y0 < 0)
 		y0 = (ScrMaxY + 1 - height) / 2;
-	for (n = 0; n < 9; n++)
-		menustr[n] = (char *) malloc(80);
-	sprintf (menustr[8], "Preferences");
-	sprintf (menustr[0], "Change default middle texture  (Current: %.*s)",
-			(int) WAD_TEX_NAME, default_middle_texture);
-	sprintf (menustr[1], "Change default upper texture   (Current: %.*s)",
-			(int) WAD_TEX_NAME, default_upper_texture);
-	sprintf (menustr[2], "Change default lower texture   (Current: %.*s)",
-			(int) WAD_TEX_NAME, default_lower_texture);
-	sprintf (menustr[3], "Change default floor texture   (Current: %.*s)",
-			(int) WAD_FLAT_NAME, default_floor_texture);
-	sprintf (menustr[4], "Change default ceiling texture (Current: %.*s)",
-			(int) WAD_FLAT_NAME, default_ceiling_texture);
-	sprintf (menustr[5], "Change default floor height    (Current: %d)",
-			default_floor_height);
-	sprintf (menustr[6], "Change default ceiling height  (Current: %d)",
-			default_ceiling_height);
-	sprintf (menustr[7], "Change default light level     (Current: %d)",
-			default_light_level);
-	val = vDisplayMenu (x0, y0, menustr[8],
-			menustr[0], YK_, 0,
-			menustr[1], YK_, 0,
-			menustr[2], YK_, 0,
-			menustr[3], YK_, 0,
-			menustr[4], YK_, 0,
-			menustr[5], YK_, 0,
-			menustr[6], YK_, 0,
-			menustr[7], YK_, 0,
+	val = vDisplayMenu (x0, y0, "Preferences",
+			menustr[0].c_str(), YK_, 0,
+			menustr[1].c_str(), YK_, 0,
+			menustr[2].c_str(), YK_, 0,
+			menustr[3].c_str(), YK_, 0,
+			menustr[4].c_str(), YK_, 0,
+			menustr[5].c_str(), YK_, 0,
+			menustr[6].c_str(), YK_, 0,
+			menustr[7].c_str(), YK_, 0,
 			NULL);
-	for (n = 0; n < 9; n++)
-		free(menustr[n]);
+
 	int subwin_x0 = x0 + BOX_BORDER + WIDE_HSPACING;
 	int subwin_y0 = y0 + BOX_BORDER + WIDE_VSPACING + (int) ((1.5 + val) * FONTH);
 	switch (val) {
 		case 1:
-			strcpy (texname, default_middle_texture);
-			ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, texname);
-			if (strlen (texname) > 0)
-				strcpy (default_middle_texture, texname);
+			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
+					NumWTexture, WTexture, default_middle_texture);
+			if (texname.length() > 0)
+				default_middle_texture = texname;
 			break;
 		case 2:
-			strcpy (texname, default_upper_texture);
-			ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, texname);
-			if (strlen (texname) > 0)
-				strcpy (default_upper_texture, texname);
+			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
+					NumWTexture, WTexture, default_upper_texture);
+			if (texname.length() > 0)
+				default_upper_texture = texname;
 			break;
 		case 3:
-			strcpy (texname, default_lower_texture);
-			ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, texname);
-			if (strlen (texname) > 0)
-				strcpy (default_lower_texture, texname);
+			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
+					NumWTexture, WTexture, default_lower_texture);
+			if (texname.length() > 0)
+				default_lower_texture = texname;
 			break;
 		case 4:
 			{

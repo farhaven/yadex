@@ -255,51 +255,6 @@ DOC2 = $(addprefix doc/, $(PIX) $(notdir $(DOC2_SRC_HTML) $(DOC2_SRC_MISC)))
 # Misc. other files that must be put in the
 # distribution archive.
 MISC_FILES =								\
-	boost/boost/config.hpp						\
-	boost/boost/config/compiler/borland.hpp				\
-	boost/boost/config/compiler/comeau.hpp				\
-	boost/boost/config/compiler/common_edg.hpp			\
-	boost/boost/config/compiler/compaq_cxx.hpp			\
-	boost/boost/config/compiler/gcc.hpp				\
-	boost/boost/config/compiler/greenhills.hpp			\
-	boost/boost/config/compiler/hp_acc.hpp				\
-	boost/boost/config/compiler/intel.hpp				\
-	boost/boost/config/compiler/kai.hpp				\
-	boost/boost/config/compiler/metrowerks.hpp			\
-	boost/boost/config/compiler/mpw.hpp				\
-	boost/boost/config/compiler/sgi_mipspro.hpp			\
-	boost/boost/config/compiler/sunpro_cc.hpp			\
-	boost/boost/config/compiler/vacpp.hpp				\
-	boost/boost/config/compiler/visualc.hpp				\
-	boost/boost/config/platform/aix.hpp				\
-	boost/boost/config/platform/beos.hpp				\
-	boost/boost/config/platform/bsd.hpp				\
-	boost/boost/config/platform/cygwin.hpp				\
-	boost/boost/config/platform/hpux.hpp				\
-	boost/boost/config/platform/irix.hpp				\
-	boost/boost/config/platform/linux.hpp				\
-	boost/boost/config/platform/macos.hpp				\
-	boost/boost/config/platform/solaris.hpp				\
-	boost/boost/config/platform/win32.hpp				\
-	boost/boost/config/posix_features.hpp				\
-	boost/boost/config/select_compiler_config.hpp			\
-	boost/boost/config/select_platform_config.hpp			\
-	boost/boost/config/select_stdlib_config.hpp			\
-	boost/boost/config/stdlib/dinkumware.hpp			\
-	boost/boost/config/stdlib/libstdcpp3.hpp			\
-	boost/boost/config/stdlib/modena.hpp				\
-	boost/boost/config/stdlib/msl.hpp				\
-	boost/boost/config/stdlib/roguewave.hpp				\
-	boost/boost/config/stdlib/sgi.hpp				\
-	boost/boost/config/stdlib/stlport.hpp				\
-	boost/boost/config/stdlib/vacpp.hpp				\
-	boost/boost/config/suffix.hpp					\
-	boost/boost/config/user.hpp					\
-	boost/boost/smart_ptr.hpp					\
-	boost/boost/static_assert.hpp					\
-	boost/boost/utility.hpp						\
-	boost/boost/utility/base_from_member.hpp			\
-	boost/boost/utility_fwd.hpp					\
 	cache/copyright.man						\
 	cache/copyright.txt						\
 	cache/pixlist							\
@@ -722,10 +677,10 @@ src/config.h: $(OBJDIR)/config.h
 	cp -p $< $@
 
 $(OBJDIR)/%.o: src/%.cc
-	$(CXX) -c -Iatclib -Iboost -I$(X11INCLUDEDIR) $(CXXFLAGS) $< -o $@
+	$(CXX) -c -Iatclib -I$(X11INCLUDEDIR) $(CXXFLAGS) $< -o $@
 
 $(DOBJDIR)/%.o: src/%.cc
-	$(CXX) -c -Iatclib -Iboost -I$(X11INCLUDEDIR) $(DCXXFLAGS) $< -o $@
+	$(CXX) -c -Iatclib -I$(X11INCLUDEDIR) $(DCXXFLAGS) $< -o $@
 
 # To compile the modules of Atclib
 # (normal and debugging versions)
@@ -738,7 +693,7 @@ $(DOBJDIR_ATCLIB)/%.o: atclib/%.c $(HEADERS_ATCLIB)
 # To see the generated assembly code
 # for the modules of Yadex
 $(OBJDIR)/%.S: src/%.cc $(MAKEFILE)
-	$(CXX) $(CXXFLAGS) -S -fverbose-asm -Iatclib -Iboost -I$(X11INCLUDEDIR)\
+	$(CXX) $(CXXFLAGS) -S -fverbose-asm -Iatclib -I$(X11INCLUDEDIR)\
 	  $< -o $@
 
 # A source file containing the credits

@@ -1022,60 +1022,50 @@ viewpal_end:;
 			  }
         }
         // "viewtex" - view the textures
-        else if (strcmp (com, "viewtex") == 0)
-        {
-            if (InitGfx ())
-                goto viewtex_end;
-            init_input_status ();
-            do
-                get_input_status ();
-            while (is.key != YE_EXPOSE);
-            com = strtok (NULL, " ");
-            force_window_not_pixmap ();  // FIXME quick hack
-            patch_dir.refresh (MasterDir);
-            {
-                char buf[WAD_TEX_NAME + 1];
-                *buf = '\0';
-                if (com != NULL)
-                strncat (buf, com, sizeof buf - 1);
-                ReadWTextureNames ();
-                ChooseWallTexture (-1, -1, "Texture viewer", WTexture, string(buf));
-                ForgetWTextureNames ();
-            }
-            TermGfx ();
-viewtex_end:;
-        }
-        /* user asked to save an object to a separate pwad file */
-        else if (strcmp (com, "save") == 0 || strcmp (com, "s") == 0)
-        {
-            com = strtok (NULL, " ");
-            if (com == NULL)
-            {
-                printf ("Object name argument missing.\n");
-                continue;
-            }
-            if (strlen (com) > WAD_NAME || strchr (com, '.') != NULL)
-            {
-                printf ("Invalid object name.\n");
-                continue;
-            }
-            out = strtok (NULL, " ");
-            if (out == NULL)
-            {
-                printf ("Wad file name argument missing.\n");
-                continue;
-            }
-            if (wad_already_loaded (com))
-            {
-                printf ("%s: in use, close it first\n", com);
-                continue;
-            }
-            printf ("Saving directory entry data to \"%s\".\n", out);
-            if ((file = fopen (out, "wb")) == NULL)
-                fatal_error ("error opening output file \"%s\"", out);
-            SaveDirectoryEntry (file, com);
-            fclose (file);
-        }
+		  else if (strcmp (com, "viewtex") == 0) {
+			  if (!InitGfx ()) {
+				  init_input_status ();
+				  do {
+					  get_input_status ();
+				  } while (is.key != YE_EXPOSE);
+				  com = strtok (NULL, " ");
+				  force_window_not_pixmap ();  // FIXME quick hack
+				  patch_dir.refresh (MasterDir);
+				  string buf;
+				  if (com != NULL)
+					  buf = string(com);
+				  ReadWTextureNames ();
+				  ChooseWallTexture (-1, -1, "Texture viewer", WTexture, buf);
+				  ForgetWTextureNames ();
+				  TermGfx ();
+			  }
+		  }
+		  /* user asked to save an object to a separate pwad file */
+		  else if (strcmp (com, "save") == 0 || strcmp (com, "s") == 0) {
+			  com = strtok (NULL, " ");
+			  if (com == NULL) {
+				  printf ("Object name argument missing.\n");
+				  continue;
+			  }
+			  if (strlen (com) > WAD_NAME || strchr (com, '.') != NULL) {
+				  printf ("Invalid object name.\n");
+				  continue;
+			  }
+			  out = strtok (NULL, " ");
+			  if (out == NULL) {
+				  printf ("Wad file name argument missing.\n");
+				  continue;
+			  }
+			  if (wad_already_loaded (com)) {
+				  printf ("%s: in use, close it first\n", com);
+				  continue;
+			  }
+			  printf ("Saving directory entry data to \"%s\".\n", out);
+			  if ((file = fopen (out, "wb")) == NULL)
+				  fatal_error ("error opening output file \"%s\"", out);
+			  SaveDirectoryEntry (file, com);
+			  fclose (file);
+		  }
         /* user asked to encapsulate a raw file in a pwad file */
         else if (strncmp (com, "insert", sizeof("insert")) == 0 || strncmp (com, "i", sizeof("i")) == 0)
         {

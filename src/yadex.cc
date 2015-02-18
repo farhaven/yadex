@@ -934,33 +934,26 @@ static void MainLoop ()
                 DumpDirectoryEntry (stdout, com);
         }
         // "v"/"view" - view the sprites
-        else if (strcmp (com, "view") == 0 || strcmp (com, "v") == 0)
-        {
-            if (InitGfx ())
-                goto v_end;
-            init_input_status ();
-            do
-                get_input_status ();
-            while (is.key != YE_EXPOSE);
-            force_window_not_pixmap ();  // FIXME quick hack
-            {
-                Lump_list list;
-                wad_res.sprites.list (list);
-                char buf[WAD_PIC_NAME + 1];
-                const char *sprite = strtok (NULL, " ");
-                *buf = '\0';
-                if (sprite != 0)
-                {
-                    strncat (buf, sprite, sizeof buf - 1);
-                    for (char *p = buf; *p != '\0'; p++)
-                        *p = toupper (*p);
-                }
-                InputNameFromListWithFunc (-1, -1, "Sprite viewer", list.size (),
-                list.data (), 10, buf, 320, 200, display_pic,
-                HOOK_DISP_SIZE | HOOK_SPRITE);
-            }
-            TermGfx ();
-v_end:;
+        else if (strcmp (com, "view") == 0 || strcmp (com, "v") == 0) {
+			  if (!InitGfx()) {
+				  init_input_status ();
+				  do {
+					  get_input_status ();
+				  } while (is.key != YE_EXPOSE);
+				  force_window_not_pixmap ();  // FIXME quick hack
+				  const char *sprite = strtok (NULL, " ");
+				  vector<string> lumps = wad_res.sprites.list();
+				  char buf[WAD_PIC_NAME + 1];
+				  *buf = '\0';
+				  if (sprite != 0) {
+					  strncat (buf, sprite, sizeof buf - 1);
+					  for (char *p = buf; *p != '\0'; p++)
+						  *p = toupper (*p);
+				  }
+				  InputNameFromListWithFunc (-1, -1, "Sprite viewer", lumps, 10, buf, 320, 200, display_pic,
+						  HOOK_DISP_SIZE | HOOK_SPRITE);
+				  TermGfx ();
+			  }
         }
         // "viewflat" - view the flats
         else if (strcmp (com, "viewflat") == 0)
@@ -1010,30 +1003,24 @@ viewflat_end:;
 viewpal_end:;
         }
         // "viewpat" - view the patches
-        else if (strcmp (com, "viewpat") == 0)
-        {
-            if (InitGfx ())
-                goto viewpat_end;
-            init_input_status ();
-            do
-                get_input_status ();
-            while (is.key != YE_EXPOSE);
-            com = strtok (NULL, " ");
-            force_window_not_pixmap ();  // FIXME quick hack
-            patch_dir.refresh (MasterDir);
-            {
-                char buf[WAD_NAME + 1];
-                *buf = '\0';
-                if (com != 0)
-                strncat (buf, com, sizeof buf - 1);
-                Patch_list pl;
-                patch_dir.list (pl);
-                InputNameFromListWithFunc (-1, -1, "Patch viewer", pl.size (),
-                pl.data (), 10, buf, 256, 256, display_pic,
-                HOOK_DISP_SIZE | HOOK_PATCH);
-            }
-            TermGfx ();
-viewpat_end:;
+		  else if (strcmp (com, "viewpat") == 0) {
+			  if (!InitGfx()) {
+				  init_input_status ();
+				  do {
+					  get_input_status ();
+				  } while (is.key != YE_EXPOSE);
+				  com = strtok (NULL, " ");
+				  force_window_not_pixmap ();  // FIXME quick hack
+				  patch_dir.refresh (MasterDir);
+				  char buf[WAD_NAME + 1];
+				  *buf = '\0';
+				  if (com != 0)
+					  strncat (buf, com, sizeof buf - 1);
+				  InputNameFromListWithFunc (-1, -1, "Patch viewer",
+						  patch_dir.list(), 10, buf, 256, 256, display_pic,
+						  HOOK_DISP_SIZE | HOOK_PATCH);
+				  TermGfx ();
+			  }
         }
         // "viewtex" - view the textures
         else if (strcmp (com, "viewtex") == 0)
@@ -1053,8 +1040,7 @@ viewpat_end:;
                 if (com != 0)
                 strncat (buf, com, sizeof buf - 1);
                 ReadWTextureNames ();
-                ChooseWallTexture (-1, -1, "Texture viewer", NumWTexture, WTexture,
-                buf);
+                ChooseWallTexture (-1, -1, "Texture viewer", WTexture, string(buf));
                 ForgetWTextureNames ();
             }
             TermGfx ();

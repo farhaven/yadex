@@ -28,6 +28,10 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <algorithm>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include "bitvec.h"
@@ -41,6 +45,10 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wads.h"
 #include "wads2.h"
 
+using std::sort;
+using std::string;
+using std::stringstream;
+using std::vector;
 
 /*
  	FIXME
@@ -62,8 +70,7 @@ uint8_t* Behavior;
 int BehaviorSize;
 
 // FIXME should be somewhere else
-int NumWTexture;		/* number of wall textures */
-char **WTexture;		/* array of wall texture names */
+vector<string> WTexture; /* vector of wall texture names */
 
 // FIXME all the flat list stuff should be put in a separate class
 size_t NumFTexture;		/* number of floor/ceiling textures */
@@ -1361,17 +1368,6 @@ return y_strnicmp (
     WAD_FLAT_NAME);
 }
 
-
-/*
-   function used by qsort to sort the texture names
-*/
-static int SortTextures (const void *a, const void *b)
-{
-return y_strnicmp (*((const char *const *)a), *((const char *const *)b),
-    WAD_TEX_NAME);
-}
-
-
 /*
    read the texture names
 */
@@ -1384,235 +1380,190 @@ int32_t val;
 verbmsg ("Reading texture names\n");
 
 // Doom alpha 0.4 : "TEXTURES", no names
-if (yg_texture_lumps == YGTL_TEXTURES
- && yg_texture_format == YGTF_NAMELESS)
-   {
-   const char *lump_name = "TEXTURES";
-   dir = FindMasterDir (MasterDir, lump_name);
-   if (dir == NULL)
-      {
-      warn ("%s: lump not found in directory\n", lump_name);
-      goto textures04_done;
-      }
-   {
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (dir->dir.start);
-   if (wf->error ())
-      {
-      warn ("%s: seek error\n", lump_name);
-      goto textures04_done;
-      }
-   wf->read_int32_t (&val);
-   if (wf->error ())
-      {
-      warn ("%s: error reading texture count\n", lump_name);
-      goto textures04_done;
-      }
-   NumWTexture = (int) val + 1;
-   WTexture = (char **) malloc((long) NumWTexture * sizeof *WTexture);
-   WTexture[0] = (char *) malloc(WAD_TEX_NAME + 1);
-   strcpy (WTexture[0], "-");
-   if (WAD_TEX_NAME < 7) nf_bug ("WAD_TEX_NAME too small");  // Sanity
-   for (long n = 0; n < val; n++)
-      {
-      WTexture[n + 1] = (char *) malloc (WAD_TEX_NAME + 1);
-      if (n > 9999)
-	 {
-	 warn ("more than 10,000 textures. Ignoring excess.\n");
-	 break;
-	 }
-      snprintf (WTexture[n + 1], WAD_TEX_NAME + 1, "TEX%04ld", n);
-      }
-   }
-   textures04_done:
-   ;
-   }
+if (yg_texture_lumps == YGTL_TEXTURES && yg_texture_format == YGTF_NAMELESS) {
+	const char *lump_name = "TEXTURES";
+	dir = FindMasterDir (MasterDir, lump_name);
+	if (dir == NULL) {
+		warn ("%s: lump not found in directory\n", lump_name);
+		goto textures04_done;
+	}
+	{
+		const Wad_file *wf = dir->wadfile;
+		wf->seek (dir->dir.start);
+		if (wf->error()) {
+			warn ("%s: seek error\n", lump_name);
+			goto textures04_done;
+		}
+		wf->read_int32_t(&val);
+		if (wf->error()) {
+			warn ("%s: error reading texture count\n", lump_name);
+			goto textures04_done;
+		}
+		WTexture.push_back("-");
+		for (long n = 0; n < val; n++) {
+			if (n > 9999) {
+				warn ("more than 10,000 textures. Ignoring excess.\n");
+				break;
+			}
+			stringstream s;
+			s.width(4);
+			s.fill(' ');
+			s << n;
+			WTexture.push_back("TEX" + s.str());
+		}
+	}
+textures04_done:
+	;
+}
 
 // Doom alpha 0.5 : only "TEXTURES"
 else if (yg_texture_lumps == YGTL_TEXTURES
-      && (yg_texture_format == YGTF_NORMAL
-	  || yg_texture_format == YGTF_STRIFE11))
-   {
-   const char *lump_name = "TEXTURES";
-   int32_t *offsets = 0;
-   dir = FindMasterDir (MasterDir, lump_name);
-   if (dir == NULL)  // In theory it always exists, though
-      {
-      warn ("%s: lump not found in directory\n", lump_name);
-      goto textures05_done;
-      }
-   {
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (dir->dir.start);
-   if (wf->error ())
-      {
-      warn ("%s: seek error\n", lump_name);
-      goto textures05_done;
-      }
-   wf->read_int32_t (&val);
-   if (wf->error ())
-      {
-      warn ("%s: error reading texture count\n", lump_name);
-      goto textures05_done;
-      }
-   NumWTexture = (int) val + 1;
-   /* read in the offsets for texture1 names */
-   offsets = (int32_t *) malloc ((long) NumWTexture * 4);
-   wf->read_int32_t (offsets + 1, NumWTexture - 1);
-   if (wf->error ())
-      {
-      warn ("%s: error reading offsets table\n", lump_name);
-      goto textures05_done;
-      }
-   /* read in the actual names */
-   WTexture = (char **) malloc ((long) NumWTexture * sizeof (char *));
-   WTexture[0] = (char *) malloc (WAD_TEX_NAME + 1);
-   strcpy (WTexture[0], "-");
-   for (n = 1; n < NumWTexture; n++)
-      {
-      WTexture[n] = (char *) malloc (WAD_TEX_NAME + 1);
-      long offset = dir->dir.start + offsets[n];
-      wf->seek (offset);
-      if (wf->error ())
-	 {
-	 warn ("%s: error seeking to  error\n", lump_name);
-	 goto textures05_done;		// FIXME cleanup
-	 }
-      wf->read_bytes (WTexture[n], WAD_TEX_NAME);
-      if (wf->error ())
-	 {
-	 warn ("%s: error reading texture names\n", lump_name);
-	 goto textures05_done;		// FIXME cleanup
-	 }
-      WTexture[n][WAD_TEX_NAME] = '\0';
-      }
-   }
-   textures05_done:
-   if (offsets != 0)
-      free (offsets);
-   }
+		&& (yg_texture_format == YGTF_NORMAL || yg_texture_format == YGTF_STRIFE11)) {
+	const char *lump_name = "TEXTURES";
+	int32_t *offsets = 0;
+	dir = FindMasterDir (MasterDir, lump_name);
+	if (dir == NULL) {  // In theory it always exists, though
+		warn ("%s: lump not found in directory\n", lump_name);
+		goto textures05_done;
+	}
+	{
+		const Wad_file *wf = dir->wadfile;
+		wf->seek (dir->dir.start);
+		if (wf->error ()) {
+			warn ("%s: seek error\n", lump_name);
+			goto textures05_done;
+		}
+		/* Read number of textures */
+		wf->read_int32_t(&val);
+		if (wf->error ()) {
+			warn ("%s: error reading texture count\n", lump_name);
+			goto textures05_done;
+		}
+		/* read in the offsets for texture1 names */
+		offsets = (int32_t *) malloc ((long) (val+1) * 4);
+		wf->read_int32_t (offsets + 1, val);
+		if (wf->error ()) {
+			warn ("%s: error reading offsets table\n", lump_name);
+			goto textures05_done;
+		}
+		/* read in the actual names */
+		WTexture.push_back("-");
+		char *buf = (char*) malloc(WAD_TEX_NAME + 1);
+		for (n = 1; n < val + 1; n++) {
+			long offset = dir->dir.start + offsets[n];
+			wf->seek (offset);
+			if (wf->error ()) {
+				warn ("%s: error seeking to  error\n", lump_name);
+				goto textures05_done;		// FIXME cleanup
+			}
+			memset(buf, 0x00, WAD_TEX_NAME);
+			wf->read_bytes (buf, WAD_TEX_NAME);
+			if (wf->error ()) {
+				warn ("%s: error reading texture names\n", lump_name);
+				goto textures05_done;		// FIXME cleanup
+			}
+			WTexture.push_back(string(buf));
+		}
+		free(buf);
+	}
+textures05_done:
+	if (offsets != 0)
+		free (offsets);
+}
 // Other iwads : "TEXTURE1" and possibly "TEXTURE2"
 else if (yg_texture_lumps == YGTL_NORMAL
-      && (yg_texture_format == YGTF_NORMAL
-	  || yg_texture_format == YGTF_STRIFE11))
-   {
-   const char *lump_name = "TEXTURE1";
-   int32_t *offsets = 0;
-   dir = FindMasterDir (MasterDir, lump_name);
-   if (dir != NULL)  // In theory it always exists, though
-      {
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start);
-      if (wf->error ())
-	 {
-	 warn ("%s: seek error\n", lump_name);
-	 // FIXME
-	 }
-      wf->read_int32_t (&val);
-      if (wf->error ())
-      {
-	// FIXME
-      }
-      NumWTexture = (int) val + 1;
-      /* read in the offsets for texture1 names */
-      offsets = (int32_t *) malloc ((long) NumWTexture * 4);
-      wf->read_int32_t (offsets + 1, NumWTexture - 1);
-      {
-	// FIXME
-      }
-      /* read in the actual names */
-      WTexture = (char **) malloc ((long) NumWTexture * sizeof (char *));
-      WTexture[0] = (char *) malloc (WAD_TEX_NAME + 1);
-      strcpy (WTexture[0], "-");
-      for (n = 1; n < NumWTexture; n++)
-	 {
-	 WTexture[n] = (char *) malloc (WAD_TEX_NAME + 1);
-	 wf->seek (dir->dir.start + offsets[n]);
-	 if (wf->error ())
-	    {
-	    warn ("%s: seek error\n", lump_name);
-	    // FIXME
-	    }
-	 wf->read_bytes (WTexture[n], WAD_TEX_NAME);
-	 if (wf->error ())
-	    {
-	      // FIXME
-	    }
-	 WTexture[n][WAD_TEX_NAME] = '\0';
-	 }
-      free (offsets);
-      }
-   {
-   dir = FindMasterDir (MasterDir, "TEXTURE2");
-   if (dir)  /* Doom II has no TEXTURE2 */
-      {
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start);
-      if (wf->error ())
-	 {
-	 warn ("%s: seek error\n", lump_name);
-	 // FIXME
-	 }
-      wf->read_int32_t (&val);
-      if (wf->error ())
-      {
-	// FIXME
-      }
-      /* read in the offsets for texture2 names */
-      offsets = (int32_t *) malloc ((long) val * 4);
-      wf->read_int32_t (offsets, val);
-      if (wf->error ())
-      {
-	// FIXME
-      }
-      /* read in the actual names */
-      WTexture = (char **) realloc(WTexture, (NumWTexture + val) * sizeof (char *));
-      for (n = 0; n < val; n++)
-	 {
-	 WTexture[NumWTexture + n] = (char *) malloc (WAD_TEX_NAME + 1);
-	 wf->seek (dir->dir.start + offsets[n]);
-	 if (wf->error ())
-	    {
-	    warn ("%s: seek error\n", lump_name);
-	    // FIXME
-	    }
-	 wf->read_bytes (WTexture[NumWTexture + n], WAD_TEX_NAME);
-	 if (wf->error ())
-	   ; // FIXME
-	 WTexture[NumWTexture + n][WAD_TEX_NAME] = '\0';
-	 }
-      NumWTexture += val;
-      free (offsets);
-      }
-   }
-   }
+		&& (yg_texture_format == YGTF_NORMAL || yg_texture_format == YGTF_STRIFE11)) {
+	const char *lump_name = "TEXTURE1";
+	int32_t *offsets = 0;
+	int32_t numtextures = 0;
+	dir = FindMasterDir (MasterDir, lump_name);
+	if (dir != NULL)  { // In theory it always exists, though
+		const Wad_file *wf = dir->wadfile;
+		wf->seek (dir->dir.start);
+		if (wf->error ()) {
+			warn ("%s: seek error\n", lump_name);
+		}
+		wf->read_int32_t (&val);
+		if (wf->error ()) {
+			// FIXME
+		}
+		numtextures = val + 1;
+		/* read in the offsets for texture1 names */
+		offsets = (int32_t *) malloc ((long) numtextures * 4);
+		wf->read_int32_t (offsets + 1, numtextures - 1);
+		/* read in the actual names */
+		WTexture.push_back("-");
+		char *buf = (char*) malloc(WAD_TEX_NAME + 1);
+		for (n = 1; n < numtextures; n++) {
+			wf->seek(dir->dir.start + offsets[n]);
+			if (wf->error ()) {
+				warn ("%s: seek error\n", lump_name);
+				// FIXME
+			}
+			memset(buf, 0x00, WAD_TEX_NAME);
+			wf->read_bytes (buf, WAD_TEX_NAME);
+			if (wf->error ()) {
+				// FIXME
+			}
+			WTexture.push_back(string(buf));
+		}
+		free(buf);
+		free(offsets);
+	}
+	dir = FindMasterDir (MasterDir, "TEXTURE2");
+	if (dir)  { /* Doom II has no TEXTURE2 */
+		const Wad_file *wf = dir->wadfile;
+		wf->seek (dir->dir.start);
+		if (wf->error ()) {
+			warn ("%s: seek error\n", lump_name);
+			// FIXME
+		}
+		wf->read_int32_t (&val);
+		if (wf->error ()) {
+			// FIXME
+		}
+		/* read in the offsets for texture2 names */
+		offsets = (int32_t *) malloc ((long) val * 4);
+		wf->read_int32_t (offsets, val);
+		if (wf->error ()) {
+			// FIXME
+		}
+		/* read in the actual names */
+		char* buf = (char*) malloc(WAD_TEX_NAME + 1);
+		for (n = 0; n < val; n++) {
+			wf->seek (dir->dir.start + offsets[n]);
+			if (wf->error ()) {
+				warn ("%s: seek error\n", lump_name);
+				// FIXME
+			}
+			memset(buf, 0x00, WAD_TEX_NAME);
+			wf->read_bytes (buf, WAD_TEX_NAME);
+			if (wf->error ()) {
+				// FIXME
+			}
+			WTexture.push_back(string(buf));
+		}
+		free(buf);
+		free(offsets);
+	}
+}
 else
    nf_bug ("Invalid texture_format/texture_lumps combination.");
 
 /* sort the names */
-qsort (WTexture, NumWTexture, sizeof (char *), SortTextures);
+sort(WTexture.begin(), WTexture.end());
 }
 
 
 
 /*
-   forget the texture names
-*/
+	forget the texture names
+	*/
 
 void ForgetWTextureNames ()
 {
-int n;
-
-/* forget all names */
-for (n = 0; n < NumWTexture; n++)
-   free (WTexture[n]);
-
-/* forget the array */
-NumWTexture = 0;
-free (WTexture);
+	WTexture = vector<string>();
 }
-
-
 
 /*
    read the flat names

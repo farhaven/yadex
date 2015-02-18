@@ -692,14 +692,12 @@ void CheckTextures () /* SWAP! */
 /*
    check if a texture name matches one of the elements of a list
 */
-bool IsTextureNameInList (char *name, char **list, int numelems)
-{
-    int n;
-
-    for (n = 0; n < numelems; n++)
-       if (! y_strnicmp (name, list[n], WAD_TEX_NAME))
-          return true;
-    return false;
+bool IsTextureNameInList (char *name, vector<string> list) {
+	for (string &i: list) {
+		if (! y_strnicmp (name, i.c_str(), WAD_TEX_NAME))
+			return true;
+	}
+	return false;
 }
 
 /*
@@ -747,7 +745,7 @@ void CheckTextureNames () /* SWAP! */
     }
     for (n = 0; n < NumSideDefs; n++)
     {
-        if (! IsTextureNameInList (SideDefs[n].tex1, WTexture, NumWTexture))
+        if (! IsTextureNameInList (SideDefs[n].tex1, WTexture ))
         {
             snprintf (msg1, sizeof(msg1), "Invalid upper texture in sidedef #%d", n);
             snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",
@@ -759,7 +757,7 @@ void CheckTextureNames () /* SWAP! */
             }
             CheckingObjects ();
         }
-        if (! IsTextureNameInList (SideDefs[n].tex2, WTexture, NumWTexture))
+        if (! IsTextureNameInList (SideDefs[n].tex2, WTexture))
         {
             snprintf (msg1, sizeof(msg1), "Invalid lower texture in sidedef #%d", n);
             snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",
@@ -771,7 +769,7 @@ void CheckTextureNames () /* SWAP! */
             }
             CheckingObjects ();
         }
-        if (! IsTextureNameInList (SideDefs[n].tex3, WTexture, NumWTexture))
+        if (! IsTextureNameInList (SideDefs[n].tex3, WTexture))
         {
             snprintf (msg1, sizeof(msg1), "Invalid middle texture in sidedef #%d", n);
             snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",

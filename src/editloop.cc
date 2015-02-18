@@ -26,6 +26,10 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "yadex.h"
 #include <assert.h>
 #include "_edit.h"
@@ -73,12 +77,15 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include <X11/Xlib.h>
 
+using std::sort;
+using std::string;
+using std::vector;
+
 static int zoom_fit (edit_t&);
 extern bool InfoShown;		/* should we display the info bar? */
 static int menubar_out_y1;	/* FIXME */
 
 /* prototypes of private functions */
-static int SortLevels (const void *item1, const void *item2);
 static char *GetBehaviorFileName (const char *levelname);
 
 /*
@@ -97,51 +104,32 @@ static char *GetBehaviorFileName (const char *levelname);
  *	because "e" now requires an argument and tends to deal
  *	with ambiguous level names (like "12") itself.
  */
-const char *SelectLevel (int levelno)
-{
-    MDirPtr dir;
-    static char name[WAD_NAME + 1]; /* AYM it was [7] previously */
-    char **levels = 0;
-    int n = 0;           /* number of levels in the dir. that match */
+string SelectLevel (int levelno) {
+	MDirPtr dir;
+	string name;
+	vector<string> levels;
 
-    get_levels_that_match:
-    for (dir = MasterDir; dir; dir = dir->next)
-    {
-        if (levelname2levelno (dir->dir.name) > 0
-            && (levelno==0 || levelname2levelno (dir->dir.name) % 1000 == levelno))
-        {
-            if (n == 0)
-                levels = (char **) malloc (sizeof (char *));
-            else
-                levels = (char **) realloc (levels, (n + 1) * sizeof (char *));
-            levels[n] = dir->dir.name;
-            n++;
-        }
-    }
-    if (n == 0 && levelno != 0)  /* In case no level matched levelno */
-    {
-        levelno = 0;               /* List ALL levels instead */
-        goto get_levels_that_match;
-    }
-    /* So that InputNameFromList doesn't fail if you
-    have both EnMn's and MAPnn's in the master dir. */
-    qsort (levels, n, sizeof (char *), SortLevels);
-    al_scps (name, levels[0], sizeof name - 1);
-    if (n == 1)
-        return name;
-    InputNameFromList (-1, -1, "Level name :", n, levels, name);
-    free (levels);
-    return name;
-}
-
-/*
-   compare 2 level names (for sorting)
-*/
-static int SortLevels (const void *item1, const void *item2)
-{
-    /* FIXME should probably use y_stricmp() instead */
-    return strcmp (*((const char * const *) item1),
-                   *((const char * const *) item2));
+get_levels_that_match:
+	for (dir = MasterDir; dir; dir = dir->next) {
+		if (levelname2levelno (dir->dir.name) > 0
+				&& (levelno==0 || levelname2levelno (dir->dir.name) % 1000 == levelno)) {
+			levels.push_back(string(dir->dir.name));
+		}
+	}
+	if (levels.size() == 0 && levelno != 0) { /* In case no level matched levelno */
+		levelno = 0;               /* List ALL levels instead */
+		goto get_levels_that_match;
+	}
+	/* So that InputNameFromList doesn't fail if you
+		have both EnMn's and MAPnn's in the master dir. */
+	sort(levels.begin(), levels.end());
+	/*
+		al_scps (name.c_str(), levels[0], name.length());
+		*/
+	if (levels.size() == 1)
+		return name;
+	name = InputNameFromList(-1, -1, "Level name :", levels, name);
+	return name;
 }
 
 // A table of the modes in the editor.
@@ -1171,7 +1159,7 @@ void EditorLoop (const char *levelname) /* SWAP! */
                         newlevelname = levelname;
                     else
                     {
-                        newlevelname = SelectLevel (0);
+                        newlevelname = SelectLevel(0).c_str();
                         if (! *newlevelname)
                             goto cancel_save;
                     }
@@ -1196,7 +1184,7 @@ cancel_save:
 
                     if (! CheckStartingPos ())
                         goto cancel_save_as;
-                    newlevelname = SelectLevel (0);
+                    newlevelname = SelectLevel(0).c_str();
                     if (! *newlevelname)
                         goto cancel_save_as;
                     if (! levelname || y_stricmp (newlevelname, levelname))

@@ -5,8 +5,4 @@
 
 
 void EditorLoop (const char *); /* SWAP! */
-const char *SelectLevel (int levelno);
-
-
-
-
+string SelectLevel (int levelno);

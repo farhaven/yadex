@@ -507,7 +507,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	case 1:
 	  strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
 	  ChooseWallTexture (x0 + 84, subsubwin_y0 ,
-	    "Choose a wall texture", NumWTexture, WTexture, texname);
+	    "Choose a wall texture", WTexture, texname);
 	  if (strlen (texname) > 0)
 	  {
 	    for (cur = sdlist; cur; cur = cur->next)
@@ -518,28 +518,28 @@ void LinedefProperties (int x0, int y0, SelPtr obj)
 	  break;
 
 	case 2:
-	  strncpy (texname, SideDefs[sdlist->objnum].tex1, WAD_TEX_NAME);
-	  ChooseWallTexture (x0 + 84, subsubwin_y0,
-	     "Choose a wall texture", NumWTexture, WTexture, texname);
-	  if (strlen (texname) > 0)
 	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		strncpy (SideDefs[cur->objnum].tex1, texname, WAD_TEX_NAME);
-	    MadeChanges = 1;
+		  string texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
+				  "Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex1));
+		  if (texname != "") {
+			  for (cur = sdlist; cur; cur = cur->next)
+				  if (cur->objnum >= 0)
+					  strncpy (SideDefs[cur->objnum].tex1, texname.c_str(), WAD_TEX_NAME);
+			  MadeChanges = 1;
+		  }
 	  }
 	  break;
 
 	case 3:
-	  strncpy (texname, SideDefs[sdlist->objnum].tex2, WAD_TEX_NAME);
-	  ChooseWallTexture (x0 + 84, subsubwin_y0,
-	    "Choose a wall texture", NumWTexture, WTexture, texname);
-	  if (strlen (texname) > 0)
 	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		strncpy (SideDefs[cur->objnum].tex2, texname, WAD_TEX_NAME);
-	    MadeChanges = 1;
+		  string texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
+				  "Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex2));
+		  if (texname != "") {
+			  for (cur = sdlist; cur; cur = cur->next)
+				  if (cur->objnum >= 0)
+					  strncpy (SideDefs[cur->objnum].tex2, texname.c_str(), WAD_TEX_NAME);
+			  MadeChanges = 1;
+		  }
 	  }
 	  break;
 

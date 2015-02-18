@@ -27,6 +27,8 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include "dependcy.h"
@@ -35,7 +37,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadnamec.h"
 #include "wadfile.h"
 
-
+using std::string;
+using std::vector;
 
 /*
  *	Lump_dir::Lump_dir - ctor 
@@ -102,11 +105,16 @@ void Lump_dir::loc_by_name (const char *name, Lump_loc& loc)
  *	Put a list of all lumps in the list, sorted by name and
  *	with duplicates removed, in <l>.
  */
-void Lump_dir::list (Lump_list& l)
-{
+vector<string> Lump_dir::list() {
   if (dependency->outdated ())
     refresh ();
-  l.set (lump_map);
+
+  vector<string> rv;
+  for (auto &i: lump_map) {
+		rv.push_back(i.first.name);
+  }
+
+  return rv;
 }
 
 

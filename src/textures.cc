@@ -536,11 +536,9 @@ else
    }
 }
 
-
 /*
    choose a wall texture
 */
-string ChooseWallTexture (int x0, int y0, const char *prompt, int listsize, char **list, string name) {
-	return InputNameFromListWithFunc (x0, y0, prompt, listsize, list, 9, name,
-			512, 256, DisplayWallTexture);
+string ChooseWallTexture (int x0, int y0, const char *prompt, vector<string> list, string name) {
+	return InputNameFromListWithFunc (x0, y0, prompt, list, 9, name, 512, 256, DisplayWallTexture);
 }

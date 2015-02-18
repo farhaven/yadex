@@ -26,11 +26,17 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+#include <vector>
+
 #include "yadex.h"
 #include "gfx.h"
 #include "lists.h"
 #include "wadfile.h"
 #include "game.h"
+
+using std::string;
+using std::vector;
 
 // FIXME Move this in a more public place
 void
@@ -54,8 +60,7 @@ lump_loc_string (char *buf, size_t buf_size, const Lump_loc& lump_loc) {
    Arguments:
       x0, y0  : where to draw the box.
       prompt  : text to be displayed.
-      listsize: number of elements in the list.
-      list    : list of names (picture names, level names, etc.).
+      list    : vector of names (picture names, level names, etc.).
       listdisp: minimum number of names that should be displayed.
       name    : what we are editing...
       width   : \ width and height of an optional window where a picture
@@ -75,7 +80,7 @@ string
 InputNameFromListWithFunc (
 		int x0, int y0,
 		const char *prompt,
-		size_t listsize, const char *const *list, size_t listdisp,
+		vector<string> list, size_t listdisp,
 		string name,
 		int width, int height,
 		void (*hookfunc)(hookfunc_comm_t *),
@@ -115,9 +120,10 @@ InputNameFromListWithFunc (
 
 	// Compute maxlen, the length of the longest item in the list
 	maxlen = 1;
-	for (n = 0; n < listsize; n++)
-		if (strlen (list[n]) > maxlen)
-		maxlen = strlen (list[n]);
+	for (string &l: list) {
+		if (l.length() > maxlen)
+			maxlen = l.length();
+	}
 	for (n = name.length() + 1; n <= maxlen; n++)
 		name[n] = '\0';
 	string namedisp = "";
@@ -207,28 +213,28 @@ InputNameFromListWithFunc (
 			maxpatches = 0;
 
 		// Is "name" in the list ?
-		for (n = 0; n < listsize; n++) {
-			if (y_stricmp (name.c_str(), list[n]) <= 0)
+		for (string &l: list) {
+			if (y_stricmp(name.c_str(), l.c_str()) <= 0)
 				break;
 		}
 
-		if (yg_level_format != YGLF_HEXEN)
-			ok = n < listsize ? ! y_stricmp (name.c_str(), list[n]) : false;
-		else
+		if (yg_level_format != YGLF_HEXEN) {
+			ok = n < list.size() ? ! y_stricmp (name.c_str(), list[n].c_str()) : false;
+		} else
 			ok = true;
-		if (n >= listsize)
-			n = listsize - 1;
+		if (n >= list.size())
+			n = list.size() - 1;
 
 		// Display the <listdisp> next items in the list
 		size_t l;				// Current line
 		int y = entry_out_y0;		// Y-coord of current line
 		int xmin = x0 + xlist;
 		int xmax = xmin + FONTW * maxlen - 1;
-		for (l = 0; l < listdisp && n + l < listsize; l++) {
+		for (l = 0; l < listdisp && n + l < list.size(); l++) {
 				set_colour (WINBG);
 				DrawScreenBox (xmin, y, xmax, y + FONTH - 1);
 				set_colour (WINFG);
-				DrawScreenText (xmin, y, list[n+l]);
+				DrawScreenText (xmin, y, list[n+l].c_str());
 				y += FONTH;
 		}
 		if (l < listdisp)  { // Less than <listdisp> names to display
@@ -354,9 +360,8 @@ InputNameFromListWithFunc (
 
 		// Process user input
 		key = get_key();
-		if (firstkey && is_ordinary (key) && key != ' ') {
+		if (firstkey && is_ordinary (key) && key != ' ')
 			name = "";
-		}
 		firstkey = false;
 		size_t len = name.length();
 		if (len < maxlen && key >= 'a' && key <= 'z') {
@@ -374,39 +379,45 @@ InputNameFromListWithFunc (
 			when editing a Doom II pwad in Doom mode) and then the
 			viewer gets "stuck" on the first duplicate. */
 			size_t m = n + 1;
-			while (m < listsize && ! y_stricmp (list[n], list[m]))
+			while (m < list.size() && ! y_stricmp(list[n].c_str(), list[m].c_str()))
 				m++;
-			if (m < listsize)
-				name = string(list[m]);
-			else
+			if (m < list.size()) {
+				name = string(list[m].c_str());
+				n = m;
+			} else
 				Beep ();
 		} else if (key == YK_UP) {		// [Up]
 			// Same trick as for [Down]
 			int m = n - 1;
-			while (m >= 0 && ! y_stricmp (list[n], list[m]))
+			while (m >= 0 && ! y_stricmp(list[n].c_str(), list[m].c_str()))
 				m--;
-			if (m >= 0)
+			if (m >= 0) {
 				name = string(list[m]);
-			else
+				n = m;
+			} else
 				Beep ();
 		} else if (key == YK_PD || key == 6 || key == 22)	{ // [Pgdn], ^F, ^V
-			if (n < listsize - listdisp)
-				name = list[y_min (n + listdisp, listsize - 1)];
+			if (n < list.size() - listdisp) {
+				n = y_min(n + listdisp, list.size() - 1);
+				name = list[n];
+			}
 			else
 				Beep ();
 		} else if ((key == YK_PU || key == 2) && n > 0) {	// [Pgup], ^B
-			if (n > listdisp)
-				name = list[n - listdisp];
-			else
-				name = list[0];
-		} else if (key == 14) {					// ^N
-			if (n + 1 >= listsize) {
-				Beep ();
-			goto done_with_event;
+			if (n > listdisp) {
+				n -= listdisp;
+			} else {
+				n = 0;
 			}
-			while (n + 1 < listsize) {
+			name = list[n];
+		} else if (key == 14) {					// ^N
+			if (n + 1 >= list.size()) {
+				Beep ();
+				goto done_with_event;
+			}
+			while (n + 1 < list.size()) {
 				n++;
-				if (y_strnicmp (list[n - 1], list[n], 4))
+				if (y_strnicmp (list[n - 1].c_str(), list[n].c_str(), 4))
 					break;
 			}
 			name = string(list[n]);
@@ -419,24 +430,26 @@ InputNameFromListWithFunc (
 			// group or, if already at the beginning of the current
 			// group, the first entry of the previous group.
 			if (n > 0) {
-				if (y_strnicmp (list[n], list[n - 1], 4))
+				if (y_strnicmp (list[n].c_str(), list[n - 1].c_str(), 4))
 					n--;
-				while (n > 0 && ! y_strnicmp (list[n], list[n - 1], 4))
+				while (n > 0 && ! y_strnicmp (list[n].c_str(), list[n - 1].c_str(), 4))
 					n--;
 			}
 			name = string(list[n]);
 		} else if (key == (YK_CTRL | YK_PD) || key == YK_END) {	// [Ctrl][Pgdn], [End]
-			if (n + 1 >= listsize) {
+			if (n + 1 >= list.size()) {
 				Beep ();
 				goto done_with_event;
 			}
-			name = string(list[listsize - 1]);
+			n = list.size() - 1;
+			name = string(list[n]);
 		} else if (key == (YK_CTRL | YK_PU) || key == YK_HOME){ // [Ctrl][Pgup], [Home]
 			if (n < 1) {
 				Beep ();
 				goto done_with_event;
 			}
-			name = string(list[0]);
+			n = 0;
+			name = string(list[n]);
 		} else if (key == YK_TAB)				// [Tab]
 			name = list[n];
 		else if (key == YK_F1 && c.flags & HOOK_LOC_VALID) {	// [F1]: print location
@@ -472,7 +485,7 @@ InputNameFromListWithFunc (
 		} else if (ok && key == YK_RETURN)			// [Return]
 			break; /* return "name" */
 		else if (key == YK_ESC) {				// [Esc]
-			name[0] = '\0'; /* return an empty string */
+			name = ""; /* return an empty string */
 			break;
 		} else
 			Beep ();
@@ -487,11 +500,11 @@ InputNameFromListWithFunc (
    ask for a name in a given list
 */
 
-void
+string
 InputNameFromList (
 		int x0, int y0,
 		const char *prompt,
-		size_t listsize, const char *const *list,
-		char *name) {
-	InputNameFromListWithFunc (x0, y0, prompt, listsize, list, 5, name, 0, 0, NULL);
+		vector<string> list,
+		string name) {
+	return InputNameFromListWithFunc (x0, y0, prompt, list, 5, name, 0, 0, NULL);
 }

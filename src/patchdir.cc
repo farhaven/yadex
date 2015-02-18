@@ -27,12 +27,16 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include "patchdir.h"
 #include "wadfile.h"
 #include "wads.h"
 
+using std::string;
+using std::vector;
 
 /* This class has only one instance, global and shared by
    everyone. I don't think there would ever be a need for
@@ -280,11 +284,13 @@ wad_pic_name_t *Patch_dir::name_for_num (int16_t num)
  *	Put a list of all existing patch lump, sorted by name
  *	and without duplicates, in <pl>.
  */
-void Patch_dir::list (Patch_list& pl)
-{
-  pl.set (patch_lumps);
+vector<string> Patch_dir::list() {
+	vector<string> rv;
+	for (auto &i: patch_lumps) {
+		rv.push_back(i.first._name);
+	}
+	return rv;
 }
-
 
 /*-------------------------- Patch_list --------------------------*/
 

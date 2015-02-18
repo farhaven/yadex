@@ -31,8 +31,13 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_PATCHDIR
 #define YH_PATCHDIR
 
-
 #include <map>
+#include <string>
+#include <vector>
+
+using std::map;
+using std::string;
+using std::vector;
 
 
 /*
@@ -111,7 +116,7 @@ class Patch_dir
     void loc_by_name (const char *name, Lump_loc& loc);
     void loc_by_num (int16_t num, Lump_loc& loc);
     wad_pic_name_t *name_for_num (int16_t num);
-    void list (Patch_list& pl);
+    vector<string> list();
 
   private :
     char *pnames;			// The contents of PNAMES

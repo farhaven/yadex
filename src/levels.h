@@ -9,10 +9,14 @@
 #ifndef YH_LEVELS  /* Prevent multiple inclusion */
 #define YH_LEVELS  /* Prevent multiple inclusion */
 
+#include <string>
+#include <vector>
 
 #include "wstructs.h"
 #include "things.h"
 
+using std::string;
+using std::vector;
 
 // Defined in levels.cc
 extern MDirPtr Level;		/* master dictionary entry for the level */
@@ -32,8 +36,7 @@ extern uint8_t*   Behavior;
 extern int   BehaviorSize;
 
 // FIXME should be somewhere else
-extern int   NumWTexture;	/* number of wall textures */
-extern char  **WTexture;	/* array of wall texture names */
+extern vector<string> WTexture;	/* vector of wall texture names */
 extern size_t NumFTexture;	/* number of floor/ceiling textures */
 typedef struct
 {

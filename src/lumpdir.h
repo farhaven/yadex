@@ -31,9 +31,12 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_LUMPDIR  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_LUMPDIR
 
-
 #include <map>
+#include <string>
+#include <vector>
 
+using std::vector;
+using std::string;
 
 class Dependency;
 class Serial_num;
@@ -100,7 +103,7 @@ class Lump_dir
     Lump_dir (MDirPtr *md, char l, Serial_num *sn);
     ~Lump_dir ();
     void loc_by_name (const char *name, Lump_loc& loc);
-    void list (Lump_list& l);
+    vector<string> list();
 
   protected :
     void refresh ();
@@ -108,9 +111,7 @@ class Lump_dir
     Dependency *dependency;		// Resource on which we depend
     MDirPtr    *master_dir;
     char       label;			// First character of label
-    Lump_map   lump_map;		// List of lumps, sorted by name
-					// (no duplicates), with their
-					// location.
+    Lump_map   lump_map;		// List of lumps, sorted by name (no duplicates), with their location.
     bool       have_prev;
     Lump_loc   loc_prev;
     wad_name_t name_prev;

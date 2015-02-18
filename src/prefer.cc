@@ -85,20 +85,20 @@ void Preferences (int x0, int y0) {
 	switch (val) {
 		case 1:
 			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, default_middle_texture);
-			if (texname.length() > 0)
+					WTexture, default_middle_texture);
+			if (texname != "")
 				default_middle_texture = texname;
 			break;
 		case 2:
 			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, default_upper_texture);
-			if (texname.length() > 0)
+					WTexture, default_upper_texture);
+			if (texname != "")
 				default_upper_texture = texname;
 			break;
 		case 3:
 			texname = ChooseWallTexture (subwin_x0, subwin_y0, "Choose a wall texture",
-					NumWTexture, WTexture, default_lower_texture);
-			if (texname.length() > 0)
+					WTexture, default_lower_texture);
+			if (texname != "")
 				default_lower_texture = texname;
 			break;
 		case 4:

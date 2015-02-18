@@ -30,7 +30,13 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_LISTS  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_LISTS
 
+#include <string>
+#include <vector>
+
 #include "img.h"
+
+using std::string;
+using std::vector;
 
 
 /* AYM 19980112
@@ -103,12 +109,10 @@ const int HOOK_LOC_VALID  = 1 << 6;	// lump_loc is valid
 const int HOOK_ROOT       = 1 << 7;	// .name is the prefix. Use loc_by_root
 
 
-string InputNameFromListWithFunc (int, int, const char *, size_t,
-  const char *const *, size_t, string name, int, int,
+string InputNameFromListWithFunc (int, int, const char *,
+  vector<string>, size_t, string name, int, int,
   void (*hookfunc)(hookfunc_comm_t *),
   char flags_to_pass_to_callback = 0);
-void InputNameFromList (int, int, const char *, size_t, const char *const *,
-  char *);
-
+string InputNameFromList (int, int, const char *, vector<string>, string);
 
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

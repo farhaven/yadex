@@ -76,7 +76,7 @@ extern int      ximage_quantum;	// Pad XImage lines to a mult of that many B.
 extern int	text_dot;     // DrawScreenText()/DrawScreenString() debug flag
 
 /* gfx.cc */
-int InitGfx (void);
+bool InitGfx (void);
 void SwitchToVGA256 (void);
 void SwitchToVGA16 (void);
 void TermGfx (void);

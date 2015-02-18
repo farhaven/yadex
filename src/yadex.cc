@@ -935,7 +935,7 @@ static void MainLoop ()
         }
         // "v"/"view" - view the sprites
         else if (strcmp (com, "view") == 0 || strcmp (com, "v") == 0) {
-			  if (!InitGfx()) {
+			  if (InitGfx()) {
 				  init_input_status ();
 				  do {
 					  get_input_status ();
@@ -958,7 +958,7 @@ static void MainLoop ()
         // "viewflat" - view the flats
         else if (strcmp (com, "viewflat") == 0)
         {
-            if (InitGfx ())
+            if (not InitGfx ())
                 goto viewflat_end;
             init_input_status ();
             do
@@ -988,7 +988,7 @@ viewflat_end:;
         // "viewpal" - view the palette (PLAYPAL and COLORMAP)
         else if (strcmp (com, "viewpal") == 0)
         {
-            if (InitGfx ())
+            if (not InitGfx ())
                 goto viewpal_end;
             init_input_status ();
             do
@@ -1004,7 +1004,7 @@ viewpal_end:;
         }
         // "viewpat" - view the patches
 		  else if (strcmp (com, "viewpat") == 0) {
-			  if (!InitGfx()) {
+			  if (InitGfx()) {
 				  init_input_status ();
 				  do {
 					  get_input_status ();
@@ -1023,7 +1023,7 @@ viewpal_end:;
         }
         // "viewtex" - view the textures
 		  else if (strcmp (com, "viewtex") == 0) {
-			  if (!InitGfx ()) {
+			  if (InitGfx ()) {
 				  init_input_status ();
 				  do {
 					  get_input_status ();

@@ -141,7 +141,7 @@ void EditLevel (const char *levelname, bool newlevel)
     ReadFTextureNames ();
     patch_dir.refresh (MasterDir);
 
-    if (InitGfx ())
+    if (not InitGfx())
         return;
 
     /* Call init_input_status() as shortly as possible after the creation

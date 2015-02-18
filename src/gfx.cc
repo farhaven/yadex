@@ -331,14 +331,14 @@ GfxSetupFont(Display *dpy) {
 /*
  *    InitGfx - initialize the graphics display
  *
- *    Return 0 on success, non-zero on failure
+ *    Return true on success, false on failure
  */
-int
+bool
 InitGfx (void) {
 	dpy = XOpenDisplay (0);
 	if (!dpy) {
 		err ("Can't open display");
-		return 1;
+		return false;
 	}
 	scn = DefaultScreen (dpy);
 	GfxSetImageEndianess(dpy);
@@ -346,68 +346,65 @@ InitGfx (void) {
 	GfxSetupXImageParameters(dpy);
 	GfxSetupFont(dpy);
 
+	/*
+	 *    Get/create the colormap
+	 *    and allocate the colours.
+	 */
+	if (win_vis_class == PseudoColor) {
+		verbmsg ("X: running on PseudoColor visual, using private Colormap\n");
+		cmap = XCreateColormap (dpy, win, win_vis, AllocNone);
+	} else
+		cmap = DefaultColormap (dpy, scn);
 
-    /*
-    *    Get/create the colormap
-    *    and allocate the colours.
-    */
-    if (win_vis_class == PseudoColor) {
-        verbmsg ("X: running on PseudoColor visual, using private Colormap\n");
-        cmap = XCreateColormap (dpy, win, win_vis, AllocNone);
-    } else
-        cmap = DefaultColormap (dpy, scn);
+	XSetWindowColormap (dpy, win, cmap);
+	game_colour = alloc_game_colours (0);
+	app_colour = commit_app_colours ();
+	if (win_depth == 24)
+		game_colour_24.refresh (game_colour, x_server_big_endian);
 
-    XSetWindowColormap (dpy, win, cmap);
-    game_colour = alloc_game_colours (0);
-    app_colour = commit_app_colours ();
-    if (win_depth == 24)
-        game_colour_24.refresh (game_colour, x_server_big_endian);
+	/*
+	 *    Create the GC
+	 */
+	XGCValues gcv;
+	unsigned long mask;
 
-    /*
-    *    Create the GC
-    */
-    {
-        XGCValues gcv;
-        unsigned long mask;
+	mask = GCForeground | GCFunction | GCLineWidth;
+	if (!default_font) {
+		mask |= GCFont;
+		gcv.font = font_xfont;
+	}
+	gcv.foreground = app_colour[0];  // Default colour
+	gcv.line_width = 0;
+	gcv.function   = GXcopy;
+	gc = XCreateGC (dpy, win, mask, &gcv);
+	if (gc == NULL)
+		fatal_error ("XCreateGC() returned NULL");
 
-        mask = GCForeground | GCFunction | GCLineWidth;
-        if (!default_font) {
-            mask |= GCFont;
-            gcv.font = font_xfont;
-        }
-        gcv.foreground = app_colour[0];  // Default colour
-        gcv.line_width = 0;
-        gcv.function   = GXcopy;
-        gc = XCreateGC (dpy, win, mask, &gcv);
-        if (gc == 0)
-            fatal_error ("XCreateGC() returned NULL");
-    }
+	/*
+	 *    More stuff
+	 */
+	XSetWindowBackground (dpy, win, app_colour[0]);
+	XMapWindow (dpy, win);
 
-    /*
-    *    More stuff
-    */
-    XSetWindowBackground (dpy, win, app_colour[0]);
-    XMapWindow (dpy, win);
+	// Unless no_pixmap is set, create the pixmap and its own pet GC.
+	if (no_pixmap)
+		drw = win;
+	else {
+		XGCValues gcv;
 
-    // Unless no_pixmap is set, create the pixmap and its own pet GC.
-    if (no_pixmap)
-        drw = win;
-    else {
-        XGCValues gcv;
+		pixmap = XCreatePixmap (dpy, win, width, height, win_depth);
+		gcv.foreground = app_colour[0];
+		gcv.graphics_exposures = False;  // We don't want NoExpose events
+		pixmap_gc = XCreateGC (dpy, pixmap, GCForeground | GCGraphicsExposures, &gcv);
+		drw = win;
+		drw_mods = 0;  // Force display the first time
+	}
+	XSync (dpy, False);
 
-        pixmap = XCreatePixmap (dpy, win, width, height, win_depth);
-        gcv.foreground = app_colour[0];
-        gcv.graphics_exposures = False;  // We don't want NoExpose events
-        pixmap_gc = XCreateGC (dpy, pixmap, GCForeground | GCGraphicsExposures, &gcv);
-        drw = win;
-        drw_mods = 0;  // Force display the first time
-    }
-    XSync (dpy, False);
+	GfxMode = 1;
 
-    GfxMode = 1;
-
-    SetWindowSize (width, height);
-    return 0;
+	SetWindowSize (width, height);
+	return true;
 }
 
 /*

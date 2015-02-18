@@ -1493,7 +1493,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 		wf->read_int32_t (offsets + 1, numtextures - 1);
 		/* read in the actual names */
 		WTexture.push_back("-");
-		char *buf = (char*) malloc(WAD_TEX_NAME + 1);
+		char *buf = (char*) calloc(sizeof(char), WAD_TEX_NAME + 1);
 		for (n = 1; n < numtextures; n++) {
 			wf->seek(dir->dir.start + offsets[n]);
 			if (wf->error ()) {
@@ -1529,7 +1529,7 @@ else if (yg_texture_lumps == YGTL_NORMAL
 			// FIXME
 		}
 		/* read in the actual names */
-		char* buf = (char*) malloc(WAD_TEX_NAME + 1);
+		char* buf = (char*) calloc(sizeof(char), WAD_TEX_NAME + 1);
 		for (n = 0; n < val; n++) {
 			wf->seek (dir->dir.start + offsets[n]);
 			if (wf->error ()) {

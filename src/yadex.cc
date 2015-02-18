@@ -1035,7 +1035,7 @@ viewpal_end:;
 				  if (com != NULL)
 					  buf = string(com);
 				  ReadWTextureNames ();
-				  ChooseWallTexture (-1, -1, "Texture viewer", WTexture, buf);
+				  ChooseWallTexture(0, 0, "Texture viewer", WTexture, buf);
 				  ForgetWTextureNames ();
 				  TermGfx ();
 			  }

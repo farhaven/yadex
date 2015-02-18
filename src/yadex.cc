@@ -1098,45 +1098,40 @@ viewpal_end:;
 			  fclose (raw);
 			  fclose (file);
 		  }
-        /* user asked to extract an object to a raw binary file */
-        else if (strcmp (com, "xtract") == 0
-                || strcmp (com, "extract") == 0
-                || strcmp (com, "x") == 0)
-        {
-            com = strtok (NULL, " ");
-            if (com == NULL)
-            {
-                printf ("Object name argument missing.\n");
-                continue;
-            }
-            if (strlen (com) > WAD_NAME || strchr (com, '.') != NULL)
-            {
-                printf ("Invalid object name.\n");
-                continue;
-            }
-            out = strtok (NULL, " ");
-            if (out == NULL)
-            {
-                printf ("Raw file name argument missing.\n");
-                continue;
-            }
-            if (wad_already_loaded (com))
-            {
-                printf ("%s: in use, close it first\n", com);
-                printf ("Besides do you really want to overwrite a wad file with"
-                " raw data ?\n");
-                continue;
-            }
-            printf ("Saving directory entry data to \"%s\".\n", out);
-            if ((file = fopen (out, "wb")) == NULL)
-                fatal_error ("error opening output file \"%s\"", out);
-            SaveEntryToRawFile (file, com);
-            fclose (file);
-        }
-        /* unknown command */
-        else
-            printf ("Unknown command \"%s\"!\n", com);
-    }
+		  /* user asked to extract an object to a raw binary file */
+		  else if (strcmp (com, "xtract") == 0
+				  || strcmp (com, "extract") == 0
+				  || strcmp (com, "x") == 0) {
+			  com = strtok (NULL, " ");
+			  if (com == NULL) {
+				  printf ("Object name argument missing.\n");
+				  continue;
+			  }
+			  if (strlen (com) > WAD_NAME || strchr (com, '.') != NULL) {
+				  printf ("Invalid object name.\n");
+				  continue;
+			  }
+			  out = strtok (NULL, " ");
+			  if (out == NULL) {
+				  printf ("Raw file name argument missing.\n");
+				  continue;
+			  }
+			  if (wad_already_loaded (com)) {
+				  printf ("%s: in use, close it first\n", com);
+				  printf ("Besides do you really want to overwrite a wad file with"
+						  " raw data ?\n");
+				  continue;
+			  }
+			  printf ("Saving directory entry data to \"%s\".\n", out);
+			  if ((file = fopen (out, "wb")) == NULL)
+				  fatal_error ("error opening output file \"%s\"", out);
+			  SaveEntryToRawFile (file, com);
+			  fclose (file);
+		  }
+		  /* unknown command */
+		  else
+			  printf ("Unknown command \"%s\"!\n", com);
+	 }
 }
 
 /*

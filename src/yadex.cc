@@ -950,7 +950,7 @@ static void MainLoop ()
 					  for (char *p = buf; *p != '\0'; p++)
 						  *p = toupper (*p);
 				  }
-				  InputNameFromListWithFunc (-1, -1, "Sprite viewer", lumps, 10, buf, 320, 200, display_pic,
+				  InputNameFromListWithFunc (0, 0, "Sprite viewer", lumps, 10, string(buf), 320, 200, display_pic,
 						  HOOK_DISP_SIZE | HOOK_SPRITE);
 				  TermGfx ();
 			  }
@@ -1012,11 +1012,10 @@ viewpal_end:;
 				  com = strtok (NULL, " ");
 				  force_window_not_pixmap ();  // FIXME quick hack
 				  patch_dir.refresh (MasterDir);
-				  char buf[WAD_NAME + 1];
-				  *buf = '\0';
+				  string buf;
 				  if (com != NULL)
-					  strncat (buf, com, sizeof buf - 1);
-				  InputNameFromListWithFunc (-1, -1, "Patch viewer",
+					  buf = string(com);
+				  InputNameFromListWithFunc (0, 0, "Patch viewer",
 						  patch_dir.list(), 10, buf, 256, 256, display_pic,
 						  HOOK_DISP_SIZE | HOOK_PATCH);
 				  TermGfx ();

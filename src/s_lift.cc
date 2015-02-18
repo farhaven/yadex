@@ -197,6 +197,3 @@ while (ld1s != NULL) {
 	UnSelectObject (&ld1s, n);
 }
 }
-
-
-

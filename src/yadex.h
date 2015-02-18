@@ -431,9 +431,6 @@ int is_flat_name_in_list (const char *name);
 void ReadFTextureNames (void);
 void ForgetWTextureNames (void);
 
-// nop.cc
-void nop (...);
-
 // s_door.cc (previously in objects.cc)
 void MakeDoorFromSector (int); /* SWAP! */
 

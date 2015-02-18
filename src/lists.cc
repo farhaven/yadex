@@ -314,12 +314,10 @@ InputNameFromListWithFunc (
 			/* If the new picture does not completely obscure the
 			previous one, rub out the old pixels. */
 			set_colour (BLACK);
-			if (c.disp_x0 == BAD_VALUE
-				|| c.disp_y0 == BAD_VALUE
-				|| c.disp_x1 == BAD_VALUE
-				|| c.disp_y1 == BAD_VALUE)
-				nop();
-			else {
+			if (!(c.disp_x0 == BAD_VALUE
+						|| c.disp_y0 == BAD_VALUE
+						|| c.disp_x1 == BAD_VALUE
+						|| c.disp_y1 == BAD_VALUE)) {
 				/* +-WINDOW------------------------+   Erase the dots...
 				|                               |
 				|  +-OLD IMAGE---------------+  |   (this is for the case where

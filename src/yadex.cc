@@ -968,7 +968,7 @@ static void MainLoop ()
             force_window_not_pixmap ();  // FIXME quick hack
             char buf[WAD_FLAT_NAME + 1];
             *buf = '\0';
-            if (com != 0)
+            if (com != NULL)
                 strncat (buf, com, sizeof buf - 1);
             ReadFTextureNames ();
             {
@@ -1014,7 +1014,7 @@ viewpal_end:;
 				  patch_dir.refresh (MasterDir);
 				  char buf[WAD_NAME + 1];
 				  *buf = '\0';
-				  if (com != 0)
+				  if (com != NULL)
 					  strncat (buf, com, sizeof buf - 1);
 				  InputNameFromListWithFunc (-1, -1, "Patch viewer",
 						  patch_dir.list(), 10, buf, 256, 256, display_pic,
@@ -1037,7 +1037,7 @@ viewpal_end:;
             {
                 char buf[WAD_TEX_NAME + 1];
                 *buf = '\0';
-                if (com != 0)
+                if (com != NULL)
                 strncat (buf, com, sizeof buf - 1);
                 ReadWTextureNames ();
                 ChooseWallTexture (-1, -1, "Texture viewer", WTexture, string(buf));

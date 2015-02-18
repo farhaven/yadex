@@ -1066,43 +1066,38 @@ viewpal_end:;
 			  SaveDirectoryEntry (file, com);
 			  fclose (file);
 		  }
-        /* user asked to encapsulate a raw file in a pwad file */
-        else if (strncmp (com, "insert", sizeof("insert")) == 0 || strncmp (com, "i", sizeof("i")) == 0)
-        {
-            com = strtok (NULL, " ");
-            if (com == NULL)
-            {
-                printf ("Raw file name argument missing.\n");
-                continue;
-            }
-            out = strtok (NULL, " ");
-            if (out == NULL)
-            {
-                printf ("Object name argument missing.\n");
-                continue;
-            }
-            if (strlen (out) > WAD_NAME || strchr (out, '.') != NULL)
-            {
-                printf ("Invalid object name.\n");
-                continue;
-            }
-            if ((raw = fopen (com, "rb")) == NULL)
-                fatal_error ("error opening input file \"%s\"", com);
-            /* kluge */
-            strcpy (input, out);
-            strcat (input, ".wad");
-            if (wad_already_loaded (input))
-            {
-                printf ("%s: in use, close it first\n", input);
-                continue;
-            }
-            printf ("Including new object %s in \"%s\".\n", out, input);
-            if ((file = fopen (input, "wb")) == NULL)
-                fatal_error ("error opening output file \"%s\"", input);
-            SaveEntryFromRawFile (file, raw, out);
-            fclose (raw);
-            fclose (file);
-        }
+		  /* user asked to encapsulate a raw file in a pwad file */
+		  else if (strncmp (com, "insert", sizeof("insert")) == 0 || strncmp (com, "i", sizeof("i")) == 0) {
+			  com = strtok (NULL, " ");
+			  if (com == NULL) {
+				  printf ("Raw file name argument missing.\n");
+				  continue;
+			  }
+			  out = strtok (NULL, " ");
+			  if (out == NULL) {
+				  printf ("Object name argument missing.\n");
+				  continue;
+			  }
+			  if (strlen (out) > WAD_NAME || strchr (out, '.') != NULL) {
+				  printf ("Invalid object name.\n");
+				  continue;
+			  }
+			  if ((raw = fopen (com, "rb")) == NULL)
+				  fatal_error ("error opening input file \"%s\"", com);
+			  /* kluge */
+			  strcpy (input, out);
+			  strcat (input, ".wad");
+			  if (wad_already_loaded (input)) {
+				  printf ("%s: in use, close it first\n", input);
+				  continue;
+			  }
+			  printf ("Including new object %s in \"%s\".\n", out, input);
+			  if ((file = fopen (input, "wb")) == NULL)
+				  fatal_error ("error opening output file \"%s\"", input);
+			  SaveEntryFromRawFile (file, raw, out);
+			  fclose (raw);
+			  fclose (file);
+		  }
         /* user asked to extract an object to a raw binary file */
         else if (strcmp (com, "xtract") == 0
                 || strcmp (com, "extract") == 0

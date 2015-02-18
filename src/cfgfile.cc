@@ -198,7 +198,7 @@ opt_desc_t options[] =        // Description of the command line options
         OPT_STRINGBUF8,
         0,
         "Default ceiling texture",
-        default_ceiling_texture
+        &default_ceiling_texture
     },
     {
         "default_floor_height",
@@ -214,7 +214,7 @@ opt_desc_t options[] =        // Description of the command line options
         OPT_STRINGBUF8,
         0,
         "Default floor texture",
-        default_floor_texture
+        &default_floor_texture
     },
     {
         "default_light_level",

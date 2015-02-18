@@ -26,6 +26,8 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include <X11/Xlib.h>
@@ -38,26 +40,16 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadfile.h"
 #include "wads.h"
 
+using std::string;
+using std::vector;
 
 /*
    choose a floor or ceiling texture
-   FIXME the <list> and <listsize> parameters are ignored since 1999-07-10.
 */
 
-void ChooseFloorTexture (int x0, int y0, const char *prompt, int listsize, char **list, char *name)
-{
-  (void) list;
-  (void) listsize;
-  vector<string> flat_names;
-  // Build a list of char *, for InputNameFromListWithFunc()'s sake
-  for (size_t n = 0; n < NumFTexture; n++) {
-	  flat_names.push_back(string(flat_list[n].name));
-  }
-
-  InputNameFromListWithFunc (x0, y0, prompt, flat_names,
-    5, name, 64, 64, DisplayFloorTexture);
+string ChooseFloorTexture (int x0, int y0, const char *prompt, vector<string> list, string name) {
+	return InputNameFromListWithFunc (x0, y0, prompt, list, 5, name, 64, 64, DisplayFloorTexture);
 }
-
 
 /*
  *	flat_list_entry_match

@@ -307,9 +307,9 @@ extern int   copy_linedef_reuse_sidedefs;
 extern int   cpu_big_endian;	// Am I running on a big-endian CPU ?
 extern bool  Debug;			// Are we debugging?
 extern int   default_ceiling_height;			// For new sectors
-extern char  default_ceiling_texture[WAD_FLAT_NAME + 1];// For new sectors
+extern string default_ceiling_texture;	// For new sectors
 extern int   default_floor_height;			// For new sectors
-extern char  default_floor_texture[WAD_FLAT_NAME + 1];	// For new sectors
+extern string default_floor_texture;	// For new sectors
 extern int   default_light_level;			// For new sectors
 extern string default_lower_texture;	// For new linedefs
 extern string default_middle_texture;	// For new linedefs

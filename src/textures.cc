@@ -27,7 +27,6 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
-
 #include "yadex.h"
 #include <X11/Xlib.h>
 #include "dialog.h"
@@ -41,7 +40,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadfile.h"
 #include "wads.h"
 #include "wstructs.h"
-
 
 /*
    display a wall texture ("TEXTURE1" or "TEXTURE2" object)

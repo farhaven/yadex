@@ -568,8 +568,8 @@ switch (objtype)
 	 {
 	 Sectors[last].floorh  = default_floor_height;
 	 Sectors[last].ceilh   = default_ceiling_height;
-	 strncpy (Sectors[last].floort, default_floor_texture, WAD_FLAT_NAME);
-	 strncpy (Sectors[last].ceilt, default_ceiling_texture, WAD_FLAT_NAME);
+	 strncpy (Sectors[last].floort, default_floor_texture.c_str(), WAD_FLAT_NAME);
+	 strncpy (Sectors[last].ceilt, default_ceiling_texture.c_str(), WAD_FLAT_NAME);
 	 Sectors[last].light   = default_light_level;
 	 Sectors[last].special = 0;
 	 Sectors[last].tag     = 0;

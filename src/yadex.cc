@@ -93,13 +93,13 @@ int       copy_linedef_reuse_sidedefs = 0;
 int       cpu_big_endian         = 0;
 bool      Debug                  = false;
 int       default_ceiling_height = 128;
-char      default_ceiling_texture[WAD_FLAT_NAME + 1] = "CEIL3_5";
+string    default_ceiling_texture = "CEIL3_5";
 int       default_floor_height   = 0;
-char      default_floor_texture[WAD_FLAT_NAME + 1]   = "FLOOR4_8";
+string    default_floor_texture  = "FLOOR4_8";
 int       default_light_level    = 144;
-string    default_lower_texture   = "STARTAN3";
-string    default_middle_texture  = "STARTAN3";
-string    default_upper_texture   = "STARTAN3";
+string    default_lower_texture  = "STARTAN3";
+string    default_middle_texture = "STARTAN3";
+string    default_upper_texture  = "STARTAN3";
 int       default_thing          = 3004;
 int       double_click_timeout   = 200;
 bool      Expert                 = false;
@@ -955,53 +955,40 @@ static void MainLoop ()
 				  TermGfx ();
 			  }
         }
-        // "viewflat" - view the flats
-        else if (strcmp (com, "viewflat") == 0)
-        {
-            if (not InitGfx ())
-                goto viewflat_end;
-            init_input_status ();
-            do
-                get_input_status ();
-            while (is.key != YE_EXPOSE);
-            com = strtok (NULL, " ");
-            force_window_not_pixmap ();  // FIXME quick hack
-            char buf[WAD_FLAT_NAME + 1];
-            *buf = '\0';
-            if (com != NULL)
-                strncat (buf, com, sizeof buf - 1);
-            ReadFTextureNames ();
-            {
-                char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
-
-                for (size_t n = 0; n < NumFTexture; n++)
-                    flat_names[n] = flat_list[n].name;
-
-                ChooseFloorTexture (-1, -1, "Flat viewer",
-                NumFTexture, flat_names, buf);
-                free(flat_names);
-            }
-            ForgetFTextureNames ();
-            TermGfx ();
-viewflat_end:;
-        }
-        // "viewpal" - view the palette (PLAYPAL and COLORMAP)
-        else if (strcmp (com, "viewpal") == 0)
-        {
-            if (not InitGfx ())
-                goto viewpal_end;
-            init_input_status ();
-            do
-                get_input_status ();
-            while (is.key != YE_EXPOSE);
-            force_window_not_pixmap ();  // FIXME quick hack
-            {
-                Palette_viewer pv;
-                pv.run ();
-            }
-            TermGfx ();
-viewpal_end:;
-        }
+		  // "viewflat" - view the flats
+		  else if (strcmp (com, "viewflat") == 0) {
+			  if (InitGfx ()) {
+				  init_input_status ();
+				  do {
+					  get_input_status ();
+				  } while (is.key != YE_EXPOSE);
+				  com = strtok (NULL, " ");
+				  force_window_not_pixmap ();  // FIXME quick hack
+				  string buf;
+				  if (com != NULL)
+					  buf = string(com);
+				  ReadFTextureNames ();
+				  vector<string> flat_names;
+				  for (size_t n = 0; n < NumFTexture; n++)
+					  flat_names.push_back(string(flat_list[n].name));
+				  ChooseFloorTexture (0, 0, "Flat viewer", flat_names, buf);
+				  ForgetFTextureNames ();
+				  TermGfx ();
+			  }
+		  }
+		  // "viewpal" - view the palette (PLAYPAL and COLORMAP)
+		  else if (strcmp (com, "viewpal") == 0) {
+			  if (InitGfx ()) {
+				  init_input_status ();
+				  do {
+					  get_input_status ();
+				  } while (is.key != YE_EXPOSE);
+				  force_window_not_pixmap ();  // FIXME quick hack
+				  Palette_viewer pv;
+				  pv.run ();
+				  TermGfx ();
+			  }
+		  }
         // "viewpat" - view the patches
 		  else if (strcmp (com, "viewpat") == 0) {
 			  if (InitGfx()) {
@@ -1020,8 +1007,8 @@ viewpal_end:;
 						  HOOK_DISP_SIZE | HOOK_PATCH);
 				  TermGfx ();
 			  }
-        }
-        // "viewtex" - view the textures
+		  }
+		  // "viewtex" - view the textures
 		  else if (strcmp (com, "viewtex") == 0) {
 			  if (InitGfx ()) {
 				  init_input_status ();

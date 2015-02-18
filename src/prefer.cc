@@ -60,7 +60,7 @@ void Preferences (int x0, int y0) {
 
 	int  val;
 	string texname;
-	char flatname[WAD_FLAT_NAME + 1];
+	string flatname;
 	int  width, height;
 
 	width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + 50 * FONTW;
@@ -103,28 +103,26 @@ void Preferences (int x0, int y0) {
 			break;
 		case 4:
 			{
-				strcpy (flatname, default_floor_texture);
-				char ** flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
-				for (size_t n = 0; n < NumFTexture; n++)
-					flat_names[n] = flat_list[n].name;
-				ChooseFloorTexture (subwin_x0, subwin_y0, "Choose a floor texture",
-						NumFTexture, flat_names, flatname);
-				free(flat_names);
-				if (strlen (flatname) > 0)
-					strcpy (default_floor_texture, flatname);
+				vector<string> flat_names;
+				for (size_t n = 0; n < NumFTexture; n++) {
+					flat_names.push_back(flat_list[n].name);
+				}
+				string flatname = ChooseFloorTexture(subwin_x0, subwin_y0,
+						"Choose a floor texture", flat_names, default_floor_texture);
+				if (flatname != "")
+					default_floor_texture = flatname;
 				break;
 			}
 		case 5:
 			{
-				strcpy (flatname, default_ceiling_texture);
-				char ** flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
-				for (size_t n = 0; n < NumFTexture; n++)
-					flat_names[n] = flat_list[n].name;
-				ChooseFloorTexture (subwin_x0, subwin_y0, "Choose a ceiling texture",
-						NumFTexture, flat_names, flatname);
-				free(flat_names);
-				if (strlen (flatname) > 0)
-					strcpy (default_ceiling_texture, flatname);
+				vector<string> flat_names;
+				for (size_t n = 0; n < NumFTexture; n++) {
+					flat_names.push_back(flat_list[n].name);
+				}
+				string flatname = ChooseFloorTexture (subwin_x0, subwin_y0,
+						"Choose a ceiling texture", flat_names, default_ceiling_texture);
+				if (flatname != "")
+					default_ceiling_texture = flatname;
 				break;
 			}
 		case 6:

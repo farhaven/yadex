@@ -104,7 +104,7 @@ const char *Menu_data_st::operator[] (size_t n) const
 void SectorProperties (int x0, int y0, SelPtr obj)
 {
   char  *menustr[30];
-  char   texname[WAD_FLAT_NAME + 1];
+  string texname;
   int    n, val;
   SelPtr cur;
   int    subwin_y0;
@@ -162,44 +162,37 @@ void SectorProperties (int x0, int y0, SelPtr obj)
       }
       break;
 
-    case 3:
-      {
-	*texname = '\0';
-	strncat (texname, Sectors[obj->objnum].floort, WAD_FLAT_NAME);
-	char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
-	for (size_t n = 0; n < NumFTexture; n++)
-	  flat_names[n] = flat_list[n].name;
-	ChooseFloorTexture (x0 + 42, subwin_y0, "Choose a floor texture",
-	  NumFTexture, flat_names, texname);
-	free(flat_names);
-	if (strlen (texname) > 0)
-	{
-	  for (cur = obj; cur; cur = cur->next)
-	    strncpy (Sectors[cur->objnum].floort, texname, WAD_FLAT_NAME);
-	  MadeChanges = 1;
-	}
-	break;
-      }
+	 case 3:
+		{
+			vector<string> flat_names;
+			for (size_t n = 0; n < NumFTexture; n++) {
+				flat_names.push_back(string(flat_list[n].name));
+			}
+			texname = ChooseFloorTexture(x0 + 42, subwin_y0, "Choose a floor texture",
+					flat_names, string(Sectors[obj->objnum].floort));
+			if (texname != "") {
+				for (cur = obj; cur; cur = cur->next)
+					strncpy (Sectors[cur->objnum].floort, texname.c_str(), WAD_FLAT_NAME);
+				MadeChanges = 1;
+			}
+			break;
+		}
 
-    case 4:
-      {
-      *texname = '\0';
-      strncat (texname, Sectors[obj->objnum].ceilt, WAD_FLAT_NAME);
-      char **flat_names = (char **) malloc(NumFTexture * sizeof *flat_names);
-      for (size_t n = 0; n < NumFTexture; n++)
-	flat_names[n] = flat_list[n].name;
-      ChooseFloorTexture (x0 + 42, subwin_y0, "Choose a ceiling texture",
-	NumFTexture, flat_names, texname);
-      free(flat_names);
-      if (strlen (texname) > 0)
-      {
-	for (cur = obj; cur; cur = cur->next)
-	  strncpy (Sectors[cur->objnum].ceilt, texname, WAD_FLAT_NAME);
-	MadeChanges = 1;
-      }
-      break;
-      }
-
+	 case 4:
+		{
+			vector<string> flat_names;
+			for (size_t n = 0; n < NumFTexture; n++) {
+				flat_names.push_back(string(flat_list[n].name));
+			}
+			texname = ChooseFloorTexture(x0 + 42, subwin_y0,
+					"Choose a ceiling texture", flat_names, string(Sectors[obj->objnum].ceilt));
+			if (texname != "") {
+				for (cur = obj; cur; cur = cur->next)
+					strncpy (Sectors[cur->objnum].ceilt, texname.c_str(), WAD_FLAT_NAME);
+				MadeChanges = 1;
+			}
+			break;
+		}
     case 5:
       val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
 	Sectors[obj->objnum].light);

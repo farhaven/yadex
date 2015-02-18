@@ -7,11 +7,15 @@
 #ifndef YH_FLATS  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_FLATS
 
+#include <string>
+#include <vector>
 
 #include "lists.h"
 
+using std::string;
+using std::vector;
 
-void ChooseFloorTexture (int, int, const char *, int, char **, char *);
+string ChooseFloorTexture (int, int, const char *, vector<string>, string name);
 void DisplayFloorTexture (hookfunc_comm_t *c);
 void display_flat_depressed (hookfunc_comm_t *c);
 

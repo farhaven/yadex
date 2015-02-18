@@ -200,45 +200,40 @@ InputNameFromListWithFunc (
 
 	// The event loop
 	for (;;) {
-	hookfunc_comm_t c;
+		hookfunc_comm_t c;
 
-	// Reset maxpatches every time when change texture
-	if (name == namedisp)
-		maxpatches = 0;
+		// Reset maxpatches every time when change texture
+		if (name == namedisp)
+			maxpatches = 0;
 
-	// Is "name" in the list ?
-	for (n = 0; n < listsize; n++) {
-		if (y_stricmp (name.c_str(), list[n]) <= 0)
-			break;
-	}
+		// Is "name" in the list ?
+		for (n = 0; n < listsize; n++) {
+			if (y_stricmp (name.c_str(), list[n]) <= 0)
+				break;
+		}
 
-	if (yg_level_format != YGLF_HEXEN)
-		ok = n < listsize ? ! y_stricmp (name.c_str(), list[n]) : false;
-	else
-		ok = true;
-	if (n >= listsize)
-		n = listsize - 1;
+		if (yg_level_format != YGLF_HEXEN)
+			ok = n < listsize ? ! y_stricmp (name.c_str(), list[n]) : false;
+		else
+			ok = true;
+		if (n >= listsize)
+			n = listsize - 1;
 
-	// Display the <listdisp> next items in the list
-	size_t l;				// Current line
-	int y = entry_out_y0;		// Y-coord of current line
-	int xmin = x0 + xlist;
-	int xmax = xmin + FONTW * maxlen - 1;
-	for (l = 0; l < listdisp && n + l < listsize; l++) {
-			if (false && has_input_event ())	{ // TEST
-				putchar ('.');		// TEST
-				fflush (stdout);	// TEST
-				goto shortcut;		// TEST
-			}
-			set_colour (WINBG);
-			DrawScreenBox (xmin, y, xmax, y + FONTH - 1);
-			set_colour (WINFG);
-			DrawScreenText (xmin, y, list[n+l]);
-			y += FONTH;
+		// Display the <listdisp> next items in the list
+		size_t l;				// Current line
+		int y = entry_out_y0;		// Y-coord of current line
+		int xmin = x0 + xlist;
+		int xmax = xmin + FONTW * maxlen - 1;
+		for (l = 0; l < listdisp && n + l < listsize; l++) {
+				set_colour (WINBG);
+				DrawScreenBox (xmin, y, xmax, y + FONTH - 1);
+				set_colour (WINFG);
+				DrawScreenText (xmin, y, list[n+l]);
+				y += FONTH;
 		}
 		if (l < listdisp)  { // Less than <listdisp> names to display
-			set_colour (WINBG);
-			DrawScreenBox (xmin, y, xmax, entry_out_y0 + listdisp * FONTH - 1);
+				set_colour (WINBG);
+				DrawScreenBox (xmin, y, xmax, entry_out_y0 + listdisp * FONTH - 1);
 		}
 
 		// Display the entry box and the current text
@@ -252,242 +247,239 @@ InputNameFromListWithFunc (
 
 		// Call the function to display the picture, if any
 		if (hookfunc) {
-		// Display the picture name
-		c.x0         = x1;
-		c.y0         = y1;
-		c.x1         = x2;
-		c.y1         = y2;
-		c.name       = name.c_str();
-		c.xofs       = 0;
-		c.yofs       = 0;
-		c.flags      = flags_to_pass_to_callback;
-		const int BAD_VALUE = INT_MAX;
-		c.disp_x0    = BAD_VALUE;  // Catch faulty callbacks
-		c.disp_y0    = BAD_VALUE;  // Catch faulty callbacks
-		c.disp_x1    = BAD_VALUE;  // Catch faulty callbacks
-		c.disp_y1    = BAD_VALUE;  // Catch faulty callbacks
-		c.maxpatches = maxpatches;
-		if (ok) {
-			hookfunc (&c);
-		} else {
-			// No picture. Null width & height. Erase everything.
-			c.disp_x0 = (x2 + x1) / 2;
-			c.disp_y0 = (y2 + y1) / 2;
-			c.disp_x1 = c.disp_x0 - 1;
-			c.disp_y1 = c.disp_y0 - 1;
-		}
-		namedisp = name;
+			// Display the picture name
+			c.x0         = x1;
+			c.y0         = y1;
+			c.x1         = x2;
+			c.y1         = y2;
+			c.name       = name.c_str();
+			c.xofs       = 0;
+			c.yofs       = 0;
+			c.flags      = flags_to_pass_to_callback;
+			const int BAD_VALUE = INT_MAX;
+			c.disp_x0    = BAD_VALUE;  // Catch faulty callbacks
+			c.disp_y0    = BAD_VALUE;  // Catch faulty callbacks
+			c.disp_x1    = BAD_VALUE;  // Catch faulty callbacks
+			c.disp_y1    = BAD_VALUE;  // Catch faulty callbacks
+			c.maxpatches = maxpatches;
+			if (ok) {
+				hookfunc (&c);
+			} else {
+				// No picture. Null width & height. Erase everything.
+				c.disp_x0 = (x2 + x1) / 2;
+				c.disp_y0 = (y2 + y1) / 2;
+				c.disp_x1 = c.disp_x0 - 1;
+				c.disp_y1 = c.disp_y0 - 1;
+			}
+			namedisp = name;
 
-		// Display the (unclipped) size of the picture
-		const size_t size_chars = 11;
-		const int    size_x0    = x0 + 10;
-		const int    size_y0    = y0 + 50;
-		if (picture_size_drawn) {
-			set_colour (WINBG);
-			DrawScreenBoxwh (size_x0, size_y0, size_chars * FONTW, FONTH);
-			picture_size_drawn = false;
-		}
-		if ((c.flags & HOOK_SIZE_VALID) && (c.flags & HOOK_DISP_SIZE)) {
-			set_colour (WINFG);
-			char size_buf[100];  // Slack
-			snprintf (size_buf, sizeof size_buf, "%dx%d", c.width, c.height);
-			if (strlen (size_buf) > size_chars)
-				strcpy (size_buf + size_chars - 1, ">");
-			DrawScreenString (size_x0, size_y0, size_buf);
-			picture_size_drawn = true;
-		}
+			// Display the (unclipped) size of the picture
+			const size_t size_chars = 11;
+			const int    size_x0    = x0 + 10;
+			const int    size_y0    = y0 + 50;
+			if (picture_size_drawn) {
+				set_colour (WINBG);
+				DrawScreenBoxwh (size_x0, size_y0, size_chars * FONTW, FONTH);
+				picture_size_drawn = false;
+			}
+			if ((c.flags & HOOK_SIZE_VALID) && (c.flags & HOOK_DISP_SIZE)) {
+				set_colour (WINFG);
+				char size_buf[100];  // Slack
+				snprintf (size_buf, sizeof size_buf, "%dx%d", c.width, c.height);
+				if (strlen (size_buf) > size_chars)
+					strcpy (size_buf + size_chars - 1, ">");
+				DrawScreenString (size_x0, size_y0, size_buf);
+				picture_size_drawn = true;
+			}
 
 #ifdef DEBUG
-		// Display the file name and file offset of the picture
-		const size_t loc_chars = win_width / FONTW;
-		const int    loc_x0    = x0;
-		const int    loc_y0    = y0 + win_height;
-		if (lump_loc_drawn) {
-			set_colour (WINBG);
-			DrawScreenBoxwh (loc_x0, loc_y0, loc_chars * FONTW, FONTH);
-			lump_loc_drawn = false;
-		}
-		if (disp_lump_loc && (c.flags & HOOK_LOC_VALID)) {
-			set_colour (WINFG);
-			char buf[150];  // Slack
-			lump_loc_string (buf, sizeof buf, c.lump_loc);
-			DrawScreenString (loc_x0, loc_y0, buf);
-			lump_loc_drawn = true;
-		}
+			// Display the file name and file offset of the picture
+			const size_t loc_chars = win_width / FONTW;
+			const int    loc_x0    = x0;
+			const int    loc_y0    = y0 + win_height;
+			if (lump_loc_drawn) {
+				set_colour (WINBG);
+				DrawScreenBoxwh (loc_x0, loc_y0, loc_chars * FONTW, FONTH);
+				lump_loc_drawn = false;
+			}
+			if (disp_lump_loc && (c.flags & HOOK_LOC_VALID)) {
+				set_colour (WINFG);
+				char buf[150];  // Slack
+				lump_loc_string (buf, sizeof buf, c.lump_loc);
+				DrawScreenString (loc_x0, loc_y0, buf);
+				lump_loc_drawn = true;
+			}
 #endif
 
-		/* If the new picture does not completely obscure the
-		previous one, rub out the old pixels. */
-		set_colour (BLACK);
-		if (c.disp_x0 == BAD_VALUE
-			|| c.disp_y0 == BAD_VALUE
-			|| c.disp_x1 == BAD_VALUE
-			|| c.disp_y1 == BAD_VALUE)
-			nop();
-		else {
-			/* +-WINDOW------------------------+   Erase the dots...
-			|                               |
-			|  +-OLD IMAGE---------------+  |   (this is for the case where
-			|  | . . : . . . . . . : . . |  |   the image is centred but the
-			|  |. . .:. . . 3 . . .:. . .|  |   principle is the same if it's
-			|  | . . : . . . . . . : . . |  |   E.G. in the top left corner)
-			|  |. . .+-NEW IMAGE---+. . .|  |
-			|  | . . |             | . . |  |
-			|  |. 1 .|             |. 2 .|  |
-			|  | . . |             | . . |  |
-			|  |. . .+-------------+. . .|  |
-			|  | . . : . . . . . . : . . |  |
-			|  |. . .:. . . 4 . . .:. . .|  |
-			|  | . . : . . . . . . : . . |  |
-			|  +-------------------------+  |
-			|                               |
-			+-------------------------------+ */
-			if (c.disp_x0 > disp_x0)
-				DrawScreenBox (disp_x0, disp_y0, c.disp_x0 - 1, disp_y1);  // (1)
-			if (c.disp_x1 < disp_x1)
-				DrawScreenBox (c.disp_x1 + 1, disp_y0, disp_x1, disp_y1);  // (2)
-			if (c.disp_y0 > disp_y0)
-				DrawScreenBox (y_max (c.disp_x0, disp_x0), disp_y0,
-			y_min (c.disp_x1, disp_x1), c.disp_y0 - 1); // (3)
-			if (c.disp_y1 < disp_y1)
-				DrawScreenBox (y_max (c.disp_x0, disp_x0), c.disp_y1 + 1,
-			y_min (c.disp_x1, disp_x1), disp_y1);       // (4)
-		}
-		disp_x0 = c.disp_x0;
-		disp_y0 = c.disp_y0;
-		disp_x1 = c.disp_x1;
-		disp_y1 = c.disp_y1;
-	}
-
-	// Process user input
-shortcut:
-	key = get_key ();
-	if (firstkey && is_ordinary (key) && key != ' ') {
-		for (size_t i = 0; i <= maxlen; i++)
-		name[i] = '\0';
-	}
-	firstkey = false;
-	size_t len = name.length();
-	if (len < maxlen && key >= 'a' && key <= 'z') {
-		name += key + 'A' - 'a';
-	} else if (len < maxlen && is_ordinary (key) && key != ' ') {
-		name += key;
-	} else if (len > 0 && key == YK_BACKSPACE)		// BS
-		name.resize(len - 1);
-	else if (key == 21 || key == 23)			// ^U, ^W
-		name = "";
-	else if (key == YK_DOWN) {			// [Down]
-		/* Look for the next item in the list that has a
-		different name. Why not just use the next item ?
-		Because sometimes the list has duplicates (for example
-		when editing a Doom II pwad in Doom mode) and then the
-		viewer gets "stuck" on the first duplicate. */
-		size_t m = n + 1;
-		while (m < listsize && ! y_stricmp (list[n], list[m]))
-			m++;
-		if (m < listsize)
-			name = string(list[m]);
-		else
-			Beep ();
-	} else if (key == YK_UP) {		// [Up]
-		// Same trick as for [Down]
-		int m = n - 1;
-		while (m >= 0 && ! y_stricmp (list[n], list[m]))
-			m--;
-		if (m >= 0)
-			name = string(list[m]);
-		else
-			Beep ();
-	} else if (key == YK_PD || key == 6 || key == 22)	{ // [Pgdn], ^F, ^V
-		if (n < listsize - listdisp)
-			name = list[y_min (n + listdisp, listsize - 1)];
-		else
-			Beep ();
-	} else if ((key == YK_PU || key == 2) && n > 0) {	// [Pgup], ^B
-		if (n > listdisp)
-			name = list[n - listdisp];
-		else
-			name = list[0];
-	} else if (key == 14) {					// ^N
-		if (n + 1 >= listsize) {
-			Beep ();
-		goto done_with_event;
-		}
-		while (n + 1 < listsize) {
-			n++;
-			if (y_strnicmp (list[n - 1], list[n], 4))
-				break;
+			/* If the new picture does not completely obscure the
+			previous one, rub out the old pixels. */
+			set_colour (BLACK);
+			if (c.disp_x0 == BAD_VALUE
+				|| c.disp_y0 == BAD_VALUE
+				|| c.disp_x1 == BAD_VALUE
+				|| c.disp_y1 == BAD_VALUE)
+				nop();
+			else {
+				/* +-WINDOW------------------------+   Erase the dots...
+				|                               |
+				|  +-OLD IMAGE---------------+  |   (this is for the case where
+				|  | . . : . . . . . . : . . |  |   the image is centred but the
+				|  |. . .:. . . 3 . . .:. . .|  |   principle is the same if it's
+				|  | . . : . . . . . . : . . |  |   E.G. in the top left corner)
+				|  |. . .+-NEW IMAGE---+. . .|  |
+				|  | . . |             | . . |  |
+				|  |. 1 .|             |. 2 .|  |
+				|  | . . |             | . . |  |
+				|  |. . .+-------------+. . .|  |
+				|  | . . : . . . . . . : . . |  |
+				|  |. . .:. . . 4 . . .:. . .|  |
+				|  | . . : . . . . . . : . . |  |
+				|  +-------------------------+  |
+				|                               |
+				+-------------------------------+ */
+				if (c.disp_x0 > disp_x0)
+					DrawScreenBox (disp_x0, disp_y0, c.disp_x0 - 1, disp_y1);  // (1)
+				if (c.disp_x1 < disp_x1)
+					DrawScreenBox (c.disp_x1 + 1, disp_y0, disp_x1, disp_y1);  // (2)
+				if (c.disp_y0 > disp_y0)
+					DrawScreenBox (y_max (c.disp_x0, disp_x0), disp_y0,
+				y_min (c.disp_x1, disp_x1), c.disp_y0 - 1); // (3)
+				if (c.disp_y1 < disp_y1)
+					DrawScreenBox (y_max (c.disp_x0, disp_x0), c.disp_y1 + 1,
+				y_min (c.disp_x1, disp_x1), disp_y1);       // (4)
+			}
+			disp_x0 = c.disp_x0;
+			disp_y0 = c.disp_y0;
+			disp_x1 = c.disp_x1;
+			disp_y1 = c.disp_y1;
 		}
 
-		name = string(list[n]);
-	} else if (key == 16) {		// ^P
-		if (n < 1) {
-			Beep ();
-			goto done_with_event;
+		// Process user input
+		key = get_key();
+		if (firstkey && is_ordinary (key) && key != ' ') {
+			name = "";
 		}
-		// Put in <n> the index of the first entry of the current
-		// group or, if already at the beginning of the current
-		// group, the first entry of the previous group.
-		if (n > 0) {
-			if (y_strnicmp (list[n], list[n - 1], 4))
-				n--;
-			while (n > 0 && ! y_strnicmp (list[n], list[n - 1], 4))
-				n--;
-		}
-		name = string(list[n]);
-	} else if (key == (YK_CTRL | YK_PD) || key == YK_END) {	// [Ctrl][Pgdn], [End]
-		if (n + 1 >= listsize) {
-			Beep ();
-			goto done_with_event;
-		}
-		name = string(list[listsize - 1]);
-	} else if (key == (YK_CTRL | YK_PU) || key == YK_HOME){ // [Ctrl][Pgup], [Home]
-		if (n < 1) {
-			Beep ();
-			goto done_with_event;
-		}
-		name = string(list[0]);
-	} else if (key == YK_TAB)				// [Tab]
-		name = list[n];
-	else if (key == YK_F1 && c.flags & HOOK_LOC_VALID) {	// [F1]: print location
-		printf ("%.8s: %s(%08lXh)\n",
-			name.c_str(), c.lump_loc.wad->pathname (), (unsigned long) c.lump_loc.ofs);
-	} else if (key == YK_F1 + YK_SHIFT	// [Shift][F1] : dump image to file
-			&& hookfunc != NULL
-			&& (c.flags & HOOK_DRAWN)) {
-		const size_t size = name.length() + 4 + 1;
-		char *filename = new char[size];
-		al_scpslower (filename, name.c_str(), size - 1);
-		al_saps      (filename, ".ppm", size - 1);
-		if (c.img.save (filename) != 0) {
-			if (errno == ECHILD)
-				err ("Error loading PLAYPAL");
+		firstkey = false;
+		size_t len = name.length();
+		if (len < maxlen && key >= 'a' && key <= 'z') {
+			name += key + 'A' - 'a';
+		} else if (len < maxlen && is_ordinary (key) && key != ' ') {
+			name += key;
+		} else if (len > 0 && key == YK_BACKSPACE)		// BS
+			name.resize(len - 1);
+		else if (key == 21 || key == 23)			// ^U, ^W
+			name = "";
+		else if (key == YK_DOWN) {			// [Down]
+			/* Look for the next item in the list that has a
+			different name. Why not just use the next item ?
+			Because sometimes the list has duplicates (for example
+			when editing a Doom II pwad in Doom mode) and then the
+			viewer gets "stuck" on the first duplicate. */
+			size_t m = n + 1;
+			while (m < listsize && ! y_stricmp (list[n], list[m]))
+				m++;
+			if (m < listsize)
+				name = string(list[m]);
 			else
-				err ("%s: %s", filename, strerror (errno));
+				Beep ();
+		} else if (key == YK_UP) {		// [Up]
+			// Same trick as for [Down]
+			int m = n - 1;
+			while (m >= 0 && ! y_stricmp (list[n], list[m]))
+				m--;
+			if (m >= 0)
+				name = string(list[m]);
+			else
+				Beep ();
+		} else if (key == YK_PD || key == 6 || key == 22)	{ // [Pgdn], ^F, ^V
+			if (n < listsize - listdisp)
+				name = list[y_min (n + listdisp, listsize - 1)];
+			else
+				Beep ();
+		} else if ((key == YK_PU || key == 2) && n > 0) {	// [Pgup], ^B
+			if (n > listdisp)
+				name = list[n - listdisp];
+			else
+				name = list[0];
+		} else if (key == 14) {					// ^N
+			if (n + 1 >= listsize) {
+				Beep ();
+			goto done_with_event;
+			}
+			while (n + 1 < listsize) {
+				n++;
+				if (y_strnicmp (list[n - 1], list[n], 4))
+					break;
+			}
+			name = string(list[n]);
+		} else if (key == 16) {		// ^P
+			if (n < 1) {
+				Beep ();
+				goto done_with_event;
+			}
+			// Put in <n> the index of the first entry of the current
+			// group or, if already at the beginning of the current
+			// group, the first entry of the previous group.
+			if (n > 0) {
+				if (y_strnicmp (list[n], list[n - 1], 4))
+					n--;
+				while (n > 0 && ! y_strnicmp (list[n], list[n - 1], 4))
+					n--;
+			}
+			name = string(list[n]);
+		} else if (key == (YK_CTRL | YK_PD) || key == YK_END) {	// [Ctrl][Pgdn], [End]
+			if (n + 1 >= listsize) {
+				Beep ();
+				goto done_with_event;
+			}
+			name = string(list[listsize - 1]);
+		} else if (key == (YK_CTRL | YK_PU) || key == YK_HOME){ // [Ctrl][Pgup], [Home]
+			if (n < 1) {
+				Beep ();
+				goto done_with_event;
+			}
+			name = string(list[0]);
+		} else if (key == YK_TAB)				// [Tab]
+			name = list[n];
+		else if (key == YK_F1 && c.flags & HOOK_LOC_VALID) {	// [F1]: print location
+			printf ("%.8s: %s(%08lXh)\n",
+				name.c_str(), c.lump_loc.wad->pathname (), (unsigned long) c.lump_loc.ofs);
+		} else if (key == YK_F1 + YK_SHIFT	// [Shift][F1] : dump image to file
+				&& hookfunc != NULL
+				&& (c.flags & HOOK_DRAWN)) {
+			const size_t size = name.length() + 4 + 1;
+			char *filename = new char[size];
+			al_scpslower (filename, name.c_str(), size - 1);
+			al_saps      (filename, ".ppm", size - 1);
+			if (c.img.save (filename) != 0) {
+				if (errno == ECHILD)
+					err ("Error loading PLAYPAL");
+				else
+					err ("%s: %s", filename, strerror (errno));
+			} else
+				printf ("Saved %s as %s\n", name.c_str(), filename);
+			delete[] filename;
+		} else if (key == 1) {					// ^A: more patches
+			if (maxpatches + 1 < c.npatches)
+				maxpatches++;
+			else
+				maxpatches = 0;
+			printf ("maxpatches %d\n", maxpatches);
+		} else if (key == 24) {					// ^X: less patches
+			if (maxpatches == 0)
+				maxpatches = c.npatches - 1;
+			else
+				maxpatches--;
+			printf ("maxpatches %d\n", maxpatches);
+		} else if (ok && key == YK_RETURN)			// [Return]
+			break; /* return "name" */
+		else if (key == YK_ESC) {				// [Esc]
+			name[0] = '\0'; /* return an empty string */
+			break;
 		} else
-			printf ("Saved %s as %s\n", name.c_str(), filename);
-		delete[] filename;
-	} else if (key == 1) {					// ^A: more patches
-		if (maxpatches + 1 < c.npatches)
-			maxpatches++;
-		else
-			maxpatches = 0;
-		printf ("maxpatches %d\n", maxpatches);
-	} else if (key == 24) {					// ^X: less patches
-		if (maxpatches == 0)
-			maxpatches = c.npatches - 1;
-		else
-			maxpatches--;
-		printf ("maxpatches %d\n", maxpatches);
-	} else if (ok && key == YK_RETURN)			// [Return]
-		break; /* return "name" */
-	else if (key == YK_ESC) {				// [Esc]
-		name[0] = '\0'; /* return an empty string */
-		break;
-	} else
-		Beep ();
-done_with_event:
-	;
+			Beep ();
+	done_with_event:
+		;
 	}
 
 	return name;

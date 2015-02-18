@@ -5,6 +5,10 @@
     6-17-2007
 */
 
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
 #include "yadex.h"
 #include "things.h"
 #include "game.h"
@@ -17,10 +21,6 @@
 
 #include "decorate.h"
 
-#include <time.h>
-
-FILE        *tempfile;
-char        filename[100];
 int         line_number;
 int         depth = 0;
 char        readbuf[200];
@@ -94,89 +94,98 @@ update_thingdefs(void) {
 
 void
 read_decorate (void) {
-    // FIXME:
-    // the decorate lump should directly be read from the
-    // wad and not from a temporary file
-    srand((unsigned) time (NULL));
-    snprintf(filename, sizeof(filename), "/tmp/decorate%d", rand());
-    printf("Reading decorate lump.\n");
-    tempfile = fopen(filename, "w");
-    SaveEntryToRawFile(tempfile, "DECORATE");
-    fclose(tempfile);
-    tempfile = fopen(filename, "r");
+	const char* templ = "/tmp/decorate.XXXXXXXXX";
+	char* filename = (char*) calloc(sizeof(char), strlen(templ) + 1);
+	strlcpy(filename, templ, strlen(templ));
+	int fd = mkstemp(filename);
+	if (fd < 0) {
+		fprintf(stderr, "can't create temp file from template \"%s\": %s\n", templ, strerror(errno));
+		return;
+	}
+	FILE* tempfile = fdopen(fd, "rw");
+	free(filename);
+	if (not tempfile) {
+		fprintf(stderr, "can't open temp file: %s\n", strerror(errno));
+		return;
+	}
 
-    if (!tempfile)
-        return;
+	printf("Reading decorate lump.\n");
 
-    while (fgets(readbuf, sizeof readbuf, tempfile)) {
-        current = 0;
-        parse_line();
+	// FIXME:
+	// the decorate lump should directly be read from the
+	// wad and not from a temporary file
+	SaveEntryToRawFile(tempfile, "DECORATE");
+	fseek(tempfile, 0L, SEEK_SET);
 
-        /* process line */
-        if (ntoks == 0) {
-            free (buffer);
-            continue;
-        }
-        // Actor definition starts
-        if (! y_strnicmp (token[0], "actor",5)) {
-            update_thingdefs();
+	while (fgets(readbuf, sizeof readbuf, tempfile)) {
+		current = 0;
+		parse_line();
 
-            counter = 0;
-            while (counter < ntoks) {
-                buf.number = atoi (token[counter]);
-                if (!buf.number)
-                    counter++;
-                else
-                    counter = ntoks+1;
-            }
+		/* process line */
+		if (ntoks == 0) {
+			free (buffer);
+			continue;
+		}
+		// Actor definition starts
+		if (! y_strnicmp (token[0], "actor",5)) {
+			update_thingdefs();
 
-            buf.thinggroup = '*';
-            buf.flags      = 0;
-            buf.desc       = token[1];
-        // the radius
-        } else if (! y_strnicmp(token[0], "radius",6)) {
-            buf.radius    = atoi(token[1]) * 2;
-        // here the state from which the sprite is read is recognized
-        } else if (! y_strnicmp(token[0], STATE,STATELEN + 1)) {
-            getsprite    = true;
-            current        = 1;
-        // the scale of the thing's sprite
-        } else if (! y_strnicmp(token[0], "scale",5)) {
-            buf.scale        = atof(token[1]);
-        } else if ((! y_strnicmp(token[0], "renderstyle",11))
-                    && ((! y_strnicmp(token[1], "optfuzzy",8))
-                        || (! y_strnicmp(token[1], "fuzzy",5)))) {
-            buf.flags     = 's';
-        }
-        // if a state was recognized,get the next token with a length
-        // of SPRITELEN and set it as the thing's sprite
-        if (getsprite == true) {
-            if (strlen(token[current]) == SPRITELEN) {
-                buf.sprite = token[current];
-                getsprite = false;
-            }
-        }
-    }
+			counter = 0;
+			while (counter < ntoks) {
+				buf.number = atoi (token[counter]);
+				if (!buf.number)
+					counter++;
+				else
+					counter = ntoks+1;
+			}
 
-    // if things were found inside the decorate file, add them to a group
-    // called "Decorate Items"
-    thinggroup_t group;
-    if (addeditem) {
-        group.thinggroup = '*';
-        group.acn = add_app_colour (rgb_c ('2','3','4'));
-        group.desc = "Decorate Items";
+			buf.thinggroup = '*';
+			buf.flags      = 0;
+			buf.desc       = token[1];
+			// the radius
+		} else if (! y_strnicmp(token[0], "radius",6)) {
+			buf.radius    = atoi(token[1]) * 2;
+			// here the state from which the sprite is read is recognized
+		} else if (! y_strnicmp(token[0], STATE,STATELEN + 1)) {
+			getsprite    = true;
+			current        = 1;
+			// the scale of the thing's sprite
+		} else if (! y_strnicmp(token[0], "scale",5)) {
+			buf.scale        = atof(token[1]);
+		} else if ((! y_strnicmp(token[0], "renderstyle",11))
+				&& ((! y_strnicmp(token[1], "optfuzzy",8))
+					|| (! y_strnicmp(token[1], "fuzzy",5)))) {
+			buf.flags     = 's';
+		}
+		// if a state was recognized,get the next token with a length
+		// of SPRITELEN and set it as the thing's sprite
+		if (getsprite == true) {
+			if (strlen(token[current]) == SPRITELEN) {
+				buf.sprite = token[current];
+				getsprite = false;
+			}
+		}
+	}
 
-        if (al_lwrite (thinggroup, &group))
-            fatal_error ("LGD5 (%s)", al_astrerror (al_aerrno));
+	// if things were found inside the decorate file, add them to a group
+	// called "Decorate Items"
+	thinggroup_t group;
+	if (addeditem) {
+		group.thinggroup = '*';
+		group.acn = add_app_colour (rgb_c ('2','3','4'));
+		group.desc = "Decorate Items";
 
-        update_thingdefs();
+		if (al_lwrite (thinggroup, &group))
+			fatal_error ("LGD5 (%s)", al_astrerror (al_aerrno));
 
-        delete_things_table();
-        create_things_table();
-    }
+		update_thingdefs();
 
-    fclose(tempfile);
-    remove(filename);
+		delete_things_table();
+		create_things_table();
+	}
 
-    return;
+	fclose(tempfile);
+	remove(filename);
+
+	return;
 }

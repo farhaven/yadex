@@ -24,20 +24,21 @@
 
 int         ntoks;
 char       *token[MAX_TOKENS];
-int         counter;
-int         in_token;
-const char *iptr;
-char       *optr;
 
 void
 parse_line(char* readbuf) {
+	bool in_token = false;
+	const char *iptr;
+	char       *optr;
+	char* buffer;
+
 	// duplicate the buffer
-	char* buffer = (char*) calloc(sizeof(char), strlen(readbuf) + 1);
+	buffer = (char*) calloc(sizeof(char), strlen(readbuf) + 1);
 	if (!buffer)
 		fatal_error ("not enough memory");
 
 	// break the line into whitespace-separated tokens.
-	for (in_token = 0, iptr = readbuf, optr = buffer, ntoks = 0;; iptr++) {
+	for (iptr = readbuf, optr = buffer, ntoks = 0;; iptr++) {
 		if (*iptr == '\n' || *iptr == '\0') {
 			if (in_token)
 				*optr = '\0';
@@ -47,13 +48,13 @@ parse_line(char* readbuf) {
 		else if (! in_token && ! isspace (*iptr)) {
 			token[ntoks] = optr;
 			ntoks++;
-			in_token = 1;
+			in_token = true;
 			*optr++ = *iptr;
 		}
 		// First space between two tokens
 		else if (in_token && (isspace (*iptr) || *iptr == '{' || *iptr == '}')) {
 			*optr++ = '\0';
-			in_token = 0;
+			in_token = false;
 		}
 		// Character in the middle of a token
 		else if (in_token)
@@ -88,7 +89,7 @@ update_thingdefs(thingdef_t *buf) {
 void
 read_decorate (void) {
 	enum { BUFSIZE = 1024 };
-	int fd, current;
+	int fd, current, counter = 0;
 	FILE* tempfile;
 	const char* templ = "/tmp/decorate.XXXXXXXXX";
 	char* filename;

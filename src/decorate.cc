@@ -199,7 +199,6 @@ read_decorate (void) {
 	}
 
 	fclose(tempfile);
-	remove(filename);
 
 	return;
 }

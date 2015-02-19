@@ -243,8 +243,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   const img_pixel_t *image_end = img.buf () + width * height;
   if (ximage_bpp == 1)
   {
-    register const img_pixel_t *image_ptr;
-    register uint8_t *buf_ptr = (uint8_t *) buf;
+    const img_pixel_t *image_ptr;
+    uint8_t *buf_ptr = (uint8_t *) buf;
     if (padding == 0)
     {
       for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
@@ -266,8 +266,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 
   else if (ximage_bpp == 2)
   {
-    register const img_pixel_t *image_ptr;
-    register uint16_t *buf_ptr = (uint16_t *) buf;
+    const img_pixel_t *image_ptr;
+    uint16_t *buf_ptr = (uint16_t *) buf;
     if (cpu_big_endian == x_server_big_endian)
     {
       if (padding == 0)
@@ -317,8 +317,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
   else if (ximage_bpp == 3)
   {
     const pv24_t *const pixel_value = game_colour_24.lut ();
-    register const img_pixel_t *image_ptr;
-    register pv24_t *buf_ptr = (pv24_t *) buf;
+    const img_pixel_t *image_ptr;
+    pv24_t *buf_ptr = (pv24_t *) buf;
     if (padding == 0)
     {
       for (image_ptr = img.buf (); image_ptr < image_end; image_ptr++)
@@ -340,8 +340,8 @@ XImage *Sticker_priv::make_ximage (const Img& img)
 
   else if (ximage_bpp == 4)
   {
-    register const img_pixel_t *image_ptr;
-    register uint32_t *buf_ptr = (uint32_t *) buf;
+    const img_pixel_t *image_ptr;
+    uint32_t *buf_ptr = (uint32_t *) buf;
     if (cpu_big_endian == x_server_big_endian)
     {
       if (padding == 0)
@@ -442,14 +442,14 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
   // Copy the "profile" of the Img onto the XImage
   {
     int bitmap_bit_order = BitmapBitOrder (dpy);
-    register uint8_t *buf_ptr = (uint8_t *) buf;
+    uint8_t *buf_ptr = (uint8_t *) buf;
     const int IMG_TRANSP = 0;
     const img_pixel_t       *image_ptr = img.buf ();
     const img_pixel_t *const image_end = image_ptr + width * height;
 
     while (image_ptr < image_end)
     {
-      register const uint8_t *src   = image_ptr;
+      const uint8_t *src   = image_ptr;
       const uint8_t *const    stop1 = src + width - 7;
       const uint8_t *const    stop2 = image_ptr + width;
       uint8_t* dest = buf_ptr;
@@ -457,7 +457,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
       {
 	while (src < stop1)
 	{
-	  register uint8_t d = 0;
+	  uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 1;
 	  if (*src++ != IMG_TRANSP) d |= 2;
 	  if (*src++ != IMG_TRANSP) d |= 4;
@@ -470,7 +470,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
 	}
 	if (src < stop2)
 	{
-	  register uint8_t d = 0;
+	  uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 1;   if (src >= stop2) goto eol_le;
 	  if (*src++ != IMG_TRANSP) d |= 2;   if (src >= stop2) goto eol_le;
 	  if (*src++ != IMG_TRANSP) d |= 4;   if (src >= stop2) goto eol_le;
@@ -487,7 +487,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
       {
 	while (src < stop1)
 	{
-	  register uint8_t d = 0;
+	  uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 128;
 	  if (*src++ != IMG_TRANSP) d |= 64;
 	  if (*src++ != IMG_TRANSP) d |= 32;
@@ -500,7 +500,7 @@ XImage *Sticker_priv::make_bitmap (const Img& img)
 	}
 	if (src < stop2)
 	{
-	  register uint8_t d = 0;
+	  uint8_t d = 0;
 	  if (*src++ != IMG_TRANSP) d |= 128; if (src >= stop2) goto eol_be;
 	  if (*src++ != IMG_TRANSP) d |= 64;  if (src >= stop2) goto eol_be;
 	  if (*src++ != IMG_TRANSP) d |= 32;  if (src >= stop2) goto eol_be;

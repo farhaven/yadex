@@ -488,10 +488,10 @@ switch (choice)
 	 for (n = 0; n < 4; n++)
 	    {
 	    InsertObject (OBJ_LINEDEFS, -1, 0, 0);
-	    LineDefs[NumLineDefs - 1].sidedef1 = NumSideDefs;
+	    LineDefs[NumLineDefs - 1].sidedef1 = SideDefs.size();
 	    InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
 	    if (sector >= 0)
-	       SideDefs[NumSideDefs - 1].sector = sector;
+	       SideDefs[SideDefs.size() - 1].sector = sector;
 	    }
 	 if (sector >= 0)
 	    {
@@ -532,10 +532,10 @@ switch (choice)
 	 for (n = 0; n < a; n++)
 	    {
 	    InsertObject (OBJ_LINEDEFS, -1, 0, 0);
-	    LineDefs[NumLineDefs - 1].sidedef1 = NumSideDefs;
+	    LineDefs[NumLineDefs - 1].sidedef1 = SideDefs.size();
 	    InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
 	    if (sector >= 0)
-	       SideDefs[NumSideDefs - 1].sector = sector;
+	       SideDefs[SideDefs.size() - 1].sector = sector;
 	    }
 	 if (sector >= 0)
 	    {
@@ -890,12 +890,11 @@ switch (val)
 	    l->flags &= ~0x04; /* clear "2S" bit */
 	    l->flags |= 0x01;  /* set "Im" bit */
 
-	    if (is_sidedef (l->sidedef1))
-	       {
-	       struct SideDef *s = SideDefs + l->sidedef1;
-	       strcpy (s->tex1, "-");
-	       strcpy (s->tex2, "-");
-	       strcpy (s->tex3, default_middle_texture.c_str());
+	    if (is_sidedef (l->sidedef1)) {
+	       struct SideDef *s = &SideDefs[l->sidedef1];
+	       s->tex1 = "-";
+	       s->tex2 = "-";
+	       s->tex3 = default_middle_texture;
 	       }
 	    /* Don't delete the 2nd sidedef, it could be used
                by another linedef. And if it isn't, the next

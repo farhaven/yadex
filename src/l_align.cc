@@ -254,7 +254,7 @@ if (type_sd == 2) /* throw out all 1st SideDefs untill a 2nd is found */
   }
 
 /* get texture name of the sidedef in the *sdlist) */
-strncpy (texname, SideDefs[(*sdlist)->objnum].tex3, WAD_TEX_NAME);
+strncpy (texname, SideDefs[(*sdlist)->objnum].tex3.c_str(), WAD_TEX_NAME);
 
 /* test if there is a texture there */
 if (texname[0] == '-')
@@ -329,7 +329,7 @@ while (*sdlist)  /* main processing loop */
    /* do we test for same textures for the sidedef in question?? */
    if (type_tex == 1)
      {
-     if (strncmp (SideDefs[(*sdlist)->objnum].tex3, texname,WAD_TEX_NAME))
+     if (strncmp (SideDefs[(*sdlist)->objnum].tex3.c_str(), texname,WAD_TEX_NAME))
        {
        Beep ();
        snprintf (errormessage, sizeof(errormessage), "No texture for sidedef #%d.", (*sdlist)->objnum);

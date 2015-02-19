@@ -1915,7 +1915,7 @@ cancel_save_as:
                             for (cur = e.Selected; cur; cur = cur->next)
                             {
                                 InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-                                SideDefs[NumSideDefs - 1].sector = e.highlighted.num;
+                                SideDefs[SideDefs.size() - 1].sector = e.highlighted.num;
                                 if (LineDefs[cur->objnum].sidedef1 >= 0)
                                 {
                                     int s;
@@ -1931,15 +1931,13 @@ cancel_save_as:
                                         Sectors[s].ceilt, WAD_FLAT_NAME);
                                         Sectors[e.highlighted.num].light = Sectors[s].light;
                                     }
-                                    LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
+                                    LineDefs[cur->objnum].sidedef2 = SideDefs.size() - 1;
                                     LineDefs[cur->objnum].flags = 4;
-                                    strncpy (SideDefs[NumSideDefs - 1].tex3,
-                                        "-", WAD_TEX_NAME);
-                                    strncpy (SideDefs[LineDefs[cur->objnum].sidedef1].tex3,
-                                        "-", WAD_TEX_NAME);
+                                    SideDefs[SideDefs.size() - 1].tex3 = "-";
+                                    SideDefs[LineDefs[cur->objnum].sidedef1].tex3 = "-";
                                 }
                                 else
-                                    LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+                                    LineDefs[cur->objnum].sidedef1 = SideDefs.size() - 1;
                             }
                             ForgetSelection (&e.Selected);
                             SelectObject (&e.Selected, e.highlighted.num);

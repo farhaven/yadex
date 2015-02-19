@@ -26,6 +26,7 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <iostream>
 
 #include "yadex.h"
 #include <vector>
@@ -48,44 +49,38 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "things.h"
 #include "wadres.h"
 
+using namespace std;
 
 static const int sprite_width  = 90;
 static const int sprite_height = 90;
 
-
 /*
  *	Extraf - one item in the list of EDGE extrafloors
  */
-class Extraf
-{
-  public :
-    Extraf (obj_no_t sector, wad_name_t& tex, wad_z_t height)
-    {
-      this->sector = sector;
-      memcpy (this->tex, &tex, sizeof this->tex);
-      this->height = height;
-    }
+class Extraf {
+	public :
+		Extraf (obj_no_t sector, string tex, wad_z_t height) {
+			this->sector = sector;
+			this->tex = tex;
+			this->height = height;
+		}
 
-    bool operator< (const Extraf& other) const
-    {
-      if (height < other.height)
-	return true;
-      else if (height == other.height && sector < other.sector)
-	return true;
-      return false;
-    }
+		bool operator< (const Extraf& other) const {
+			if (height < other.height)
+				return true;
+			else if (height == other.height && sector < other.sector)
+				return true;
+			return false;
+		}
 
-    wad_z_t height;	// To sort by increasing floor height
-    obj_no_t sector;	// Sector# (for heights, flats and light level)
-    wad_tex_name_t tex;	// Texture (middle tex of first sidedef)
+		wad_z_t height;	// To sort by increasing floor height
+		obj_no_t sector;	// Sector# (for heights, flats and light level)
+		string tex;	// Texture (middle tex of first sidedef)
 };
-
 
 static void get_extrafloors (std::vector<Extraf>& list, wad_tag_t tag);
 
-
-objinfo_c::objinfo_c ()
-{
+objinfo_c::objinfo_c () {
   for (size_t n = 0; n < MAX_BOXES; n++)
     box_disp[n] = false;
   obj_no      = OBJ_NO_NONE;
@@ -95,8 +90,7 @@ objinfo_c::objinfo_c ()
 }
 
 
-void objinfo_c::draw ()
-{
+void objinfo_c::draw () {
   int  n;
   int  sd1 = OBJ_NO_NONE;
   int  sd2 = OBJ_NO_NONE;
@@ -387,15 +381,14 @@ void objinfo_c::draw ()
 	if (s1 >= 0 && s2 >= 0 && Sectors[s1].ceilh > Sectors[s2].ceilh
 	  && ! (is_sky (Sectors[s1].ceilt) && is_sky (Sectors[s2].ceilt)))
 	{
-	  if (SideDefs[sd1].tex1[0] == '-' && SideDefs[sd1].tex1[1] == '\0')
+	  if (SideDefs[sd1].tex1 == "-")
 	    set_colour (CLR_ERROR);
 	  else
 	    set_colour (WINFG);
 	}
 	else
 	  set_colour (WINFG_DIM);
-	DrawScreenText (-1, iy0 + (int) (1.5 * FONTH), "\1Upper:\2  %.*s",
-	    WAD_TEX_NAME, SideDefs[sd1].tex1);
+	DrawScreenText (-1, iy0 + (int) (1.5 * FONTH), string("\1Upper:\2  " + SideDefs[sd1].tex1).c_str());
 
 	if (sd2 < 0
 	  && SideDefs[sd1].tex3[0] == '-' && SideDefs[sd1].tex3[1] == '\0')
@@ -403,7 +396,7 @@ void objinfo_c::draw ()
 	else
 	  set_colour (WINFG);
 	DrawScreenText (-1, -1,
-	  "\1Middle:\2 %.*s", WAD_TEX_NAME, SideDefs[sd1].tex3);
+	  "\1Middle:\2 %.*s", WAD_TEX_NAME, SideDefs[sd1].tex3.c_str());
 
 	if (s1 >= 0 && s2 >= 0 && Sectors[s1].floorh < Sectors[s2].floorh
 	  && ! (is_sky (Sectors[s1].floort) && is_sky (Sectors[s2].floort)))
@@ -416,7 +409,7 @@ void objinfo_c::draw ()
 	else
 	  set_colour (WINFG_DIM);
 	DrawScreenText (-1, -1, "\1Lower:\2  %.*s",
-	  WAD_TEX_NAME, SideDefs[sd1].tex2);
+	  WAD_TEX_NAME, SideDefs[sd1].tex2.c_str());
 
 	set_colour (WINFG);
 	DrawScreenText (-1, -1, "\1X-ofs:\2  %d", SideDefs[sd1].xoff);
@@ -442,9 +435,8 @@ void objinfo_c::draw ()
 	set_colour (WINTITLE);
 	DrawScreenText (ix0, iy0, "Sidedef2 #%d", sd2);
 	set_colour (WINFG);
-	const char *tex_name;
 
-	tex_name = SideDefs[sd2].tex1;  // Upper texture
+	string tex_name = SideDefs[sd2].tex1;  // Upper texture
 	if (s1 >= 0 && s2 >= 0 && Sectors[s2].ceilh > Sectors[s1].ceilh
 	  && ! (is_sky (Sectors[s1].ceilt) && is_sky (Sectors[s2].ceilt)))
 	{
@@ -456,12 +448,12 @@ void objinfo_c::draw ()
 	else
 	  set_colour (WINFG_DIM);
 	DrawScreenText (-1, iy0 + (int) (1.5 * FONTH),
-	  "\1Upper:\2  %.*s", WAD_TEX_NAME, tex_name);
+	  "\1Upper:\2  %.*s", WAD_TEX_NAME, tex_name.c_str());
 
 	tex_name = SideDefs[sd2].tex3;  // Middle texture
 	set_colour (WINFG);
 	DrawScreenText (-1, -1,
-	  "\1Middle:\2 %.*s", WAD_TEX_NAME, tex_name);
+	  "\1Middle:\2 %.*s", WAD_TEX_NAME, tex_name.c_str());
 
 	tex_name = SideDefs[sd2].tex2;  // Lower texture
 	if (s1 >= 0 && s2 >= 0 && Sectors[s2].floorh < Sectors[s1].floorh
@@ -474,7 +466,7 @@ void objinfo_c::draw ()
 	}
 	else
 	  set_colour (WINFG_DIM);
-	DrawScreenText (-1, -1, "\1Lower:\2  %.*s", WAD_TEX_NAME, tex_name);
+	DrawScreenText (-1, -1, "\1Lower:\2  %.*s", WAD_TEX_NAME, tex_name.c_str());
 
 	set_colour (WINFG);
 	DrawScreenText (-1, -1, "\1X-ofs:\2  %d", SideDefs[sd2].xoff);
@@ -698,7 +690,7 @@ void objinfo_c::draw ()
 	{
 	  const Extraf& i = v[e];
 	  obj_no_t dsecno = i.sector;
-	  bool thick = (*i.tex != '\0');
+	  bool thick = (i.tex != "");
 	  const struct Sector *dsec = Sectors + dsecno;
 	  x1 = x0 + width2 - 1;
 	  y1 = y0 + height - 1;
@@ -743,7 +735,7 @@ void objinfo_c::draw ()
 	  DrawScreenText (-1, -1, "\1Shadow:\2 %d",   dsec->light);
 	  DrawScreenText (-1, -1, "\1Type:\2   %d",   dsec->special);
 	  if (thick)
-	    DrawScreenText (-1, -1, "\1Side:\2   %.*s", WAD_TEX_NAME, i.tex);
+	    DrawScreenText (-1, -1, "\1Side:\2   %.*s", WAD_TEX_NAME, i.tex.c_str());
 	  {
 	    hookfunc_comm_t block;
 
@@ -822,32 +814,28 @@ void objinfo_c::draw ()
  *	- <height> is the to the floor height of the dummy
  *	  sector.
  */
-static void get_extrafloors (std::vector<Extraf>& v, wad_tag_t tag)
-{
-  v.clear ();
-  for (obj_no_t l = 0; l < NumLineDefs; l++)
-  {
-    if (LineDefs[l].tag == tag
-      && LineDefs[l].type >= 400 && LineDefs[l].type <= 407)  // FIXME
-    {
-      obj_no_t sd = LineDefs[l].sidedef1;
-      if (! is_sidedef (sd) || ! is_sector (SideDefs[sd].sector))  // Paranoia
-	continue;
-      wad_tex_name_t tex;
-      if (LineDefs[l].type == 400)
-	memcpy (tex, SideDefs[sd].tex3, sizeof tex);
-      else if (LineDefs[l].type == 401)		// side_upper
-	memcpy (tex, SideDefs[sd].tex1, sizeof tex);
-      else if (LineDefs[l].type == 402)		// side_lower
-	memcpy (tex, SideDefs[sd].tex2, sizeof tex);
-      else
-	memset (tex, '\0', sizeof tex);
-      v.push_back (Extraf (SideDefs[sd].sector,
-			   tex,
-			   Sectors[SideDefs[sd].sector].floorh));
-    }
-  }
-  sort (v.begin (), v.end ());
+static void get_extrafloors (std::vector<Extraf>& v, wad_tag_t tag) {
+	v.clear ();
+	for (obj_no_t l = 0; l < NumLineDefs; l++) {
+		if (LineDefs[l].tag != tag || !(LineDefs[l].type >= 400 && LineDefs[l].type <= 407))
+			continue;
+		obj_no_t sd = LineDefs[l].sidedef1;
+		if (! is_sidedef (sd) || ! is_sector (SideDefs[sd].sector))  // Paranoia
+			continue;
+		string tex;
+		if (LineDefs[l].type == 400)
+			tex = SideDefs[sd].tex3;
+		else if (LineDefs[l].type == 401)		// side_upper
+			tex = SideDefs[sd].tex1;
+		else if (LineDefs[l].type == 402)		// side_lower
+			tex = SideDefs[sd].tex2;
+		else
+			tex = "";
+		v.push_back (Extraf (SideDefs[sd].sector,
+					tex,
+					Sectors[SideDefs[sd].sector].floorh));
+	}
+	sort (v.begin (), v.end ());
 }
 
 

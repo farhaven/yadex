@@ -39,104 +39,90 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
    turn a sector into a door: change the linedefs and sidedefs
 */
 
-void MakeDoorFromSector (int sector) /* SWAP! */
-{
-int    sd1, sd2;
-int    n, s;
-SelPtr ldok, ldflip, ld1s;
+void MakeDoorFromSector (int sector) { /* SWAP! */
+	int    sd1, sd2;
+	int    n, s;
+	SelPtr ldok, ldflip, ld1s;
 
-ldok = NULL;
-ldflip = NULL;
-ld1s = NULL;
-s = 0;
-/* build lists of linedefs that border the sector */
-for (n = 0; n < NumLineDefs; n++)
-{
-   sd1 = LineDefs[n].sidedef1;
-   sd2 = LineDefs[n].sidedef2;
-   if (sd1 >= 0 && sd2 >= 0)
-   {
-      if (SideDefs[sd2].sector == sector)
-      {
-	 SelectObject (&ldok, n); /* already ok */
-	 s++;
-      }
-      if (SideDefs[sd1].sector == sector)
-      {
-	 SelectObject (&ldflip, n); /* must be flipped */
-	 s++;
-      }
-   }
-   else if (sd1 >= 0 && sd2 < 0)
-   {
-      if (SideDefs[sd1].sector == sector)
-	 SelectObject (&ld1s, n); /* wall (one-sided) */
-   }
+	ldok = NULL;
+	ldflip = NULL;
+	ld1s = NULL;
+	s = 0;
+	/* build lists of linedefs that border the sector */
+	for (n = 0; n < NumLineDefs; n++) {
+		sd1 = LineDefs[n].sidedef1;
+		sd2 = LineDefs[n].sidedef2;
+		if (sd1 >= 0 && sd2 >= 0) {
+			if (SideDefs[sd2].sector == sector) {
+				SelectObject (&ldok, n); /* already ok */
+				s++;
+			}
+			if (SideDefs[sd1].sector == sector) {
+				SelectObject (&ldflip, n); /* must be flipped */
+				s++;
+			}
+		} else if (sd1 >= 0 && sd2 < 0) {
+			if (SideDefs[sd1].sector == sector)
+				SelectObject (&ld1s, n); /* wall (one-sided) */
+		}
+	}
+	/* a normal door has two sides... */
+	if (s < 2) {
+		Beep ();
+		Notify (-1, -1, "The door must be connected to two other Sectors.", NULL);
+		ForgetSelection (&ldok);
+		ForgetSelection (&ldflip);
+		ForgetSelection (&ld1s);
+		return;
+	}
+	if ((s > 2) &&
+			!(Expert ||
+				Confirm (-1, -1, "The door will have more than two sides.", "Do you still want to create it?"))) {
+		ForgetSelection (&ldok);
+		ForgetSelection (&ldflip);
+		ForgetSelection (&ld1s);
+		return;
+	}
+	/* flip the linedefs that have the wrong orientation */
+	if (ldflip != NULL)
+		FlipLineDefs (ldflip, 1);
+	/* merge the two selection lists */
+	while (ldflip != NULL) {
+		if (!IsSelected (ldok, ldflip->objnum))
+			SelectObject (&ldok, ldflip->objnum);
+		UnSelectObject (&ldflip, ldflip->objnum);
+	}
+	/* change the linedefs and sidedefs */
+	while (ldok != NULL) {
+		/* give the "normal door" type and flags to the linedef */
+		n = ldok->objnum;
+		LineDefs[n].type = 1;
+		LineDefs[n].flags = 0x04;
+		sd1 = LineDefs[n].sidedef1; /* outside */
+		sd2 = LineDefs[n].sidedef2; /* inside */
+		/* adjust the textures for the sidedefs */
+		if (SideDefs[sd1].tex3 != "-") {
+			if (SideDefs[sd1].tex1 == "-")
+				SideDefs[sd1].tex1 = SideDefs[sd1].tex3;
+			SideDefs[sd1].tex3 = "-";
+		}
+		if (SideDefs[sd1].tex1 == "-")
+			SideDefs[sd1].tex1 = "BIGDOOR2";
+		SideDefs[sd2].tex3 = "-";
+		UnSelectObject (&ldok, n);
+	}
+	while (ld1s != NULL) {
+		/* give the "door side" flags to the linedef */
+		n = ld1s->objnum;
+		LineDefs[n].flags = 0x11;
+		sd1 = LineDefs[n].sidedef1;
+		/* adjust the textures for the sidedef */
+		if (SideDefs[sd1].tex3 == "-")
+			SideDefs[sd1].tex3 = "DOORTRAK";
+		SideDefs[sd1].tex1 = "-";
+		SideDefs[sd1].tex2 = "-";
+		UnSelectObject (&ld1s, n);
+	}
+	/* adjust the ceiling height */
+	Sectors[sector].ceilh = Sectors[sector].floorh;
 }
-/* a normal door has two sides... */
-if (s < 2)
-{
-   Beep ();
-   Notify (-1, -1, "The door must be connected to two other Sectors.", NULL);
-   ForgetSelection (&ldok);
-   ForgetSelection (&ldflip);
-   ForgetSelection (&ld1s);
-   return;
-}
-if ((s > 2) && !(Expert || Confirm (-1, -1, "The door will have more than two sides.", "Do you still want to create it?")))
-{
-   ForgetSelection (&ldok);
-   ForgetSelection (&ldflip);
-   ForgetSelection (&ld1s);
-   return;
-}
-/* flip the linedefs that have the wrong orientation */
-if (ldflip != NULL)
-   FlipLineDefs (ldflip, 1);
-/* merge the two selection lists */
-while (ldflip != NULL)
-{
-   if (!IsSelected (ldok, ldflip->objnum))
-      SelectObject (&ldok, ldflip->objnum);
-   UnSelectObject (&ldflip, ldflip->objnum);
-}
-/* change the linedefs and sidedefs */
-while (ldok != NULL)
-{
-   /* give the "normal door" type and flags to the linedef */
-   n = ldok->objnum;
-   LineDefs[n].type = 1;
-   LineDefs[n].flags = 0x04;
-   sd1 = LineDefs[n].sidedef1; /* outside */
-   sd2 = LineDefs[n].sidedef2; /* inside */
-   /* adjust the textures for the sidedefs */
-   if (strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
-   {
-      if (!strncmp (SideDefs[sd1].tex1, "-", WAD_TEX_NAME))
-	 strncpy (SideDefs[sd1].tex1, SideDefs[sd1].tex3, WAD_TEX_NAME);
-      strncpy (SideDefs[sd1].tex3, "-", WAD_TEX_NAME);
-   }
-   if (!strncmp (SideDefs[sd1].tex1, "-", WAD_TEX_NAME))
-      strncpy (SideDefs[sd1].tex1, "BIGDOOR2", WAD_TEX_NAME);
-   strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
-   UnSelectObject (&ldok, n);
-}
-while (ld1s != NULL)
-{
-   /* give the "door side" flags to the linedef */
-   n = ld1s->objnum;
-   LineDefs[n].flags = 0x11;
-   sd1 = LineDefs[n].sidedef1;
-   /* adjust the textures for the sidedef */
-   if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
-      strncpy (SideDefs[sd1].tex3, "DOORTRAK", WAD_TEX_NAME);
-   strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);
-   strncpy (SideDefs[sd1].tex2, "-", WAD_TEX_NAME);
-   UnSelectObject (&ld1s, n);
-}
-/* adjust the ceiling height */
-Sectors[sector].ceilh = Sectors[sector].floorh;
-}
-
-
-

@@ -123,12 +123,12 @@ void Statistics ()
     DrawScreenText (-1, -1, "Number of linedefs: %4d (%lu K)", NumLineDefs,
     ((unsigned long) NumLineDefs * sizeof (struct LineDef) + 512L) / 1024L);
 
-    if (! SideDefs)
+    if (SideDefs.empty())
         set_colour (WINFG_DIM);
     else
         set_colour (WINFG);
-    DrawScreenText (-1, -1, "Number of sidedefs: %4d (%lu K)", NumSideDefs,
-    ((unsigned long) NumSideDefs * sizeof (struct SideDef) + 512L) / 1024L);
+    DrawScreenText (-1, -1, "Number of sidedefs: %4d (%lu K)", SideDefs.size(),
+    ((unsigned long) SideDefs.size() * sizeof (struct SideDef) + 512L) / 1024L);
 
     if (! Sectors)
         set_colour (WINFG_DIM);
@@ -497,8 +497,8 @@ void CheckCrossReferences () /* SWAP! */
 
     CheckingObjects ();
     /* select all SideDefs */
-    for (n = 0; n < NumSideDefs; n++)
-        SelectObject (&cur, n);
+    for (unsigned int idx = 0; idx < SideDefs.size(); idx++)
+        SelectObject (&cur, idx);
     /* unselect SideDefs bound to a LineDef */
     for (n = 0; n < NumLineDefs; n++)
     {
@@ -615,7 +615,7 @@ void CheckTextures () /* SWAP! */
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
-                strncpy (SideDefs[sd1].tex3, default_middle_texture.c_str(), WAD_TEX_NAME);
+                SideDefs[sd1].tex3 = default_middle_texture;
                 MadeChanges = 1;
                 CheckingObjects ();
             }
@@ -632,7 +632,7 @@ void CheckTextures () /* SWAP! */
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
-                strncpy (SideDefs[sd1].tex1, default_upper_texture.c_str(), WAD_TEX_NAME);
+                SideDefs[sd1].tex1 = default_upper_texture;
                 MadeChanges = 1;
                 CheckingObjects ();
             }
@@ -648,7 +648,7 @@ void CheckTextures () /* SWAP! */
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
-                strncpy (SideDefs[sd1].tex2, default_lower_texture.c_str(), WAD_TEX_NAME);
+                SideDefs[sd1].tex2 = default_lower_texture;
                 MadeChanges = 1;
                 CheckingObjects ();
             }
@@ -665,7 +665,7 @@ void CheckTextures () /* SWAP! */
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
-                strncpy (SideDefs[sd2].tex1, default_upper_texture.c_str(), WAD_TEX_NAME);
+                SideDefs[sd2].tex1 = default_upper_texture;
                 MadeChanges = 1;
                 CheckingObjects ();
             }
@@ -681,7 +681,7 @@ void CheckTextures () /* SWAP! */
 					GoToObject (Objid (OBJ_LINEDEFS, n));
 					return;
 				}
-            strncpy (SideDefs[sd2].tex2, default_lower_texture.c_str(), WAD_TEX_NAME);
+            SideDefs[sd2].tex2 = default_lower_texture;
             MadeChanges = 1;
             CheckingObjects ();
             }
@@ -692,9 +692,9 @@ void CheckTextures () /* SWAP! */
 /*
    check if a texture name matches one of the elements of a list
 */
-bool IsTextureNameInList (char *name, vector<string> list) {
+bool IsTextureNameInList (string name, vector<string> list) {
 	for (string &i: list) {
-		if (! y_strnicmp (name, i.c_str(), WAD_TEX_NAME))
+		if (! y_strnicmp (name.c_str(), i.c_str(), WAD_TEX_NAME))
 			return true;
 	}
 	return false;
@@ -743,39 +743,31 @@ void CheckTextureNames () /* SWAP! */
             CheckingObjects ();
         }
     }
-    for (n = 0; n < NumSideDefs; n++)
-    {
-        if (! IsTextureNameInList (SideDefs[n].tex1, WTexture ))
-        {
-            snprintf (msg1, sizeof(msg1), "Invalid upper texture in sidedef #%d", n);
-            snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",
-            (int) WAD_TEX_NAME, SideDefs[n].tex1);
-            if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
-            {
+	 n = 0;
+	 for (SideDef& s: SideDefs) {
+		 n++;
+        if (!IsTextureNameInList(s.tex1, WTexture )) {
+            snprintf(msg1, sizeof(msg1), "Invalid upper texture in sidedef #%d", n);
+            if (CheckFailed(-1, -1, msg1,
+							"The name \"" + s.tex1 + "\" is not a wall texture", 0, first_time)) {
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;
             }
-            CheckingObjects ();
+            CheckingObjects();
         }
-        if (! IsTextureNameInList (SideDefs[n].tex2, WTexture))
-        {
+        if (!IsTextureNameInList(s.tex2, WTexture)) {
             snprintf (msg1, sizeof(msg1), "Invalid lower texture in sidedef #%d", n);
-            snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",
-            (int) WAD_TEX_NAME, SideDefs[n].tex2);
-            if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
-            {
-                GoToObject (Objid (OBJ_SIDEDEFS, n));
+            if (CheckFailed(-1, -1, msg1,
+							"The name \"" + s.tex2 + "\" is not a wall texture", 0, first_time)) {
+                GoToObject(Objid (OBJ_SIDEDEFS, n));
                 return;
             }
             CheckingObjects ();
         }
-        if (! IsTextureNameInList (SideDefs[n].tex3, WTexture))
-        {
-            snprintf (msg1, sizeof(msg1), "Invalid middle texture in sidedef #%d", n);
-            snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a wall texture",
-            (int) WAD_TEX_NAME, SideDefs[n].tex3);
-            if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
-            {
+        if (!IsTextureNameInList (s.tex3, WTexture)) {
+            snprintf(msg1, sizeof(msg1), "Invalid middle texture in sidedef #%d", n);
+            if (CheckFailed(-1, -1, msg1,
+							"The name \"" + s.tex3 + "\" is not a wall texture", 0, first_time)) {
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;
             }

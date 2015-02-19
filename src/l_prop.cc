@@ -412,7 +412,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 				for (cur = obj; cur; cur = cur->next)
 					if (LineDefs[cur->objnum].sidedef1 == -1) {
 						InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-						LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+						LineDefs[cur->objnum].sidedef1 = SideDefs.size() - 1;
 					}
 				break;
 			}
@@ -435,13 +435,13 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 					for (cur = obj; cur; cur = cur->next)
 						if (LineDefs[cur->objnum].sidedef1 == -1) {
 							InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-							LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+							LineDefs[cur->objnum].sidedef1 = SideDefs.size() - 1;
 						} else if (LineDefs[cur->objnum].sidedef2 == -1) {
 							n = LineDefs[cur->objnum].sidedef1;
 							InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-							strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
-							strncpy (SideDefs[n].tex3, "-", WAD_TEX_NAME);
-							LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
+							SideDefs[SideDefs.size() - 1].tex3 = "-";
+							SideDefs[n].tex3 = "-";
+							LineDefs[cur->objnum].sidedef2 = SideDefs.size() - 1;
 							LineDefs[cur->objnum].flags ^= 4;  // Set the 2S bit
 							LineDefs[cur->objnum].flags &= ~1;  // Clear the Im bit
 						}
@@ -473,7 +473,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 					if (texname != "") {
 						for (cur = sdlist; cur; cur = cur->next) {
 							if (cur->objnum >= 0)
-								strncpy (SideDefs[cur->objnum].tex3, texname.c_str(), WAD_TEX_NAME);
+								SideDefs[cur->objnum].tex3 = texname;
 						}
 						MadeChanges = 1;
 					}
@@ -483,9 +483,10 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 					texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
 							"Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex1));
 					if (texname != "") {
-						for (cur = sdlist; cur; cur = cur->next)
+						for (cur = sdlist; cur; cur = cur->next) {
 							if (cur->objnum >= 0)
-								strncpy (SideDefs[cur->objnum].tex1, texname.c_str(), WAD_TEX_NAME);
+								SideDefs[cur->objnum].tex1 = texname.c_str();
+						}
 						MadeChanges = 1;
 					}
 					break;
@@ -494,9 +495,10 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 					texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
 							"Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex2));
 					if (texname != "") {
-						for (cur = sdlist; cur; cur = cur->next)
+						for (cur = sdlist; cur; cur = cur->next) {
 							if (cur->objnum >= 0)
-								strncpy (SideDefs[cur->objnum].tex2, texname.c_str(), WAD_TEX_NAME);
+								SideDefs[cur->objnum].tex2 = texname;
+						}
 						MadeChanges = 1;
 					}
 					break;

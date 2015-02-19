@@ -46,7 +46,7 @@ using std::to_string;
 void MergeSectors (SelPtr *slist) /* SWAP! */
 {
 SelPtr cur;
-int    n, olds, news;
+int    olds, news;
 
 /* save the first Sector number */
 news = (*slist)->objnum;
@@ -56,11 +56,10 @@ UnSelectObject (slist, news);
 for (cur = *slist; cur; cur = cur->next)
 {
    olds = cur->objnum;
-   for (n = 0; n < NumSideDefs; n++)
-   {
-      if (SideDefs[n].sector == olds)
-	 SideDefs[n].sector = news;
-   }
+	for (SideDef &s: SideDefs) {
+		if (s.sector == olds)
+			s.sector = news;
+	}
 }
 
 /* delete the Sectors */

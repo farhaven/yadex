@@ -185,13 +185,13 @@ for (prev_ld_no = linedefno; times > 0; times--, prev_ld_no = NumLineDefs-1)
   if (sd >= 0)
     {
     InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-    LineDefs[NumLineDefs-1].sidedef1 = NumSideDefs - 1;
+    LineDefs[NumLineDefs-1].sidedef1 = SideDefs.size() - 1;
     }
   sd = LineDefs[linedefno].sidedef2;
   if (sd >= 0)
     {
     InsertObject (OBJ_SIDEDEFS, sd, 0, 0);
-    LineDefs[NumLineDefs-1].sidedef2 = NumSideDefs - 1;
+    LineDefs[NumLineDefs-1].sidedef2 = SideDefs.size() - 1;
     }
   }
 }

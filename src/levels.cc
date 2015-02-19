@@ -60,8 +60,7 @@ int NumThings;			/* number of things */
 TPtr Things;			/* things data */
 int NumLineDefs;		/* number of line defs */
 LDPtr LineDefs;			/* line defs data */
-int NumSideDefs;		/* number of side defs */
-SDPtr SideDefs;			/* side defs data */
+vector<SideDef> SideDefs;			/* side defs data */
 int NumVertices;		/* number of vertexes */
 VPtr Vertices;			/* vertex data */
 int NumSectors;			/* number of sectors */
@@ -115,8 +114,7 @@ void EmptyLevelData (string levelname) {
 	things_types++;
 	LineDefs = 0;
 	NumLineDefs = 0;
-	SideDefs = 0;
-	NumSideDefs = 0;
+	SideDefs = vector<SideDef>();
 	Sectors = 0;
 	NumSectors = 0;
 	Vertices = 0;
@@ -162,821 +160,727 @@ else
 */
 
 int ReadLevelData (string levelname) { /* SWAP! */
-int rc = 0;
-MDirPtr dir;
-int OldNumVertices;
+	int rc = 0;
+	int n = 0;
+	MDirPtr dir;
+	int OldNumVertices;
 
-/* Find the various level information from the master directory */
-DisplayMessage (-1, -1, "Reading data for level %s...", levelname.c_str());
-Level = FindMasterDir (MasterDir, levelname.c_str());
-if (!Level)
-   fatal_error ("level data not found");
+	/* Find the various level information from the master directory */
+	DisplayMessage (-1, -1, "Reading data for level %s...", levelname.c_str());
+	Level = FindMasterDir (MasterDir, levelname.c_str());
+	if (!Level)
+		fatal_error ("level data not found");
 
-/* Get the number of vertices */
-int32_t v_offset = 42;
-int32_t v_length = 42;
-{
-const char *lump_name = "BUG";
-if (yg_level_format == YGLF_ALPHA)  // Doom alpha
-   lump_name = "POINTS";
-else
-   lump_name = "VERTEXES";
-dir = FindMasterDir (Level, lump_name);
-if (dir == 0)
-   OldNumVertices = 0;
-else
-   {
-   v_offset = dir->dir.start;
-   v_length = dir->dir.size;
-   if (yg_level_format == YGLF_ALPHA)  // Doom alpha: skip leading count
-      {
-      v_offset += 4;
-      v_length -= 4;
-      }
-   OldNumVertices = (int) (v_length / WAD_VERTEX_BYTES);
-   if ((int32_t) (OldNumVertices * WAD_VERTEX_BYTES) != v_length)
-      warn ("the %s lump has a weird size."
-        " The wad might be corrupt or the -game parameter could be wrong.\n", lump_name);
-   }
-}
-
-// Read THINGS
-{
-const char *lump_name = "THINGS";
-verbmsg ("Reading %s things", levelname.c_str());
-int32_t offset = 42;
-int32_t length;
-dir = FindMasterDir (Level, lump_name);
-if (dir == 0)
-   NumThings = 0;
-else
-   {
-   offset = dir->dir.start;
-   length = dir->dir.size;
-   if (yg_level_format == YGLF_HEXEN)  // Hexen mode
-      {
-      NumThings = (int) (length / WAD_HEXEN_THING_BYTES);
-      if ((int32_t) (NumThings * WAD_HEXEN_THING_BYTES) != length)
-         warn ("the %s lump has a weird size."
-            " The wad might be corrupt.\n", lump_name);
-      }
-   else                    // Doom/Heretic/Strife mode
-      {
-      if (yg_level_format == YGLF_ALPHA)  // Doom alpha: skip leading count
-	 {
-	 offset += 4;
-	 length -= 4;
-	 }
-      size_t thing_size = yg_level_format == YGLF_ALPHA ? 12 : WAD_THING_BYTES;
-      NumThings = (int) (length / thing_size);
-      if ((int32_t) (NumThings * thing_size) != length)
-         warn ("the %s lump has a weird size."
-            " The wad might be corrupt or the -game parameter might be wrong.\n", lump_name);
-      }
-   }
-things_angles++;
-things_types++;
-if (NumThings > 0)
-   {
-   Things = (TPtr) malloc((unsigned long) NumThings * sizeof (struct Thing));
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (offset);
-   if (wf->error ())
-      {
-      err ("%s: seek error", lump_name);
-      rc = 1;
-      goto byebye;
-      }
-   if (yg_level_format == YGLF_HEXEN)		// Hexen mode
-      for (long n = 0; n < NumThings; n++)
-	 {
-	 wf->read_int16_t   (&Things[n].tid  );
-	 wf->read_int16_t   (&Things[n].xpos );
-	 wf->read_int16_t   (&Things[n].ypos );
-	 wf->read_int16_t   (&Things[n].height);
-	 wf->read_int16_t   (&Things[n].angle);
-	 wf->read_int16_t   (&Things[n].type );
-	 wf->read_int16_t   (&Things[n].when );
-	 wf->read_uint8_t    (Things[n].special);
-	 wf->read_uint8_t    (Things[n].arg1  );
-	 wf->read_uint8_t    (Things[n].arg2  );
-	 wf->read_uint8_t    (Things[n].arg3  );
-	 wf->read_uint8_t    (Things[n].arg4  );
-	 wf->read_uint8_t    (Things[n].arg5  );
-	 if (wf->error ())
-	    {
-	    err ("%s: error reading thing #%ld", lump_name, n);
-	    rc = 1;
-	    goto byebye;
-	    }
-	 }
-   else					// Doom/Heretic/Strife mode
-      for (long n = 0; n < NumThings; n++)
-	 {
-	 wf->read_int16_t (&Things[n].xpos );
-	 wf->read_int16_t (&Things[n].ypos );
-	 wf->read_int16_t (&Things[n].angle);
-	 wf->read_int16_t (&Things[n].type );
-	 if (yg_level_format == YGLF_ALPHA)
-	    wf->read_int16_t ();		// Alpha. Don't know what it's for.
-	 wf->read_int16_t (&Things[n].when );
-	 if (wf->error ())
-	    {
-	    err ("%s: error reading thing #%ld", lump_name, n);
-	    rc = 1;
-	    goto byebye;
-	    }
-	 }
-   }
-}
-
-// Read LINEDEFS
-if (yg_level_format != YGLF_ALPHA)
-   {
-   const char *lump_name = "LINEDEFS";
-   verbmsg (" linedefs");
-   dir = FindMasterDir (Level, lump_name);
-   if (dir == 0)
-      NumLineDefs = 0;
-   else
-      {
-      if (yg_level_format == YGLF_HEXEN)  // Hexen mode
-	 {
-	 NumLineDefs = (int) (dir->dir.size / WAD_HEXEN_LINEDEF_BYTES);
-	 if ((int32_t) (NumLineDefs * WAD_HEXEN_LINEDEF_BYTES) != dir->dir.size)
-	    warn ("the %s lump has a weird size."
-	       " The wad might be corrupt.\n", lump_name);
-	 }
-      else                   // Doom/Heretic/Strife mode
-	 {
-	 NumLineDefs = (int) (dir->dir.size / WAD_LINEDEF_BYTES);
-	 if ((int32_t) (NumLineDefs * WAD_LINEDEF_BYTES) != dir->dir.size)
-	    warn ("the %s lump has a weird size."
-	       " The wad might be corrupt.\n", lump_name);
-	 }
-      }
-   if (NumLineDefs > 0)
-      {
-      LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs * sizeof (struct LineDef));
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start);
-      if (wf->error ())
-	 {
-	 err ("%s: seek error", lump_name);
-	 rc = 1;
-	 goto byebye;
-	 }
-      if (yg_level_format == YGLF_HEXEN)  // Hexen mode
-	 for (long n = 0; n < NumLineDefs; n++)
-	    {
-	    uint8_t dummy[6];
-	    wf->read_int16_t   (&LineDefs[n].start);
-	    wf->read_int16_t   (&LineDefs[n].end);
-	    wf->read_int16_t   (&LineDefs[n].flags);
-	    wf->read_bytes (dummy, sizeof dummy);
-	    wf->read_int16_t   (&LineDefs[n].sidedef1);
-	    wf->read_int16_t   (&LineDefs[n].sidedef2);
-	    LineDefs[n].type = dummy[0];
-	    LineDefs[n].tag  = dummy[1];  // arg1 often contains a tag
-		LineDefs[n].arg2 = dummy[2];
-		LineDefs[n].arg3 = dummy[3];
-		LineDefs[n].arg4 = dummy[4];
-		LineDefs[n].arg5 = dummy[5];
-	    if (wf->error ())
-	       {
-	       err ("%s: error reading linedef #%ld", lump_name, n);
-	       rc = 1;
-	       goto byebye;
-	       }
-	    }
-      else                   // Doom/Heretic/Strife mode
-	 for (long n = 0; n < NumLineDefs; n++)
-	    {
-	    wf->read_int16_t (&LineDefs[n].start);
-	    wf->read_int16_t (&LineDefs[n].end);
-	    wf->read_int16_t (&LineDefs[n].flags);
-	    wf->read_int16_t (&LineDefs[n].type);
-	    wf->read_int16_t (&LineDefs[n].tag);
-	    wf->read_int16_t (&LineDefs[n].sidedef1);
-	    wf->read_int16_t (&LineDefs[n].sidedef2);
-	    if (wf->error ())
-	       {
-	       err ("%s: error reading linedef #%ld", lump_name, n);
-	       rc = 1;
-	       goto byebye;
-	       }
-	    }
-      }
-   }
-
-// Read SIDEDEFS
-{
-const char *lump_name = "SIDEDEFS";
-verbmsg (" sidedefs");
-dir = FindMasterDir (Level, lump_name);
-if (dir)
-   {
-   NumSideDefs = (int) (dir->dir.size / WAD_SIDEDEF_BYTES);
-   if ((int32_t) (NumSideDefs * WAD_SIDEDEF_BYTES) != dir->dir.size)
-      warn ("the SIDEDEFS lump has a weird size."
-         " The wad might be corrupt.\n");
-   }
-else
-   NumSideDefs = 0;
-if (NumSideDefs > 0)
-   {
-   SideDefs = (SDPtr) malloc((unsigned long) NumSideDefs * sizeof (struct SideDef));
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (dir->dir.start);
-   if (wf->error ())
-      {
-      err ("%s: seek error", lump_name);
-      rc = 1;
-      goto byebye;
-      }
-   for (long n = 0; n < NumSideDefs; n++)
-      {
-      wf->read_int16_t   (&SideDefs[n].xoff);
-      wf->read_int16_t   (&SideDefs[n].yoff);
-      wf->read_bytes (&SideDefs[n].tex1, WAD_TEX_NAME);
-      wf->read_bytes (&SideDefs[n].tex2, WAD_TEX_NAME);
-      wf->read_bytes (&SideDefs[n].tex3, WAD_TEX_NAME);
-      wf->read_int16_t   (&SideDefs[n].sector);
-      if (wf->error ())
-	 {
-	 err ("%s: error reading sidedef #%ld", lump_name, n);
-	 rc = 1;
-	 goto byebye;
-	 }
-      }
-   }
-}
-
-/* Sanity checkings on linedefs: the 1st and 2nd vertices
-   must exist. The 1st and 2nd sidedefs must exist or be
-   set to -1. */
-for (long n = 0; n < NumLineDefs; n++)
-   {
-   if (LineDefs[n].sidedef1 != -1
-      && outside (LineDefs[n].sidedef1, 0, NumSideDefs - 1))
-      {
-      err ("linedef %ld has bad 1st sidedef number %d, giving up",
-	 n, LineDefs[n].sidedef1);
-      rc = 1;
-      goto byebye;
-      }
-   if (LineDefs[n].sidedef2 != -1
-      && outside (LineDefs[n].sidedef2, 0, NumSideDefs - 1))
-      {
-      err ("linedef %ld has bad 2nd sidedef number %d, giving up",
-	 n, LineDefs[n].sidedef2);
-      rc = 1;
-      goto byebye;
-      }
-   if (outside (LineDefs[n].start, 0, OldNumVertices -1))
-      {
-      err ("linedef %ld has bad 1st vertex number %d, giving up",
-        n, LineDefs[n].start);
-      rc = 1;
-      goto byebye;
-      }
-   if (outside (LineDefs[n].end, 0, OldNumVertices - 1))
-      {
-      err ("linedef %ld has bad 2nd vertex number %d, giving up",
-        n, LineDefs[n].end);
-      rc = 1;
-      goto byebye;
-      }
-   }
-
-// Read LINES (Doom alpha only)
-if (yg_level_format == YGLF_ALPHA)
-   {
-   const char *lump_name = "LINES";
-   verbmsg (" lines");
-   dir = FindMasterDir (Level, lump_name);
-   if (dir)
-      {
-      if ((dir->dir.size - 4) % 36)
-	 warn ("the %s lump has a weird size. The wad might be corrupt.\n",
-	    lump_name);
-      const size_t nlines = dir->dir.size / 36;
-      NumLineDefs = nlines;
-      NumSideDefs = 2 * nlines;  // Worst case. We'll adjust later.
-      LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs
-	 * sizeof (struct LineDef));
-      SideDefs = (SDPtr) malloc((unsigned long) NumSideDefs
-	 * sizeof (struct SideDef));
-      // Read TEXTURES
-      if (yg_texture_format != YGTF_NAMELESS)
-	 {
-	 const char *lump_name = "TEXTURES";
-	 bool success = false;
-	 ntex = 0;
-	 int32_t *offset_table = 0;
-	 MDirPtr d = FindMasterDir (MasterDir, lump_name);
-	 if (! d)
-	    {
-	    warn ("%s: lump not found in directory\n", lump_name);
-	    goto textures_done;
-	    }
-	 {
-	 const Wad_file *wf = d->wadfile;
-	 wf->seek (d->dir.start);
-	 if (wf->error ())
-	    {
-	    warn ("%s: seek error\n", lump_name);
-	    goto textures_done;
-	    }
-	 int32_t num;
-	 wf->read_int32_t (&num);
-	 if (wf->error ())
-	    {
-	    warn ("%s: error reading texture count\n", lump_name);
-	    }
-	 if (num < 0 || num > 32767)
-	    {
-	    warn ("%s: bad texture count, giving up\n", lump_name);
-	    goto textures_done;
-	    }
-	 ntex = num;
-	 offset_table = new int32_t[ntex];
-	 for (size_t n = 0; n < ntex; n++)
-	    {
-	    wf->read_int32_t (offset_table + n);
-	    if (wf->error ())
-	       {
-	       warn ("%s: error reading offsets table\n");
-	       goto textures_done;
-	       }
-	    }
-	 tex_list = (char *) malloc (ntex * WAD_TEX_NAME);
-	 for (size_t n = 0; n < ntex; n++)
-	    {
-	    const long offset = d->dir.start + offset_table[n];
-	    wf->seek (offset);
-	    if (wf->error ())
-	       {
-	       warn ("%s: seek error\n", lump_name);
-	       goto textures_done;
-	       }
-	    wf->read_bytes (tex_list + WAD_TEX_NAME * n, WAD_TEX_NAME);
-	    if (wf->error ())
-	       {
-	       warn ("%s: error reading texture names\n", lump_name);
-	       goto textures_done;
-	       }
-	    }
-	 success = true;
-	 }
-
-	 textures_done:
-	 if (offset_table != 0)
-	    delete[] offset_table;
-	 if (! success)
-	    warn ("%s: errors found, won't be able to import texture names\n",
-	       lump_name);
-	 }
-
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start + 4);
-      if (wf->error ())
-	 {
-	 err ("%s: seek error", lump_name);
-	 rc = 1;
-	 goto byebye;
-	 }
-      size_t s = 0;
-      for (size_t n = 0; n < nlines; n++)
-	 {
-	 LDPtr ld = LineDefs + n;
-	 ld->start   = wf->read_int16_t ();
-	 ld->end     = wf->read_int16_t ();
-	 ld->flags   = wf->read_int16_t ();
-	               wf->read_int16_t ();  // Unused ?
-	 ld->type    = wf->read_int16_t ();
-	 ld->tag     = wf->read_int16_t ();
-	               wf->read_int16_t ();  // Unused ?
-	 int16_t sector1 = wf->read_int16_t ();
-	 int16_t xofs1   = wf->read_int16_t ();
-	 int16_t tex1m   = wf->read_int16_t ();
-	 int16_t tex1u   = wf->read_int16_t ();
-	 int16_t tex1l   = wf->read_int16_t ();
-	               wf->read_int16_t ();  // Unused ?
-	 int16_t sector2 = wf->read_int16_t ();
-	 int16_t xofs2   = wf->read_int16_t ();
-	 int16_t tex2m   = wf->read_int16_t ();
-	 int16_t tex2u   = wf->read_int16_t ();
-	 int16_t tex2l   = wf->read_int16_t ();
-	 if (sector1 >= 0)			// Create first sidedef
-	    {
-	    ld->sidedef1 = s;
-	    SDPtr sd = SideDefs + s;
-	    sd->xoff = xofs1;
-	    sd->yoff = 0;
-	    memcpy (sd->tex1, texno_texname (tex1u), sizeof sd->tex1);
-	    memcpy (sd->tex2, texno_texname (tex1l), sizeof sd->tex2);
-	    memcpy (sd->tex3, texno_texname (tex1m), sizeof sd->tex3);
-	    sd->sector = sector1;
-	    s++;
-	    }
-	 else  // No first sidedef !
-	    ld->sidedef1 = -1;
-	 if (ld->flags & 0x04)			// Create second sidedef
-	    {
-	    ld->sidedef2 = s;
-	    SDPtr sd = SideDefs + s;
-	    sd->xoff = xofs2;
-	    sd->yoff = 0;
-	    memcpy (sd->tex1, texno_texname (tex2u), sizeof sd->tex1);
-	    memcpy (sd->tex2, texno_texname (tex2l), sizeof sd->tex2);
-	    memcpy (sd->tex3, texno_texname (tex2m), sizeof sd->tex3);
-	    sd->sector = sector2;
-	    s++;
-	    }
-	 else
-	    ld->sidedef2 = -1;
-	 if (wf->error ())
-	    {
-	    err ("%s: error reading line #%d", lump_name, int (n));
-	    rc = 1;
-	    goto byebye;
-	    }
-	 }
-      // (size_t) to silence GCC warning
-      if ((size_t) NumSideDefs > s)  // Almost always true.
-         {
-	 NumSideDefs = s;
-         SideDefs = (SDPtr) realloc(SideDefs, (unsigned long) NumSideDefs * sizeof (struct SideDef));
-         }
-      if (tex_list)
-         free (tex_list);
-      tex_list = 0;
-      ntex = 0;
-      }
-   }
-
-/* Read the vertices. If the wad has been run through a nodes
-   builder, there is a bunch of vertices at the end that are not
-   used by any linedefs. Those vertices have been created by the
-   nodes builder for the segs. We ignore them, because they're
-   useless to the level designer. However, we do NOT ignore
-   unused vertices in the middle because that's where the
-   "string art" bug came from.
-
-   Note that there is absolutely no guarantee that the nodes
-   builders add their own vertices at the end, instead of at the
-   beginning or right in the middle, AFAIK. It's just that they
-   all seem to do that (1). What if some don't ? Well, we would
-   end up with many unwanted vertices in the level data. Nothing
-   that a good CheckCrossReferences() couldn't take care of. */
-{
-verbmsg (" vertices");
-int last_used_vertex = -1;
-for (long n = 0; n < NumLineDefs; n++)
-   {
-   last_used_vertex = y_max (last_used_vertex, LineDefs[n].start);
-   last_used_vertex = y_max (last_used_vertex, LineDefs[n].end);
-   }
-NumVertices = last_used_vertex + 1;
-// This block is only here to warn me if (1) is false.
-{
-  bitvec_c vertex_used (OldNumVertices);
-  for (long n = 0; n < NumLineDefs; n++)
-     {
-     vertex_used.set (LineDefs[n].start);
-     vertex_used.set (LineDefs[n].end);
-     }
-  int unused = 0;
-  for (long n = 0; n <= last_used_vertex; n++)
-     {
-     if (! vertex_used.get (n))
-	unused++;
-     }
-  if (unused > 0)
-     {
-     warn ("this level has unused vertices in the middle.\n");
-     warn ("total %d, tail %d (%d%%), unused %d (",
-	OldNumVertices,
-	OldNumVertices - NumVertices,
-	NumVertices - unused
-	   ? 100 * (OldNumVertices - NumVertices) / (NumVertices - unused)
-	   : 0,
-	unused);
-     int first = 1;
-     for (int n = 0; n <= last_used_vertex; n++)
-        {
-	if (! vertex_used.get (n))
-	   {
-	   if (n == 0 || vertex_used.get (n - 1))
-	      {
-	      if (first)
-	         first = 0;
-	      else
-	         warn (", ");
-	      warn ("%d", n);
-	      }
-	   else if (n == last_used_vertex || vertex_used.get (n + 1))
-	      warn ("-%d", n);
-	   }
+	/* Get the number of vertices */
+	int32_t v_offset = 42;
+	int32_t v_length = 42;
+	{
+		const char *lump_name = "BUG";
+		if (yg_level_format == YGLF_ALPHA)  // Doom alpha
+			lump_name = "POINTS";
+		else
+			lump_name = "VERTEXES";
+		dir = FindMasterDir (Level, lump_name);
+		if (dir == 0)
+			OldNumVertices = 0;
+		else {
+			v_offset = dir->dir.start;
+			v_length = dir->dir.size;
+			if (yg_level_format == YGLF_ALPHA) { // Doom alpha: skip leading count
+				v_offset += 4;
+				v_length -= 4;
+			}
+			OldNumVertices = (int) (v_length / WAD_VERTEX_BYTES);
+			if ((int32_t) (OldNumVertices * WAD_VERTEX_BYTES) != v_length)
+				warn ("the %s lump has a weird size."
+						" The wad might be corrupt or the -game parameter could be wrong.\n", lump_name);
+		}
 	}
-     warn (")\n");
-     }
-}
-// Now load all the vertices except the unused ones at the end.
-if (NumVertices > 0)
-   {
-   const char *lump_name = "BUG";
-   Vertices = (VPtr) malloc((unsigned long) NumVertices * sizeof (struct Vertex));
-   if (yg_level_format == YGLF_ALPHA)  // Doom alpha
-      lump_name = "POINTS";
-   else
-      lump_name = "VERTEXES";
-   dir = FindMasterDir (Level, lump_name);
-   if (dir == 0)
-      goto vertexes_done;		// FIXME isn't that fatal ?
-   {
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (v_offset);
-   if (wf->error ())
-      {
-      err ("%s: seek error", lump_name);
-      rc = 1;
-      goto byebye;
-      }
-   MapMaxX = -32767;
-   MapMaxY = -32767;
-   MapMinX = 32767;
-   MapMinY = 32767;
-   for (long n = 0; n < NumVertices; n++)
-      {
-      int16_t val;
-      wf->read_int16_t (&val);
-      if (val < MapMinX)
-	 MapMinX = val;
-      if (val > MapMaxX)
-	 MapMaxX = val;
-      Vertices[n].x = val;
-      wf->read_int16_t (&val);
-      if (val < MapMinY)
-	 MapMinY = val;
-      if (val > MapMaxY)
-	 MapMaxY = val;
-      Vertices[n].y = val;
-      if (wf->error ())
-	 {
-	 err ("%s: error reading vertex #%ld", lump_name, n);
-	 rc = 1;
-	 goto byebye;
-	 }
-      }
-   }
-   vertexes_done:
-   ;
-   }
-}
 
-// Ignore SEGS, SSECTORS and NODES
+	// Read THINGS
+	{
+		const char *lump_name = "THINGS";
+		verbmsg ("Reading %s things", levelname.c_str());
+		int32_t offset = 42;
+		int32_t length;
+		dir = FindMasterDir (Level, lump_name);
+		if (dir == 0)
+			NumThings = 0;
+		else {
+			offset = dir->dir.start;
+			length = dir->dir.size;
+			if (yg_level_format == YGLF_HEXEN) {  // Hexen mode
+				NumThings = (int) (length / WAD_HEXEN_THING_BYTES);
+				if ((int32_t) (NumThings * WAD_HEXEN_THING_BYTES) != length)
+					warn ("the %s lump has a weird size."
+							" The wad might be corrupt.\n", lump_name);
+			} else {                   // Doom/Heretic/Strife mode
+				if (yg_level_format == YGLF_ALPHA) {  // Doom alpha: skip leading count
+					offset += 4;
+					length -= 4;
+				}
+				size_t thing_size = yg_level_format == YGLF_ALPHA ? 12 : WAD_THING_BYTES;
+				NumThings = (int) (length / thing_size);
+				if ((int32_t) (NumThings * thing_size) != length)
+					warn ("the %s lump has a weird size."
+							" The wad might be corrupt or the -game parameter might be wrong.\n", lump_name);
+			}
+		}
+		things_angles++;
+		things_types++;
+		if (NumThings > 0) {
+			Things = (TPtr) malloc((unsigned long) NumThings * sizeof (struct Thing));
+			const Wad_file *wf = dir->wadfile;
+			wf->seek (offset);
+			if (wf->error ()) {
+				err ("%s: seek error", lump_name);
+				rc = 1;
+				goto byebye;
+			}
+			if (yg_level_format == YGLF_HEXEN) // Hexen mode
+				for (long n = 0; n < NumThings; n++) {
+					wf->read_int16_t   (&Things[n].tid  );
+					wf->read_int16_t   (&Things[n].xpos );
+					wf->read_int16_t   (&Things[n].ypos );
+					wf->read_int16_t   (&Things[n].height);
+					wf->read_int16_t   (&Things[n].angle);
+					wf->read_int16_t   (&Things[n].type );
+					wf->read_int16_t   (&Things[n].when );
+					wf->read_uint8_t    (Things[n].special);
+					wf->read_uint8_t    (Things[n].arg1  );
+					wf->read_uint8_t    (Things[n].arg2  );
+					wf->read_uint8_t    (Things[n].arg3  );
+					wf->read_uint8_t    (Things[n].arg4  );
+					wf->read_uint8_t    (Things[n].arg5  );
+					if (wf->error ()) {
+						err ("%s: error reading thing #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				} else // Doom/Heretic/Strife mode
+				for (long n = 0; n < NumThings; n++) {
+					wf->read_int16_t (&Things[n].xpos );
+					wf->read_int16_t (&Things[n].ypos );
+					wf->read_int16_t (&Things[n].angle);
+					wf->read_int16_t (&Things[n].type );
+					if (yg_level_format == YGLF_ALPHA)
+						wf->read_int16_t ();		// Alpha. Don't know what it's for.
+					wf->read_int16_t (&Things[n].when );
+					if (wf->error ()) {
+						err ("%s: error reading thing #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				}
+		}
+	}
 
-// Read SECTORS
-{
-const char *lump_name = "SECTORS";
-verbmsg (" sectors\n");
-dir = FindMasterDir (Level, lump_name);
-if (yg_level_format != YGLF_ALPHA)
-   {
-   if (dir)
-      {
-      NumSectors = (int) (dir->dir.size / WAD_SECTOR_BYTES);
-      if ((int32_t) (NumSectors * WAD_SECTOR_BYTES) != dir->dir.size)
-	 warn ("the %s lump has a weird size."
-	   " The wad might be corrupt.\n", lump_name);
-      }
-   else
-      NumSectors = 0;
-   if (NumSectors > 0)
-      {
-      Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start);
-      if (wf->error ())
-	 {
-	 err ("%s: seek error", lump_name);
-	 rc = 1;
-	 goto byebye;
-	 }
-      for (long n = 0; n < NumSectors; n++)
-	 {
-	 wf->read_int16_t   (&Sectors[n].floorh);
-	 wf->read_int16_t   (&Sectors[n].ceilh);
-	 wf->read_bytes (&Sectors[n].floort, WAD_FLAT_NAME);
-	 wf->read_bytes (&Sectors[n].ceilt,  WAD_FLAT_NAME);
-	 wf->read_int16_t   (&Sectors[n].light);
-	 wf->read_int16_t   (&Sectors[n].special);
-	 wf->read_int16_t   (&Sectors[n].tag);
-	 if (wf->error ())
-	    {
-	    err ("%s: error reading sector #%ld", lump_name, n);
-	    rc = 1;
-	    goto byebye;
-	    }
-	 }
-      }
-   }
-else  // Doom alpha--a wholly different SECTORS format
-   {
-   int32_t  *offset_table = 0;
-   int32_t   nsectors     = 0;
-   int32_t   nflatnames   = 0;
-   char *flatnames    = 0;
-   if (dir == 0)
-      {
-      warn ("%s: lump not found in directory\n", lump_name);  // FIXME fatal ?
-      goto sectors_alpha_done;
-      }
-   {
-   const Wad_file *wf = dir->wadfile;
-   wf->seek (dir->dir.start);
-   if (wf->error ())
-      {
-      err ("%s: seek error", lump_name);
-      rc = 1;
-      goto byebye;
-      }
-   wf->read_int32_t (&nsectors);
-   if (wf->error ())
-      {
-      err ("%s: error reading sector count", lump_name);
-      rc = 1;
-      goto byebye;
-      }
-   if (nsectors < 0)
-      {
-      warn ("Negative sector count. Clamping to 0.\n");
-      nsectors = 0;
-      }
-   NumSectors = nsectors;
-   Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
-   offset_table = new int32_t[nsectors];
-   for (size_t n = 0; n < (size_t) nsectors; n++)
-      wf->read_int32_t (offset_table + n);
-   if (wf->error ())
-      {
-      err ("%s: error reading offsets table", lump_name);
-      rc = 1;
-      goto sectors_alpha_done;
-      }
-   // Load FLATNAME
-   {
-      const char *lump_name = "FLATNAME";
-      bool success = false;
-      MDirPtr dir2 = FindMasterDir (Level, lump_name);
-      if (dir2 == 0)
-	 {
-	 warn ("%s: lump not found in directory\n", lump_name);
-	 goto flatname_done;		// FIXME warn ?
-	 }
-      {
-      const Wad_file *wf = dir2->wadfile;
-      wf->seek (dir2->dir.start);
-      if (wf->error ())
-	 {
-	 warn ("%s: seek error\n", lump_name);
-	 goto flatname_done;
-	 }
-      wf->read_int32_t (&nflatnames);
-      if (wf->error ())
-	 {
-	 warn ("%s: error reading flat name count\n", lump_name);
-	 nflatnames = 0;
-	 goto flatname_done;
-	 }
-      if (nflatnames < 0 || nflatnames > 32767)
-	 {
-	 warn ("%s: bad flat name count, giving up\n", lump_name);
-	 nflatnames = 0;
-	 goto flatname_done;
-	 }
-      else
-	 {
-	 flatnames = new char[WAD_FLAT_NAME * nflatnames];
-	 wf->read_bytes (flatnames, WAD_FLAT_NAME * nflatnames);
-	 if (wf->error ())
-	    {
-	    warn ("%s: error reading flat names\n", lump_name);
-	    nflatnames = 0;
-	    goto flatname_done;
-	    }
-	 success = true;
-	 }
-      }
-      flatname_done:
-      if (! success)
-	 warn ("%s: errors found, you'll have to do without flat names\n",
-	       lump_name);
-   }
-   for (size_t n = 0; n < (size_t) nsectors; n++)
-      {
-      wf->seek (dir->dir.start + offset_table[n]);
-      if (wf->error ())
-	 {
-	 err ("%s: seek error", lump_name);
-	 rc = 1;
-	 goto sectors_alpha_done;
-	 }
-      int16_t index;
-      wf->read_int16_t (&Sectors[n].floorh);
-      wf->read_int16_t (&Sectors[n].ceilh );
-      wf->read_int16_t (&index);
-      if (nflatnames && flatnames && index >= 0 && index < nflatnames)
-	 memcpy (Sectors[n].floort, flatnames + WAD_FLAT_NAME * index,
-	     WAD_FLAT_NAME);
-      else
-	 strcpy (Sectors[n].floort, "unknown");
-      wf->read_int16_t (&index);
-      if (nflatnames && flatnames && index >= 0 && index < nflatnames)
-	 memcpy (Sectors[n].ceilt, flatnames + WAD_FLAT_NAME * index,
-	     WAD_FLAT_NAME);
-      else
-	 strcpy (Sectors[n].ceilt, "unknown");
-      wf->read_int16_t (&Sectors[n].light);
-      wf->read_int16_t (&Sectors[n].special);
-      wf->read_int16_t (&Sectors[n].tag);
-      // Don't know what the tail is for. Ignore it.
-      if (wf->error ())
-	 {
-	 err ("%s: error reading sector #%ld", lump_name, long (n));
-	 rc = 1;
-	 goto sectors_alpha_done;
-	 }
-      }
-   }
-   
-   sectors_alpha_done:
-   if (offset_table != 0)
-      delete[] offset_table;
-   if (flatnames != 0)
-      delete[] flatnames;
-   if (rc != 0)
-      goto byebye;
-   }
-}
+	// Read LINEDEFS
+	if (yg_level_format != YGLF_ALPHA) {
+		const char *lump_name = "LINEDEFS";
+		verbmsg (" linedefs");
+		dir = FindMasterDir (Level, lump_name);
+		if (dir == 0)
+			NumLineDefs = 0;
+		else {
+			if (yg_level_format == YGLF_HEXEN) { // Hexen mode
+				NumLineDefs = (int) (dir->dir.size / WAD_HEXEN_LINEDEF_BYTES);
+				if ((int32_t) (NumLineDefs * WAD_HEXEN_LINEDEF_BYTES) != dir->dir.size)
+					warn ("the %s lump has a weird size."
+							" The wad might be corrupt.\n", lump_name);
+			} else {// Doom/Heretic/Strife mode
+				NumLineDefs = (int) (dir->dir.size / WAD_LINEDEF_BYTES);
+				if ((int32_t) (NumLineDefs * WAD_LINEDEF_BYTES) != dir->dir.size)
+					warn ("the %s lump has a weird size."
+							" The wad might be corrupt.\n", lump_name);
+			}
+		}
+		if (NumLineDefs > 0) {
+			LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs * sizeof (struct LineDef));
+			const Wad_file *wf = dir->wadfile;
+			wf->seek (dir->dir.start);
+			if (wf->error ()) {
+				err ("%s: seek error", lump_name);
+				rc = 1;
+				goto byebye;
+			}
+			if (yg_level_format == YGLF_HEXEN)  // Hexen mode
+				for (long n = 0; n < NumLineDefs; n++) {
+					uint8_t dummy[6];
+					wf->read_int16_t   (&LineDefs[n].start);
+					wf->read_int16_t   (&LineDefs[n].end);
+					wf->read_int16_t   (&LineDefs[n].flags);
+					wf->read_bytes (dummy, sizeof dummy);
+					wf->read_int16_t   (&LineDefs[n].sidedef1);
+					wf->read_int16_t   (&LineDefs[n].sidedef2);
+					LineDefs[n].type = dummy[0];
+					LineDefs[n].tag  = dummy[1];  // arg1 often contains a tag
+					LineDefs[n].arg2 = dummy[2];
+					LineDefs[n].arg3 = dummy[3];
+					LineDefs[n].arg4 = dummy[4];
+					LineDefs[n].arg5 = dummy[5];
+					if (wf->error ()) {
+						err ("%s: error reading linedef #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				} else                   // Doom/Heretic/Strife mode
+				for (long n = 0; n < NumLineDefs; n++) {
+					wf->read_int16_t (&LineDefs[n].start);
+					wf->read_int16_t (&LineDefs[n].end);
+					wf->read_int16_t (&LineDefs[n].flags);
+					wf->read_int16_t (&LineDefs[n].type);
+					wf->read_int16_t (&LineDefs[n].tag);
+					wf->read_int16_t (&LineDefs[n].sidedef1);
+					wf->read_int16_t (&LineDefs[n].sidedef2);
+					if (wf->error ()) {
+						err ("%s: error reading linedef #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				}
+		}
+	}
 
-// Read BEHAVIOR
-if (yg_level_format == YGLF_HEXEN)
-{
-const char *lump_name = "BEHAVIOR";
-verbmsg (" behavior\n");
-dir = FindMasterDir (Level, lump_name);
-if (dir)
-   {
-   BehaviorSize = (int)dir->dir.size;
-   if (BehaviorSize > 0)
-      {
-      Behavior = (uint8_t*) malloc((unsigned long) BehaviorSize );
-      const Wad_file *wf = dir->wadfile;
-      wf->seek (dir->dir.start);
-      if (wf->error ())
-         {
-         err ("%s: seek error", lump_name);
-         rc = 1;
-         goto byebye;
-         }
-      wf->read_bytes (Behavior, BehaviorSize);
-      if (wf->error ())
-         {
-         err ("%s: error behavior lump", lump_name);
-         rc = 1;
-         goto byebye;
-         }
-      }
-   }
-}
+	// Read SIDEDEFS
+	{
+		const char *lump_name = "SIDEDEFS";
+		verbmsg (" sidedefs");
+		dir = FindMasterDir (Level, lump_name);
+		int NumSideDefs = 0;
+		if (dir) {
+			NumSideDefs = (int) (dir->dir.size / WAD_SIDEDEF_BYTES);
+			if ((int32_t) (NumSideDefs * WAD_SIDEDEF_BYTES) != dir->dir.size)
+				warn ("the SIDEDEFS lump has a weird size."
+						" The wad might be corrupt.\n");
+		}
+		if (NumSideDefs > 0) {
+			SideDefs = vector<struct SideDef>();
+			const Wad_file *wf = dir->wadfile;
+			wf->seek (dir->dir.start);
+			if (wf->error ()) {
+				err ("%s: seek error", lump_name);
+				rc = 1;
+				goto byebye;
+			}
+			for (long n = 0; n < NumSideDefs; n++) {
+				SideDef sd;
+				char buf[WAD_TEX_NAME + 1];
+				wf->read_int16_t   (&sd.xoff);
+				wf->read_int16_t   (&sd.yoff);
 
-/* Sanity checking on sidedefs: the sector must exist. I don't
-   make this a fatal error, though, because it's not exceptional
-   to find wads with unused sidedefs with a sector# of -1. Well
-   known ones include dyst3 (MAP06, MAP07, MAP08), mm (MAP16),
-   mm2 (MAP13, MAP28) and requiem (MAP03, MAP08, ...). */
-for (long n = 0; n < NumSideDefs; n++)
-   {
-   if (outside (SideDefs[n].sector, 0, NumSectors - 1))
-      warn ("sidedef %ld has bad sector number %d\n",
-	 n, SideDefs[n].sector);
-   }
+				wf->read_bytes(buf, WAD_TEX_NAME);
+				sd.tex1 = "-"; // string(buf);
+				memset(buf, 0x00, sizeof(buf));
 
-// Ignore REJECT and BLOCKMAP
+				wf->read_bytes(buf, WAD_TEX_NAME);
+				sd.tex2 = string(buf);
+				memset(buf, 0x00, sizeof(buf));
 
-// Silly statistics
-verbmsg ("  %d things, %d vertices, %d linedefs, %d sidedefs, %d sectors\n",
-   (int) NumThings, (int) NumVertices, (int) NumLineDefs,
-   (int) NumSideDefs, (int) NumSectors);
-verbmsg ("  Map: (%d,%d)-(%d,%d)\n", MapMinX, MapMinY, MapMaxX, MapMaxY);
+				wf->read_bytes(buf, WAD_TEX_NAME);
+				sd.tex3 = string(buf);
+
+				wf->read_int16_t   (&sd.sector);
+				if (wf->error ()) {
+					err ("%s: error reading sidedef #%ld", lump_name, n);
+					rc = 1;
+					goto byebye;
+				}
+				SideDefs.push_back(sd);
+			}
+		}
+	}
+
+	/* Sanity checkings on linedefs: the 1st and 2nd vertices
+		must exist. The 1st and 2nd sidedefs must exist or be
+		set to -1. */
+	for (long n = 0; n < NumLineDefs; n++) {
+		if (LineDefs[n].sidedef1 != -1
+				&& outside (LineDefs[n].sidedef1, 0, SideDefs.size() - 1)) {
+			err ("linedef %ld has bad 1st sidedef number %d, giving up",
+					n, LineDefs[n].sidedef1);
+			rc = 1;
+			goto byebye;
+		}
+		if (LineDefs[n].sidedef2 != -1
+				&& outside (LineDefs[n].sidedef2, 0, SideDefs.size() - 1)) {
+			err ("linedef %ld has bad 2nd sidedef number %d, giving up",
+					n, LineDefs[n].sidedef2);
+			rc = 1;
+			goto byebye;
+		}
+		if (outside (LineDefs[n].start, 0, OldNumVertices -1)) {
+			err ("linedef %ld has bad 1st vertex number %d, giving up",
+					n, LineDefs[n].start);
+			rc = 1;
+			goto byebye;
+		}
+		if (outside (LineDefs[n].end, 0, OldNumVertices - 1)) {
+			err ("linedef %ld has bad 2nd vertex number %d, giving up",
+					n, LineDefs[n].end);
+			rc = 1;
+			goto byebye;
+		}
+	}
+
+	// Read LINES (Doom alpha only)
+	if (yg_level_format == YGLF_ALPHA) {
+		const char *lump_name = "LINES";
+		verbmsg (" lines");
+		dir = FindMasterDir (Level, lump_name);
+		if (dir) {
+			if ((dir->dir.size - 4) % 36)
+				warn ("the %s lump has a weird size. The wad might be corrupt.\n",
+						lump_name);
+			const size_t nlines = dir->dir.size / 36;
+			NumLineDefs = nlines;
+			LineDefs = (LDPtr) malloc((unsigned long) NumLineDefs * sizeof (struct LineDef));
+			SideDefs = vector<SideDef>();
+			// Read TEXTURES
+			if (yg_texture_format != YGTF_NAMELESS) {
+				const char *lump_name = "TEXTURES";
+				bool success = false;
+				ntex = 0;
+				int32_t *offset_table = 0;
+				MDirPtr d = FindMasterDir (MasterDir, lump_name);
+				if (!d) {
+					warn ("%s: lump not found in directory\n", lump_name);
+					goto textures_done;
+				}
+				{
+					const Wad_file *wf = d->wadfile;
+					wf->seek (d->dir.start);
+					if (wf->error ()) {
+						warn ("%s: seek error\n", lump_name);
+						goto textures_done;
+					}
+					int32_t num;
+					wf->read_int32_t (&num);
+					if (wf->error ()) {
+						warn ("%s: error reading texture count\n", lump_name);
+					}
+					if (num < 0 || num > 32767) {
+						warn ("%s: bad texture count, giving up\n", lump_name);
+						goto textures_done;
+					}
+					ntex = num;
+					offset_table = new int32_t[ntex];
+					for (size_t n = 0; n < ntex; n++) {
+						wf->read_int32_t (offset_table + n);
+						if (wf->error ()) {
+							warn ("%s: error reading offsets table\n");
+							goto textures_done;
+						}
+					}
+					tex_list = (char *) malloc (ntex * WAD_TEX_NAME);
+					for (size_t n = 0; n < ntex; n++) {
+						const long offset = d->dir.start + offset_table[n];
+						wf->seek (offset);
+						if (wf->error ()) {
+							warn ("%s: seek error\n", lump_name);
+							goto textures_done;
+						}
+						wf->read_bytes (tex_list + WAD_TEX_NAME * n, WAD_TEX_NAME);
+						if (wf->error ()) {
+							warn ("%s: error reading texture names\n", lump_name);
+							goto textures_done;
+						}
+					}
+					success = true;
+				}
+
+textures_done:
+				if (offset_table != 0)
+					delete[] offset_table;
+				if (! success)
+					warn ("%s: errors found, won't be able to import texture names\n",
+							lump_name);
+			}
+
+			const Wad_file *wf = dir->wadfile;
+			wf->seek (dir->dir.start + 4);
+			if (wf->error ()) {
+				err ("%s: seek error", lump_name);
+				rc = 1;
+				goto byebye;
+			}
+			size_t s = 0;
+			for (size_t n = 0; n < nlines; n++) {
+				LDPtr ld = LineDefs + n;
+				ld->start   = wf->read_int16_t ();
+				ld->end     = wf->read_int16_t ();
+				ld->flags   = wf->read_int16_t ();
+				wf->read_int16_t ();  // Unused ?
+				ld->type    = wf->read_int16_t ();
+				ld->tag     = wf->read_int16_t ();
+				wf->read_int16_t ();  // Unused ?
+				int16_t sector1 = wf->read_int16_t ();
+				int16_t xofs1   = wf->read_int16_t ();
+				int16_t tex1m   = wf->read_int16_t ();
+				int16_t tex1u   = wf->read_int16_t ();
+				int16_t tex1l   = wf->read_int16_t ();
+				wf->read_int16_t ();  // Unused ?
+				int16_t sector2 = wf->read_int16_t ();
+				int16_t xofs2   = wf->read_int16_t ();
+				int16_t tex2m   = wf->read_int16_t ();
+				int16_t tex2u   = wf->read_int16_t ();
+				int16_t tex2l   = wf->read_int16_t ();
+				if (sector1 >= 0) {			// Create first sidedef
+					SideDef sd;
+					ld->sidedef1 = s;
+					sd.xoff = xofs1;
+					sd.yoff = 0;
+					sd.tex1 = string(texno_texname(tex1u), WAD_NAME);
+					sd.tex2 = string(texno_texname(tex1l), WAD_NAME);
+					sd.tex3 = string(texno_texname(tex1m), WAD_NAME);
+					sd.sector = sector1;
+					SideDefs.push_back(sd);
+					s++;
+				} else  // No first sidedef !
+					ld->sidedef1 = -1;
+				if (ld->flags & 0x04) {			// Create second sidedef
+					SideDef sd;
+					ld->sidedef2 = s;
+					sd.xoff = xofs2;
+					sd.yoff = 0;
+					sd.tex1 = string(texno_texname(tex2u), WAD_NAME);
+					sd.tex2 = string(texno_texname(tex2l), WAD_NAME);
+					sd.tex3 = string(texno_texname(tex2m), WAD_NAME);
+					sd.sector = sector2;
+					SideDefs.push_back(sd);
+					s++;
+				} else
+					ld->sidedef2 = -1;
+				if (wf->error ()) {
+					err ("%s: error reading line #%d", lump_name, int (n));
+					rc = 1;
+					goto byebye;
+				}
+			}
+			if (tex_list)
+				free (tex_list);
+			tex_list = 0;
+			ntex = 0;
+		}
+	}
+
+	/* Read the vertices. If the wad has been run through a nodes
+		builder, there is a bunch of vertices at the end that are not
+		used by any linedefs. Those vertices have been created by the
+		nodes builder for the segs. We ignore them, because they're
+		useless to the level designer. However, we do NOT ignore
+		unused vertices in the middle because that's where the
+		"string art" bug came from.
+
+		Note that there is absolutely no guarantee that the nodes
+		builders add their own vertices at the end, instead of at the
+		beginning or right in the middle, AFAIK. It's just that they
+		all seem to do that (1). What if some don't ? Well, we would
+		end up with many unwanted vertices in the level data. Nothing
+		that a good CheckCrossReferences() couldn't take care of. */
+	{
+		verbmsg (" vertices");
+		int last_used_vertex = -1;
+		for (long n = 0; n < NumLineDefs; n++) {
+			last_used_vertex = y_max (last_used_vertex, LineDefs[n].start);
+			last_used_vertex = y_max (last_used_vertex, LineDefs[n].end);
+		}
+		NumVertices = last_used_vertex + 1;
+		// This block is only here to warn me if (1) is false.
+		{
+			bitvec_c vertex_used (OldNumVertices);
+			for (long n = 0; n < NumLineDefs; n++) {
+				vertex_used.set (LineDefs[n].start);
+				vertex_used.set (LineDefs[n].end);
+			}
+			int unused = 0;
+			for (long n = 0; n <= last_used_vertex; n++) {
+				if (! vertex_used.get (n))
+					unused++;
+			}
+			if (unused > 0) {
+				warn ("this level has unused vertices in the middle.\n");
+				warn ("total %d, tail %d (%d%%), unused %d (",
+						OldNumVertices,
+						OldNumVertices - NumVertices,
+						NumVertices - unused
+						? 100 * (OldNumVertices - NumVertices) / (NumVertices - unused)
+						: 0,
+						unused);
+				int first = 1;
+				for (int n = 0; n <= last_used_vertex; n++) {
+					if (! vertex_used.get (n)) {
+						if (n == 0 || vertex_used.get (n - 1)) {
+							if (first)
+								first = 0;
+							else
+								warn (", ");
+							warn ("%d", n);
+						} else if (n == last_used_vertex || vertex_used.get (n + 1))
+							warn ("-%d", n);
+					}
+				}
+				warn (")\n");
+			}
+		}
+		// Now load all the vertices except the unused ones at the end.
+		if (NumVertices > 0) {
+			const char *lump_name = "BUG";
+			Vertices = (VPtr) malloc((unsigned long) NumVertices * sizeof (struct Vertex));
+			if (yg_level_format == YGLF_ALPHA)  // Doom alpha
+				lump_name = "POINTS";
+			else
+				lump_name = "VERTEXES";
+			dir = FindMasterDir (Level, lump_name);
+			if (dir == 0)
+				goto vertexes_done;		// FIXME isn't that fatal ?
+			{
+				const Wad_file *wf = dir->wadfile;
+				wf->seek (v_offset);
+				if (wf->error ()) {
+					err ("%s: seek error", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+				MapMaxX = -32767;
+				MapMaxY = -32767;
+				MapMinX = 32767;
+				MapMinY = 32767;
+				for (long n = 0; n < NumVertices; n++) {
+					int16_t val;
+					wf->read_int16_t (&val);
+					if (val < MapMinX)
+						MapMinX = val;
+					if (val > MapMaxX)
+						MapMaxX = val;
+					Vertices[n].x = val;
+					wf->read_int16_t (&val);
+					if (val < MapMinY)
+						MapMinY = val;
+					if (val > MapMaxY)
+						MapMaxY = val;
+					Vertices[n].y = val;
+					if (wf->error ()) {
+						err ("%s: error reading vertex #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				}
+			}
+vertexes_done:
+			;
+		}
+	}
+
+	// Ignore SEGS, SSECTORS and NODES
+
+	// Read SECTORS
+	{
+		const char *lump_name = "SECTORS";
+		verbmsg (" sectors\n");
+		dir = FindMasterDir (Level, lump_name);
+		if (yg_level_format != YGLF_ALPHA) {
+			if (dir) {
+				NumSectors = (int) (dir->dir.size / WAD_SECTOR_BYTES);
+				if ((int32_t) (NumSectors * WAD_SECTOR_BYTES) != dir->dir.size)
+					warn ("the %s lump has a weird size."
+							" The wad might be corrupt.\n", lump_name);
+			} else
+				NumSectors = 0;
+			if (NumSectors > 0) {
+				Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
+				const Wad_file *wf = dir->wadfile;
+				wf->seek (dir->dir.start);
+				if (wf->error ()) {
+					err ("%s: seek error", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+				for (long n = 0; n < NumSectors; n++) {
+					wf->read_int16_t   (&Sectors[n].floorh);
+					wf->read_int16_t   (&Sectors[n].ceilh);
+					wf->read_bytes (&Sectors[n].floort, WAD_FLAT_NAME);
+					wf->read_bytes (&Sectors[n].ceilt,  WAD_FLAT_NAME);
+					wf->read_int16_t   (&Sectors[n].light);
+					wf->read_int16_t   (&Sectors[n].special);
+					wf->read_int16_t   (&Sectors[n].tag);
+					if (wf->error ()) {
+						err ("%s: error reading sector #%ld", lump_name, n);
+						rc = 1;
+						goto byebye;
+					}
+				}
+			}
+		} else { // Doom alpha--a wholly different SECTORS format
+			int32_t  *offset_table = 0;
+			int32_t   nsectors     = 0;
+			int32_t   nflatnames   = 0;
+			char *flatnames    = 0;
+			if (dir == 0) {
+				warn ("%s: lump not found in directory\n", lump_name);  // FIXME fatal ?
+				goto sectors_alpha_done;
+			}
+			{
+				const Wad_file *wf = dir->wadfile;
+				wf->seek (dir->dir.start);
+				if (wf->error ()) {
+					err ("%s: seek error", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+				wf->read_int32_t (&nsectors);
+				if (wf->error ()) {
+					err ("%s: error reading sector count", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+				if (nsectors < 0) {
+					warn ("Negative sector count. Clamping to 0.\n");
+					nsectors = 0;
+				}
+				NumSectors = nsectors;
+				Sectors = (SPtr) malloc((unsigned long) NumSectors * sizeof (struct Sector));
+				offset_table = new int32_t[nsectors];
+				for (size_t n = 0; n < (size_t) nsectors; n++)
+					wf->read_int32_t (offset_table + n);
+				if (wf->error ()) {
+					err ("%s: error reading offsets table", lump_name);
+					rc = 1;
+					goto sectors_alpha_done;
+				}
+				// Load FLATNAME
+				{
+					const char *lump_name = "FLATNAME";
+					bool success = false;
+					MDirPtr dir2 = FindMasterDir (Level, lump_name);
+					if (dir2 == 0) {
+						warn ("%s: lump not found in directory\n", lump_name);
+						goto flatname_done;		// FIXME warn ?
+					}
+					{
+						const Wad_file *wf = dir2->wadfile;
+						wf->seek (dir2->dir.start);
+						if (wf->error ()) {
+							warn ("%s: seek error\n", lump_name);
+							goto flatname_done;
+						}
+						wf->read_int32_t (&nflatnames);
+						if (wf->error ()) {
+							warn ("%s: error reading flat name count\n", lump_name);
+							nflatnames = 0;
+							goto flatname_done;
+						}
+						if (nflatnames < 0 || nflatnames > 32767) {
+							warn ("%s: bad flat name count, giving up\n", lump_name);
+							nflatnames = 0;
+							goto flatname_done;
+						} else {
+							flatnames = new char[WAD_FLAT_NAME * nflatnames];
+							wf->read_bytes (flatnames, WAD_FLAT_NAME * nflatnames);
+							if (wf->error ()) {
+								warn ("%s: error reading flat names\n", lump_name);
+								nflatnames = 0;
+								goto flatname_done;
+							}
+							success = true;
+						}
+					}
+flatname_done:
+					if (! success)
+						warn ("%s: errors found, you'll have to do without flat names\n",
+								lump_name);
+				}
+				for (size_t n = 0; n < (size_t) nsectors; n++) {
+					wf->seek (dir->dir.start + offset_table[n]);
+					if (wf->error ()) {
+						err ("%s: seek error", lump_name);
+						rc = 1;
+						goto sectors_alpha_done;
+					}
+					int16_t index;
+					wf->read_int16_t (&Sectors[n].floorh);
+					wf->read_int16_t (&Sectors[n].ceilh );
+					wf->read_int16_t (&index);
+					if (nflatnames && flatnames && index >= 0 && index < nflatnames)
+						memcpy (Sectors[n].floort, flatnames + WAD_FLAT_NAME * index, WAD_FLAT_NAME);
+					else
+						strcpy (Sectors[n].floort, "unknown");
+					wf->read_int16_t (&index);
+					if (nflatnames && flatnames && index >= 0 && index < nflatnames)
+						memcpy (Sectors[n].ceilt, flatnames + WAD_FLAT_NAME * index, WAD_FLAT_NAME);
+					else
+						strcpy (Sectors[n].ceilt, "unknown");
+					wf->read_int16_t (&Sectors[n].light);
+					wf->read_int16_t (&Sectors[n].special);
+					wf->read_int16_t (&Sectors[n].tag);
+					// Don't know what the tail is for. Ignore it.
+					if (wf->error ()) {
+						err ("%s: error reading sector #%ld", lump_name, long (n));
+						rc = 1;
+						goto sectors_alpha_done;
+					}
+				}
+			}
+
+sectors_alpha_done:
+			if (offset_table != 0)
+				delete[] offset_table;
+			if (flatnames != 0)
+				delete[] flatnames;
+			if (rc != 0)
+				goto byebye;
+		}
+	}
+
+	// Read BEHAVIOR
+	if (yg_level_format == YGLF_HEXEN) {
+		const char *lump_name = "BEHAVIOR";
+		verbmsg (" behavior\n");
+		dir = FindMasterDir (Level, lump_name);
+		if (dir) {
+			BehaviorSize = (int)dir->dir.size;
+			if (BehaviorSize > 0) {
+				Behavior = (uint8_t*) malloc((unsigned long) BehaviorSize );
+				const Wad_file *wf = dir->wadfile;
+				wf->seek (dir->dir.start);
+				if (wf->error ()) {
+					err ("%s: seek error", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+				wf->read_bytes (Behavior, BehaviorSize);
+				if (wf->error ()) {
+					err ("%s: error behavior lump", lump_name);
+					rc = 1;
+					goto byebye;
+				}
+			}
+		}
+	}
+
+	/* Sanity checking on sidedefs: the sector must exist. I don't
+		make this a fatal error, though, because it's not exceptional
+		to find wads with unused sidedefs with a sector# of -1. Well
+		known ones include dyst3 (MAP06, MAP07, MAP08), mm (MAP16),
+		mm2 (MAP13, MAP28) and requiem (MAP03, MAP08, ...). */
+	for (SideDef &s: SideDefs) {
+		if (outside (s.sector, 0, NumSectors - 1))
+			warn("sidedef %ld has bad sector number %d\n", n, s.sector);
+		n++;
+	}
+
+	// Ignore REJECT and BLOCKMAP
+
+	// Silly statistics
+	verbmsg ("  %d things, %d vertices, %d linedefs, %d sidedefs, %d sectors\n",
+			(int) NumThings, (int) NumVertices, (int) NumLineDefs,
+			(int) SideDefs.size(), (int) NumSectors);
+	verbmsg ("  Map: (%d,%d)-(%d,%d)\n", MapMinX, MapMinY, MapMaxX, MapMaxY);
 
 byebye:
-if (rc != 0)
-   err ("%s: errors found, giving up", levelname.c_str());
-return rc;
+	if (rc != 0)
+		err ("%s: errors found, giving up", levelname.c_str());
+	return rc;
 }
 
 
@@ -1004,9 +908,7 @@ void ForgetLevelData () { /* SWAP! */
 	LineDefs = NULL;
 
 	/* forget the sidedefs */
-	NumSideDefs = 0;
-	free(SideDefs);
-	SideDefs = NULL;
+	SideDefs = vector<SideDef>();
 
 	/* forget the sectors */
 	NumSectors = 0;
@@ -1168,15 +1070,15 @@ if (Level)
 // Write the SIDEDEFS lump
 l = WAD_LL_SIDEDEFS;
 lump_offset[l] = ftell (file);
-for (n = 0; n < NumSideDefs; n++)
-   {
-   file_write_int16_t (file, SideDefs[n].xoff);
-   file_write_int16_t (file, SideDefs[n].yoff);
-   WriteBytes     (file, &(SideDefs[n].tex1), WAD_TEX_NAME);
-   WriteBytes     (file, &(SideDefs[n].tex2), WAD_TEX_NAME);
-   WriteBytes     (file, &(SideDefs[n].tex3), WAD_TEX_NAME);
-   file_write_int16_t (file, SideDefs[n].sector);
-   }
+for (SideDef &s: SideDefs) {
+   file_write_int16_t (file, s.xoff);
+   file_write_int16_t (file, s.yoff);
+   WriteBytes     (file, s.tex1.c_str(), WAD_TEX_NAME);
+   WriteBytes     (file, s.tex2.c_str(), WAD_TEX_NAME);
+   WriteBytes     (file, s.tex3.c_str(), WAD_TEX_NAME);
+   file_write_int16_t (file, s.sector);
+}
+
 lump_size[l] = ftell (file) - lump_offset[l];
 if (Level)
    dir = dir->next;

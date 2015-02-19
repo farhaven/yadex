@@ -177,9 +177,9 @@ struct SideDef
 {
   wad_coord_t    xoff;			// FIXME rename to "xofs"
   wad_coord_t    yoff;			// FIXME rename to "yofs"
-  wad_tex_name_t tex1;			// Name of upper texture
-  wad_tex_name_t tex2;			// Name of lower texture
-  wad_tex_name_t tex3;			// Name of middle texture
+  string tex1;			// Name of upper texture
+  string tex2;			// Name of lower texture
+  string tex3;			// Name of middle texture
   wad_sn_t       sector;		// # of adjacent sector
 };
 // (it's the same for Hexen)

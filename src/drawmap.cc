@@ -386,9 +386,9 @@ static void draw_linedefs (edit_t *e) {
 				int s2  = OBJ_NO_NONE;
 				// FIXME should flag negative sidedef numbers as errors
 				// FIXME should flag unused tag as errors
-				if ((sd1 = LineDefs[n].sidedef1) < 0 || sd1 >= NumSideDefs
+				if ((sd1 = LineDefs[n].sidedef1) < 0 || sd1 >= (signed) SideDefs.size()
 						|| (s1 = SideDefs[sd1].sector) < 0 || s1 >= NumSectors
-						|| (sd2 = LineDefs[n].sidedef2) >= NumSideDefs
+						|| (sd2 = LineDefs[n].sidedef2) >= (signed) SideDefs.size()
 						|| (sd2 >= 0 && ((s2 = SideDefs[sd2].sector) < 0 || s2 >= NumSectors))) {
 					new_colour = LIGHTRED;
 				} else {

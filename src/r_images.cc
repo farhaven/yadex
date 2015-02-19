@@ -26,6 +26,7 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
 
 #include "yadex.h"
 #include <X11/Xlib.h>
@@ -46,6 +47,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "r_images.h"
 
+using std::string;
 
 /*
  *	flat_list_entry_match
@@ -96,7 +98,7 @@ return img;
  * Returns NULL if not found or error.
  */
 
-Img * Tex2Img (const wad_tex_name_t& texname)
+Img * Tex2Img (const string& texname)
 {
 MDirPtr  dir = 0;	/* main directory pointer to the TEXTURE* entries */
 int32_t     *offsets;	/* array of offsets to texture names */
@@ -112,7 +114,7 @@ int      header_size;
 int      item_size;
 
 char name[WAD_TEX_NAME + 1];
-strncpy (name, texname, WAD_TEX_NAME);
+strncpy (name, texname.c_str(), WAD_TEX_NAME);
 name[WAD_TEX_NAME] = 0;
 
 // Iwad-dependant details
@@ -340,28 +342,25 @@ return result;
 }
 
 
-Img *ImageCache::GetTex (const wad_tex_name_t& tname)
-{
-if (tname[0] == 0 || tname[0] == '-')
-   return 0;
+Img *ImageCache::GetTex (const string& tname) {
+	if (tname == "" || tname == "-")
+		return NULL;
 
-std::string t_str = WadToString(tname);
+	tex_map_t::iterator P = textures.find(tname);
 
-tex_map_t::iterator P = textures.find (t_str);
+	if (P != textures.end ())
+		return P->second;
 
-if (P != textures.end ())
-   return P->second;
+	// texture not in the list yet.  Add it.
 
-// texture not in the list yet.  Add it.
+	Img *result = Tex2Img(tname);
+	textures[tname] = result;
 
-Img *result = Tex2Img (tname);
-textures[t_str] = result;
+	// note that a NULL return from Tex2Img is OK, it means that no
+	// such texture exists.  Our renderer will revert to using a solid
+	// colour.
 
-// note that a NULL return from Tex2Img is OK, it means that no
-// such texture exists.  Our renderer will revert to using a solid
-// colour.
-
-return result;
+	return result;
 }
 
 

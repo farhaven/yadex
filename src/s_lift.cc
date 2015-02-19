@@ -35,165 +35,147 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "objid.h"
 #include "selectn.h"
 
-
 /*
-   turn a Sector into a lift: change the linedefs and sidedefs
-*/
+	turn a Sector into a lift: change the linedefs and sidedefs
+	*/
 
-void MakeLiftFromSector (int sector) /* SWAP! */
-{
-int    sd1, sd2;
-int    n, s, tag;
-SelPtr ldok, ldflip, ld1s;
-SelPtr sect, curs;
-int    minh, maxh;
+void MakeLiftFromSector (int sector) { /* SWAP! */
+	int    sd1, sd2;
+	int    n, s, tag;
+	SelPtr ldok, ldflip, ld1s;
+	SelPtr sect, curs;
+	int    minh, maxh;
 
-ldok = NULL;
-ldflip = NULL;
-ld1s = NULL;
-sect = NULL;
-/* build lists of linedefs that border the Sector */
-for (n = 0; n < NumLineDefs; n++)
-{
-   sd1 = LineDefs[n].sidedef1;
-   sd2 = LineDefs[n].sidedef2;
-   if (sd1 >= 0 && sd2 >= 0)
-   {
-      if (SideDefs[sd2].sector == sector)
-      {
-	 SelectObject (&ldok, n); /* already ok */
-	 s = SideDefs[sd1].sector;
-	 if (s != sector && !IsSelected (sect, s))
-	    SelectObject (&sect, s);
-      }
-      if (SideDefs[sd1].sector == sector)
-      {
-	 SelectObject (&ldflip, n); /* will be flipped */
-	 s = SideDefs[sd2].sector;
-	 if (s != sector && !IsSelected (sect, s))
-	    SelectObject (&sect, s);
-      }
-   }
-   else if (sd1 >= 0 && sd2 < 0)
-   {
-      if (SideDefs[sd1].sector == sector)
-	 SelectObject (&ld1s, n); /* wall (one-sided) */
-   }
-}
-/* there must be a way to go on the lift... */
-if (sect == NULL)
-{
-   Beep ();
-   Notify (-1, -1, "The lift must be connected to at least one other Sector.", NULL);
-   ForgetSelection (&ldok);
-   ForgetSelection (&ldflip);
-   ForgetSelection (&ld1s);
-   return;
-}
-/* flip the linedefs that have the wrong orientation */
-if (ldflip != NULL)
-   FlipLineDefs (ldflip, 1);
-/* merge the two selection lists */
-while (ldflip != NULL)
-{
-   if (!IsSelected (ldok, ldflip->objnum))
-      SelectObject (&ldok, ldflip->objnum);
-   UnSelectObject (&ldflip, ldflip->objnum);
-}
-
-/* find a free tag number */
-tag = FindFreeTag ();
-
-/* find the minimum and maximum altitudes */
-minh = 32767;
-maxh = -32767;
-for (curs = sect; curs; curs = curs->next)
-   {
-   if (Sectors[curs->objnum].floorh < minh)
-      minh = Sectors[curs->objnum].floorh;
-   if (Sectors[curs->objnum].floorh > maxh)
-      maxh = Sectors[curs->objnum].floorh;
-   }
-ForgetSelection (&sect);
-
-/* change the lift's floor height if necessary */
-if (Sectors[sector].floorh < maxh)
-   Sectors[sector].floorh = maxh;
-
-/* change the lift's ceiling height if necessary */
-if (Sectors[sector].ceilh < maxh + DOOM_PLAYER_HEIGHT)
-   Sectors[sector].ceilh = maxh + DOOM_PLAYER_HEIGHT;
-
-/* assign the new tag number to the lift */
-Sectors[sector].tag = tag;
-
-/* change the linedefs and sidedefs */
-while (ldok != NULL)
-   {
-   /* give the "lower lift" type and flags to the linedef */
-   n = ldok->objnum;
-   LineDefs[n].type = 62; /* lower lift (switch) */
-   LineDefs[n].flags = 0x04;
-   LineDefs[n].tag = tag;
-   sd1 = LineDefs[n].sidedef1; /* outside */
-   sd2 = LineDefs[n].sidedef2; /* inside */
-   /* adjust the textures for the sidedef visible from the outside */
-   if (strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
-      {
-      if (!strncmp (SideDefs[sd1].tex2, "-", WAD_TEX_NAME))
-	 strncpy (SideDefs[sd1].tex2, SideDefs[sd1].tex3, WAD_TEX_NAME);
-      strncpy (SideDefs[sd1].tex3, "-", WAD_TEX_NAME);
-      }
-   if (!strncmp (SideDefs[sd1].tex2, "-", WAD_TEX_NAME))
-      strncpy (SideDefs[sd1].tex2, "SHAWN2", WAD_TEX_NAME);
-   /* adjust the textures for the sidedef visible from the lift */
-   strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
-   s = SideDefs[sd1].sector;
-   if (Sectors[s].floorh > minh)
-      {
-      if (strncmp (SideDefs[sd2].tex3, "-", WAD_TEX_NAME))
-      {
-	 if (!strncmp (SideDefs[sd2].tex2, "-", WAD_TEX_NAME))
-	    strncpy (SideDefs[sd2].tex2, SideDefs[sd1].tex3, WAD_TEX_NAME);
-	 strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
-      }
-      if (!strncmp (SideDefs[sd2].tex2, "-", WAD_TEX_NAME))
-	 strncpy (SideDefs[sd2].tex2, "SHAWN2", WAD_TEX_NAME);
-      }
-   else
-      {
-      strncpy (SideDefs[sd2].tex2, "-", WAD_TEX_NAME);
-      }
-   strncpy (SideDefs[sd2].tex3, "-", WAD_TEX_NAME);
-   /* if the ceiling of the sector is lower than that of the lift */
-	if (Sectors[s].ceilh < Sectors[sector].ceilh) {
-		if (strncmp (SideDefs[sd2].tex1, "-", WAD_TEX_NAME))
-			strncpy (SideDefs[sd2].tex1, default_upper_texture.c_str(), WAD_TEX_NAME);
+	ldok = NULL;
+	ldflip = NULL;
+	ld1s = NULL;
+	sect = NULL;
+	/* build lists of linedefs that border the Sector */
+	for (n = 0; n < NumLineDefs; n++) {
+		sd1 = LineDefs[n].sidedef1;
+		sd2 = LineDefs[n].sidedef2;
+		if (sd1 >= 0 && sd2 >= 0) {
+			if (SideDefs[sd2].sector == sector) {
+				SelectObject (&ldok, n); /* already ok */
+				s = SideDefs[sd1].sector;
+				if (s != sector && !IsSelected (sect, s))
+					SelectObject (&sect, s);
+			}
+			if (SideDefs[sd1].sector == sector) {
+				SelectObject (&ldflip, n); /* will be flipped */
+				s = SideDefs[sd2].sector;
+				if (s != sector && !IsSelected (sect, s))
+					SelectObject (&sect, s);
+			}
+		} else if (sd1 >= 0 && sd2 < 0) {
+			if (SideDefs[sd1].sector == sector)
+				SelectObject (&ld1s, n); /* wall (one-sided) */
+		}
 	}
-   /* if the floor of the sector is above the lift */
-   if (Sectors[s].floorh >= Sectors[sector].floorh)
-      {
-      LineDefs[n].type = 88; /* lower lift (walk through) */
-      /* flip it, just for fun */
-      curs = NULL;
-      SelectObject (&curs, n);
-      FlipLineDefs (curs, 1);
-      ForgetSelection (&curs);
-      }
-   /* done with this linedef */
-   UnSelectObject (&ldok, n);
-   }
+	/* there must be a way to go on the lift... */
+	if (sect == NULL) {
+		Beep ();
+		Notify (-1, -1, "The lift must be connected to at least one other Sector.", NULL);
+		ForgetSelection (&ldok);
+		ForgetSelection (&ldflip);
+		ForgetSelection (&ld1s);
+		return;
+	}
+	/* flip the linedefs that have the wrong orientation */
+	if (ldflip != NULL)
+		FlipLineDefs (ldflip, 1);
+	/* merge the two selection lists */
+	while (ldflip != NULL) {
+		if (!IsSelected (ldok, ldflip->objnum))
+			SelectObject (&ldok, ldflip->objnum);
+		UnSelectObject (&ldflip, ldflip->objnum);
+	}
 
-while (ld1s != NULL) {
-	/* these are the lift walls (one-sided) */
-	n = ld1s->objnum;
-	LineDefs[n].flags = 0x01;
-	sd1 = LineDefs[n].sidedef1;
-	/* adjust the textures for the sidedef */
-	if (!strncmp (SideDefs[sd1].tex3, "-", WAD_TEX_NAME))
-		strncpy (SideDefs[sd1].tex3, default_middle_texture.c_str(), WAD_TEX_NAME);
-	strncpy (SideDefs[sd1].tex1, "-", WAD_TEX_NAME);
-	strncpy (SideDefs[sd1].tex2, "-", WAD_TEX_NAME);
-	UnSelectObject (&ld1s, n);
-}
+	/* find a free tag number */
+	tag = FindFreeTag ();
+
+	/* find the minimum and maximum altitudes */
+	minh = 32767;
+	maxh = -32767;
+	for (curs = sect; curs; curs = curs->next) {
+		if (Sectors[curs->objnum].floorh < minh)
+			minh = Sectors[curs->objnum].floorh;
+		if (Sectors[curs->objnum].floorh > maxh)
+			maxh = Sectors[curs->objnum].floorh;
+	}
+	ForgetSelection (&sect);
+
+	/* change the lift's floor height if necessary */
+	if (Sectors[sector].floorh < maxh)
+		Sectors[sector].floorh = maxh;
+
+	/* change the lift's ceiling height if necessary */
+	if (Sectors[sector].ceilh < maxh + DOOM_PLAYER_HEIGHT)
+		Sectors[sector].ceilh = maxh + DOOM_PLAYER_HEIGHT;
+
+	/* assign the new tag number to the lift */
+	Sectors[sector].tag = tag;
+
+	/* change the linedefs and sidedefs */
+	while (ldok != NULL) {
+		/* give the "lower lift" type and flags to the linedef */
+		n = ldok->objnum;
+		LineDefs[n].type = 62; /* lower lift (switch) */
+		LineDefs[n].flags = 0x04;
+		LineDefs[n].tag = tag;
+		sd1 = LineDefs[n].sidedef1; /* outside */
+		sd2 = LineDefs[n].sidedef2; /* inside */
+		/* adjust the textures for the sidedef visible from the outside */
+		if (SideDefs[sd1].tex3 != "-") {
+			if (SideDefs[sd1].tex2 == "-")
+				SideDefs[sd1].tex2 = SideDefs[sd1].tex3;
+			SideDefs[sd1].tex3 = "-";
+		}
+		if (SideDefs[sd1].tex2 == "-")
+			SideDefs[sd1].tex2 = "SHAWN2";
+		/* adjust the textures for the sidedef visible from the lift */
+		SideDefs[sd2].tex3 = "-";
+		s = SideDefs[sd1].sector;
+		if (Sectors[s].floorh > minh) {
+			if (SideDefs[sd2].tex3 != "-") {
+				if (SideDefs[sd2].tex2 == "-")
+					SideDefs[sd2].tex2 = SideDefs[sd1].tex3;
+				SideDefs[sd2].tex3 = "-";
+			}
+			if (SideDefs[sd2].tex2 == "-")
+				SideDefs[sd2].tex2 = "SHAWN2";
+		} else {
+			SideDefs[sd2].tex2 = "-";
+		}
+		SideDefs[sd2].tex3 = "-";
+		/* if the ceiling of the sector is lower than that of the lift */
+		if (Sectors[s].ceilh < Sectors[sector].ceilh) {
+			if (SideDefs[sd2].tex1 != "-")
+				SideDefs[sd2].tex1 = default_upper_texture;
+		}
+		/* if the floor of the sector is above the lift */
+		if (Sectors[s].floorh >= Sectors[sector].floorh) {
+			LineDefs[n].type = 88; /* lower lift (walk through) */
+			/* flip it, just for fun */
+			curs = NULL;
+			SelectObject (&curs, n);
+			FlipLineDefs (curs, 1);
+			ForgetSelection (&curs);
+		}
+		/* done with this linedef */
+		UnSelectObject (&ldok, n);
+	}
+
+	while (ld1s != NULL) {
+		/* these are the lift walls (one-sided) */
+		n = ld1s->objnum;
+		LineDefs[n].flags = 0x01;
+		sd1 = LineDefs[n].sidedef1;
+		/* adjust the textures for the sidedef */
+		if (SideDefs[sd1].tex3 == "-")
+			SideDefs[sd1].tex3 = default_middle_texture;
+		SideDefs[sd1].tex1 = "-";
+		SideDefs[sd1].tex2 = "-";
+		UnSelectObject (&ld1s, n);
+	}
 }

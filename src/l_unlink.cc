@@ -50,13 +50,13 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 void unlink_sidedef (SelPtr linedefs, int side1, int side2)
 {
-// Array of NumSideDefs bits that tell whether the
+// Array of SizeDefs.size() bits that tell whether the
 // sidedef is used by the linedefs in <linedefs>.
-bitvec_c sd_used_in (NumSideDefs);
+bitvec_c sd_used_in (SideDefs.size());
 
-// Array of NumSideDefs bits that tell whether the
+// Array of SideDefs.size() bits that tell whether the
 // sidedef is used by the linedefs _not_ in <linedefs>.
-bitvec_c sd_used_out (NumSideDefs);
+bitvec_c sd_used_out (SideDefs.size());
 
 SelPtr cur;
 int n;
@@ -89,7 +89,7 @@ for (n = 0; n < NumLineDefs; n++)
 // duplicate the sidedef and make all the linedefs
 // in <linedefs> use the copy instead.
 
-for (n = 0; n < NumSideDefs; n++)
+for (n = 0; n < (signed) SideDefs.size(); n++)
    {
    if (sd_used_in.get (n) && sd_used_out.get (n))
       {
@@ -97,9 +97,9 @@ for (n = 0; n < NumSideDefs; n++)
       for (cur = linedefs; cur; cur = cur->next)
          {
          if (side1 && LineDefs[cur->objnum].sidedef1 == n)
-            LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+            LineDefs[cur->objnum].sidedef1 = SideDefs.size() - 1;
          if (side2 && LineDefs[cur->objnum].sidedef2 == n)
-            LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
+            LineDefs[cur->objnum].sidedef2 = SideDefs.size() - 1;
          }
       }
    }

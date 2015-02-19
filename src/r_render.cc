@@ -192,7 +192,7 @@ public:
       col = 0x70 + ((sec - Sectors) % 48);
       }
 
-   void FindTex (const wad_tex_name_t& tname, LineDef *ld)
+   void FindTex (const string& tname, LineDef *ld)
       {
       if (view.texturing)
          {
@@ -315,7 +315,7 @@ public:
 
       if (is_obj (side ? ld->sidedef1 : ld->sidedef2))
          {
-         SideDef *bsd = SideDefs + (side ? ld->sidedef1 : ld->sidedef2);
+         SideDef *bsd = &SideDefs[side ? ld->sidedef1 : ld->sidedef2];
 
          if (is_obj (bsd->sector))
             back = Sectors + bsd->sector;
@@ -579,7 +579,7 @@ public:
       if (! is_obj (side ? ld->sidedef2 : ld->sidedef1))
          return;
 
-      sd = SideDefs + (side ? ld->sidedef2 : ld->sidedef1);
+      sd = &SideDefs[side ? ld->sidedef2 : ld->sidedef1];
 
       if (! is_obj (sd->sector))
          return;

@@ -25,8 +25,7 @@ extern int   NumThings;		/* number of things */
 extern TPtr  Things;		/* things data */
 extern int   NumLineDefs;	/* number of linedefs */
 extern LDPtr LineDefs;		/* linedefs data */
-extern int   NumSideDefs;	/* number of sidedefs */
-extern SDPtr SideDefs;		/* sidedefs data */
+extern vector<SideDef> SideDefs;
 extern int   NumVertices;	/* number of vertices */
 extern VPtr  Vertices;		/* vertices data */
 extern int   NumSegs;		/* number of segments */

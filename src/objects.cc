@@ -67,7 +67,7 @@ switch (objtype)
    case OBJ_LINEDEFS:
       return NumLineDefs - 1;
    case OBJ_SIDEDEFS:
-      return NumSideDefs - 1;
+      return SideDefs.size() - 1;
    case OBJ_VERTICES:
       return NumVertices - 1;
    case OBJ_SECTORS:
@@ -327,7 +327,7 @@ switch (objtype)
       while (*list)
 	 {
 	 objnum = (*list)->objnum;
-	 if (objnum < 0 || objnum >= NumSideDefs)  // Paranoia
+	 if (objnum < 0 || objnum >= (signed) SideDefs.size())  // Paranoia
 	 {
 	    nf_bug ("attempt to delete non-existent sidedef #%d", objnum);
 	    goto next_sidedef;
@@ -345,18 +345,7 @@ switch (objtype)
 	       LineDefs[n].sidedef2--;
 	    }
 	 /* delete the sidedef */
-	 NumSideDefs--;
-	 if (NumSideDefs > 0)
-	    {
-	    for (n = objnum; n < NumSideDefs; n++)
-	       SideDefs[n] = SideDefs[n + 1];
-	    SideDefs = (SDPtr) realloc(SideDefs, NumSideDefs * sizeof (struct SideDef));
-	    }
-	 else
-	    {
-	    free(SideDefs);
-	    SideDefs = NULL;
-	    }
+	 SideDefs.erase(SideDefs.begin() + n);
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
 	       cur->objnum--;
@@ -375,11 +364,14 @@ switch (objtype)
 	 }
 	// Delete the sidedefs bound to this sector and change the references
 	// AYM 19980203: Hmm, hope this is OK with multiply used sidedefs...
-	for (n = 0; n < NumSideDefs; n++)
-	   if (SideDefs[n].sector == objnum)
-	      DeleteObject (Objid (OBJ_SIDEDEFS, n--));
-	   else if (SideDefs[n].sector >= objnum)
-	      SideDefs[n].sector--;
+	n = 0;
+	for (SideDef &s: SideDefs) {
+		if (s.sector == objnum)
+			DeleteObject(Objid(OBJ_SIDEDEFS, n--));
+		else if (s.sector >= objnum)
+			s.sector--;
+		n++;
+	}
 	/* delete the sector */
 	NumSectors--;
 	if (NumSectors > 0)
@@ -521,35 +513,31 @@ switch (objtype)
       LineDefs[last].sidedef2 = OBJ_NO_NONE;
       break;
 
-   case OBJ_SIDEDEFS:
-      last = NumSideDefs++;
-      if (last > 0)
-	 SideDefs = (SDPtr) realloc(SideDefs, (unsigned long) NumSideDefs * sizeof (struct SideDef));
-      else
-	 SideDefs = (SDPtr) malloc(sizeof (struct SideDef));
-      if (is_obj (copyfrom))
-	 {
-	 SideDefs[last].xoff = SideDefs[copyfrom].xoff;
-	 SideDefs[last].yoff = SideDefs[copyfrom].yoff;
-	 strncpy (SideDefs[last].tex1, SideDefs[copyfrom].tex1, WAD_TEX_NAME);
-	 strncpy (SideDefs[last].tex2, SideDefs[copyfrom].tex2, WAD_TEX_NAME);
-	 strncpy (SideDefs[last].tex3, SideDefs[copyfrom].tex3, WAD_TEX_NAME);
-	 SideDefs[last].sector = SideDefs[copyfrom].sector;
-	 }
-      else
-	 {
-	 SideDefs[last].xoff = 0;
-	 SideDefs[last].yoff = 0;
-	 strcpy (SideDefs[last].tex1, "-");
-	 strcpy (SideDefs[last].tex2, "-");
-	 strcpy (SideDefs[last].tex3, default_middle_texture.c_str());
-	 SideDefs[last].sector = NumSectors - 1;
-	 }
-      MadeMapChanges = 1;
-      break;
+	case OBJ_SIDEDEFS:
+		{
+			SideDef sd;
+			if (is_obj (copyfrom)) {
+				sd.xoff = SideDefs[copyfrom].xoff;
+				sd.yoff = SideDefs[copyfrom].yoff;
+				sd.tex1 = SideDefs[copyfrom].tex1;
+				sd.tex2 = SideDefs[copyfrom].tex2;
+				sd.tex3 = SideDefs[copyfrom].tex3;
+				sd.sector = SideDefs[copyfrom].sector;
+			} else {
+				sd.xoff = 0;
+				sd.yoff = 0;
+				sd.tex1 = "-";
+				sd.tex2 = "-";
+				sd.tex3 = default_middle_texture;
+				sd.sector = NumSectors - 1;
+			}
+			SideDefs.push_back(sd);
+		}
+		MadeMapChanges = 1;
+		break;
 
-   case OBJ_SECTORS:
-      last = NumSectors++;
+	case OBJ_SECTORS:
+		last = NumSectors++;
       if (last > 0)
 	 Sectors = (SPtr) realloc(Sectors, (unsigned long) NumSectors * sizeof (struct Sector));
       else
@@ -860,12 +848,12 @@ switch (objtype)
             if (is_sidedef (LineDefs[old].sidedef1))
 	       {
 	       InsertObject (OBJ_SIDEDEFS, LineDefs[old].sidedef1, 0, 0);
-	       LineDefs[New].sidedef1 = NumSideDefs - 1;
+	       LineDefs[New].sidedef1 = SideDefs.size() - 1;
 	       }
             if (is_sidedef (LineDefs[old].sidedef2))
 	       {
 	       InsertObject (OBJ_SIDEDEFS, LineDefs[old].sidedef2, 0, 0);
-	       LineDefs[New].sidedef2 = NumSideDefs - 1; 
+	       LineDefs[New].sidedef2 = SideDefs.size() - 1; 
 	       }
             }
 	 cur->objnum = New;
@@ -927,13 +915,13 @@ switch (objtype)
 	 if ((n = LineDefs[ref1->objnum].sidedef1) >= 0)
 	    {
 	    InsertObject (OBJ_SIDEDEFS, n, 0, 0);
-	    n = NumSideDefs - 1;
+	    n = SideDefs.size() - 1;
 	    LineDefs[ref2->objnum].sidedef1 = n;
 	    }
 	 if ((m = LineDefs[ref1->objnum].sidedef2) >= 0)
 	    {
 	    InsertObject (OBJ_SIDEDEFS, m, 0, 0);
-	    m = NumSideDefs - 1;
+	    m = SideDefs.size() - 1;
 	    LineDefs[ref2->objnum].sidedef2 = m;
 	    }
 	 ref1->objnum = n;

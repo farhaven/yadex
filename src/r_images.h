@@ -24,7 +24,7 @@ public:
    tex_map_t    textures;
    sprite_map_t sprites;
 
-   static std::string WadToString(const wad_flat_name_t& fname)
+   static string WadToString(const wad_flat_name_t& fname)
    {
 		unsigned int len = 0;
       for (; len < WAD_NAME && fname[len]; len++);
@@ -58,7 +58,7 @@ public:
       }
 
    Img *GetFlat   (const wad_flat_name_t& fname);
-   Img *GetTex    (const wad_tex_name_t& tname);
+   Img *GetTex    (const string& tname);
    Img *GetSprite (const wad_ttype_t& type);
 };
 

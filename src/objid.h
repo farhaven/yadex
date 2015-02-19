@@ -55,7 +55,7 @@ typedef char obj_type_t;
 #define is_obj(n)      ((n) >= 0)
 #define is_linedef(n)  ((n) >= 0 && (n) < NumLineDefs)
 #define is_sector(n)   ((n) >= 0 && (n) < NumSectors )
-#define is_sidedef(n)  ((n) >= 0 && (n) < NumSideDefs)
+#define is_sidedef(n)  ((n) >= 0 && (n) < (signed) SideDefs.size())
 #define is_thing(n)    ((n) >= 0 && (n) < NumThings  )
 #define is_vertex(n)   ((n) >= 0 && (n) < NumVertices)
 

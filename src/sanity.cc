@@ -63,7 +63,9 @@ void check_types ()
 {
   assert_size (struct LineDef, 18);
   assert_size (struct Sector,  26);
+  /*
   assert_size (struct SideDef, 30);
+  */
   assert_size (struct Thing,   20);
   assert_size (struct Vertex,   4);
 }

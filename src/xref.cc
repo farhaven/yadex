@@ -86,8 +86,8 @@ void bad_sector_number (SelPtr *list)
   {
     int s1 = LineDefs[n].sidedef1;
     int s2 = LineDefs[n].sidedef2;
-    if ((s1 >= 0 && s1 < NumSideDefs && SideDefs[s1].sector < 0) || SideDefs[s1].sector >= NumSectors
-     || (s2 >= 0 && s2 < NumSideDefs && SideDefs[s2].sector < 0) || SideDefs[s2].sector >= NumSectors)
+    if ((s1 >= 0 && s1 < (signed) SideDefs.size() && SideDefs[s1].sector < 0) || SideDefs[s1].sector >= NumSectors
+     || (s2 >= 0 && s2 < (signed) SideDefs.size() && SideDefs[s2].sector < 0) || SideDefs[s2].sector >= NumSectors)
       SelectObject (list, n);
   }
 }

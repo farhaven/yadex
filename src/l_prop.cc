@@ -148,28 +148,28 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 				menustr.push_back("Change 2nd sidedef ref. (Current: #" + to_string(LineDefs[obj->objnum].sidedef2) + ")");
 
 				s.fill(' ');
-				s.width(17);
-				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 1) << "(Current: " << LineDefs[obj->objnum].tag << ")";
+				s.width(16);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 1) << " (Current: " << to_string(LineDefs[obj->objnum].tag) << ")";
 				menustr.push_back("Change " + s.str());
 
 				s.str("");
-				s.width(17);
-				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 2) << "(Current: " << LineDefs[obj->objnum].arg2 << ")";
+				s.width(16);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 2) << " (Current: " << to_string(LineDefs[obj->objnum].arg2) << ")";
 				menustr.push_back("Change " + s.str());
 
 				s.str("");
-				s.width(17);
-				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 3) << "(Current: " << LineDefs[obj->objnum].arg3 << ")";
+				s.width(16);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 3) << " (Current: " << to_string(LineDefs[obj->objnum].arg3) << ")";
 				menustr.push_back("Change " + s.str());
 
 				s.str("");
-				s.width(17);
-				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 4) << "(Current: " << LineDefs[obj->objnum].arg4 << ")";
+				s.width(16);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 4) << " (Current: " << to_string(LineDefs[obj->objnum].arg4) << ")";
 				menustr.push_back("Change " + s.str());
 
 				s.str("");
-				s.width(17);
-				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 5) << "(Current: " << LineDefs[obj->objnum].arg5 << ")";
+				s.width(16);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 5) << " (Current: " << to_string(LineDefs[obj->objnum].arg5) << ")";
 				menustr.push_back("Change " + s.str());
 			} else {
 				menustr.push_back("Change sector tag       (Current: #" + to_string(LineDefs[obj->objnum].tag) + ")");

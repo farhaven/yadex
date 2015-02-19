@@ -5,9 +5,10 @@
     6-17-2007
 */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+#include <unistd.h>
 
 #include "yadex.h"
 #include "things.h"
@@ -94,17 +95,28 @@ update_thingdefs(void) {
 
 void
 read_decorate (void) {
+	int fd;
+	FILE* tempfile;
 	const char* templ = "/tmp/decorate.XXXXXXXXX";
-	char* filename = (char*) calloc(sizeof(char), strlen(templ) + 1);
+	char *filename;
+
+	filename = (char*) calloc(sizeof(char), strlen(templ) + 1);
 	strlcpy(filename, templ, strlen(templ));
-	int fd = mkstemp(filename);
-	if (fd < 0) {
+
+	if ((fd = mkstemp(filename)) < 0) {
 		fprintf(stderr, "can't create temp file from template \"%s\": %s\n", templ, strerror(errno));
+		free(filename);
 		return;
 	}
-	FILE* tempfile = fdopen(fd, "rw");
+
+	if (unlink(filename) != 0) {
+		fprintf(stderr, "can't unlink temporary file \"%s\": %s\n", filename, strerror(errno));
+		free(filename);
+		return;
+	}
+
 	free(filename);
-	if (not tempfile) {
+	if ((tempfile = fdopen(fd, "rw")) == NULL) {
 		fprintf(stderr, "can't open temp file: %s\n", strerror(errno));
 		return;
 	}

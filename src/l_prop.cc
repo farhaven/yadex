@@ -29,6 +29,9 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "yadex.h"
 #include "entry.h"
@@ -44,11 +47,15 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "textures.h"
 #include "things.h"
 
+using std::string;
+using std::stringstream;
+using std::to_string;
+using std::vector;
+
 /*
  *	Menu_data_ldt - Menu_data class for the linedef type
  */
-class Menu_data_ldt : public Menu_data
-{
+class Menu_data_ldt : public Menu_data {
   public :
     Menu_data_ldt (al_llist_t *list);
     virtual size_t nitems () const;
@@ -63,17 +70,14 @@ class Menu_data_ldt : public Menu_data
 /*
  *	Menu_data_ldt::Menu_data_ldt - ctor
  */
-Menu_data_ldt::Menu_data_ldt (al_llist_t *list) : list (list)
-{
+Menu_data_ldt::Menu_data_ldt (al_llist_t *list) : list (list) {
   al_lrewind (this->list);
 }
-
 
 /*
  *	Menu_data_ldt::nitems - return the number of items
  */
-size_t Menu_data_ldt::nitems () const
-{
+size_t Menu_data_ldt::nitems () const {
   return al_lcount (list);
 }
 
@@ -81,10 +85,8 @@ size_t Menu_data_ldt::nitems () const
 /*
  *	Menu_data_ldt::operator[] - return the nth item
  */
-const char *Menu_data_ldt::operator[] (size_t n) const
-{
-  if (al_lseek (list, n, SEEK_SET) != 0)
-  {
+const char *Menu_data_ldt::operator[] (size_t n) const {
+  if (al_lseek (list, n, SEEK_SET) != 0) {
     snprintf (buf, sizeof(buf), "BUG: al_lseek(%p, %lu): %s",
       (void *) list, 
       (unsigned long) n,
@@ -112,476 +114,432 @@ static int InputThingType (int x0, int y0, int *number);
 static const char *PrintThinggroup (void *ptr);
 static const char *PrintThingdef (void *ptr);
 
-void LinedefProperties (int x0, int y0, SelPtr obj)
-{
-  char  *menustr[12];
-  char   texname[WAD_TEX_NAME + 1];
-  int    n, val;
-  SelPtr cur, sdlist;
-  int objtype = OBJ_LINEDEFS;
-  int    subwin_y0;
-  int    subsubwin_y0;
+void LinedefProperties (int x0, int y0, SelPtr obj) {
+	string menutitle;
+	vector<string> menustr;
+	string texname;
+	int    n, val;
+	SelPtr cur, sdlist;
+	int objtype = OBJ_LINEDEFS;
+	int    subwin_y0;
+	int    subsubwin_y0;
 
-  {
-    bool sd1 = LineDefs[obj->objnum].sidedef1 >= 0;
-    bool sd2 = LineDefs[obj->objnum].sidedef2 >= 0;
-    val = vDisplayMenu (x0, y0, "Choose the object to edit:",
-       "Edit the linedef",					YK_, 0,
-       sd1 ? "Edit the 1st sidedef" : "Add a 1st sidedef",	YK_, 0,
-       sd2 ? "Edit the 2nd sidedef" : "Add a 2nd sidedef",	YK_, 0,
-       NULL);
-  }
-  subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
-  switch (val)
-  {
-    case 1:
-      for (n = 0; n < 12; n++)
-	menustr[n] = (char *) malloc (60);
-      snprintf (menustr[11], 60, "Edit linedef #%d", obj->objnum);
-      snprintf (menustr[0], 60, "Change flags            (Current: %d)",
-	LineDefs[obj->objnum].flags);
-      snprintf (menustr[1], 60, "Change type             (Current: %d)",
-	LineDefs[obj->objnum].type);
-      if (yg_level_format == YGLF_HEXEN) {
-			snprintf (menustr[2], 60, "Change starting vertex  (Current: #%d)",
-			LineDefs[obj->objnum].start);
-		snprintf (menustr[3], 60, "Change ending vertex    (Current: #%d)",
-			LineDefs[obj->objnum].end);
-		snprintf (menustr[4], 60, "Change 1st sidedef ref. (Current: #%d)",
-			LineDefs[obj->objnum].sidedef1);
-      		snprintf (menustr[5], 60, "Change 2nd sidedef ref. (Current: #%d)",
-			LineDefs[obj->objnum].sidedef2);
-		snprintf (menustr[6], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type, 1).c_str(), LineDefs[obj->objnum].tag);
-      		snprintf (menustr[7], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type, 2).c_str(), LineDefs[obj->objnum].arg2);
-      		snprintf (menustr[8], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type, 3).c_str(), LineDefs[obj->objnum].arg3);
-      		snprintf (menustr[9], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type, 4).c_str(), LineDefs[obj->objnum].arg4);
-      		snprintf (menustr[10], 60, "Change %-17s(Current: %d)",
-			GetLineDefArgumentName(LineDefs[obj->objnum].type, 5).c_str(), LineDefs[obj->objnum].arg5);
-	} else {
-		snprintf (menustr[2], 60, "Change sector tag       (Current: %d)",
-			LineDefs[obj->objnum].tag);
-      		snprintf (menustr[3], 60, "Change starting vertex  (Current: #%d)",
-			LineDefs[obj->objnum].start);
-      		snprintf (menustr[4], 60, "Change ending vertex    (Current: #%d)",
-			LineDefs[obj->objnum].end);
-	  	snprintf (menustr[5], 60, "Change 1st sidedef ref. (Current: #%d)",
-			LineDefs[obj->objnum].sidedef1);
-      		snprintf (menustr[6], 60, "Change 2nd sidedef ref. (Current: #%d)",
-			LineDefs[obj->objnum].sidedef2);
-      	}
-	if (yg_level_format == YGLF_HEXEN)
-         val = vDisplayMenu (x0 + 42, subwin_y0, menustr[11],
-	menustr[0], YK_, 0,
-	menustr[1], YK_, 0,
-	menustr[2], YK_, 0,
-	menustr[3], YK_, 0,
-	menustr[4], YK_, 0,
-	menustr[5], YK_, 0,
-	menustr[6], YK_, 0,
-	menustr[7], YK_, 0,
-	menustr[8], YK_, 0,
-	menustr[9], YK_, 0,
-	menustr[10], YK_, 0,
-	NULL);
-	  else
-         val = vDisplayMenu (x0 + 42, subwin_y0, menustr[11],
-	menustr[0], YK_, 0,
-	menustr[1], YK_, 0,
-	menustr[2], YK_, 0,
-	menustr[3], YK_, 0,
-	menustr[4], YK_, 0,
-	menustr[5], YK_, 0,
-	menustr[6], YK_, 0,
-	NULL);
-      for (n = 0; n < 12; n++)
-	free (menustr[n]);
-      subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
-      switch (val)
-      {
-	case 1:
-	  val = vDisplayMenu (x0 + 84, subsubwin_y0, "Toggle the flags:",
-	    GetTaggedLineDefFlag (obj->objnum, 1),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 2),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 3),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 4),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 5),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 6),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 7),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 8),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 9),  YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 10), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 11), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 12), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 13), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 14), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 15), YK_, 0,
-	    GetTaggedLineDefFlag (obj->objnum, 16), YK_, 0,
-	    "(Enter a decimal value)", YK_, 0,
-	    NULL);
-	  if (val >= 1 && val <= 16)
-	     {
-	     for (cur = obj; cur; cur = cur->next)
-		LineDefs[cur->objnum].flags ^= 0x01 << (val - 1);
-	     MadeChanges = 1;
-	     }
-	  else if (val == 17)
-	     {
-	     val = InputIntegerValue (x0 + 126, subsubwin_y0 + 12 * FONTH,
-		0, 65535, LineDefs[obj->objnum].flags);
-	     if (val != IIV_CANCEL)
-		{
-		for (cur = obj; cur; cur = cur->next)
-		   LineDefs[cur->objnum].flags = val;
-		MadeChanges = 1;
-		}
-	     }
-	  break;
+	bool sd1 = LineDefs[obj->objnum].sidedef1 >= 0;
+	bool sd2 = LineDefs[obj->objnum].sidedef2 >= 0;
+	val = vDisplayMenu (x0, y0, "Choose the object to edit:",
+			"Edit the linedef",					YK_, 0,
+			sd1 ? "Edit the 1st sidedef" : "Add a 1st sidedef",	YK_, 0,
+			sd2 ? "Edit the 2nd sidedef" : "Add a 2nd sidedef",	YK_, 0,
+			NULL);
 
-	case 2:
-	  if (! InputLinedefType (x0, subsubwin_y0, &val))
-	  {
-	    for (cur = obj; cur; cur = cur->next)
-	      LineDefs[cur->objnum].type = val;
-	    MadeChanges = 1;
-	  }
-	  break;
+	subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
+	switch (val) {
+		case 1:
+			menutitle = "Edit linedef #" + to_string(obj->objnum);
+			menustr = {
+				"Change flags            (Current: " + to_string(LineDefs[obj->objnum].flags) + ")",
+				"Change type             (Current: " + to_string(LineDefs[obj->objnum].type) + ")",
+			};
+			if (yg_level_format == YGLF_HEXEN) {
+				stringstream s;
+				menustr.push_back("Change starting vertex  (Current: #" + to_string(LineDefs[obj->objnum].start) + ")");
+				menustr.push_back("Change ending vertex    (Current: #" + to_string(LineDefs[obj->objnum].end) + ")");
+				menustr.push_back("Change 1st sidedef ref. (Current: #" + to_string(LineDefs[obj->objnum].sidedef1) + ")");
+				menustr.push_back("Change 2nd sidedef ref. (Current: #" + to_string(LineDefs[obj->objnum].sidedef2) + ")");
 
-	case 3:
-	  if (yg_level_format == YGLF_HEXEN)
-	  {	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    	OBJ_VERTICES, 0, LineDefs[obj->objnum].start);
-	  	if (val >= 0)
-	  	{
-	    		for (cur = obj; cur; cur = cur->next)
-	      		LineDefs[cur->objnum].start = val;
-	    		MadeChanges = 1;
-	    		MadeMapChanges = 1;
-	  	}
-	  }
-	  else
-	  {
-	   	val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    		-32768, 32767, LineDefs[obj->objnum].tag);
-	  	if (val != IIV_CANCEL)  // Not [esc]
-	  	{
-	    		for (cur = obj; cur; cur = cur->next)
-	      		LineDefs[cur->objnum].tag = val;
-	    		MadeChanges = 1;
-	  	}
-	  }
-	  break;
+				s.fill(' ');
+				s.width(17);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 1) << "(Current: " << LineDefs[obj->objnum].tag << ")";
+				menustr.push_back("Change " + s.str());
 
-	case 4:
-		if (yg_level_format == YGLF_HEXEN)
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_VERTICES, 0, LineDefs[obj->objnum].end);
-	  		if (val >= 0)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].end = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}else  
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_VERTICES, 0, LineDefs[obj->objnum].start);
-	  		if (val >= 0)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].start = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}
-	  	break;
+				s.str("");
+				s.width(17);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 2) << "(Current: " << LineDefs[obj->objnum].arg2 << ")";
+				menustr.push_back("Change " + s.str());
 
-	case 5:
-		if (yg_level_format == YGLF_HEXEN)
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef1);
-	  		if (val >= -1)
-	  		{
-	    		for (cur = obj; cur; cur = cur->next)
-	      		LineDefs[cur->objnum].sidedef1 = val;
-	    		MadeChanges = 1;
-	    		MadeMapChanges = 1;
-	  		}
-		}else
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_VERTICES, 0, LineDefs[obj->objnum].end);
-	  		if (val >= 0)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].end = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}
-	  break;
+				s.str("");
+				s.width(17);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 3) << "(Current: " << LineDefs[obj->objnum].arg3 << ")";
+				menustr.push_back("Change " + s.str());
 
-	case 6:
-		if (yg_level_format == YGLF_HEXEN)
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef2);
-	  		if (val >= -1)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].sidedef2 = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}else
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef1);
-	  		if (val >= -1)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].sidedef1 = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}
-	  	break;
+				s.str("");
+				s.width(17);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 4) << "(Current: " << LineDefs[obj->objnum].arg4 << ")";
+				menustr.push_back("Change " + s.str());
 
-	case 7:
-		if (yg_level_format == YGLF_HEXEN)
-		{	val = InputIntegerValue (x0 + 84, subsubwin_y0,
-				0,255, LineDefs[obj->objnum].tag);
-			if (val != IIV_CANCEL)
-			{	for (cur = obj; cur; cur = cur->next)
-				LineDefs[cur->objnum].tag = val;
-				MadeChanges = 1;
+				s.str("");
+				s.width(17);
+				s << GetLineDefArgumentName(LineDefs[obj->objnum].type, 5) << "(Current: " << LineDefs[obj->objnum].arg5 << ")";
+				menustr.push_back("Change " + s.str());
+			} else {
+				menustr.push_back("Change sector tag       (Current: #" + to_string(LineDefs[obj->objnum].tag) + ")");
+				menustr.push_back("Change starting vertex  (Current: #" + to_string(LineDefs[obj->objnum].start) + ")");
+				menustr.push_back("Change ending vertex    (Current: #" + to_string(LineDefs[obj->objnum].end) + ")");
+				menustr.push_back("Change 1st sidedef ref. (Current: #" + to_string(LineDefs[obj->objnum].sidedef1) + ")");
+				menustr.push_back("Change 2nd sidedef ref. (Current: #" + to_string(LineDefs[obj->objnum].sidedef2) + ")");
 			}
-		}else
-		{	val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    		OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef2);
-	  		if (val >= -1)
-	  		{
-	    			for (cur = obj; cur; cur = cur->next)
-	      			LineDefs[cur->objnum].sidedef2 = val;
-	    			MadeChanges = 1;
-	    			MadeMapChanges = 1;
-	  		}
-		}
-	  break;
 
-	case 8:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    0, 255, LineDefs[obj->objnum].arg2);
-	  if (val != IIV_CANCEL)  // Not [esc]
-	  {
-	    for (cur = obj; cur; cur = cur->next)
-	      LineDefs[cur->objnum].arg2 = val;
-	    MadeChanges = 1;
-	  }
-	  break;
+			if (yg_level_format == YGLF_HEXEN)
+				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(), 
+						menustr[0].c_str(), YK_, 0,
+						menustr[1].c_str(), YK_, 0,
+						menustr[2].c_str(), YK_, 0,
+						menustr[3].c_str(), YK_, 0,
+						menustr[4].c_str(), YK_, 0,
+						menustr[5].c_str(), YK_, 0,
+						menustr[6].c_str(), YK_, 0,
+						menustr[7].c_str(), YK_, 0,
+						menustr[8].c_str(), YK_, 0,
+						menustr[9].c_str(), YK_, 0,
+						menustr[10].c_str(), YK_, 0,
+						NULL);
+			else
+				val = vDisplayMenu (x0 + 42, subwin_y0, menustr[11].c_str(),
+						menustr[0].c_str(), YK_, 0,
+						menustr[1].c_str(), YK_, 0,
+						menustr[2].c_str(), YK_, 0,
+						menustr[3].c_str(), YK_, 0,
+						menustr[4].c_str(), YK_, 0,
+						menustr[5].c_str(), YK_, 0,
+						menustr[6].c_str(), YK_, 0,
+						NULL);
+			subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
 
-	case 9:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    0, 255, LineDefs[obj->objnum].arg3);
-	  if (val != IIV_CANCEL)  // Not [esc]
-	  {
-	    for (cur = obj; cur; cur = cur->next)
-	      LineDefs[cur->objnum].arg3 = val;
-	    MadeChanges = 1;
-	  }
-	  break;
+			switch (val) {
+				case 1:
+					val = vDisplayMenu (x0 + 84, subsubwin_y0, "Toggle the flags:",
+							GetTaggedLineDefFlag (obj->objnum, 1),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 2),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 3),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 4),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 5),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 6),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 7),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 8),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 9),  YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 10), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 11), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 12), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 13), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 14), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 15), YK_, 0,
+							GetTaggedLineDefFlag (obj->objnum, 16), YK_, 0,
+							"(Enter a decimal value)", YK_, 0,
+							NULL);
+					if (val >= 1 && val <= 16) {
+						for (cur = obj; cur; cur = cur->next)
+							LineDefs[cur->objnum].flags ^= 0x01 << (val - 1);
+						MadeChanges = 1;
+					} else if (val == 17) {
+						val = InputIntegerValue (x0 + 126, subsubwin_y0 + 12 * FONTH,
+								0, 65535, LineDefs[obj->objnum].flags);
+						if (val != IIV_CANCEL) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].flags = val;
+							MadeChanges = 1;
+						}
+					}
+					break;
+				case 2:
+					if (!InputLinedefType (x0, subsubwin_y0, &val)) {
+						for (cur = obj; cur; cur = cur->next)
+							LineDefs[cur->objnum].type = val;
+						MadeChanges = 1;
+					}
+					break;
 
-	case 10:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    0, 255, LineDefs[obj->objnum].arg4);
-	  if (val != IIV_CANCEL)  // Not [esc]
-	  {
-	    for (cur = obj; cur; cur = cur->next)
-	      LineDefs[cur->objnum].arg4 = val;
-	    MadeChanges = 1;
-	  }
-	  break;
-	case 11:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    0, 255, LineDefs[obj->objnum].arg5);
-	  if (val != IIV_CANCEL)
-	  {
-		  for (cur = obj;cur;cur = cur->next)
-			  LineDefs[cur->objnum].arg5 = val;
-		  MadeChanges = 1;
-	  }
-	  break;
-     }
-     break;
+				case 3:
+					if (yg_level_format == YGLF_HEXEN) {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_VERTICES, 0, LineDefs[obj->objnum].start);
+						if (val >= 0) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].start = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					} else {
+						val = InputIntegerValue (x0 + 84, subsubwin_y0,
+								-32768, 32767, LineDefs[obj->objnum].tag);
+						if (val != IIV_CANCEL) {  // Not [esc]
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].tag = val;
+							MadeChanges = 1;
+						}
+					}
+					break;
 
-    // Edit or add the first sidedef
-    case 2:
-      if (LineDefs[obj->objnum].sidedef1 >= 0)
-      {
-	// Build a new selection list with the first sidedefs
-	objtype = OBJ_SIDEDEFS;
-	sdlist = 0;
-	for (cur = obj; cur; cur = cur->next)
-	  if (LineDefs[cur->objnum].sidedef1 >= 0)
-	    SelectObject (&sdlist, LineDefs[cur->objnum].sidedef1);
-      }
-      else
-      {
-	// Add a new first sidedef
-	for (cur = obj; cur; cur = cur->next)
-	  if (LineDefs[cur->objnum].sidedef1 == -1)
-	  {
-	    InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-	    LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
-	  }
-	break;
-      }
-      // FALL THROUGH
+				case 4:
+					if (yg_level_format == YGLF_HEXEN) {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_VERTICES, 0, LineDefs[obj->objnum].end);
+						if (val >= 0) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].end = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}else  {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_VERTICES, 0, LineDefs[obj->objnum].start);
+						if (val >= 0) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].start = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}
+					break;
 
-    // Edit or add the second sidedef
-    case 3:
-      if (objtype != OBJ_SIDEDEFS)
-      {
-	if (LineDefs[obj->objnum].sidedef2 >= 0)
-	{
-	  // Build a new selection list with the second (or first) SideDefs
-	  objtype = OBJ_SIDEDEFS;
-	  sdlist = 0;
-	  for (cur = obj; cur; cur = cur->next)
-	    if (LineDefs[cur->objnum].sidedef2 >= 0)
-	      SelectObject (&sdlist, LineDefs[cur->objnum].sidedef2);
-	    else if (LineDefs[cur->objnum].sidedef1 >= 0)
-	      SelectObject (&sdlist, LineDefs[cur->objnum].sidedef1);
+				case 5:
+					if (yg_level_format == YGLF_HEXEN) {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef1);
+						if (val >= -1) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].sidedef1 = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					} else {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_VERTICES, 0, LineDefs[obj->objnum].end);
+						if (val >= 0) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].end = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}
+					break;
+
+				case 6:
+					if (yg_level_format == YGLF_HEXEN) {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef2);
+						if (val >= -1) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].sidedef2 = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}else {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef1);
+						if (val >= -1) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].sidedef1 = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}
+					break;
+
+				case 7:
+					if (yg_level_format == YGLF_HEXEN) {
+						val = InputIntegerValue (x0 + 84, subsubwin_y0,
+								0,255, LineDefs[obj->objnum].tag);
+						if (val != IIV_CANCEL) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].tag = val;
+							MadeChanges = 1;
+						}
+					}else {
+						val = InputObjectXRef (x0 + 84, subsubwin_y0,
+								OBJ_SIDEDEFS, 1, LineDefs[obj->objnum].sidedef2);
+						if (val >= -1) {
+							for (cur = obj; cur; cur = cur->next)
+								LineDefs[cur->objnum].sidedef2 = val;
+							MadeChanges = 1;
+							MadeMapChanges = 1;
+						}
+					}
+					break;
+
+				case 8:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							0, 255, LineDefs[obj->objnum].arg2);
+					if (val != IIV_CANCEL) {  // Not [esc]
+						for (cur = obj; cur; cur = cur->next)
+							LineDefs[cur->objnum].arg2 = val;
+						MadeChanges = 1;
+					}
+					break;
+
+				case 9:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							0, 255, LineDefs[obj->objnum].arg3);
+					if (val != IIV_CANCEL) {  // Not [esc]
+						for (cur = obj; cur; cur = cur->next)
+							LineDefs[cur->objnum].arg3 = val;
+						MadeChanges = 1;
+					}
+					break;
+
+				case 10:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							0, 255, LineDefs[obj->objnum].arg4);
+					if (val != IIV_CANCEL) { // Not [esc]
+						for (cur = obj; cur; cur = cur->next)
+							LineDefs[cur->objnum].arg4 = val;
+						MadeChanges = 1;
+					}
+					break;
+
+				case 11:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							0, 255, LineDefs[obj->objnum].arg5);
+					if (val != IIV_CANCEL) {
+						for (cur = obj;cur;cur = cur->next)
+							LineDefs[cur->objnum].arg5 = val;
+						MadeChanges = 1;
+					}
+					break;
+			}
+			break;
+
+			// Edit or add the first sidedef
+		case 2:
+			if (LineDefs[obj->objnum].sidedef1 >= 0) {
+				// Build a new selection list with the first sidedefs
+				objtype = OBJ_SIDEDEFS;
+				sdlist = 0;
+				for (cur = obj; cur; cur = cur->next)
+					if (LineDefs[cur->objnum].sidedef1 >= 0)
+						SelectObject (&sdlist, LineDefs[cur->objnum].sidedef1);
+			} else {
+				// Add a new first sidedef
+				for (cur = obj; cur; cur = cur->next)
+					if (LineDefs[cur->objnum].sidedef1 == -1) {
+						InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
+						LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+					}
+				break;
+			}
+			// FALL THROUGH
+
+			// Edit or add the second sidedef
+		case 3:
+			if (objtype != OBJ_SIDEDEFS) {
+				if (LineDefs[obj->objnum].sidedef2 >= 0) {
+					// Build a new selection list with the second (or first) SideDefs
+					objtype = OBJ_SIDEDEFS;
+					sdlist = 0;
+					for (cur = obj; cur; cur = cur->next)
+						if (LineDefs[cur->objnum].sidedef2 >= 0)
+							SelectObject (&sdlist, LineDefs[cur->objnum].sidedef2);
+						else if (LineDefs[cur->objnum].sidedef1 >= 0)
+							SelectObject (&sdlist, LineDefs[cur->objnum].sidedef1);
+				} else {
+					// Add a new second (or first) sidedef
+					for (cur = obj; cur; cur = cur->next)
+						if (LineDefs[cur->objnum].sidedef1 == -1) {
+							InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
+							LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
+						} else if (LineDefs[cur->objnum].sidedef2 == -1) {
+							n = LineDefs[cur->objnum].sidedef1;
+							InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
+							strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
+							strncpy (SideDefs[n].tex3, "-", WAD_TEX_NAME);
+							LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
+							LineDefs[cur->objnum].flags ^= 4;  // Set the 2S bit
+							LineDefs[cur->objnum].flags &= ~1;  // Clear the Im bit
+						}
+					break;
+				}
+			}
+			menutitle = "Edit sidedef #" + to_string(sdlist->objnum);
+			menustr = {
+				"Change middle texture   (Current: " + string(SideDefs[sdlist->objnum].tex3) + ")",
+				"Change upper texture    (Current: " + string(SideDefs[sdlist->objnum].tex1) + ")",
+				"Change lower texture    (Current: " + string(SideDefs[sdlist->objnum].tex2) + ")",
+				"Change texture X offset (Current: " + to_string(SideDefs[sdlist->objnum].xoff) + ")",
+				"Change texture Y offset (Current: " + to_string(SideDefs[sdlist->objnum].yoff) + ")",
+				"Change sector ref.      (Current: #" + to_string(SideDefs[sdlist->objnum].sector) + ")"
+			};
+			val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(),
+					menustr[0].c_str(), YK_, 0,
+					menustr[1].c_str(), YK_, 0,
+					menustr[2].c_str(), YK_, 0,
+					menustr[3].c_str(), YK_, 0,
+					menustr[4].c_str(), YK_, 0,
+					menustr[5].c_str(), YK_, 0,
+					NULL);
+			subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
+			switch (val) {
+				case 1:
+					texname = ChooseWallTexture (x0 + 84, subsubwin_y0 ,
+							"Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex3));
+					if (texname != "") {
+						for (cur = sdlist; cur; cur = cur->next) {
+							if (cur->objnum >= 0)
+								strncpy (SideDefs[cur->objnum].tex3, texname.c_str(), WAD_TEX_NAME);
+						}
+						MadeChanges = 1;
+					}
+					break;
+
+				case 2:
+					texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
+							"Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex1));
+					if (texname != "") {
+						for (cur = sdlist; cur; cur = cur->next)
+							if (cur->objnum >= 0)
+								strncpy (SideDefs[cur->objnum].tex1, texname.c_str(), WAD_TEX_NAME);
+						MadeChanges = 1;
+					}
+					break;
+
+				case 3:
+					texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
+							"Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex2));
+					if (texname != "") {
+						for (cur = sdlist; cur; cur = cur->next)
+							if (cur->objnum >= 0)
+								strncpy (SideDefs[cur->objnum].tex2, texname.c_str(), WAD_TEX_NAME);
+						MadeChanges = 1;
+					}
+					break;
+
+				case 4:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							-32768, 32767, SideDefs[sdlist->objnum].xoff);
+					if (val != IIV_CANCEL) {
+						for (cur = sdlist; cur; cur = cur->next) {
+							if (cur->objnum >= 0)
+								SideDefs[cur->objnum].xoff = val;
+						}
+						MadeChanges = 1;
+					}
+					break;
+
+				case 5:
+					val = InputIntegerValue (x0 + 84, subsubwin_y0,
+							-32768, 32767, SideDefs[sdlist->objnum].yoff);
+					if (val != IIV_CANCEL) {
+						for (cur = sdlist; cur; cur = cur->next) {
+							if (cur->objnum >= 0)
+								SideDefs[cur->objnum].yoff = val;
+						}
+						MadeChanges = 1;
+					}
+					break;
+
+				case 6:
+					val = InputObjectXRef (x0 + 84, subsubwin_y0,
+							OBJ_SECTORS, 0, SideDefs[sdlist->objnum].sector);
+					if (val >= 0) {
+						for (cur = sdlist; cur; cur = cur->next) {
+							if (cur->objnum >= 0)
+								SideDefs[cur->objnum].sector = val;
+						}
+						MadeChanges = 1;
+					}
+					break;
+			}
+			ForgetSelection (&sdlist);
+			break;
 	}
-	else
-	{
-	  // Add a new second (or first) sidedef
-	  for (cur = obj; cur; cur = cur->next)
-	    if (LineDefs[cur->objnum].sidedef1 == -1)
-	    {
-	      InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-	      LineDefs[cur->objnum].sidedef1 = NumSideDefs - 1;
-	    }
-	    else if (LineDefs[cur->objnum].sidedef2 == -1)
-	    {
-	      n = LineDefs[cur->objnum].sidedef1;
-	      InsertObject (OBJ_SIDEDEFS, -1, 0, 0);
-	      strncpy (SideDefs[NumSideDefs - 1].tex3, "-", WAD_TEX_NAME);
-	      strncpy (SideDefs[n].tex3, "-", WAD_TEX_NAME);
-	      LineDefs[cur->objnum].sidedef2 = NumSideDefs - 1;
-	      LineDefs[cur->objnum].flags ^= 4;  // Set the 2S bit
-	      LineDefs[cur->objnum].flags &= ~1;  // Clear the Im bit
-	    }
-	  break;
-	}
-      }
-      for (n = 0; n < 7; n++)
-	menustr[n] = (char *) malloc (60);
-      snprintf (menustr[6], 60, "Edit sidedef #%d", sdlist->objnum);
-      texname[WAD_TEX_NAME] = '\0';
-      strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
-      snprintf (menustr[0], 60, "Change middle texture   (Current: %s)", texname);
-      strncpy (texname, SideDefs[sdlist->objnum].tex1, WAD_TEX_NAME);
-      snprintf (menustr[1], 60, "Change upper texture    (Current: %s)", texname);
-      strncpy (texname, SideDefs[sdlist->objnum].tex2, WAD_TEX_NAME);
-      snprintf (menustr[2], 60, "Change lower texture    (Current: %s)", texname);
-      snprintf (menustr[3], 60, "Change texture X offset (Current: %d)",
-	SideDefs[sdlist->objnum].xoff);
-      snprintf (menustr[4], 60, "Change texture Y offset (Current: %d)",
-	SideDefs[sdlist->objnum].yoff);
-      snprintf (menustr[5], 60, "Change sector ref.      (Current: #%d)",
-	SideDefs[sdlist->objnum].sector);
-      val = vDisplayMenu (x0 + 42, subwin_y0, menustr[6],
-	menustr[0], YK_, 0,
-	menustr[1], YK_, 0,
-	menustr[2], YK_, 0,
-	menustr[3], YK_, 0,
-	menustr[4], YK_, 0,
-	menustr[5], YK_, 0,
-	NULL);
-      for (n = 0; n < 7; n++)
-	free (menustr[n]);
-      subsubwin_y0 = subwin_y0 + BOX_BORDER + (2 + val) * FONTH;
-      switch (val)
-      {
-	case 1:
-	  strncpy (texname, SideDefs[sdlist->objnum].tex3, WAD_TEX_NAME);
-	  ChooseWallTexture (x0 + 84, subsubwin_y0 ,
-	    "Choose a wall texture", WTexture, texname);
-	  if (strlen (texname) > 0)
-	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		strncpy (SideDefs[cur->objnum].tex3, texname, WAD_TEX_NAME);
-	    MadeChanges = 1;
-	  }
-	  break;
-
-	case 2:
-	  {
-		  string texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
-				  "Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex1));
-		  if (texname != "") {
-			  for (cur = sdlist; cur; cur = cur->next)
-				  if (cur->objnum >= 0)
-					  strncpy (SideDefs[cur->objnum].tex1, texname.c_str(), WAD_TEX_NAME);
-			  MadeChanges = 1;
-		  }
-	  }
-	  break;
-
-	case 3:
-	  {
-		  string texname = ChooseWallTexture (x0 + 84, subsubwin_y0,
-				  "Choose a wall texture", WTexture, string(SideDefs[sdlist->objnum].tex2));
-		  if (texname != "") {
-			  for (cur = sdlist; cur; cur = cur->next)
-				  if (cur->objnum >= 0)
-					  strncpy (SideDefs[cur->objnum].tex2, texname.c_str(), WAD_TEX_NAME);
-			  MadeChanges = 1;
-		  }
-	  }
-	  break;
-
-	case 4:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    -32768, 32767, SideDefs[sdlist->objnum].xoff);
-	  if (val != IIV_CANCEL)
-	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		SideDefs[cur->objnum].xoff = val;
-	    MadeChanges = 1;
-	  }
-	  break;
-
-	case 5:
-	  val = InputIntegerValue (x0 + 84, subsubwin_y0,
-	    -32768, 32767, SideDefs[sdlist->objnum].yoff);
-	  if (val != IIV_CANCEL)
-	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		SideDefs[cur->objnum].yoff = val;
-	    MadeChanges = 1;
-	  }
-	  break;
-
-	case 6:
-	  val = InputObjectXRef (x0 + 84, subsubwin_y0,
-	    OBJ_SECTORS, 0, SideDefs[sdlist->objnum].sector);
-	  if (val >= 0)
-	  {
-	    for (cur = sdlist; cur; cur = cur->next)
-	      if (cur->objnum >= 0)
-		SideDefs[cur->objnum].sector = val;
-	    MadeChanges = 1;
-	  }
-	  break;
-      }
-      ForgetSelection (&sdlist);
-      break;
-  }
 }
 
 /*

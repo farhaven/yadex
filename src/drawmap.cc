@@ -136,112 +136,99 @@ void draw_map (edit_t *e) /* SWAP! */
 /*
  *	draw_grid - draw the grid in the background of the edit window
  */
-static void draw_grid (edit_t *e)
-{
-  if (! e->grid_shown)
-    return;
-  
-  int mapx0   = MAPX (0);
-  int mapx1   = MAPX (ScrMaxX);
-  int mapy0   = MAPY (ScrMaxY);
-  int mapy1   = MAPY (0);
+static void draw_grid (edit_t *e) {
+	if (! e->grid_shown)
+		return;
 
-  int grid_step_1 = e->grid_step;	// Map units between dots
-  int grid_step_2 = 4 * grid_step_1;	// Map units between dim lines
-  int grid_step_3 = 4 * grid_step_2;	// Map units between bright lines
-  int grid_step_4 = 4 * grid_step_3;	// Map units between brighter lines
+	int mapx0 = MAPX (0);
+	int mapx1 = MAPX (ScrMaxX);
+	int mapy0 = MAPY (ScrMaxY);
+	int mapy1 = MAPY (0);
 
-  {
-    set_colour (GRID2V);
-    int mapx0_2 = (mapx0 / grid_step_2) * grid_step_2;
-    if (mapx0_2 < mapx0)
-      mapx0_2 += grid_step_2;
-    for (int i = mapx0_2; i <= mapx1; i += grid_step_2)
-      if (i % grid_step_3 != 0)
-	DrawMapLine (i, mapy0, i, mapy1);
-  }
+	int grid_step_1 = e->grid_step;	// Map units between dots
+	int grid_step_2 = 4 * grid_step_1;	// Map units between dim lines
+	int grid_step_3 = 4 * grid_step_2;	// Map units between bright lines
+	int grid_step_4 = 4 * grid_step_3;	// Map units between brighter lines
 
-  {
-    set_colour (GRID2H);
-    int mapy0_2 = (mapy0 / grid_step_2) * grid_step_2;
-    if (mapy0_2 < mapy0)
-      mapy0_2 += grid_step_2;
-    for (int j = mapy0_2; j <=  mapy1; j += grid_step_2)
-      if (j % grid_step_3 != 0)
-	DrawMapLine (mapx0, j, mapx1, j);
-  }
+	set_colour (GRID2V);
+	int mapx0_2 = (mapx0 / grid_step_2) * grid_step_2;
+	if (mapx0_2 < mapx0)
+		mapx0_2 += grid_step_2;
+	for (int i = mapx0_2; i <= mapx1; i += grid_step_2) {
+		if (i % grid_step_3 != 0)
+			DrawMapLine (i, mapy0, i, mapy1);
+	}
 
-  {
-    set_colour (GRID3V);
-    int mapx0_3 = (mapx0 / grid_step_3) * grid_step_3;
-    if (mapx0_3 < mapx0)
-      mapx0_3 += grid_step_3;
-    for (int i = mapx0_3; i <= mapx1; i += grid_step_3)
-      if (i % grid_step_4 != 0)
-	DrawMapLine (i, mapy0, i, mapy1);
-  }
+	set_colour (GRID2H);
+	int mapy0_2 = (mapy0 / grid_step_2) * grid_step_2;
+	if (mapy0_2 < mapy0)
+		mapy0_2 += grid_step_2;
+	for (int j = mapy0_2; j <=  mapy1; j += grid_step_2) {
+		if (j % grid_step_3 != 0)
+			DrawMapLine (mapx0, j, mapx1, j);
+	}
 
-  {
-    set_colour (GRID3H);
-    int mapy0_3 = (mapy0 / grid_step_3) * grid_step_3;
-    if (mapy0_3 < mapy0)
-      mapy0_3 += grid_step_3;
-    for (int j = mapy0_3; j <=  mapy1; j += grid_step_3)
-      if (j % grid_step_4 != 0)
-	DrawMapLine (mapx0, j, mapx1, j);
-  }
+	set_colour (GRID3V);
+	int mapx0_3 = (mapx0 / grid_step_3) * grid_step_3;
+	if (mapx0_3 < mapx0)
+		mapx0_3 += grid_step_3;
+	for (int i = mapx0_3; i <= mapx1; i += grid_step_3) {
+		if (i % grid_step_4 != 0)
+			DrawMapLine (i, mapy0, i, mapy1);
+	}
 
-  {
-    set_colour (GRID4V);
-    int mapx0_4 = (mapx0 / grid_step_4) * grid_step_4;
-    if (mapx0_4 < mapx0)
-      mapx0_4 += grid_step_4;
-    //printf ("MAPX(0): %d  mapx0_4: %d\n", MAPX(0), mapx0_4);  // DEBUG
-    for (int i = mapx0_4; i <= mapx1; i += grid_step_4)
-      DrawMapLine (i, mapy0, i, mapy1);
-  }
+	set_colour (GRID3H);
+	int mapy0_3 = (mapy0 / grid_step_3) * grid_step_3;
+	if (mapy0_3 < mapy0)
+		mapy0_3 += grid_step_3;
+	for (int j = mapy0_3; j <=  mapy1; j += grid_step_3) {
+		if (j % grid_step_4 != 0)
+			DrawMapLine (mapx0, j, mapx1, j);
+	}
 
-  {
-    set_colour (GRID4H);
-    int mapy0_4 = (mapy0 / grid_step_4) * grid_step_4;
-    if (mapy0_4 < mapy0)
-      mapy0_4 += grid_step_4;
-    for (int j = mapy0_4; j <=  mapy1; j += grid_step_4)
-      DrawMapLine (mapx0, j, mapx1, j);
-  }
+	set_colour (GRID4V);
+	int mapx0_4 = (mapx0 / grid_step_4) * grid_step_4;
+	if (mapx0_4 < mapx0)
+		mapx0_4 += grid_step_4;
+	//printf ("MAPX(0): %d  mapx0_4: %d\n", MAPX(0), mapx0_4);  // DEBUG
+	for (int i = mapx0_4; i <= mapx1; i += grid_step_4)
+		DrawMapLine (i, mapy0, i, mapy1);
 
-  {
-    int mapx0_1 = (mapx0 / grid_step_1) * grid_step_1;
-    if (mapx0_1 < mapx0)
-      mapx0_1 += grid_step_1;
-    int mapy0_1 = (mapy0 / grid_step_1) * grid_step_1;
-    if (mapy0_1 < mapy0)
-      mapy0_1 += grid_step_1;
+	set_colour (GRID4H);
+	int mapy0_4 = (mapy0 / grid_step_4) * grid_step_4;
+	if (mapy0_4 < mapy0)
+		mapy0_4 += grid_step_4;
+	for (int j = mapy0_4; j <=  mapy1; j += grid_step_4)
+		DrawMapLine (mapx0, j, mapx1, j);
 
-    // Optimisation for X: draw several points in one go
-    int npoints = (mapx1 - mapx0_1) / grid_step_1 + 1;
-    XPoint *points = (XPoint *) malloc (npoints * sizeof *points);
-    points[0].x = SCREENX (mapx0_1);
-    int n = 1;
-    int last_i = points[0].x;
-    for (int i = mapx0_1 + grid_step_1; i <= mapx1; i += grid_step_1)
-    {
-      if (n >= npoints)
-	nf_bug ("%d >= %d", n, npoints);
-      points[n].x = SCREENX (i) - last_i;
-      points[n].y = 0;
-      n++;
-      last_i = SCREENX (i);
-    }
-    npoints = n;
-    set_colour (GRID1);
-    for (int j = mapy0_1; j <= mapy1; j += grid_step_1)
-    {
-      points[0].y = SCREENY (j);
-      XDrawPoints (dpy, drw, gc, points, npoints, CoordModePrevious);
-    }
-    free (points);
-  }
+	int mapx0_1 = (mapx0 / grid_step_1) * grid_step_1;
+	if (mapx0_1 < mapx0)
+		mapx0_1 += grid_step_1;
+	int mapy0_1 = (mapy0 / grid_step_1) * grid_step_1;
+	if (mapy0_1 < mapy0)
+		mapy0_1 += grid_step_1;
+
+	// Optimisation for X: draw several points in one go
+	int npoints = (mapx1 - mapx0_1) / grid_step_1 + 1;
+	XPoint *points = (XPoint *) malloc (npoints * sizeof *points);
+	points[0].x = SCREENX (mapx0_1);
+	int n = 1;
+	int last_i = points[0].x;
+	for (int i = mapx0_1 + grid_step_1; i <= mapx1; i += grid_step_1) {
+		if (n >= npoints)
+			nf_bug ("%d >= %d", n, npoints);
+		points[n].x = SCREENX (i) - last_i;
+		points[n].y = 0;
+		n++;
+		last_i = SCREENX (i);
+	}
+	npoints = n;
+	set_colour (GRID1);
+	for (int j = mapy0_1; j <= mapy1; j += grid_step_1) {
+		points[0].y = SCREENY (j);
+		XDrawPoints (dpy, drw, gc, points, npoints, CoordModePrevious);
+	}
+	free (points);
 }
 
 

@@ -22,26 +22,17 @@
 
 #include "decorate.h"
 
-char        readbuf[200];
-
 int         ntoks;
 char       *token[MAX_TOKENS];
 int         counter;
 int         in_token;
 const char *iptr;
 char       *optr;
-int        current;
-float        scale;
-
-bool        getsprite = false;
-bool        addeditem = false;
-
-thingdef_t  buf;
 
 void
-parse_line(void) {
+parse_line(char* readbuf) {
 	// duplicate the buffer
-	char* buffer = (char *) malloc (strlen (readbuf) + 1);
+	char* buffer = (char*) calloc(sizeof(char), strlen(readbuf) + 1);
 	if (!buffer)
 		fatal_error ("not enough memory");
 
@@ -74,29 +65,39 @@ parse_line(void) {
 // this function pushes a thing definition onto the stack of things
 // this is done only if buf.number is set,which means we are talking
 // about a complete new,placable thing
-void
-update_thingdefs(void) {
-    if (buf.number) {
-        if (al_lwrite (thingdef, &buf))
-             fatal_error ("LGD4 (%s)", al_astrerror (al_aerrno));
-        addeditem = true;
-    }
+bool
+update_thingdefs(thingdef_t *buf) {
+	bool rv = false;
+	if (buf->number) {
+		if (al_lwrite (thingdef, buf))
+			fatal_error ("LGD4 (%s)", al_astrerror (al_aerrno));
+		rv = true;
+	}
 
-    buf.number     = 0;
-    buf.thinggroup = '*';
-    buf.flags      = 0;
-    buf.radius     = 16;
-    buf.desc       = 0;
-    buf.sprite     = 0;
-    buf.scale      = 1;
+	buf->number     = 0;
+	buf->thinggroup = '*';
+	buf->flags      = 0;
+	buf->radius     = 16;
+	buf->desc       = 0;
+	buf->sprite     = 0;
+	buf->scale      = 1;
+
+	return rv;
 }
 
 void
 read_decorate (void) {
-	int fd;
+	enum { BUFSIZE = 1024 };
+	int fd, current;
 	FILE* tempfile;
 	const char* templ = "/tmp/decorate.XXXXXXXXX";
-	char *filename;
+	char* filename;
+	char* readbuf;
+
+	bool getsprite = false;
+	bool addeditem = false;
+
+	thingdef_t buf;
 
 	filename = (char*) calloc(sizeof(char), strlen(templ) + 1);
 	strlcpy(filename, templ, strlen(templ));
@@ -127,9 +128,10 @@ read_decorate (void) {
 	SaveEntryToRawFile(tempfile, "DECORATE");
 	fseek(tempfile, 0L, SEEK_SET);
 
-	while (fgets(readbuf, sizeof readbuf, tempfile)) {
+	readbuf = (char*) calloc(sizeof(char), BUFSIZE);
+	while (fgets(readbuf, BUFSIZE - 1, tempfile)) {
 		current = 0;
-		parse_line();
+		parse_line(readbuf);
 
 		/* process line */
 		if (ntoks == 0) {
@@ -138,7 +140,7 @@ read_decorate (void) {
 
 		// Actor definition starts
 		if (! y_strnicmp (token[0], "actor",5)) {
-			update_thingdefs();
+			addeditem = update_thingdefs(&buf);
 
 			counter = 0;
 			while (counter < ntoks) {
@@ -176,6 +178,7 @@ read_decorate (void) {
 			}
 		}
 	}
+	free(readbuf);
 
 	// if things were found inside the decorate file, add them to a group
 	// called "Decorate Items"
@@ -188,7 +191,7 @@ read_decorate (void) {
 		if (al_lwrite (thinggroup, &group))
 			fatal_error ("LGD5 (%s)", al_astrerror (al_aerrno));
 
-		update_thingdefs();
+		addeditem = update_thingdefs(&buf);
 
 		delete_things_table();
 		create_things_table();

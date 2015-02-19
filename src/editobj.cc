@@ -628,7 +628,7 @@ if (val > 1 && ! *list)
    {
    Beep ();
    snprintf (msg, sizeof(msg), "You must select at least one %s", GetObjectTypeName(objtype).c_str());
-   Notify (-1, -1, msg, 0);
+   Notify (-1, -1, msg, "");
    return;
    }
 
@@ -639,7 +639,7 @@ switch (val)
    case 1:
       // * -> First free tag number
       snprintf (msg, sizeof(msg), "First free tag number: %d", FindFreeTag ());
-      Notify (-1, -1, msg, 0);
+      Notify (-1, -1, msg, "");
       break;
 
    case 2:
@@ -647,7 +647,7 @@ switch (val)
       if ((objtype == OBJ_VERTICES) && ! (*list)->next) {
 	 Beep ();
 	 snprintf (msg, sizeof(msg), "You must select more than one %s", GetObjectTypeName(objtype).c_str());
-	 Notify (-1, -1, msg, 0);
+	 Notify (-1, -1, msg, "");
 	 return;
 	 }
       if (objtype != OBJ_THINGS) {	angle = 0;
@@ -658,7 +658,7 @@ switch (val)
        	     (double) scale * 0.01);
       } else {
 			snprintf (msg, sizeof(msg), "First free TID: %d", FindFreeTID ());
-      		Notify (-1, -1, msg, 0);
+      		Notify (-1, -1, msg, "");
       		break;
       }
       break;
@@ -675,7 +675,7 @@ switch (val)
 	 if ((*list)->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select exactly one sector", 0);
+	    Notify (-1, -1, "You must select exactly one sector", "");
 	    }
 	 else
 	    {
@@ -702,7 +702,7 @@ switch (val)
 	 if (! (*list)->next || (*list)->next->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select exactly two linedefs", 0);
+	    Notify (-1, -1, "You must select exactly two linedefs", "");
 	    }
 	 else
 	    {
@@ -716,7 +716,7 @@ switch (val)
 	 if ((*list)->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select exactly one Sector", 0);
+	    Notify (-1, -1, "You must select exactly one Sector", "");
 	    }
 	 else
 	    {
@@ -745,7 +745,7 @@ switch (val)
 	 if (! (*list)->next || ! (*list)->next->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select three or more sectors", 0);
+	    Notify (-1, -1, "You must select three or more sectors", "");
 	    }
 	 else
 	    {
@@ -763,7 +763,7 @@ switch (val)
 	 if (! (*list)->next || (*list)->next->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select exactly two vertices", 0);
+	    Notify (-1, -1, "You must select exactly two vertices", "");
 	    }
 	 else
 	    {
@@ -785,7 +785,7 @@ switch (val)
 	 if (! (*list)->next || ! (*list)->next->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select three or more sectors", 0);
+	    Notify (-1, -1, "You must select three or more sectors", "");
 	    }
 	 else
 	    {
@@ -979,7 +979,7 @@ switch (val)
 	 if (! (*list)->next || (*list)->next->next)
 	    {
 	    Beep ();
-	    Notify (-1, -1, "You must select exactly two linedefs", 0);
+	    Notify (-1, -1, "You must select exactly two linedefs", "");
 	    }
 	 else
 	    {

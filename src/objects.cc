@@ -345,7 +345,7 @@ switch (objtype)
 	       LineDefs[n].sidedef2--;
 	    }
 	 /* delete the sidedef */
-	 SideDefs.erase(SideDefs.begin() + n);
+	 SideDefs.erase(SideDefs.begin() + objnum);
 	 for (cur = (*list)->next; cur; cur = cur->next)
 	    if (cur->objnum > objnum)
 	       cur->objnum--;

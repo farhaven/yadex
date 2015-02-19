@@ -22,8 +22,6 @@
 
 #include "decorate.h"
 
-int         line_number;
-int         depth = 0;
 char        readbuf[200];
 
 int         ntoks;
@@ -32,7 +30,6 @@ int         counter;
 int         in_token;
 const char *iptr;
 char       *optr;
-char       *buffer;
 int        current;
 float        scale;
 
@@ -43,34 +40,35 @@ thingdef_t  buf;
 
 void
 parse_line(void) {
-    // duplicate the buffer
-    buffer = (char *) malloc (strlen (readbuf) + 1);
-    if (! buffer)
-        fatal_error ("not enough memory");
+	// duplicate the buffer
+	char* buffer = (char *) malloc (strlen (readbuf) + 1);
+	if (!buffer)
+		fatal_error ("not enough memory");
 
-    // break the line into whitespace-separated tokens.
-    for (in_token = 0, iptr = readbuf, optr = buffer, ntoks = 0;; iptr++) {
-        if (*iptr == '\n' || *iptr == '\0') {
-            if (in_token)
-                *optr = '\0';
-            break;
-        }
-        // First character of token
-        else if (! in_token && ! isspace (*iptr)) {
-            token[ntoks] = optr;
-            ntoks++;
-            in_token = 1;
-            *optr++ = *iptr;
-        }
-        // First space between two tokens
-        else if (in_token && (isspace (*iptr) || *iptr == '{' || *iptr == '}')) {
-            *optr++ = '\0';
-            in_token = 0;
-        }
-        // Character in the middle of a token
-        else if (in_token)
-            *optr++ = *iptr;
-    }
+	// break the line into whitespace-separated tokens.
+	for (in_token = 0, iptr = readbuf, optr = buffer, ntoks = 0;; iptr++) {
+		if (*iptr == '\n' || *iptr == '\0') {
+			if (in_token)
+				*optr = '\0';
+			break;
+		}
+		// First character of token
+		else if (! in_token && ! isspace (*iptr)) {
+			token[ntoks] = optr;
+			ntoks++;
+			in_token = 1;
+			*optr++ = *iptr;
+		}
+		// First space between two tokens
+		else if (in_token && (isspace (*iptr) || *iptr == '{' || *iptr == '}')) {
+			*optr++ = '\0';
+			in_token = 0;
+		}
+		// Character in the middle of a token
+		else if (in_token)
+			*optr++ = *iptr;
+	}
+	free (buffer);
 }
 
 // this function pushes a thing definition onto the stack of things
@@ -135,9 +133,9 @@ read_decorate (void) {
 
 		/* process line */
 		if (ntoks == 0) {
-			free (buffer);
 			continue;
 		}
+
 		// Actor definition starts
 		if (! y_strnicmp (token[0], "actor",5)) {
 			update_thingdefs();

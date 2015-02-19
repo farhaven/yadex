@@ -130,9 +130,9 @@ int Confirm2 (int x0, int y0, confirm_t *confirm_flag,
  *	Notify - notification dialog box
  *
  *	Display a notification and wait for a key (prompt2 may
- *	be NULL)
+ *	be empty)
  */
-void Notify (int x0, int y0, const char *prompt1, const char *prompt2)
+void Notify (int x0, int y0, string prompt1, string prompt2)
 {
     const char *const prompt3 = "Press any key to continue...";
     size_t maxlen;
@@ -148,12 +148,12 @@ void Notify (int x0, int y0, const char *prompt1, const char *prompt2)
 
     maxlen = strlen (prompt3);
 
-    if (strlen (prompt1) > maxlen)
-        maxlen = strlen (prompt1);
-    if (prompt2 != NULL && strlen (prompt2) > maxlen)
-        maxlen = strlen (prompt2);
+    if (prompt1.length() > maxlen)
+        maxlen = prompt1.length();
+    if (prompt2.length() > maxlen)
+        maxlen = prompt2.length();
 
-    n_lines_of_text = (prompt2 == NULL ? 2.5 : 3.5);
+    n_lines_of_text = (prompt2 == "" ? 2.5 : 3.5);
     width = 2 * BOX_BORDER + 2 * WIDE_HSPACING + maxlen * FONTW;
     height = 2 * BOX_BORDER + 2 * WIDE_VSPACING + (int) (n_lines_of_text * FONTH);
 
@@ -170,10 +170,10 @@ void Notify (int x0, int y0, const char *prompt1, const char *prompt2)
     y1      = text_y1 + WIDE_HSPACING + BOX_BORDER;
     DrawScreenBox3D (x0, y0, x1, y1);
     set_colour (WHITE);
-    DrawScreenText (text_x0, text_y0, prompt1);
+    DrawScreenText (text_x0, text_y0, prompt1.c_str());
 
-    if (prompt2 != NULL)
-        DrawScreenText (text_x0, text_y0 + FONTH, prompt2);
+    if (prompt2 != "")
+        DrawScreenText (text_x0, text_y0 + FONTH, prompt2.c_str());
 
     set_colour (WINTITLE);
     DrawScreenText (text_x0, text_y1 - FONTH - 1, prompt3);

@@ -27,6 +27,7 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <string>
 
 #include "yadex.h"
 #include "dialog.h"
@@ -35,6 +36,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "objid.h"
 #include "selectn.h"
 
+using std::string;
+using std::to_string;
 
 /*
    merge two or more Sectors into one
@@ -78,27 +81,23 @@ void DeleteLineDefsJoinSectors (SelPtr *ldlist) /* SWAP! */
 SelPtr cur, slist;
 int    sd1, sd2;
 int    s1, s2;
-char   msg[80];
 
 /* first, do the tests for all LineDefs */
-for (cur = *ldlist; cur; cur = cur->next)
-   {
+for (cur = *ldlist; cur; cur = cur->next) {
    sd1 = LineDefs[cur->objnum].sidedef1;
    sd2 = LineDefs[cur->objnum].sidedef2;
-   if (sd1 < 0 || sd2 < 0)
-      {
+   if (sd1 < 0 || sd2 < 0) {
       Beep ();
-      sprintf (msg, "ERROR: Linedef #%d has only one side", cur->objnum);
-      Notify (-1, -1, msg, NULL);
+      Notify (-1, -1, "ERROR: Linedef #" + to_string(cur->objnum) + " has only one side", "");
       return;
       }
    s1 = SideDefs[sd1].sector;
    s2 = SideDefs[sd2].sector;
-   if (s1 < 0 || s2 < 0)
-      {
+   if (s1 < 0 || s2 < 0) {
       Beep ();
-      sprintf (msg, "ERROR: Linedef #%d has two sides, but one", cur->objnum);
-      Notify (-1, -1, msg, "side is not bound to any sector");
+      Notify (-1, -1,
+				"ERROR: Linedef #" + to_string(cur->objnum) + " has two sides, but one",
+				"side is not bound to any sector");
       return;
       }
    }

@@ -3,7 +3,11 @@
  *	AYM 1998-09-06
  */
 
+#include <string>
+#include <utility>
 
-char *find_level (const char *name_given);
-void EditLevel (const char *, bool);
+using std::string;
+using std::pair;
 
+pair<string, char*> find_level (const string name_given);
+void EditLevel (string, bool);

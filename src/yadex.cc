@@ -27,6 +27,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <string>
+#include <utility>
 
 #include "yadex.h"
 #include <time.h>
@@ -58,6 +59,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wads2.h"
 
 using std::string;
+using std::pair;
+using std::make_pair;
 
 /*
  *    Constants (declared in yadex.h)
@@ -717,9 +720,8 @@ static void MainLoop ()
         else if (strcmp (com, "edit") == 0 || strcmp (com, "e") == 0
                     || strcmp (com, "create") == 0 || strcmp (com, "c") == 0)
         {
-            const int newlevel = strcmp (com, "create") == 0
-                || strcmp (com, "c") == 0;
-            char *level_name = 0;
+            const bool newlevel = strcmp (com, "create") == 0 || strcmp (com, "c") == 0;
+            pair<string, char*> level_name;
             com = strtok (NULL, " ");
             if (com == 0)
                 if (! newlevel)
@@ -727,25 +729,25 @@ static void MainLoop ()
                     printf ("Which level ?\n");
                     continue;
                 }else
-                    level_name = 0;
+                    level_name = make_pair("", nullptr);
             else
             {
-                level_name = find_level (com);
-                if (level_name == error_invalid)
+					level_name = find_level(string(com));
+                if (level_name.second == error_invalid)
                 {
                     printf ("\"%s\" is not a valid level name.\n", com);
                     continue;
-                }else if (level_name == error_none)
+                }else if (level_name.second == error_none)
                 {
                     printf ("Neither E%dM%d nor MAP%02d exist.\n",
                     atoi (com) / 10, atoi (com) % 10, atoi (com));
                     continue;
-                }else if (level_name == error_non_unique)
+                }else if (level_name.second == error_non_unique)
                 {
                     printf ("Both E%dM%d and MAP%02d exist. Use an unambiguous name.\n",
                     atoi (com) / 10, atoi (com) % 10, atoi (com));
                     continue;
-                }else if (level_name == NULL)
+                }else if (level_name.first == "")
                 {
                     printf ("Level %s not found.", com);
                     // Hint absent-minded users
@@ -758,9 +760,7 @@ static void MainLoop ()
                     continue;
                 }
             }
-            EditLevel (level_name, newlevel);
-            if (level_name)
-                free (level_name);
+            EditLevel(level_name.first, newlevel);
         }
         /* user asked to build a new main wad file */
         else if (strcmp (com, "build") == 0 || strcmp (com, "b") == 0)

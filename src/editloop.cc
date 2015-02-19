@@ -174,7 +174,7 @@ bool mode_s  (micbarg_t p) { return ((edit_t *) p)->obj_type == OBJ_SECTORS;  }
 /*
   the editor main loop
 */
-void EditorLoop (const char *levelname) /* SWAP! */
+void EditorLoop (string levelname) /* SWAP! */
 {
     edit_t e;
     /* FIXME : all these variables should be moved to edit_t : */
@@ -1149,27 +1149,25 @@ void EditorLoop (const char *levelname) /* SWAP! */
 
                 /* [F2] save level into pwad, prompt for the file name
                 every time but keep the same level name. */
-                else if (is.key == YK_F2 && Registered)
-                {
+                else if (is.key == YK_F2 && Registered) {
+                    string newlevelname = "";
+                    char *outfile;
                     if (! CheckStartingPos ())
                         goto cancel_save;
-                    char *outfile;
-                    const char *newlevelname;
-                    if (levelname)
+                    if (levelname != "")
                         newlevelname = levelname;
-                    else
-                    {
+                    else {
                         newlevelname = SelectLevel(0).c_str();
-                        if (! *newlevelname)
+                        if (newlevelname == "")
                             goto cancel_save;
                     }
-                    outfile = GetWadFileName (newlevelname);
+                    outfile = GetWadFileName (newlevelname.c_str());
                     if (! outfile)
                         goto cancel_save;
-                    SaveLevelData (outfile, newlevelname);
+                    SaveLevelData (outfile, newlevelname.c_str());
                     levelname = newlevelname;
                     // Sigh. Shouldn't have to do that. Level must die !
-                    Level = FindMasterDir (MasterDir, levelname);
+                    Level = FindMasterDir (MasterDir, levelname.c_str());
 cancel_save:
                     RedrawMap = 1;
                 }
@@ -1187,7 +1185,7 @@ cancel_save:
                     newlevelname = SelectLevel(0).c_str();
                     if (! *newlevelname)
                         goto cancel_save_as;
-                    if (! levelname || y_stricmp (newlevelname, levelname))
+                    if (levelname == "" || y_stricmp (newlevelname, levelname.c_str()))
                     {
                         /* horrible but it works... */
                         // Horrible indeed -- AYM 1999-07-30
@@ -2113,15 +2111,14 @@ cancel_save_as:
             else if (is.key == 'b')
             {
                 char *acsfile;
-                const char *acsname;
-                if (levelname)
+                string acsname;
+                if (levelname != "")
                     acsname = levelname;
                 else
                     acsname = "behavior";
-                acsfile = GetBehaviorFileName (acsname);
+                acsfile = GetBehaviorFileName (acsname.c_str());
                 FILE* f = fopen(acsfile, "rb");
-                if (f)
-                {
+                if (f) {
                     free(Behavior);
                     fseek(f, 0, SEEK_END);
                     BehaviorSize = ftell(f);

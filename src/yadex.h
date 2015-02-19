@@ -422,7 +422,6 @@ void LinedefProperties (int x0, int y0, SelPtr obj);
 void unlink_sidedef (SelPtr linedefs, int side1, int side2);
 
 // levels.cc
-int ReadLevelData (const char *); /* SWAP! */
 void ForgetLevelData (void); /* SWAP! */
 int SaveLevelData (const char *, const char *level_name); /* SWAP! */
 void ReadWTextureNames (void);

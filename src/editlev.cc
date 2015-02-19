@@ -25,6 +25,11 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <exception>
+#include <sstream>
+#include <string>
+#include <utility>
+
 #include "yadex.h"
 #include <time.h>
 #include <X11/Xlib.h>
@@ -36,6 +41,14 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "levels.h"
 #include "patchdir.h"
 #include "wadfile.h"
+
+using std::stringstream;
+using std::exception;
+using std::stoi;
+using std::string;
+using std::to_string;
+using std::pair;
+using std::make_pair;
 
 static void WriteYadexLog (const char *file, const char *level,
  time_t *t0, time_t *t1);
@@ -65,166 +78,119 @@ static void WriteYadexLog (const char *file, const char *level,
  *      - if the <name_given> is invalid, <error_invalid>,
  *      - if several were found, <error_non_unique>.
  */
-char *find_level (const char *name_given)
-{
-    // Is it a shorthand name ? ("1", "23", ...)
-	if ((al_sisnum (name_given) && (atoi (name_given) <= 99))
-		|| (atoi (name_given) <= 999 && yg_level_name == YGLN_E1M10))
-	{
-        int n = atoi (name_given);
-        char *name1 = (char *) malloc (7);
-        char *name2 = (char *) malloc (6);
-        if (n > 99)
-            snprintf (name1, 7, "E%dM%02d", n / 100, n % 100);
-        else
-            snprintf (name1, 7, "E%dM%d", n / 10, n % 10);
-        snprintf (name2, 6, "MAP%02d", n);
-        int match1 = FindMasterDir (MasterDir, name1) != NULL;
-        int match2 = FindMasterDir (MasterDir, name2) != NULL;
-        if (match1 && ! match2)       // Found only ExMy
-        {
-            free (name2);
-            return name1;
-        }else if (match2 && ! match1) // Found only MAPxy
-        {
-            free (name1);
-            return name2;
-        }else if (match1 && match2)   // Found both
-        {
-            free (name1);
-            free (name2);
-            return error_non_unique;
-        }else                         // Found none
-        {
-            free (name1);
-            free (name2);
-            return error_none;
-        }
-    }
+pair<string, char*>
+find_level (const string name_given) {
+	try {
+		/* Short level name */
+		int n = stoi(name_given);
+		if (n <= 99 || (n <= 999 && yg_level_name == YGLN_E1M10)) {
+			stringstream s;
+			s << "E";
+			if (n > 99) {
+				s << n / 100 << "M";
+				s.width(2);
+				s.fill('0');
+				s << n % 100;
+			} else {
+				s << n / 10 << "M" << n % 10;
+			}
+			string name1 = s.str();
+			s.str("");
+			s << "MAP";
+			s.width(2);
+			s << n;
+			string name2 = s.str();
 
-#if 1
-    // Else look for <name_given>
-    if (FindMasterDir (MasterDir, name_given))
-        return al_sdup (name_given);
-    else
-    {
-        if (levelname2levelno (name_given))
-            return NULL;
-        else
-            return error_invalid;
-    }
-#else
-    // If <name_given> is "[Ee]n[Mm]m" or "[Mm][Aa][Pp]nm", look for that
-    if (levelname2levelno (name_given))
-    {
-        char *canonical_name = strdup (name_given);
-        for (char *p = canonical_name; *p; p++)
-            *p = toupper (*p);  // But shouldn't FindMasterDir() be case-insensitive ?
-        if (FindMasterDir (MasterDir, canonical_name))
-            return canonical_name;
-        else
-        {
-            free (canonical_name);
-            return NULL;
-        }
-    }
-    return error_invalid;
-#endif
+			bool match1 = FindMasterDir(MasterDir, name1.c_str()) != NULL;
+			bool match2 = FindMasterDir(MasterDir, name2.c_str()) != NULL;
+
+			if (match1 and not match2) /* Found only ExMy */
+				return make_pair(name1, nullptr);
+			else if (match2 and not match1) /* Found only MAPxy */
+				return make_pair(name2, nullptr);
+			else if (match1 and match2) /* Found both */
+				return make_pair("", error_non_unique);
+			else /* Found none */
+				return make_pair("", error_none);
+		}
+	} catch (exception &e) {
+	}
+
+	/* Complete name */
+	if (FindMasterDir (MasterDir, name_given.c_str()))
+		return make_pair(name_given, nullptr);
+	else {
+		if (levelname2levelno(name_given.c_str()))
+			return make_pair(name_given, nullptr);
+		else
+			return make_pair("", error_invalid);
+	}
 }
 
 /*
    the driving program
 */
-void EditLevel (const char *levelname, bool newlevel)
+void EditLevel (string levelname, bool newlevel)
 {
-    ReadWTextureNames ();
-    ReadFTextureNames ();
-    patch_dir.refresh (MasterDir);
+	time_t t0, t1;
+	string buf = "Yadex: " + (levelname != "" ? levelname : "(untitled)");
 
-    if (not InitGfx())
-        return;
+	ReadWTextureNames ();
+	ReadFTextureNames ();
+	patch_dir.refresh (MasterDir);
 
-    /* Call init_input_status() as shortly as possible after the creation
-    of the window to minimize the risk of calling get_input_status(),
-    get_key(), have_key(), etc. with <is> still uninitialized. */
-    init_input_status ();
-    init_event ();
-    if (newlevel && ! levelname)  // "create"
-    {
-        EmptyLevelData (levelname);
-        MapMinX = -2000;
-        MapMinY = -2000;
-        MapMaxX = 2000;
-        MapMaxY = 2000;
-        Level = 0;
-    } else if (newlevel && levelname)  // "create <level_name>"
-    {
-        printf ("Sorry, \"create <level_name>\" is not implemented."
-                " Try \"create\" without argument.\n");
-        TermGfx ();
-        return;
-    } else  // "edit <level_name>" or "edit"
-    {
-            ClearScreen ();
-            if (ReadLevelData (levelname))
-            {
-                goto done;  // Failure!
-            }
-    }
-    LogMessage (": Editing %s...\n", levelname ? levelname : "new level");
+	if (not InitGfx())
+		return;
 
-    // Set the name of the window
-    {
-#define BUFSZ 100
-        char buf[BUFSZ + 1];
+	/* Call init_input_status() as shortly as possible after the creation
+		of the window to minimize the risk of calling get_input_status(),
+		get_key(), have_key(), etc. with <is> still uninitialized. */
+	init_input_status ();
+	init_event ();
+	if (newlevel && levelname == "") { // "create"
+		EmptyLevelData (levelname);
+		MapMinX = -2000;
+		MapMinY = -2000;
+		MapMaxX = 2000;
+		MapMaxY = 2000;
+		Level = 0;
+	} else if (newlevel && levelname != "")  { // "create <level_name>"
+		printf ("Sorry, \"create <level_name>\" is not implemented."
+				" Try \"create\" without argument.\n");
+		TermGfx ();
+		return;
+	} else { // "edit <level_name>" or "edit"
+		ClearScreen ();
+		if (ReadLevelData (levelname)) {
+			goto done;  // Failure!
+		}
+	}
+	LogMessage(string(": Editing " + (levelname != "" ? levelname : "new level") + "...\n").c_str());
 
-#ifdef OLD_TITLE
-        al_scps (buf, "Yadex - ", BUFSZ);
-        if (Level && Level->wadfile)
-            al_saps (buf, Level->wadfile->filename, BUFSZ);
-        else
-            al_saps (buf, "New level", BUFSZ);
-        if (Level)
-        {
-            al_saps (buf, " - ",           BUFSZ);
-            al_saps (buf, Level->dir.name, BUFSZ);
-        } else if (levelname)
-        {
-            al_saps (buf, " - ",     BUFSZ);
-            al_saps (buf, levelname, BUFSZ);
-        }
-#else
-        al_scps (buf, "Yadex: ", BUFSZ);
-        al_saps (buf, (levelname) ? levelname : "(null)", BUFSZ);
-#endif
-        XStoreName (dpy, win, buf);
-#undef BUFSZ
-    }
+	// Set the name of the window
+	XStoreName (dpy, win, buf.c_str());
 
-    {
-        time_t t0, t1;
-        time (&t0);
-        EditorLoop (levelname);
-        time (&t1);
-        LogMessage (": Finished editing %s...\n", levelname ? levelname : "new level");
-        if (Level && Level->wadfile)
-        {
-            const char *const file_name =
-            Level->wadfile ? Level->wadfile->pathname () : "(New level)";
-            WriteYadexLog (file_name, levelname, &t0, &t1);
-        }
-    }
+	time (&t0);
+	EditorLoop (levelname);
+	time (&t1);
+	LogMessage(string(": Finished editing " + (levelname != "" ? levelname : "new level") + "...\n").c_str());
+	if (Level && Level->wadfile) {
+		const char *const file_name =
+			Level->wadfile ? Level->wadfile->pathname () : "(New level)";
+		WriteYadexLog (file_name, levelname.c_str(), &t0, &t1);
+	}
+
 done:
-    TermGfx ();
-    if (! Registered)
-        printf ("Please register the game"
-                " if you want to be able to save your changes.\n");
+	TermGfx ();
+	if (! Registered)
+		printf ("Please register the game"
+				" if you want to be able to save your changes.\n");
 
-    ForgetLevelData ();
-    /* forget the level pointer */
-    Level = 0;
-    ForgetWTextureNames ();
-    ForgetFTextureNames ();
+	ForgetLevelData ();
+	/* forget the level pointer */
+	Level = 0;
+	ForgetWTextureNames ();
+	ForgetFTextureNames ();
 }
 
 

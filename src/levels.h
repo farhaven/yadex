@@ -90,7 +90,8 @@ extern y_file_name_t Level_file_name_saved;  /* The name of the file in
 				   the Level has never been saved yet,
 				   an empty string. */
 
-void EmptyLevelData (const char *levelname);
+int ReadLevelData (string); /* SWAP! */
+void EmptyLevelData(string levelname);
 void update_level_bounds ();
 
 

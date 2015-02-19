@@ -108,26 +108,25 @@ static uint8_t DefaultBehavior[16] = {
 	'A', 'C', 'S', 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void EmptyLevelData (const char *levelname)
-{
-Things = 0;
-NumThings = 0;
-things_angles++;
-things_types++;
-LineDefs = 0;
-NumLineDefs = 0;
-SideDefs = 0;
-NumSideDefs = 0;
-Sectors = 0;
-NumSectors = 0;
-Vertices = 0;
-NumVertices = 0;
-if (yg_level_format == YGLF_HEXEN)
-   {
-      BehaviorSize = sizeof(DefaultBehavior);
-      Behavior = (uint8_t*) malloc(BehaviorSize );
-      memcpy(Behavior, DefaultBehavior, BehaviorSize);
-   }
+void EmptyLevelData (string levelname) {
+	Things = 0;
+	NumThings = 0;
+	things_angles++;
+	things_types++;
+	LineDefs = 0;
+	NumLineDefs = 0;
+	SideDefs = 0;
+	NumSideDefs = 0;
+	Sectors = 0;
+	NumSectors = 0;
+	Vertices = 0;
+	NumVertices = 0;
+
+	if (yg_level_format == YGLF_HEXEN) {
+		BehaviorSize = sizeof(DefaultBehavior);
+		Behavior = (uint8_t*) malloc(BehaviorSize );
+		memcpy(Behavior, DefaultBehavior, BehaviorSize);
+	}
 }
 
 
@@ -162,15 +161,14 @@ else
    read in the level data
 */
 
-int ReadLevelData (const char *levelname) /* SWAP! */
-{
+int ReadLevelData (string levelname) { /* SWAP! */
 int rc = 0;
 MDirPtr dir;
 int OldNumVertices;
 
 /* Find the various level information from the master directory */
-DisplayMessage (-1, -1, "Reading data for level %s...", levelname);
-Level = FindMasterDir (MasterDir, levelname);
+DisplayMessage (-1, -1, "Reading data for level %s...", levelname.c_str());
+Level = FindMasterDir (MasterDir, levelname.c_str());
 if (!Level)
    fatal_error ("level data not found");
 
@@ -205,7 +203,7 @@ else
 // Read THINGS
 {
 const char *lump_name = "THINGS";
-verbmsg ("Reading %s things", levelname);
+verbmsg ("Reading %s things", levelname.c_str());
 int32_t offset = 42;
 int32_t length;
 dir = FindMasterDir (Level, lump_name);
@@ -977,44 +975,43 @@ verbmsg ("  Map: (%d,%d)-(%d,%d)\n", MapMinX, MapMinY, MapMaxX, MapMaxY);
 
 byebye:
 if (rc != 0)
-   err ("%s: errors found, giving up", levelname);
+   err ("%s: errors found, giving up", levelname.c_str());
 return rc;
 }
 
 
 
 /*
-   forget the level data
-*/
+	forget the level data
+	*/
 
-void ForgetLevelData () /* SWAP! */
-{
-/* forget the things */
-NumThings = 0;
-free(Things);
-Things = NULL;
-things_angles++;
-things_types++;
+void ForgetLevelData () { /* SWAP! */
+	/* forget the things */
+	NumThings = 0;
+	free(Things);
+	Things = NULL;
+	things_angles++;
+	things_types++;
 
-/* forget the vertices */
-NumVertices = 0;
-free(Vertices);
-Vertices = NULL;
+	/* forget the vertices */
+	NumVertices = 0;
+	free(Vertices);
+	Vertices = NULL;
 
-/* forget the linedefs */
-NumLineDefs = 0;
-free(LineDefs);
-LineDefs = NULL;
+	/* forget the linedefs */
+	NumLineDefs = 0;
+	free(LineDefs);
+	LineDefs = NULL;
 
-/* forget the sidedefs */
-NumSideDefs = 0;
-free(SideDefs);
-SideDefs = NULL;
+	/* forget the sidedefs */
+	NumSideDefs = 0;
+	free(SideDefs);
+	SideDefs = NULL;
 
-/* forget the sectors */
-NumSectors = 0;
-free(Sectors);
-Sectors = NULL;
+	/* forget the sectors */
+	NumSectors = 0;
+	free(Sectors);
+	Sectors = NULL;
 }
 
 

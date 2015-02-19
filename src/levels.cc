@@ -369,14 +369,15 @@ int ReadLevelData (string levelname) { /* SWAP! */
 				wf->read_int16_t   (&sd.xoff);
 				wf->read_int16_t   (&sd.yoff);
 
-				wf->read_bytes(buf, WAD_TEX_NAME);
-				sd.tex1 = "-"; // string(buf);
 				memset(buf, 0x00, sizeof(buf));
+				wf->read_bytes(buf, WAD_TEX_NAME);
+				sd.tex1 = string(buf);
 
+				memset(buf, 0x00, sizeof(buf));
 				wf->read_bytes(buf, WAD_TEX_NAME);
 				sd.tex2 = string(buf);
-				memset(buf, 0x00, sizeof(buf));
 
+				memset(buf, 0x00, sizeof(buf));
 				wf->read_bytes(buf, WAD_TEX_NAME);
 				sd.tex3 = string(buf);
 

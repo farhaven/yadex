@@ -248,225 +248,192 @@ static void draw_grid (edit_t *e)
 /*
  *	draw_vertices - draw the vertices, and possibly their numbers
  */
-static void draw_vertices (edit_t *e)
-{
-  int mapx0 = MAPX (0);
-  int mapx9 = MAPX (ScrMaxX);
-  int mapy0 = MAPY (ScrMaxY);
-  int mapy9 = MAPY (0);
-  const int r = vertex_radius (Scale);
+static void draw_vertices (edit_t *e) {
+	int mapx0 = MAPX(0);
+	int mapx9 = MAPX(ScrMaxX);
+	int mapy0 = MAPY(ScrMaxY);
+	int mapy9 = MAPY(0);
+	const int r = vertex_radius(Scale);
 
-  push_colour (LIGHTGREEN);
-  for (int n = 0; n < NumVertices; n++)
-  {
-    int mapx = Vertices[n].x;
-    int mapy = Vertices[n].y;
-    if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9)
-    {
-      register int scrx = SCREENX (mapx);
-      register int scry = SCREENY (mapy);
-      DrawScreenLine (scrx - r, scry - r, scrx + r, scry + r);
-      DrawScreenLine (scrx + r, scry - r, scrx - r, scry + r);
-    }
-  }
-  if (e->show_object_numbers)
-  {
-    for (int n = 0; n < NumVertices; n++)
-    {
-      int mapx = Vertices[n].x;
-      int mapy = Vertices[n].y;
-      if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9)
-      {
-	int x = (int) (SCREENX (mapx) + 2 * r);
-	int y = SCREENY (mapy) + 2;
-	draw_obj_no (x, y, n, VERTEX_NO);
-      }
-    }
-  }
-  pop_colour ();
+	push_colour(LIGHTGREEN);
+
+	for (int n = 0; n < NumVertices; n++) {
+		int mapx = Vertices[n].x;
+		int mapy = Vertices[n].y;
+		if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9) {
+			int scrx = SCREENX (mapx);
+			int scry = SCREENY (mapy);
+			DrawScreenLine (scrx - r, scry - r, scrx + r, scry + r);
+			DrawScreenLine (scrx + r, scry - r, scrx - r, scry + r);
+		}
+	}
+	if (e->show_object_numbers) {
+		for (int n = 0; n < NumVertices; n++) {
+			int mapx = Vertices[n].x;
+			int mapy = Vertices[n].y;
+			if (mapx >= mapx0 && mapx <= mapx9 && mapy >= mapy0 && mapy <= mapy9) {
+				int x = (int) (SCREENX (mapx) + 2 * r);
+				int y = SCREENY (mapy) + 2;
+				draw_obj_no (x, y, n, VERTEX_NO);
+			}
+		}
+	}
+	pop_colour ();
 }
 
 
 /*
  *	draw_linedefs - draw the linedefs
  */
-static void draw_linedefs (edit_t *e)
-{
-  int mapx0 = MAPX (0);
-  int mapx9 = MAPX (ScrMaxX);
-  int mapy0 = MAPY (ScrMaxY);
-  int mapy9 = MAPY (0);
+static void draw_linedefs (edit_t *e) {
+	int mapx0 = MAPX(0);
+	int mapx9 = MAPX(ScrMaxX);
+	int mapy0 = MAPY(ScrMaxY);
+	int mapy9 = MAPY(0);
 
-  switch (e->obj_type)
-  {
-    case OBJ_THINGS:
-    {
-      int current_colour = INT_MIN;  /* Some impossible colour no. */
-      int new_colour;
-      
-      for (int n = 0; n < NumLineDefs; n++)
-      {
-	register int x1 = Vertices[LineDefs[n].start].x;
-	register int x2 = Vertices[LineDefs[n].end  ].x;
-	register int y1 = Vertices[LineDefs[n].start].y;
-	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if ((x1 < mapx0 && x2 < mapx0)
-			|| (x1 > mapx9 && x2 > mapx9)
-			|| (y1 < mapy0 && y2 < mapy0)
-			|| (y1 > mapy9 && y2 > mapy9))
-	  continue;
-	if (LineDefs[n].flags & 1)
-	  new_colour = WHITE;
-	else
-	  new_colour = LIGHTGREY;
-	if (new_colour != current_colour)
-	  set_colour (current_colour = new_colour);
-	DrawMapLine (x1, y1, x2, y2);
-      }
-      break;
-    }
+	int current_colour = INT_MIN;  /* Some impossible colour no. */
+	int new_colour;
 
-    case OBJ_VERTICES:
-      set_colour (LIGHTGREY);
-      for (int n = 0; n < NumLineDefs; n++)
-      {
-	register int x1 = Vertices[LineDefs[n].start].x;
-	register int x2 = Vertices[LineDefs[n].end  ].x;
-	register int y1 = Vertices[LineDefs[n].start].y;
-	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if ((x1 < mapx0 && x2 < mapx0)
-			||(x1 > mapx9 && x2 > mapx9)
-			||(y1 < mapy0 && y2 < mapy0)
-			||(y1 > mapy9 && y2 > mapy9))
-	  continue;
-	DrawMapVector (x1, y1, x2, y2);
-      }
-      break;
+	switch (e->obj_type) {
+		case OBJ_THINGS:
+			for (int n = 0; n < NumLineDefs; n++) {
+				int x1 = Vertices[LineDefs[n].start].x;
+				int x2 = Vertices[LineDefs[n].end  ].x;
+				int y1 = Vertices[LineDefs[n].start].y;
+				int y2 = Vertices[LineDefs[n].end  ].y;
+				if ((x1 < mapx0 && x2 < mapx0)
+						|| (x1 > mapx9 && x2 > mapx9)
+						|| (y1 < mapy0 && y2 < mapy0)
+						|| (y1 > mapy9 && y2 > mapy9))
+					continue;
+				if (LineDefs[n].flags & 1)
+					new_colour = WHITE;
+				else
+					new_colour = LIGHTGREY;
+				if (new_colour != current_colour)
+					set_colour (current_colour = new_colour);
+				DrawMapLine (x1, y1, x2, y2);
+			}
+			break;
+		case OBJ_VERTICES:
+			set_colour (LIGHTGREY);
+			for (int n = 0; n < NumLineDefs; n++) {
+				int x1 = Vertices[LineDefs[n].start].x;
+				int x2 = Vertices[LineDefs[n].end  ].x;
+				int y1 = Vertices[LineDefs[n].start].y;
+				int y2 = Vertices[LineDefs[n].end  ].y;
+				if ((x1 < mapx0 && x2 < mapx0)
+						||(x1 > mapx9 && x2 > mapx9)
+						||(y1 < mapy0 && y2 < mapy0)
+						||(y1 > mapy9 && y2 > mapy9))
+					continue;
+				DrawMapVector (x1, y1, x2, y2);
+			}
+			break;
+		case OBJ_LINEDEFS:
+			for (int n = 0; n < NumLineDefs; n++) {
+				int x1 = Vertices[LineDefs[n].start].x;
+				int x2 = Vertices[LineDefs[n].end  ].x;
+				int y1 = Vertices[LineDefs[n].start].y;
+				int y2 = Vertices[LineDefs[n].end  ].y;
+				if ((x1 < mapx0 && x2 < mapx0)
+						|| (x1 > mapx9 && x2 > mapx9)
+						|| (x1 < mapy0 && y2 < mapy0)
+						|| (y1 > mapy9 && y2 > mapy9))
+					continue;
+				if (LineDefs[n].type != 0)  { /* AYM 19980207: was "> 0" */
+					if (LineDefs[n].tag != 0)  /* AYM 19980207: was "> 0" */
+						new_colour = LIGHTMAGENTA;
+					else
+						new_colour = LIGHTGREEN;
+				}
+				else if (LineDefs[n].flags & 1)
+					new_colour = WHITE;
+				else
+					new_colour = LIGHTGREY;
 
-    case OBJ_LINEDEFS:
-    {
-      int current_colour = INT_MIN;  /* Some impossible colour no. */
-      int new_colour;
+				// Signal errors by drawing the linedef in red. Needs work.
+				// Tag on a typeless linedef
+				if (LineDefs[n].type == 0 && LineDefs[n].tag != 0)
+					new_colour = LIGHTRED;
+				// No first sidedef
+				if (! is_sidedef (LineDefs[n].sidedef1))
+					new_colour = LIGHTRED;
+				// Bad second sidedef
+				if (! is_sidedef (LineDefs[n].sidedef2) && LineDefs[n].sidedef2 != -1)
+					new_colour = LIGHTRED;
 
-      for (int n = 0; n < NumLineDefs; n++)
-      {
-	register int x1 = Vertices[LineDefs[n].start].x;
-	register int x2 = Vertices[LineDefs[n].end  ].x;
-	register int y1 = Vertices[LineDefs[n].start].y;
-	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if ((x1 < mapx0 && x2 < mapx0)
-			|| (x1 > mapx9 && x2 > mapx9)
-			|| (x1 < mapy0 && y2 < mapy0)
-			|| (y1 > mapy9 && y2 > mapy9))
-		continue;
-	if (LineDefs[n].type != 0)  /* AYM 19980207: was "> 0" */
-	{
-	  if (LineDefs[n].tag != 0)  /* AYM 19980207: was "> 0" */
-	    new_colour = LIGHTMAGENTA;
-	  else
-	    new_colour = LIGHTGREEN;
+				if (new_colour != current_colour)
+					set_colour (current_colour = new_colour);
+				DrawMapLine (x1, y1, x2, y2);
+
+				if (e->show_object_numbers) {
+					int scnx0       = SCREENX (x1);
+					int scnx1       = SCREENX (x2);
+					int scny0       = SCREENY (y1);
+					int scny1       = SCREENY (y2);
+					int label_width = ((int) log10 (n) + 1) * FONTW;
+					if (abs (scnx1 - scnx0) > label_width + 4
+							|| abs (scny1 - scny0) > label_width + 4) {
+						int scnx = (scnx0 + scnx1) / 2 - label_width / 2;
+						int scny = (scny0 + scny1) / 2 - FONTH / 2;
+						draw_obj_no (scnx, scny, n, LINEDEF_NO);
+					}
+				}
+			}
+			break;
+		case OBJ_SECTORS:
+			for (int n = 0; n < NumLineDefs; n++) {
+				int x1 = Vertices[LineDefs[n].start].x;
+				int x2 = Vertices[LineDefs[n].end  ].x;
+				int y1 = Vertices[LineDefs[n].start].y;
+				int y2 = Vertices[LineDefs[n].end  ].y;
+				if ((x1 < mapx0 && x2 < mapx0)
+						|| (x1 > mapx9 && x2 > mapx9)
+						|| (y1 < mapy0 && y2 < mapy0)
+						|| (y1 > mapy9 && y2 > mapy9))
+					continue;
+				int sd1 = OBJ_NO_NONE;
+				int sd2 = OBJ_NO_NONE;
+				int s1  = OBJ_NO_NONE;
+				int s2  = OBJ_NO_NONE;
+				// FIXME should flag negative sidedef numbers as errors
+				// FIXME should flag unused tag as errors
+				if ((sd1 = LineDefs[n].sidedef1) < 0 || sd1 >= NumSideDefs
+						|| (s1 = SideDefs[sd1].sector) < 0 || s1 >= NumSectors
+						|| (sd2 = LineDefs[n].sidedef2) >= NumSideDefs
+						|| (sd2 >= 0 && ((s2 = SideDefs[sd2].sector) < 0 || s2 >= NumSectors))) {
+					new_colour = LIGHTRED;
+				} else {
+					bool have_tag  = false;
+					bool have_type = false;
+					if (Sectors[s1].tag != 0)
+						have_tag = true;
+					if (Sectors[s1].special != 0)
+						have_type = true;
+					if (sd2 >= 0) {
+						if (Sectors[s2].tag != 0)
+							have_tag = true;
+						if (Sectors[s2].special != 0)
+							have_type = true;
+					}
+					if (have_tag && have_type)
+						new_colour = SECTOR_TAGTYPE;
+					else if (have_tag)
+						new_colour = SECTOR_TAG;
+					else if (have_type)
+						new_colour = SECTOR_TYPE;
+					else if (LineDefs[n].flags & 1)
+						new_colour = WHITE;
+					else
+						new_colour = LIGHTGREY;
+				}
+				if (new_colour != current_colour)
+					set_colour (current_colour = new_colour);
+				DrawMapLine (x1, y1, x2, y2);
+			}
+			break;
 	}
-	else if (LineDefs[n].flags & 1)
-	  new_colour = WHITE;
-	else
-	  new_colour = LIGHTGREY;
-
-	// Signal errors by drawing the linedef in red. Needs work.
-	// Tag on a typeless linedef
-	if (LineDefs[n].type == 0 && LineDefs[n].tag != 0)
-	  new_colour = LIGHTRED;
-	// No first sidedef
-	if (! is_sidedef (LineDefs[n].sidedef1))
-	  new_colour = LIGHTRED;
-	// Bad second sidedef
-	if (! is_sidedef (LineDefs[n].sidedef2) && LineDefs[n].sidedef2 != -1)
-	  new_colour = LIGHTRED;
-
-	if (new_colour != current_colour)
-	  set_colour (current_colour = new_colour);
-	DrawMapLine (x1, y1, x2, y2);
-
-	if (e->show_object_numbers)
-	{
-	  int scnx0       = SCREENX (x1);
-	  int scnx1       = SCREENX (x2);
-	  int scny0       = SCREENY (y1);
-	  int scny1       = SCREENY (y2);
-	  int label_width = ((int) log10 (n) + 1) * FONTW;
-	  if (abs (scnx1 - scnx0) > label_width + 4
-	   || abs (scny1 - scny0) > label_width + 4)
-	  {
-	    int scnx = (scnx0 + scnx1) / 2 - label_width / 2;
-	    int scny = (scny0 + scny1) / 2 - FONTH / 2;
-	    draw_obj_no (scnx, scny, n, LINEDEF_NO);
-	  }
-	}
-      }
-      break;
-    }
-
-    case OBJ_SECTORS:
-    {
-      int current_colour = INT_MIN;  /* Some impossible colour no. */
-      int new_colour;
-
-      for (int n = 0; n < NumLineDefs; n++)
-      {
-	register int x1 = Vertices[LineDefs[n].start].x;
-	register int x2 = Vertices[LineDefs[n].end  ].x;
-	register int y1 = Vertices[LineDefs[n].start].y;
-	register int y2 = Vertices[LineDefs[n].end  ].y;
-	if ((x1 < mapx0 && x2 < mapx0)
-			|| (x1 > mapx9 && x2 > mapx9)
-			|| (y1 < mapy0 && y2 < mapy0)
-			|| (y1 > mapy9 && y2 > mapy9))
-	  continue;
-	int sd1 = OBJ_NO_NONE;
-	int sd2 = OBJ_NO_NONE;
-	int s1  = OBJ_NO_NONE;
-	int s2  = OBJ_NO_NONE;
-	// FIXME should flag negative sidedef numbers as errors
-	// FIXME should flag unused tag as errors
-	if ((sd1 = LineDefs[n].sidedef1) < 0 || sd1 >= NumSideDefs
-	  || (s1 = SideDefs[sd1].sector) < 0 || s1 >= NumSectors
-	  || (sd2 = LineDefs[n].sidedef2) >= NumSideDefs
-	  || (sd2 >= 0 && ((s2 = SideDefs[sd2].sector) < 0 || s2 >= NumSectors)))
-	{
-	  new_colour = LIGHTRED;
-	}
-	else
-	{
-	  bool have_tag  = false;
-	  bool have_type = false;
-	  if (Sectors[s1].tag != 0)
-	    have_tag = true;
-	  if (Sectors[s1].special != 0)
-	    have_type = true;
-	  if (sd2 >= 0)
-	  {
-	    if (Sectors[s2].tag != 0)
-	      have_tag = true;
-	    if (Sectors[s2].special != 0)
-	      have_type = true;
-	  }
-	  if (have_tag && have_type)
-	    new_colour = SECTOR_TAGTYPE;
-	  else if (have_tag)
-	    new_colour = SECTOR_TAG;
-	  else if (have_type)
-	    new_colour = SECTOR_TYPE;
-	  else if (LineDefs[n].flags & 1)
-	    new_colour = WHITE;
-	  else
-	    new_colour = LIGHTGREY;
-	}
-	if (new_colour != current_colour)
-	  set_colour (current_colour = new_colour);
-	DrawMapLine (x1, y1, x2, y2);
-      }
-      break;
-    }
-  }
 }
 
 
@@ -623,9 +590,6 @@ static dim_map_t dim_map;  // FIXME there should be one for each game
  */
 static void draw_things_sprites (edit_t *e)
 {
-#ifdef NO_RENDER
-  static
-#endif
   Sticker      sticker;
   wad_ttype_t last_type = -1;  // Type of last thing displayed
   dim_map_t::iterator dim = dim_map.end ();
@@ -643,20 +607,6 @@ static void draw_things_sprites (edit_t *e)
     things_types_prev = things_types;
   }
 
-#ifdef NO_RENDER
-  static double last_scale = 0;
-  if (last_scale != Scale)
-  {
-    Lump_loc loc;
-    wad_res.sprites.loc_by_root ("PLAY", loc);
-    Img img;
-    LoadPicture (img, "PLAYA0", loc, 0, 0);
-    Img img_scaled;
-    scale_img (img, Scale * sprite_scale / 100, img_scaled);
-    sprite.load (img_scaled, false);
-    last_scale = Scale;
-  }
-#endif
   push_colour (CYAN);
   for (int n = 0; n < NumThings; n++)
   {
@@ -687,7 +637,6 @@ static void draw_things_sprites (edit_t *e)
     if (mapx < mapx0 || mapx > mapx9 || mapy < mapy0 || mapy > mapy9)
       continue;
 
-#ifndef NO_RENDER
     // If not the same as the last thing displayed, rasterize it
     if (t.type != last_type)
     {
@@ -720,7 +669,6 @@ static void draw_things_sprites (edit_t *e)
       else
 	sticker.clear ();  // We'll display the thing type instead
     }
-#endif
     
     // Display it
     if (sticker.is_clear ())

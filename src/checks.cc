@@ -38,8 +38,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "oldmenus.h"
 #include "selectn.h"
 
-static void CheckingObjects ();
-
 /*
  *	CheckLevel
  *	check the level consistency
@@ -144,14 +142,6 @@ void Statistics ()
 }
 
 /*
-   display a message while the user is waiting...
-*/
-static void CheckingObjects ()
-{
-    DisplayMessage (-1, -1, "Grinding...");
-}
-
-/*
    display a message, then ask if the check should continue (prompt2 may be empty)
 */
 bool CheckFailed (int x0, int y0, char *prompt1, string prompt2, bool fatal,
@@ -235,7 +225,6 @@ void CheckSectors ()
     char msg1[80], msg2[80];
     bool first_time = true;
 
-    CheckingObjects ();
     LogMessage ("\nVerifying Sectors...\n");
     ends = (char *) malloc(NumVertices);
     for (s = 0; s < NumSectors; s++)
@@ -368,13 +357,10 @@ void CheckCrossReferences () /* SWAP! */
     SelPtr cur;
     bool   first_time = true;
 
-    CheckingObjects ();
     LogMessage ("\nVerifying cross-references...\n");
-    for (n = 0; n < NumLineDefs; n++)
-    {
+    for (n = 0; n < NumLineDefs; n++) {
         /* Check for missing first sidedefs */
-        if (LineDefs[n].sidedef1 < 0)
-        {
+        if (LineDefs[n].sidedef1 < 0) {
             snprintf (msg, sizeof(msg), "ERROR: linedef #%d has no first sidedef!", n);
             CheckFailed (-1, -1, msg, "", 1, first_time);
             GoToObject (Objid (OBJ_LINEDEFS, n));
@@ -382,8 +368,7 @@ void CheckCrossReferences () /* SWAP! */
         }
 
         /* Check for vertices used twice in the same linedef */
-        if (LineDefs[n].start == LineDefs[n].end)
-        {
+        if (LineDefs[n].start == LineDefs[n].end) {
             snprintf (msg, sizeof(msg), "ERROR: linedef #%d uses the same vertex twice (#%d)",
             n, LineDefs[n].start);
             CheckFailed (-1, -1, msg, "", 1, first_time);
@@ -395,14 +380,12 @@ void CheckCrossReferences () /* SWAP! */
     /* check if there aren't two linedefs between the same Vertices */
     cur = 0;
     /* AYM 19980203 FIXME should use new algorithm */
-    for (n = NumLineDefs - 1; n >= 1; n--)
-    {
+    for (n = NumLineDefs - 1; n >= 1; n--) {
         for (m = n - 1; m >= 0; m--)
             if ((LineDefs[n].start == LineDefs[m].start
                 && LineDefs[n].end   == LineDefs[m].end)
                 || (LineDefs[n].start == LineDefs[m].end
-                && LineDefs[n].end   == LineDefs[m].start))
-                {
+                && LineDefs[n].end   == LineDefs[m].start)) {
                     SelectObject (&cur, n);
                     break;
                 }
@@ -415,7 +398,6 @@ void CheckCrossReferences () /* SWAP! */
     else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
     /* check for invalid flags in the linedefs */
     for (n = 0; n < NumLineDefs; n++)
         if ((LineDefs[n].flags & 0x01) == 0 && LineDefs[n].sidedef2 < 0)
@@ -423,60 +405,53 @@ void CheckCrossReferences () /* SWAP! */
     if (cur && (Expert
             || Confirm (-1, -1, "Some linedefs have only one side but their I flag is"
                                 " not set",
-                                "Do you want to set the 'Impassible' flag?")))
-        while (cur)
-        {
+                                "Do you want to set the 'Impassible' flag?"))) {
+        while (cur) {
             LogMessage  ("Check: 1-sided linedef without I flag: %d", cur->objnum);
             LineDefs[cur->objnum].flags |= 0x01;
             UnSelectObject (&cur, cur->objnum);
         }
-    else
+	 } else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
-    for (n = 0; n < NumLineDefs; n++)
+    for (n = 0; n < NumLineDefs; n++) {
         if ((LineDefs[n].flags & 0x04) != 0 && LineDefs[n].sidedef2 < 0)
             SelectObject (&cur, n);
+	 }
     if (cur
         && (Expert
             || Confirm (-1, -1, "Some linedefs have only one side but their 2 flag"
                                 " is set",
-                                "Do you want to clear the 'two-sided' flag?")))
-    {
-        while (cur)
-        {
+                                "Do you want to clear the 'two-sided' flag?"))) {
+        while (cur) {
             LogMessage  ("Check: 1-sided linedef with 2s bit: %d", cur->objnum);
             LineDefs[cur->objnum].flags &= ~0x04;
             UnSelectObject (&cur, cur->objnum);
         }
-    }else
+    } else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
-    for (n = 0; n < NumLineDefs; n++)
+    for (n = 0; n < NumLineDefs; n++) {
         if ((LineDefs[n].flags & 0x04) == 0 && LineDefs[n].sidedef2 >= 0)
             SelectObject (&cur, n);
+	 }
     if (cur
         && (Expert
             || Confirm (-1, -1,
             "Some linedefs have two sides but their 2S bit is not set",
-            "Do you want to set the 'two-sided' flag?")))
-    {
-            while (cur)
-            {
+            "Do you want to set the 'two-sided' flag?"))) {
+            while (cur) {
                 LineDefs[cur->objnum].flags |= 0x04;
                 UnSelectObject (&cur, cur->objnum);
             }
-    }else
+    } else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
     /* select all Vertices */
     for (n = 0; n < NumVertices; n++)
         SelectObject (&cur, n);
     /* unselect Vertices used in a LineDef */
-    for (n = 0; n < NumLineDefs; n++)
-    {
+    for (n = 0; n < NumLineDefs; n++) {
         m = LineDefs[n].start;
         if (cur && m >= 0)
             UnSelectObject (&cur, m);
@@ -486,46 +461,38 @@ void CheckCrossReferences () /* SWAP! */
         continue;
     }
     /* check if there are any Vertices left */
-    if (cur
-        && (Expert
+    if (cur && (Expert
             || Confirm (-1, -1, "Some vertices are not bound to any linedef",
-                                "Do you want to delete these unused Vertices?")))
-    {
+                                "Do you want to delete these unused Vertices?"))) {
         DeleteObjects (OBJ_VERTICES, &cur);
-    }else
+    } else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
     /* select all SideDefs */
-    for (unsigned int idx = 0; idx < SideDefs.size(); idx++)
-        SelectObject (&cur, idx);
+    for (n = 0; n < (signed) SideDefs.size(); n++)
+        SelectObject (&cur, n);
     /* unselect SideDefs bound to a LineDef */
-    for (n = 0; n < NumLineDefs; n++)
-    {
+    for (n = 0; n < NumLineDefs; n++) {
         m = LineDefs[n].sidedef1;
         if (cur && m >= 0)
             UnSelectObject (&cur, m);
         m = LineDefs[n].sidedef2;
         if (cur && m >= 0)
             UnSelectObject (&cur, m);
-        continue;
     }
     /* check if there are any SideDefs left */
-    if (cur
-        && (Expert
+    if (cur && (Expert
             || Confirm (-1, -1, "Some sidedefs are not bound to any linedef",
                                 "Do you want to delete these unused sidedefs?")))
         DeleteObjects (OBJ_SIDEDEFS, &cur);
     else
         ForgetSelection (&cur);
 
-    CheckingObjects ();
     /* select all Sectors */
     for (n = 0; n < NumSectors; n++)
         SelectObject (&cur, n);
     /* unselect Sectors bound to a sidedef */
-    for (n = 0; n < NumLineDefs; n++)
-    {
+    for (n = 0; n < NumLineDefs; n++) {
         m = LineDefs[n].sidedef1;
         if (cur && m >= 0 /* && SideDefs[m].sector >= 0 AYM 1998-06-13 */)
             UnSelectObject (&cur, SideDefs[m].sector);
@@ -535,8 +502,7 @@ void CheckCrossReferences () /* SWAP! */
         continue;
     }
     /* check if there are any Sectors left */
-    if (cur
-        && (Expert
+    if (cur && (Expert
             || Confirm (-1, -1, "Some sectors are not bound to any sidedef",
                                 "Do you want to delete these unused sectors?")))
         DeleteObjects (OBJ_SECTORS, &cur);
@@ -556,7 +522,6 @@ void CheckTextures () /* SWAP! */
 	 string msg2;
     bool first_time = true;
 
-    CheckingObjects ();
     LogMessage ("\nVerifying textures...\n");
     for (n = 0; n < NumSectors; n++)
     {
@@ -617,7 +582,6 @@ void CheckTextures () /* SWAP! */
                 }
                 SideDefs[sd1].tex3 = default_middle_texture;
                 MadeChanges = 1;
-                CheckingObjects ();
             }
         }
         if (is_obj (s1) && is_obj (s2) && Sectors[s1].ceilh > Sectors[s2].ceilh)
@@ -634,7 +598,6 @@ void CheckTextures () /* SWAP! */
                 }
                 SideDefs[sd1].tex1 = default_upper_texture;
                 MadeChanges = 1;
-                CheckingObjects ();
             }
         }
         if (is_obj (s1) && is_obj (s2) && Sectors[s1].floorh < Sectors[s2].floorh)
@@ -650,7 +613,6 @@ void CheckTextures () /* SWAP! */
                 }
                 SideDefs[sd1].tex2 = default_lower_texture;
                 MadeChanges = 1;
-                CheckingObjects ();
             }
         }
         if (is_obj (s1) && is_obj (s2) && Sectors[s2].ceilh > Sectors[s1].ceilh)
@@ -667,7 +629,6 @@ void CheckTextures () /* SWAP! */
                 }
                 SideDefs[sd2].tex1 = default_upper_texture;
                 MadeChanges = 1;
-                CheckingObjects ();
             }
         }
         if (is_obj (s1) && is_obj (s2) && Sectors[s2].floorh < Sectors[s1].floorh)
@@ -683,7 +644,6 @@ void CheckTextures () /* SWAP! */
 				}
             SideDefs[sd2].tex2 = default_lower_texture;
             MadeChanges = 1;
-            CheckingObjects ();
             }
         }
     }
@@ -709,7 +669,6 @@ void CheckTextureNames () /* SWAP! */
     char msg1[80], msg2[80];
     bool first_time = true;
 
-    CheckingObjects ();
     LogMessage ("\nVerifying texture names...\n");
 
     // AYM 2000-07-24: could someone explain this one ?
@@ -728,7 +687,6 @@ void CheckTextureNames () /* SWAP! */
                 GoToObject (Objid (OBJ_SECTORS, n));
                 return;
             }
-            CheckingObjects ();
         }
         if (! is_flat_name_in_list (Sectors[n].floort))
         {
@@ -740,7 +698,6 @@ void CheckTextureNames () /* SWAP! */
                 GoToObject (Objid (OBJ_SECTORS, n));
                 return;
             }
-            CheckingObjects ();
         }
     }
 	 n = 0;
@@ -753,7 +710,6 @@ void CheckTextureNames () /* SWAP! */
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;
             }
-            CheckingObjects();
         }
         if (!IsTextureNameInList(s.tex2, WTexture)) {
             snprintf (msg1, sizeof(msg1), "Invalid lower texture in sidedef #%d", n);
@@ -762,7 +718,6 @@ void CheckTextureNames () /* SWAP! */
                 GoToObject(Objid (OBJ_SIDEDEFS, n));
                 return;
             }
-            CheckingObjects ();
         }
         if (!IsTextureNameInList (s.tex3, WTexture)) {
             snprintf(msg1, sizeof(msg1), "Invalid middle texture in sidedef #%d", n);
@@ -771,7 +726,6 @@ void CheckTextureNames () /* SWAP! */
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;
             }
-            CheckingObjects ();
         }
     }
 }

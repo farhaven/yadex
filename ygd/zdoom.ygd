@@ -318,6 +318,7 @@ thinggroup x rgb:0/b/d "Scripted Marines"
 thinggroup P rgb:0/b/d "Particle Fountains"
 thinggroup B rgb:0/b/d "Bridges"
 thinggroup C rgb:0/b/d "Cameras and Skyboxes"
+thinggroup S rgb:0/b/d "Map Spots"
 
 #
 #	Definition of things
@@ -527,3 +528,5 @@ thing 9108 x -	32 "Rocket"		PLAY
 thing 9109 x -	32 "PlasmaGun"		PLAY
 thing 9110 x -	32 "RailGun"		PLAY
 thing 9111 x -	32 "BFG"		PLAY
+
+thing 9039 S -	20 "Fade Setter"

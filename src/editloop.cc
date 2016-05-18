@@ -128,7 +128,7 @@ get_levels_that_match:
 		*/
 	if (levels.size() == 1)
 		return name;
-	name = InputNameFromList(-1, -1, "Level name :", levels, name);
+	name = InputNameFromList(-1, -1, "Level name:", levels, name);
 	return name;
 }
 

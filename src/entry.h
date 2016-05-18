@@ -7,6 +7,4 @@
 
 int InputInteger (int, int, int *, int, int);
 int InputIntegerValue (int, int, int, int, int);
-void InputFileName (int, int, const char *, size_t, char *);
-
-
+string InputFileName (int, int, const char *, size_t, string);

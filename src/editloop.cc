@@ -86,7 +86,7 @@ extern bool InfoShown;		/* should we display the info bar? */
 static int menubar_out_y1;	/* FIXME */
 
 /* prototypes of private functions */
-static char *GetBehaviorFileName (const char *levelname);
+static string GetBehaviorFileName (string levelname);
 
 /*
  *	SelectLevel
@@ -2108,14 +2108,13 @@ cancel_save_as:
             // Load BEHAVIOR lump (JL)
             else if (is.key == 'b')
             {
-                char *acsfile;
-                string acsname;
+                string acsfile, acsname;
                 if (levelname != "")
                     acsname = levelname;
                 else
                     acsname = "behavior";
-                acsfile = GetBehaviorFileName (acsname.c_str());
-                FILE* f = fopen(acsfile, "rb");
+                acsfile = GetBehaviorFileName (acsname);
+                FILE* f = fopen(acsfile.c_str(), "rb");
                 if (f) {
                     free(Behavior);
                     fseek(f, 0, SEEK_END);
@@ -2271,24 +2270,18 @@ static int zoom_fit (edit_t& e)
    get the name of the BEHAVIOR lump file (returns NULL on Esc)
 */
 
-static char *GetBehaviorFileName (const char *levelname)
-{
+string
+GetBehaviorFileName (string levelname) {
 #define BUFSZ 79
-    char *outfile = (char *) malloc (BUFSZ + 1);
+	string outfile = "";
 
-    /* get the file name */
-    // If no name, find a default one
-    if (! levelname)
-        levelname = "behavior";
+	/* get the file name */
+	// If no name, find a default one
+	if (levelname == "")
+		levelname = "behavior";
 
-    al_scpslower (outfile, levelname, BUFSZ);
-    strlcat(outfile, ".o", BUFSZ + 1);
-    InputFileName (-1, -1, "Name of the BEHAVIOR script file:", BUFSZ, outfile);
-    /* escape */
-    if (outfile[0] == '\0')
-    {
-        free (outfile);
-        return 0;
-    }
-    return outfile;
+	outfile = levelname;
+	std::transform(outfile.begin(), outfile.end(), outfile.begin(), ::tolower);
+	outfile = InputFileName (-1, -1, "Name of the BEHAVIOR script file:", BUFSZ, outfile + ".o");
+	return outfile;
 }

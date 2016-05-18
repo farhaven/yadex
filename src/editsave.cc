@@ -195,12 +195,12 @@ string GetWadFileName (string levelname) {
 		outfile = string(Level->wadfile->filename);
 	}
 
-	do
-		InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, (char*) outfile.c_str());
-	while (! strcmp(outfile.c_str(), MainWad));
+	do {
+		outfile = InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, outfile);
+	} while (outfile == MainWad);
 
 	/* escape */
-	if (outfile[0] == '\0') {
+	if (outfile == "") {
 		return "";
 	}
 

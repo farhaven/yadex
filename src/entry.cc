@@ -143,8 +143,8 @@ InputIntegerValue (int x0, int y0, int minv, int maxv, int defv) {
 /*
    ask for a filename
 */
-void
-InputFileName (int x0, int y0, const char *prompt, size_t maxlen, char *filename) {
+string
+InputFileName (int x0, int y0, const char *prompt, size_t maxlen, string filename) {
 	int   key;
 	size_t l;
 	size_t boxlen;
@@ -156,8 +156,6 @@ InputFileName (int x0, int y0, const char *prompt, size_t maxlen, char *filename
 	int entry_text_x0, entry_text_y0;
 	int entry_text_x1, entry_text_y1;
 
-	for (l = strlen (filename) + 1; l <= maxlen; l++)
-		filename [l] = '\0';
 	/* compute the width of the input box */
 	if (maxlen > 20)
 		boxlen = 20;
@@ -197,36 +195,35 @@ InputFileName (int x0, int y0, const char *prompt, size_t maxlen, char *filename
 	DrawScreenString (entry_out_x0, title_y0, prompt);
 	firstkey = true;
 	for (;;) {
-		l = strlen (filename);
+		l = filename.length();
 		set_colour (BLACK);
 		DrawScreenBox (entry_text_x0, entry_text_y0, entry_text_x1, entry_text_y1);
 		set_colour (WHITE);
 		if (l > boxlen) {
-			DrawScreenText (entry_text_x0, entry_text_y0, "<%s",
-			filename + (l - boxlen + 1));
+			DrawScreenText (entry_text_x0, entry_text_y0, "<%s", filename.c_str() + (l - boxlen + 1));
 		} else
-			DrawScreenString (entry_text_x0, entry_text_y0, filename);
+			DrawScreenString (entry_text_x0, entry_text_y0, filename.c_str());
 		key = get_key ();
 		if (firstkey && is_ordinary (key)) {
-			for (l = 0; l <= maxlen; l++)
-				filename[l] = '\0';
+			filename = "";
 			l = 0;
 		}
 		firstkey = false;
 		if (l < maxlen && is_ordinary (key)) {
-			filename[l] = key;
-			filename[l + 1] = '\0';
-		} else if (l > 0 && key == YK_BACKSPACE)
-			filename[l-1] = '\0';
-		else if (key == YK_RETURN)
+			filename += key;
+		} else if (l > 0 && key == YK_BACKSPACE) {
+			filename.erase(filename.end());
+		} else if (key == YK_RETURN)
 			break;  /* return "filename" */
 		else if (key == YK_ESC) {
-			filename[0] = '\0'; /* return an empty string */
+			filename = "";
 			break;
 		} else
 			Beep ();
 	}
 	is.key = 0;  // Shouldn't have to do that but EditorLoop() is broken
+
+	return filename;
 }
 
 

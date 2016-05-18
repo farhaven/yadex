@@ -89,7 +89,7 @@ class Wad_file
   /* Ugly but better than making the data members public. FIXME
      Many of these are friend just because they use fp for
      reading. */
-  friend char     *GetWadFileName     (const char *);
+  friend string    GetWadFileName     (string);
   friend int       SaveLevelData      (const char *, const char *);
   friend int       OpenMainWad        (const char *);
   friend int       OpenPatchWad       (const char *);

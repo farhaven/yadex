@@ -1151,7 +1151,7 @@ void EditorLoop (string levelname) /* SWAP! */
                 every time but keep the same level name. */
                 else if (is.key == YK_F2 && Registered) {
                     string newlevelname = "";
-                    char *outfile;
+                    string outfile;
                     if (! CheckStartingPos ())
                         goto cancel_save;
                     if (levelname != "")
@@ -1161,10 +1161,10 @@ void EditorLoop (string levelname) /* SWAP! */
                         if (newlevelname == "")
                             goto cancel_save;
                     }
-                    outfile = GetWadFileName (newlevelname.c_str());
-                    if (! outfile)
+                    outfile = GetWadFileName(newlevelname);
+                    if (outfile == "")
                         goto cancel_save;
-                    SaveLevelData (outfile, newlevelname.c_str());
+                    SaveLevelData (outfile.c_str(), newlevelname.c_str());
                     levelname = newlevelname;
                     // Sigh. Shouldn't have to do that. Level must die !
                     Level = FindMasterDir (MasterDir, levelname.c_str());
@@ -1176,7 +1176,7 @@ cancel_save:
                 level name. */
                 else if (is.key == YK_F3 && Registered)
                 {
-                    char *outfile;
+                    string outfile;
 						  string newlevelname;
                     MDirPtr newLevel, oldl, newl;
 
@@ -1207,10 +1207,10 @@ cancel_save:
                         }
                         Level = newLevel;
                     }
-                    outfile = GetWadFileName (newlevelname.c_str());
-                    if (! outfile)
+                    outfile = GetWadFileName(newlevelname);
+                    if (outfile == "")
                         goto cancel_save_as;
-                    SaveLevelData (outfile, newlevelname.c_str());
+                    SaveLevelData (outfile.c_str(), newlevelname.c_str());
                     levelname = newlevelname;
 cancel_save_as:
                     RedrawMap = 1;

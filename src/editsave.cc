@@ -27,6 +27,7 @@ this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include <algorithm>
 
 #include "yadex.h"
 #include "dialog.h"
@@ -167,103 +168,99 @@ try_again :
    get the name of the new wad file (returns NULL on Esc)
 */
 
-char *GetWadFileName (const char *levelname)
-{
+string GetWadFileName (string levelname) {
 #define BUFSZ 79
-  char *outfile = (char *) malloc (BUFSZ + 1);
+	string outfile;
 
-  /* get the file name */
-  // If no name, find a default one
-  if (! levelname)
-  {
-    if (yg_level_name == YGLN_E1M1 || yg_level_name == YGLN_E1M10)
-      levelname = "E1M1";
-    else if (yg_level_name == YGLN_MAP01)
-      levelname = "MAP01";
-    else
-    {
-      nf_bug ("Bad ygd_level_name %d, using E1M1.", (int) yg_level_name);
-      levelname = "E1M1";
-    }
-  }
-
-  if (! Level
-    || ! Level->wadfile
-    || ! strcmp(Level->wadfile->filename, MainWad))
-  {
-    al_scpslower (outfile, levelname, BUFSZ);
-    strlcat(outfile, ".wad", BUFSZ + 1);
-  }
-  else
-    strlcpy (outfile, Level->wadfile->filename, BUFSZ + 1);
-  do
-    InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, outfile);
-  while (! strcmp(outfile, MainWad));
-  /* escape */
-  if (outfile[0] == '\0')
-  {
-    free (outfile);
-    return 0;
-  }
-  /* if the wad file already exists, rename it to "*.bak" */
-  Wad_file *wf;
-  for (wad_list.rewind (); wad_list.get (wf);)
-    if (strcmp(outfile, wf->filename) == 0)
-    {
-      verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
-      verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
-      verbmsg ("outfile       %s\n", outfile);		// DEBUG
-      al_fdrv_t drv;
-      al_fpath_t path;
-      al_fbase_t base;
-
-      al_fana (wf->filename, drv, path, base, 0);
-      snprintf (wf->filename, strlen(wf->filename) + 1, "%s%s%s.bak", drv, path, base);
-      verbmsg ("setting wf->filename to %s\n", wf->filename);  // DEBUG
-      /* Need to close, then reopen: problems with SHARE.EXE */
-      verbmsg ("closing %p\n", wf->fp);				// DEBUG
-      fclose (wf->fp);
-      verbmsg ("renaming %s -> %s\n", outfile, wf->filename);	// DEBUG
-      if (rename (outfile, wf->filename) != 0)
-      {
-	verbmsg ("removing %s\n", wf->filename);  // DEBUG
-	if (remove (wf->filename) != 0 && errno != ENOENT)
-	{
-	  char buf1[81];
-	  char buf2[81];
-	  snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"", wf->filename);
-	  snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
-	  Notify (-1, -1, buf1, buf2);
-	  return 0;
+	/* get the file name */
+	// If no name, find a default one
+	if (levelname == "") {
+		if (yg_level_name == YGLN_E1M1 || yg_level_name == YGLN_E1M10)
+			levelname = "E1M1";
+		else if (yg_level_name == YGLN_MAP01)
+			levelname = "MAP01";
+		else {
+			nf_bug ("Bad ygd_level_name %d, using E1M1.", (int) yg_level_name);
+			levelname = "E1M1";
+		}
 	}
-	verbmsg ("renaming %s -> %s\n", outfile, wf->filename);  // DEBUG
-	if (rename (outfile, wf->filename))
-	{
-	  char buf1[81];
-	  char buf2[81];
-	  snprintf (buf1, sizeof buf1, "Could not rename \"%.64s\"", outfile);
-	  snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)", wf->filename, strerror (errno));
-	  Notify (-1, -1, buf1, buf2);
-	  return 0;
+
+	if (! Level
+			|| ! Level->wadfile
+			|| ! strcmp(Level->wadfile->filename, MainWad)) {
+		outfile = levelname;
+		std::transform(outfile.begin(), outfile.end(), outfile.begin(), ::tolower);
+		outfile += ".wad";
+	} else {
+		outfile = string(Level->wadfile->filename);
 	}
-      }
-      verbmsg ("opening %s\n", wf->filename); // DEBUG
-      wf->fp = fopen (wf->filename, "rb");
-      if (wf->fp == 0)
-      {
-	char buf1[81];
-	char buf2[81];
-	snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"", wf->filename);
-	snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
-	Notify (-1, -1, buf1, buf2);
-	return 0;
-      }
-      verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
-      verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
-      verbmsg ("outfile       %s\n", outfile);		// DEBUG
-      break;
-    }
-  return outfile;
+
+	do
+		InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, (char*) outfile.c_str());
+	while (! strcmp(outfile.c_str(), MainWad));
+
+	/* escape */
+	if (outfile[0] == '\0') {
+		return "";
+	}
+
+	/* if the wad file already exists, rename it to "*.bak" */
+	Wad_file *wf;
+	for (wad_list.rewind (); wad_list.get (wf);) {
+		if (strcmp(outfile.c_str(), wf->filename) == 0) {
+			verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
+			verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
+			verbmsg ("outfile       %s\n", outfile.c_str());		// DEBUG
+			al_fdrv_t drv;
+			al_fpath_t path;
+			al_fbase_t base;
+
+			al_fana (wf->filename, drv, path, base, 0);
+			snprintf (wf->filename, strlen(wf->filename) + 1, "%s%s%s.bak", drv, path, base);
+			verbmsg ("setting wf->filename to %s\n", wf->filename);  // DEBUG
+			/* Need to close, then reopen: problems with SHARE.EXE */
+			verbmsg ("closing %p\n", wf->fp);				// DEBUG
+			fclose (wf->fp);
+			verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename);	// DEBUG
+
+			if (rename (outfile.c_str(), wf->filename) != 0) {
+				verbmsg ("removing %s\n", wf->filename);  // DEBUG
+				if (remove (wf->filename) != 0 && errno != ENOENT) {
+					char buf1[81];
+					char buf2[81];
+					snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"", wf->filename);
+					snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
+					Notify (-1, -1, buf1, buf2);
+					return 0;
+				}
+				verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename);  // DEBUG
+				if (rename (outfile.c_str(), wf->filename)) {
+					char buf1[81];
+					char buf2[81];
+					snprintf (buf1, sizeof buf1, "Could not rename \"%.64s\"", outfile.c_str());
+					snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)", wf->filename, strerror (errno));
+					Notify (-1, -1, buf1, buf2);
+					return 0;
+				}
+			}
+			verbmsg ("opening %s\n", wf->filename); // DEBUG
+			wf->fp = fopen (wf->filename, "rb");
+			if (wf->fp == 0) {
+				char buf1[81];
+				char buf2[81];
+				snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"", wf->filename);
+				snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
+				Notify (-1, -1, buf1, buf2);
+				return 0;
+			}
+			verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
+			verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
+			verbmsg ("outfile       %s\n", outfile.c_str());		// DEBUG
+			break;
+		}
+	}
+
+	return outfile;
 }
 #endif
 

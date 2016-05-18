@@ -214,29 +214,19 @@ GREP=/usr/xpg4/bin/grep
 printf "looking for a C compiler..."
 if [ -n "$CC" ]
 then
-  printf ' using user-supplied value:'
+	printf ' using user-supplied value:'
 else
-  CC=gcc
-  if type $CC >/dev/null 2>&1
-  then
-    :
-  else
-    CC=c89
-    if type $CC >/dev/null 2>&1
-    then
-      :
-    else
-      CC=cc
-      if type $CC >/dev/null 2>&1
-      then
-	:
-      else
-	echo " none"
-	echo "error: none of (gcc, c89, cc) work, is your PATH set right?" 1>&2
-	exit 1
-      fi
-    fi
-  fi
+	CC=
+	for c in egcc gcc c89 c89; do
+		if type $c >/dev/null 2>&1; then
+			CC=$c
+			break
+		fi
+	done
+	if [ "x$CC" == "x" ]; then
+		echo "error: none of (gcc, c89, cc) work, is your PATH set right?" 1>&2
+		exit 1
+	fi
 fi
 echo " $CC"
 

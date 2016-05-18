@@ -2282,7 +2282,7 @@ static char *GetBehaviorFileName (const char *levelname)
         levelname = "behavior";
 
     al_scpslower (outfile, levelname, BUFSZ);
-    al_saps (outfile, ".o", BUFSZ);
+    strlcat(outfile, ".o", BUFSZ + 1);
     InputFileName (-1, -1, "Name of the BEHAVIOR script file:", BUFSZ, outfile);
     /* escape */
     if (outfile[0] == '\0')

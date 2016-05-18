@@ -184,7 +184,7 @@ MODULES_ATCLIB =							\
 	al_lpoke	al_lpokel	al_lptr		al_lread	\
 	al_lreadl	al_lrewind	al_lseek	\
 	al_lstep	al_ltell	al_lwrite	al_lwritel	\
-	al_sapc		al_saps		al_scpslower	\
+	al_sapc		al_scpslower	\
 	al_sdup		al_sisnum	al_strolc
 
 # The source files of Yadex and Atclib

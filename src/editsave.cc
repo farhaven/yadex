@@ -108,7 +108,7 @@ bool save_save_as (bool prompt)
   {
     prompt = true;
     al_scpslower (f, l, sizeof f - 1);
-    al_saps (f, ".wad", sizeof f - 1);
+	 strlcat(f, ".wad", sizeof(f));
   }
 
   // Create the dialog
@@ -192,7 +192,7 @@ char *GetWadFileName (const char *levelname)
     || ! strcmp(Level->wadfile->filename, MainWad))
   {
     al_scpslower (outfile, levelname, BUFSZ);
-    al_saps (outfile, ".wad", BUFSZ);
+    strlcat(outfile, ".wad", BUFSZ + 1);
   }
   else
     strlcpy (outfile, Level->wadfile->filename, BUFSZ + 1);

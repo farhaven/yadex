@@ -876,7 +876,7 @@ static char *locate_pwad (const char *filename) {
 		} else {
 			snprintf (real_name, Y_FILE_NAME + 1, *dirname, Game ? Game : "");
 		}
-		al_saps(real_name, real_basename, Y_FILE_NAME);
+		strlcat(real_name, real_basename, Y_FILE_NAME + 1);
 		verbmsg("  Trying \"%s\"... ", real_name);
 		if (file_exists(real_name)) {
 			verbmsg("right on !\n");

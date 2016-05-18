@@ -112,7 +112,7 @@ int vmacro_expand (char *buf, size_t size, const char *fmt, va_list list)
 	  rc = macro_no;
       }
       else
-        al_saps (buf, macro_value, size);
+        strlcat(buf, macro_value, size + 1);
       fmt += strlen (macro_name);
     }
     else
@@ -207,7 +207,7 @@ int macro_expand (char *buf, size_t size, const char *fmt,
 	  rc = macro_no;
       }
       else
-        al_saps (buf, macro_value, size);
+        strlcat(buf, macro_value, size + 1);
       fmt     += macro_name_len;
       fmt_len -= macro_name_len;
     }
@@ -220,45 +220,3 @@ int macro_expand (char *buf, size_t size, const char *fmt,
   }
   return rc;
 }
-
-
-#ifdef TEST
-/*
-  make CXXFLAGS='-DTEST'
-    LDFLAGS=../obj/0/atclib/al_saps.o\ ../obj/0/atclib/al_sapc.o
-    macro
-*/
-
-#include <list>
-#include <algorithm>
-
-
-struct macdef
-{
-  const char *name;
-  const char *value;
-  macdef (const char *name, const char *value) :
-    name (name), value (value) { }
-};
-
-
-void dump (const macdef& m)
-{
-  fprintf (stderr, "%s=%s\n", m.name, m.value);
-}
-
-
-int main ()
-{
-  char buf[100];
-  std::list<macdef> macdefs;
-  macdefs.push_back (macdef ("%b", "1"));
-  macdefs.push_back (macdef ("%bc", "2"));
-  std::for_each (macdefs.begin (), macdefs.end (), dump);
-  macro_expand (buf, sizeof buf - 1, "a%bcd", macdefs.begin (), macdefs.end ());
-  puts (buf);
-  return 0;
-}
-
-
-#endif

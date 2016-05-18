@@ -439,7 +439,7 @@ const char *key_to_string (inpev_t k)
     *buf = '\0';
     if (k & YK_CTRL || (n == nmax && k <= 31))
     {
-        al_saps (buf, "Ctrl-", sizeof buf - 1);
+        strlcat(buf, "Ctrl-", sizeof(buf));
         if (k & YK_CTRL)
             k ^= YK_CTRL;
         if (k <= 31)
@@ -447,12 +447,12 @@ const char *key_to_string (inpev_t k)
     }
     if (k & YK_ALT)
     {
-        al_saps (buf, "Alt-", sizeof buf - 1);
+        strlcat(buf, "Alt-", sizeof(buf));
         k ^= YK_ALT;
     }
     if (k & YK_SHIFT)
     {
-        al_saps (buf, "Shift-", sizeof buf - 1);
+        strlcat(buf, "Shift-", sizeof(buf));
         k ^= YK_SHIFT;
     }
 
@@ -469,7 +469,7 @@ const char *key_to_string (inpev_t k)
         }
     }
     else
-        al_saps (buf, key_string[n].string, sizeof buf - 1);
+        strlcat(buf, key_string[n].string, sizeof(buf));
 
     buf[sizeof buf - 1] = '\0';  /* Paranoia */
     return buf;

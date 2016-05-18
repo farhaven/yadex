@@ -461,7 +461,7 @@ InputNameFromListWithFunc (
 			const size_t size = name.length() + 4 + 1;
 			char *filename = new char[size];
 			al_scpslower (filename, name.c_str(), size - 1);
-			al_saps      (filename, ".ppm", size - 1);
+			strlcat(filename, ".ppm", size);
 			if (c.img.save (filename) != 0) {
 				if (errno == ECHILD)
 					err ("Error loading PLAYPAL");

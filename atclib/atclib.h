@@ -204,7 +204,6 @@ int    al_lwritel  (al_llist_t *l, const void *buf, size_t length);
  *	Strings
  */
 int    al_sapc      (al_as_t dest, char   source, size_t maxlen);
-int    al_saps      (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sapslower (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sapsupper (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_scpc      (al_as_t dest, char   source, size_t maxlen);

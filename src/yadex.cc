@@ -1072,8 +1072,8 @@ static void MainLoop ()
 			  if ((raw = fopen (com, "rb")) == NULL)
 				  fatal_error ("error opening input file \"%s\"", com);
 			  /* kluge */
-			  strcpy (input, out);
-			  strcat (input, ".wad");
+			  strlcpy(input, out, sizeof(input));
+			  strlcat(input, ".wad", sizeof(input));
 			  if (wad_already_loaded (input)) {
 				  printf ("%s: in use, close it first\n", input);
 				  continue;

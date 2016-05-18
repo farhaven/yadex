@@ -202,7 +202,7 @@ const char *get_thing_name (wad_ttype_t type)
     if (table_idx == (size_t) -1)
     {
         static char buf[20];
-        sprintf (buf, "UNKNOWN (%d)", type);  // Not found.
+        snprintf (buf, sizeof(buf), "UNKNOWN (%d)", type);  // Not found.
         return buf;
     }
     return things_table[table_idx].desc;
@@ -279,9 +279,9 @@ const char *GetAngleName (int angle)
             return "South-east";
     }
     if (yg_level_format == YGLF_HEXEN)
-        sprintf(buf,"Unknown (%d)",angle);
+        snprintf(buf, sizeof(buf), "Unknown (%d)",angle);
     else
-        sprintf (buf, "ILLEGAL (%d)", angle);
+        snprintf(buf, sizeof(buf), "ILLEGAL (%d)", angle);
     return buf;
 }
 

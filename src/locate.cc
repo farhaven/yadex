@@ -102,7 +102,7 @@ const char *Locate::get_next ()
       warn ("%s: file name too long\n", name);
       return NULL;
     }
-    strcpy (pathname, name);
+    strlcpy (pathname, name, sizeof(pathname));
     return pathname;
   }
 
@@ -149,14 +149,14 @@ const char *Locate::get_next ()
 	warn ("%s: file name too long, skipping\n", dirname);
 	continue;
       }
-      strcat (pathname, "/");
+      strlcat(pathname, "/", sizeof(pathname));
     }
     if (strlen (pathname) + strlen (name) + 1 >= sizeof pathname)
     {
       warn ("%s: file name too long, skipping\n", dirname);
       continue;
     }
-    strcat (pathname, name);
+    strlcat(pathname, name, sizeof(pathname));
 
     // Look for a file of that name.
     struct stat s;

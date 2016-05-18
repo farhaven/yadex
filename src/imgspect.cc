@@ -61,7 +61,7 @@ for (y = 0; y < height; y++)
    img_pixel_t *row = buf + y * width;
    for (x = 0; x < width; x++)
       if (row[x] != IMG_TRANSP)
-         row[x] = grey + (rand () >> 6) % 7;  // FIXME more kludgery
+         row[x] = grey + arc4random() % 7;
    }
 }
 

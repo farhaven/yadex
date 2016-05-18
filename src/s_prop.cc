@@ -80,7 +80,7 @@ const char *Menu_data_st::operator[] (size_t n) const
 {
   if (al_lseek (list, n, SEEK_SET) != 0)
   {
-    sprintf (buf, "BUG: al_lseek(%p, %lu): %s",
+    snprintf (buf, sizeof(buf), "BUG: al_lseek(%p, %lu): %s",
       (void *) list, 
       (unsigned long) n,
       al_astrerror (al_aerrno));
@@ -88,11 +88,11 @@ const char *Menu_data_st::operator[] (size_t n) const
   }
   const stdef_t *ptr = (const stdef_t *) al_lptr (list);
   if (ptr == NULL)
-    sprintf (buf, "BUG: al_lptr(%p): %s",
+    snprintf (buf, sizeof(buf), "BUG: al_lptr(%p): %s",
       (void *) list,
       al_astrerror (al_aerrno));
   else
-    sprintf (buf, "%2d - %.70s", ptr->number, ptr->longdesc);
+    snprintf (buf, sizeof(buf), "%2d - %.70s", ptr->number, ptr->longdesc);
   return buf;
 }
 
@@ -109,22 +109,23 @@ void SectorProperties (int x0, int y0, SelPtr obj)
   SelPtr cur;
   int    subwin_y0;
 
+#define ILEN 60
   for (n = 0; n < 8; n++)
-    menustr[n] = (char *) malloc(60);
-  sprintf (menustr[7], "Edit sector #%d", obj->objnum);
-  sprintf (menustr[0], "Change floor height     (Current: %d)",
+    menustr[n] = (char *) malloc(ILEN);
+  snprintf (menustr[7], ILEN, "Edit sector #%d", obj->objnum);
+  snprintf (menustr[0], ILEN, "Change floor height     (Current: %d)",
 	  Sectors[obj->objnum].floorh);
-  sprintf (menustr[1], "Change ceiling height   (Current: %d)",
+  snprintf (menustr[1], ILEN, "Change ceiling height   (Current: %d)",
 	  Sectors[obj->objnum].ceilh);
-  sprintf (menustr[2], "Change floor texture    (Current: %.*s)",
+  snprintf (menustr[2], ILEN, "Change floor texture    (Current: %.*s)",
 	  (int) WAD_FLAT_NAME, Sectors[obj->objnum].floort);
-  sprintf (menustr[3], "Change ceiling texture  (Current: %.*s)",
+  snprintf (menustr[3], ILEN, "Change ceiling texture  (Current: %.*s)",
 	  (int) WAD_FLAT_NAME, Sectors[obj->objnum].ceilt);
-  sprintf (menustr[4], "Change light level      (Current: %d)",
+  snprintf (menustr[4], ILEN, "Change light level      (Current: %d)",
 	  Sectors[obj->objnum].light);
-  sprintf (menustr[5], "Change type             (Current: %d)",
+  snprintf (menustr[5], ILEN, "Change type             (Current: %d)",
 	  Sectors[obj->objnum].special);
-  sprintf (menustr[6], "Change linedef tag      (Current: %d)",
+  snprintf (menustr[6], ILEN, "Change linedef tag      (Current: %d)",
 	  Sectors[obj->objnum].tag);
   val = vDisplayMenu (x0, y0, menustr[7],
     menustr[0], YK_, 0,

@@ -80,7 +80,7 @@ al_saps (basename, ".ygd", sizeof basename - 1);
       fatal_error ("Game definition file \"%s\" not found", basename);
    if (strlen (pathname) > sizeof filename - 1)
       fatal_error ("%s: file name too long");
-   strcpy (filename, pathname);
+   strlcpy (filename, pathname, sizeof(filename));
    printf ("Reading game definition file \"%s\".\n", filename);
 }
 

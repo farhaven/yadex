@@ -92,10 +92,10 @@ bool save_save_as (bool prompt)
   {
     prompt = true;
     if (yg_level_name == YGLN_MAP01)
-      strcpy (l, "map01");
+      strlcpy (l, "map01", sizeof(l));
     else
     {
-      strcpy (l, "e1m1");
+      strlcpy (l, "e1m1", sizeof(l));
       if (yg_level_name != YGLN_E1M1 && yg_level_name != YGLN_E1M10)
 	nf_bug ("Bad yg_level_name %d", (int) yg_level_name);
     }
@@ -195,7 +195,7 @@ char *GetWadFileName (const char *levelname)
     al_saps (outfile, ".wad", BUFSZ);
   }
   else
-    strcpy (outfile, Level->wadfile->filename);
+    strlcpy (outfile, Level->wadfile->filename, BUFSZ + 1);
   do
     InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, outfile);
   while (! strcmp(outfile, MainWad));

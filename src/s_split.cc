@@ -58,7 +58,7 @@ void SplitSector (int vertex1, int vertex2) { /* SWAP! */
 	s = o.num;
 	if (s < 0) {
 		Beep ();
-		sprintf (msg1, "There is no sector between vertex #%d and vertex #%d",
+		snprintf (msg1, sizeof(msg1), "There is no sector between vertex #%d and vertex #%d",
 				vertex1, vertex2);
 		Notify (-1, -1, msg1, NULL);
 		return;
@@ -97,13 +97,13 @@ void SplitSector (int vertex1, int vertex2) { /* SWAP! */
 		}
 		if (n >= nlinedefs) {
 			Beep ();
-			sprintf (msg1, "Cannot find a closed path from vertex #%d to vertex #%d",
+			snprintf (msg1, sizeof(msg1), "Cannot find a closed path from vertex #%d to vertex #%d",
 					vertex1, vertex2);
 			if (curv == vertex1)
-				sprintf (msg2, "There is no sidedef starting from vertex #%d"
+				snprintf (msg2, sizeof(msg2), "There is no sidedef starting from vertex #%d"
 						" on sector #%d", vertex1, s);
 			else
-				sprintf (msg2, "Check if sector #%d is closed"
+				snprintf (msg2, sizeof(msg2), "Check if sector #%d is closed"
 						" (cannot go past vertex #%d)", s, curv);
 			Notify (-1, -1, msg1, msg2);
 			ForgetSelection (&llist);
@@ -112,7 +112,7 @@ void SplitSector (int vertex1, int vertex2) { /* SWAP! */
 		}
 		if (curv == vertex1) {
 			Beep ();
-			sprintf (msg1, "Vertex #%d is not on the same sector (#%d)"
+			snprintf (msg1, sizeof(msg1), "Vertex #%d is not on the same sector (#%d)"
 					" as vertex #%d", vertex2, s, vertex1);
 			Notify (-1, -1, msg1, NULL);
 			ForgetSelection (&llist);
@@ -194,7 +194,7 @@ if (s4 >= 0)
 if ((s1 < 0 || (s1 != s3 && s1 != s4)) && (s2 < 0 || (s2 != s3 && s2 != s4)))
 {
    Beep ();
-   sprintf (msg, "Linedefs #%d and #%d are not adjacent to the same sector",
+   snprintf (msg, sizeof(msg), "Linedefs #%d and #%d are not adjacent to the same sector",
      linedef1, linedef2);
    Notify (-1, -1, msg, NULL);
    return;

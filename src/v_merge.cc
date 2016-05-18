@@ -83,7 +83,7 @@ while (obj != NULL)
    if (lstart < 0 || lend < 0)
       {
       Beep ();
-      sprintf (msg, "Cannot delete vertex #%d and join the linedefs",
+      snprintf (msg, sizeof(msg), "Cannot delete vertex #%d and join the linedefs",
 	cur->objnum);
       Notify (-1, -1, msg, "The vertex must be the start of one linedef"
 	" and the end of another one");
@@ -190,7 +190,7 @@ while (ref)
          {
          char buf[81];
 	 redraw = true;
-         sprintf (buf, "Vertices %d and %d occupy the same position", refv, v);
+         snprintf (buf, sizeof(buf), "Vertices %d and %d occupy the same position", refv, v);
 	 if (Confirm2 (-1, -1, &confirm_flag,
             buf,
 	    "Do you want to merge them into one?"))
@@ -251,7 +251,7 @@ while (ref)
          {
          char buf[81];
 	 redraw = true;
-         sprintf (buf, "Vertex %d is on top of linedef %d", refv, ld);
+         snprintf (buf, sizeof(buf), "Vertex %d is on top of linedef %d", refv, ld);
 	 if (Confirm2 (-1, -1, &confirm_flag,
             buf,
             "Do you want to split the linedef there?"))

@@ -920,8 +920,8 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
 
                 case OPT_STRINGPTR:
                     {
-                        char *dup = (char *) malloc (strlen (value) + 1);
-                        strcpy (dup, value);
+                        char *dup = (char *) malloc (strlen(value) + 1);
+                        strlcpy (dup, value, strlen(value) + 1);
                         if (o->data_ptr)
                             *((char **) (o->data_ptr)) = dup;
                         break;
@@ -929,8 +929,8 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
 
                 case OPT_STRINGPTRACC:
                     {
-                        char *dup = (char *) malloc (strlen (value) + 1);
-                        strcpy (dup, value);
+                        char *dup = (char *) malloc (strlen(value) + 1);
+                        strlcpy (dup, value, strlen(value) + 1);
                         if (o->data_ptr)
                             append_item_to_list ((const char ***) o->data_ptr, dup);
                         break;

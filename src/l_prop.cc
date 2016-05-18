@@ -1036,10 +1036,10 @@ static char *GetTaggedLineDefFlag (int linedefnum, int flagndx)
   static char ldstr[16][50];
 
   if ((LineDefs[linedefnum].flags & (0x01 << (flagndx - 1))) != 0)
-    strcpy (ldstr[flagndx - 1], "* ");
+    strlcpy(ldstr[flagndx - 1], "* ", sizeof(ldstr[flagndx - 1]));
   else
-    strcpy (ldstr[flagndx - 1], "  ");
-  strcat (ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str());
+    strlcpy(ldstr[flagndx - 1], "  ", sizeof(ldstr[flagndx - 1]));
+  strlcat(ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str(), sizeof(ldstr[flagndx - 1]));
   return ldstr[flagndx - 1];
 }
 

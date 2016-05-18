@@ -439,7 +439,7 @@ Wad_file *wf = new Wad_file;
 wf->pic_format_ = pic_format;
 wf->directory   = 0;
 wf->filename    = (char *) malloc(strlen (filename) + 1);
-strcpy (wf->filename, filename);
+strlcpy (wf->filename, filename, strlen(filename) + 1);
 
 // Open the wad and read its header.
 wf->fp = fopen (filename, "rb");
@@ -913,6 +913,7 @@ al_fext_t ext;
 const char **dirname;
 char *real_basename;
 char *real_name;
+size_t len = strlen(filename) + 1 + (*ext? 0: 4);
 
 // Get the extension in <ext>
 al_fana (filename, NULL, NULL, NULL, ext);
@@ -920,8 +921,8 @@ al_fana (filename, NULL, NULL, NULL, ext);
 // If it's an absolute name, stop there.
 if (is_absolute (filename))
    {
-   real_name = (char *) malloc(strlen (filename) + 1 + (*ext ? 0 : 4));
-   strcpy (real_name, filename);
+   real_name = (char *) malloc(len);
+   strlcpy (real_name, filename, len);
    if (! *ext)
       strcat (real_name, ".wad");
    bool r = file_exists (real_name);
@@ -934,8 +935,8 @@ if (is_absolute (filename))
    }
 
 // It's a relative name. If no extension given, append ".wad"
-real_basename = (char *) malloc(strlen (filename) + 1 + (*ext ? 0 : 4));
-strcpy (real_basename, filename);
+real_basename = (char *) malloc(len);
+strlcpy (real_basename, filename, len);
 if (! *ext)
    strcat (real_basename, ".wad");
 

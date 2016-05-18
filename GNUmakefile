@@ -282,7 +282,6 @@ SCRIPTS = $(addprefix scripts/,	\
 	copyright		\
 	ftime.1			\
 	ftime.c			\
-	install.c		\
 	mkinstalldirs		\
 	notexist.c		\
 	process			\
@@ -336,20 +335,16 @@ test:
 	$(OBJDIR)/yadex $(A)
 
 .PHONY: install
-install: $(OBJDIR)/install
+install:
 	@scripts/mkinstalldirs $(BINDIR)
 	@scripts/mkinstalldirs $(ETCDIR)
 	@scripts/mkinstalldirs $(MANDIR)
 	@scripts/mkinstalldirs $(MANDIR)/man6
 	@scripts/mkinstalldirs $(SHAREDIR)
-	$(OBJDIR)/install -m 755 $(OBJDIR)/yadex $(BINDIR)/yadex-$(VERSION)
-	rm -f $(BINDIR)/yadex
-	ln -s yadex-$(VERSION) $(BINDIR)/yadex
-	$(OBJDIR)/install -m 644 doc/yadex.6 $(MANDIR)/man6/yadex-$(VERSION).6
-	rm -f $(MANDIR)/man6/yadex.6
-	ln -s yadex-$(VERSION).6 $(MANDIR)/man6/yadex.6
-	$(OBJDIR)/install -m 644 -d $(SHAREDIR) $(YGD)
-	$(OBJDIR)/install -m 644 -d $(ETCDIR) yadex.cfg
+	install -m 755 $(OBJDIR)/yadex $(BINDIR)/yadex
+	install -m 644 doc/yadex.6 $(MANDIR)/man6/yadex.6
+	$(foreach y,$(YGD),install -D -m 644 $(y) $(SHAREDIR);)
+	install -D -m 644 yadex.cfg $(ETCDIR)
 	@echo "---------------------------------------------------------------"
 	@echo "  Yadex is now installed."
 	@echo
@@ -366,7 +361,6 @@ clean:
 	rm -f $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(OBJDIR)/yadex
 	rm -f $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(DOBJDIR)/yadex
 	rm -f $(OBJDIR)/ftime
-	rm -f $(OBJDIR)/install
 	rm -f $(OBJDIR)/notexist
 	rm -f $(OBJDIR)
 	rm -f $(DOBJDIR)

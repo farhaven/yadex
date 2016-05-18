@@ -169,6 +169,7 @@ MODULES_YADEX =								\
 
 # Compatibility modules
 MODULES_COMPAT =
+ifneq "$(HAVE_STRL)" "1"
 	MODULES_COMPAT += strlcpy strlcat
 endif
 ifneq "$(HAVE_ARC4RANDOM)" "1"

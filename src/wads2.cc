@@ -849,7 +849,7 @@ static char *locate_pwad (const char *filename) {
 		real_name = (char *) malloc(len);
 		strlcpy (real_name, filename, len);
 		if (!*ext)
-			strcat (real_name, ".wad");
+			strlcat (real_name, ".wad", len);
 		bool r = file_exists (real_name);
 		if (!r) {
 			free(real_name);
@@ -862,7 +862,7 @@ static char *locate_pwad (const char *filename) {
 	real_basename = (char *) malloc(len);
 	strlcpy (real_basename, filename, len);
 	if (!*ext)
-		strcat(real_basename, ".wad");
+		strlcat(real_basename, ".wad", len);
 
 	// Then search for a file of that name in the standard directories.
 	real_name = (char *) malloc(Y_FILE_NAME + 1);

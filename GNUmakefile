@@ -84,6 +84,10 @@ endif
 
 # Options used when compiling Atclib.
 CFLAGS = -fPIC
+CFLAGS += -pedantic
+CFLAGS += -Wall
+CFLAGS += -Werror
+CFLAGS += -Wno-variadic-macros
 
 # Options used when compiling and linking Yadex.
 # ld is invoked through the C++ compiler so

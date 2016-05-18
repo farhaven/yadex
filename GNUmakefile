@@ -29,10 +29,10 @@ OBJDIR_ATCLIB      = $(OBJDIR)/atclib
 DOBJDIR_ATCLIB     = $(DOBJDIR)/atclib
 OBJPHYSDIR_ATCLIB  = $(OBJPHYSDIR)/atclib
 DOBJPHYSDIR_ATCLIB = $(DOBJPHYSDIR)/atclib
-OBJDIR_COMPAT      = $(OBJDIR)/atclib
-DOBJDIR_COMPAT     = $(DOBJDIR)/atclib
-OBJPHYSDIR_COMPAT  = $(OBJPHYSDIR)/atclib
-DOBJPHYSDIR_COMPAT = $(DOBJPHYSDIR)/atclib
+OBJDIR_COMPAT      = $(OBJDIR)/compat
+DOBJDIR_COMPAT     = $(DOBJDIR)/compat
+OBJPHYSDIR_COMPAT  = $(OBJPHYSDIR)/compat
+DOBJPHYSDIR_COMPAT = $(DOBJPHYSDIR)/compat
 
 # Create all directories and make symlinks to
 # config.cc and config.h. Doing it at the start
@@ -166,8 +166,7 @@ MODULES_YADEX =								\
 
 # Compatibility modules
 MODULES_COMPAT =
-ifneq "$(HAVE_STRL)" "1"
-	MODULES_COMPAT += strl
+	MODULES_COMPAT += strlcpy strlcat
 endif
 ifneq "$(HAVE_ARC4RANDOM)" "1"
 	MODULES_COMPAT += arc4random

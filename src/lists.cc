@@ -72,10 +72,6 @@ AYM 1998-02-12 : if hookfunc is <> NULL, a message "Press shift-F1 to save
   image to file" is displayed and shift-F1 does just that.
 */
 
-#ifdef DEBUG
-static bool disp_lump_loc = false;
-#endif
-
 string
 InputNameFromListWithFunc (
 		int x0, int y0,
@@ -88,19 +84,17 @@ InputNameFromListWithFunc (
 	const char *msg1 = "Press Shift-F1 to";
 	const char *msg2 = "save image to file";
 	int    key;
-	size_t n;
+	size_t n = 0;
 	size_t win_height;
 	int    win_columns;
 	int    win_width;
 	int    l0;
 	int    x1, y1, x2, y2;
-	size_t maxlen;
+	size_t maxlen = 1;
 	int    xlist;
 	bool   picture_size_drawn = false;
-#ifdef DEBUG
-	bool   lump_loc_drawn = false;
-#endif
-	bool   ok, firstkey;
+	bool   ok = true;
+	bool   firstkey = true;
 	/* Edge of name entry widget including border */
 	int    entry_out_x0, entry_out_y0;
 	int    entry_out_x1, entry_out_y1;
@@ -119,13 +113,10 @@ InputNameFromListWithFunc (
 	}
 
 	// Compute maxlen, the length of the longest item in the list
-	maxlen = 1;
 	for (string &l: list) {
 		if (l.length() > maxlen)
 			maxlen = l.length();
 	}
-	for (n = name.length() + 1; n <= maxlen; n++)
-		name[n] = '\0';
 	string namedisp = "";
 	for (unsigned int idx = 0; idx < maxlen; idx++) {
 		namedisp += '\xff';
@@ -193,8 +184,7 @@ InputNameFromListWithFunc (
 			msg2);
 	}
 	if (width > 0)
-	DrawScreenBoxHollow (x1 - 1, y1 - 1, x2 + 1, y2 + 1, BLACK);
-	firstkey = true;
+		DrawScreenBoxHollow (x1 - 1, y1 - 1, x2 + 1, y2 + 1, BLACK);
 
 	// Another way of saying "nothing to rub out"
 	int disp_x0 = (x2 + x1) / 2;
@@ -214,14 +204,11 @@ InputNameFromListWithFunc (
 
 		// Is "name" in the list ?
 		for (string &l: list) {
-			if (y_stricmp(name.c_str(), l.c_str()) <= 0)
+			if (y_stricmp(name.c_str(), l.c_str()) == 0) {
 				break;
+			}
 		}
 
-		if (yg_level_format != YGLF_HEXEN) {
-			ok = n < list.size() ? ! y_stricmp (name.c_str(), list[n].c_str()) : false;
-		} else
-			ok = true;
 		if (n >= list.size())
 			n = list.size() - 1;
 
@@ -231,11 +218,11 @@ InputNameFromListWithFunc (
 		int xmin = x0 + xlist;
 		int xmax = xmin + FONTW * maxlen - 1;
 		for (l = 0; l < listdisp && n + l < list.size(); l++) {
-				set_colour (WINBG);
-				DrawScreenBox (xmin, y, xmax, y + FONTH - 1);
-				set_colour (WINFG);
-				DrawScreenText (xmin, y, list[n+l].c_str());
-				y += FONTH;
+			set_colour (WINBG);
+			DrawScreenBox (xmin, y, xmax, y + FONTH - 1);
+			set_colour (WINFG);
+			DrawScreenText (xmin, y, list[n+l].c_str());
+			y += FONTH;
 		}
 		if (l < listdisp)  { // Less than <listdisp> names to display
 				set_colour (WINBG);
@@ -245,6 +232,9 @@ InputNameFromListWithFunc (
 		// Display the entry box and the current text
 		set_colour (BLACK);
 		DrawScreenBox (entry_text_x0, entry_text_y0, entry_text_x1, entry_text_y1);
+		if (yg_level_format != YGLF_HEXEN) {
+			ok = n < list.size() ? ! y_stricmp (name.c_str(), list[n].c_str()) : false;
+		}
 		if (ok)  // FIXME this colour scheme should be changed.
 			set_colour (WHITE);
 		else
@@ -297,25 +287,6 @@ InputNameFromListWithFunc (
 				DrawScreenString (size_x0, size_y0, size_buf);
 				picture_size_drawn = true;
 			}
-
-#ifdef DEBUG
-			// Display the file name and file offset of the picture
-			const size_t loc_chars = win_width / FONTW;
-			const int    loc_x0    = x0;
-			const int    loc_y0    = y0 + win_height;
-			if (lump_loc_drawn) {
-				set_colour (WINBG);
-				DrawScreenBoxwh (loc_x0, loc_y0, loc_chars * FONTW, FONTH);
-				lump_loc_drawn = false;
-			}
-			if (disp_lump_loc && (c.flags & HOOK_LOC_VALID)) {
-				set_colour (WINFG);
-				char buf[150];  // Slack
-				lump_loc_string (buf, sizeof buf, c.lump_loc);
-				DrawScreenString (loc_x0, loc_y0, buf);
-				lump_loc_drawn = true;
-			}
-#endif
 
 			/* If the new picture does not completely obscure the
 			previous one, rub out the old pixels. */
@@ -506,5 +477,5 @@ InputNameFromList (
 		const char *prompt,
 		vector<string> list,
 		string name) {
-	return InputNameFromListWithFunc (x0, y0, prompt, list, 5, name, 0, 0, NULL);
+	return InputNameFromListWithFunc(x0, y0, prompt, list, 5, name, 0, 0, NULL);
 }

@@ -29,13 +29,17 @@ OBJDIR_ATCLIB      = $(OBJDIR)/atclib
 DOBJDIR_ATCLIB     = $(DOBJDIR)/atclib
 OBJPHYSDIR_ATCLIB  = $(OBJPHYSDIR)/atclib
 DOBJPHYSDIR_ATCLIB = $(DOBJPHYSDIR)/atclib
+OBJDIR_COMPAT      = $(OBJDIR)/atclib
+DOBJDIR_COMPAT     = $(DOBJDIR)/atclib
+OBJPHYSDIR_COMPAT  = $(OBJPHYSDIR)/atclib
+DOBJPHYSDIR_COMPAT = $(DOBJPHYSDIR)/atclib
 
 # Create all directories and make symlinks to
 # config.cc and config.h. Doing it at the start
 # makes things much simpler later on.
 DUMMY := $(shell							\
-	mkdir -p $(OBJPHYSDIR)  $(OBJPHYSDIR_ATCLIB);			\
-	mkdir -p $(DOBJPHYSDIR) $(DOBJPHYSDIR_ATCLIB);			\
+	mkdir -p $(OBJPHYSDIR)  $(OBJPHYSDIR_ATCLIB) $(OBJPHYSDIR_COMPAT);			\
+	mkdir -p $(DOBJPHYSDIR) $(DOBJPHYSDIR_ATCLIB) $(DOBJPHYSDIR_COMPAT);			\
 	[ ! -h $(OBJDIR)  ] || rm $(OBJDIR);				\
 	[ ! -h $(DOBJDIR) ] || rm $(DOBJDIR);				\
 	ln -s $(SYSTEM) $(OBJDIR);					\
@@ -158,7 +162,16 @@ MODULES_YADEX =								\
 	wadres		wads		wads2		warn		\
 	windim		x_centre	x_exchng	x_hover		\
 	x_mirror	x_rotate	x11			xref		\
-	yadex		ytime		
+	yadex		ytime
+
+# Compatibility modules
+MODULES_COMPAT =
+ifneq "$(HAVE_STRL)" "1"
+	MODULES_COMPAT += strl
+endif
+ifneq "$(HAVE_ARC4RANDOM)" "1"
+	MODULES_COMPAT += arc4random
+endif
 
 # All the modules of Atclib without path or extension.
 MODULES_ATCLIB =							\
@@ -174,6 +187,7 @@ MODULES_ATCLIB =							\
 
 # The source files of Yadex and Atclib
 SRC_YADEX  = $(addprefix src/,     $(addsuffix .cc, $(MODULES_YADEX)))
+SRC_COMPAT = $(addprefix compat/,  $(addsuffix .c,  $(MODULES_COMPAT)))
 SRC_ATCLIB = $(addprefix atclib/,  $(addsuffix .c,  $(MODULES_ATCLIB)))
 
 # The headers of Yadex and Atclib
@@ -183,7 +197,8 @@ HEADERS_ATCLIB =  atclib/atclib.h
 # All the source files, including the headers.
 SRC = $(filter-out src/config.cc, $(SRC_YADEX))				\
       $(filter-out src/config.h, $(HEADERS_YADEX))			\
-      $(SRC_ATCLIB) $(HEADERS_ATCLIB)
+      $(SRC_ATCLIB) $(HEADERS_ATCLIB)	\
+      $(SRC_COMPAT)
 
 # The files on which youngest is run.
 SRC_NON_GEN = $(filter-out src/credits.cc src/prefix.cc src/version.cc, $(SRC))
@@ -195,6 +210,8 @@ OBJ_YADEX   = $(addprefix $(OBJDIR)/,  $(addsuffix .o, $(MODULES_YADEX)))
 DOBJ_YADEX  = $(addprefix $(DOBJDIR)/, $(addsuffix .o, $(MODULES_YADEX)))
 OBJ_ATCLIB  = $(addprefix $(OBJDIR_ATCLIB)/,  $(addsuffix .o,$(MODULES_ATCLIB)))
 DOBJ_ATCLIB = $(addprefix $(DOBJDIR_ATCLIB)/, $(addsuffix .o,$(MODULES_ATCLIB)))
+OBJ_COMPAT  = $(addprefix $(OBJDIR_COMPAT)/,  $(addsuffix .o,$(MODULES_COMPAT)))
+DOBJ_COMPAT = $(addprefix $(DOBJDIR_COMPAT)/, $(addsuffix .o,$(MODULES_COMPAT)))
 
 # The game definition files.
 YGD = $(addprefix ygd/,							\
@@ -325,9 +342,9 @@ all: doc yadex.dep yadex $(YGD)
 .PHONY: yadex
 yadex: $(OBJDIR)/yadex
 
-$(OBJDIR)/yadex: $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(MAKEFILE)
+$(OBJDIR)/yadex: $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(OBJ_COMPAT) $(MAKEFILE)
 	@echo "** Linking Yadex"
-	$(CXX) $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) -o $@		\
+	$(CXX) $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(OBJ_COMPAT) -o $@		\
 	  -L$(X11LIBDIR) -lX11 -lm -lc $(LDFLAGS)
 
 .PHONY: test
@@ -358,8 +375,8 @@ install:
 
 .PHONY: clean
 clean:
-	rm -f $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(OBJDIR)/yadex
-	rm -f $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(DOBJDIR)/yadex
+	rm -f $(OBJ_CONFIG) $(OBJ_YADEX) $(OBJ_ATCLIB) $(OBJ_COMPAT) $(OBJDIR)/yadex
+	rm -f $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(OBJ_COMPAT) $(DOBJDIR)/yadex
 	rm -f $(OBJDIR)/ftime
 	rm -f $(OBJDIR)/notexist
 	rm -f $(OBJDIR)
@@ -435,9 +452,9 @@ dall: yadex.dep dyadex $(YGD)
 .PHONY: dyadex
 dyadex: $(DOBJDIR)/yadex
 	
-$(DOBJDIR)/yadex: $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(MAKEFILE)
+$(DOBJDIR)/yadex: $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(DOBJ_COMPAT) $(MAKEFILE)
 	@echo "** Linking Yadex"
-	$(CXX) $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) -o $@	\
+	$(CXX) $(DOBJ_CONFIG) $(DOBJ_YADEX) $(DOBJ_ATCLIB) $(DOBJ_COMPAT) -o $@	\
 	  -L$(X11LIBDIR) -lX11 -lm -lc $(DLDFLAGS)
 
 .PHONY: dtest
@@ -522,6 +539,7 @@ showconf:
 	@echo "DLDFLAGS           \"$(DLDFLAGS)\""
 	@echo "ETCDIR             \"$(ETCDIR)\""
 	@echo "ETCDIRNV           \"$(ETCDIRNV)\""
+	@echo "HAVE_STRL          \"$(HAVE_STRL)\""
 	@echo "HAVE_GETTIMEOFDAY  \"$(HAVE_GETTIMEOFDAY)\""
 	@echo "HAVE_NANOSLEEP     \"$(HAVE_NANOSLEEP)\""
 	@echo "HAVE_USLEEP        \"$(HAVE_USLEEP)\""
@@ -682,6 +700,14 @@ $(OBJDIR_ATCLIB)/%.o: atclib/%.c $(HEADERS_ATCLIB)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 $(DOBJDIR_ATCLIB)/%.o: atclib/%.c $(HEADERS_ATCLIB)
+	$(CC) -c $(DCFLAGS) $< -o $@
+
+# To compile the modules of Atclib
+# (normal and debugging versions)
+$(OBJDIR_COMPAT)/%.o: compat/%.c $(HEADERS_COMPAT)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+$(DOBJDIR_COMPAT)/%.o: compat/%.c $(HEADERS_COMPAT)
 	$(CC) -c $(DCFLAGS) $< -o $@
 
 # To see the generated assembly code

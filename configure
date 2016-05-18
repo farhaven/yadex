@@ -26,6 +26,8 @@ VERSION=`cat VERSION`
 
 CC=
 CXX=
+HAVE_STRL=
+HAVE_ARC4RANDOM=
 HAVE_GETTIMEOFDAY=
 HAVE_NANOSLEEP=
 HAVE_USLEEP=
@@ -263,6 +265,28 @@ int main (int argc, char *argv[])
 }
 ' || true
 
+check "for strl{cat,cpy}" HAVE_STRL '
+#include <stdlib.h>
+#include <string.h>
+int main(int argc, char *argv[])
+{
+	char *tmp = calloc(1, 7);
+	strlcpy(tmp, "foo", 7);
+	strlcat(tmp, "bar", 7);
+	free(tmp);
+	return 0;
+}
+' || true
+
+check "for arc4random" HAVE_ARC4RANDOM '
+#include <stdlib.h>
+int main(int argc, char *argv[])
+{
+	int x = (int) arc4random();
+	return x;
+}
+' || true
+
 #
 #	Do we have nanosleep() ?
 #
@@ -394,6 +418,8 @@ echo generating $BUILDDIR/Makefile.config
   echo "CXX               = $CXX"
   echo "ETCDIR            = $ETCDIR" | sed "s/%v/$VERSION/g"
   echo "ETCDIRNV          = $ETCDIRNV"
+  echo "HAVE_STRL         = $HAVE_STRL"
+  echo "HAVE_ARC4RANDOM   = $HAVE_ARC4RANDOM"
   echo "HAVE_GETTIMEOFDAY = $HAVE_GETTIMEOFDAY"
   echo "HAVE_NANOSLEEP    = $HAVE_NANOSLEEP"
   echo "HAVE_USLEEP       = $HAVE_USLEEP"

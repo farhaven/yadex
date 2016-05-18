@@ -1177,19 +1177,19 @@ cancel_save:
                 else if (is.key == YK_F3 && Registered)
                 {
                     char *outfile;
-                    const char *newlevelname;
+						  string newlevelname;
                     MDirPtr newLevel, oldl, newl;
 
                     if (! CheckStartingPos ())
                         goto cancel_save_as;
-                    newlevelname = SelectLevel(0).c_str();
-                    if (! *newlevelname)
+                    newlevelname = SelectLevel(0);
+                    if (newlevelname == "")
                         goto cancel_save_as;
-                    if (levelname == "" || y_stricmp (newlevelname, levelname.c_str()))
+                    if (levelname == "" || y_stricmp (newlevelname.c_str(), levelname.c_str()))
                     {
                         /* horrible but it works... */
                         // Horrible indeed -- AYM 1999-07-30
-                        newLevel = FindMasterDir (MasterDir, newlevelname);
+                        newLevel = FindMasterDir (MasterDir, newlevelname.c_str());
                         if (! newLevel)
                             nf_bug ("newLevel is NULL");  // Debatable ! -- AYM 2001-05-29
                         if (Level)  // If new level ("create" command), Level is NULL
@@ -1207,10 +1207,10 @@ cancel_save:
                         }
                         Level = newLevel;
                     }
-                    outfile = GetWadFileName (newlevelname);
+                    outfile = GetWadFileName (newlevelname.c_str());
                     if (! outfile)
                         goto cancel_save_as;
-                    SaveLevelData (outfile, newlevelname);
+                    SaveLevelData (outfile, newlevelname.c_str());
                     levelname = newlevelname;
 cancel_save_as:
                     RedrawMap = 1;

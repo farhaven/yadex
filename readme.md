@@ -117,7 +117,7 @@ LEGAL
 
 Yadex
 :
-    Parts copyright Gregor Best 2010-2014, GNU GPL v2
+    Parts copyright Gregor Best 2010-2016, GNU GPL v2
     Parts copyright Andrew Apted 2000-2001, GNU GPL v2
     Parts copyright André Majorel 1997-2003, GNU GPL v2
     Parts copyright Matthew W. Miller 2000, GNU GPL v2

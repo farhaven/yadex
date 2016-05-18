@@ -180,7 +180,7 @@ MODULES_ATCLIB =							\
 	al_ldelete	al_ldiscard	al_lgetpos	al_linsert	\
 	al_linsertl	al_llength	al_lpeek	al_lpeekl	\
 	al_lpoke	al_lpokel	al_lptr		al_lread	\
-	al_lreadl	al_lrewind	al_lseek	al_lsetpos	\
+	al_lreadl	al_lrewind	al_lseek	\
 	al_lstep	al_ltell	al_lwrite	al_lwritel	\
 	al_sapc		al_saps		al_scps		al_scpslower	\
 	al_sdup		al_sisnum	al_strolc

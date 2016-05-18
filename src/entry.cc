@@ -143,7 +143,7 @@ InputIntegerValue (int x0, int y0, int minv, int maxv, int defv) {
    ask for a filename
 */
 string
-InputFileName (int x0, int y0, const char *prompt, size_t maxlen, string filename) {
+InputFileName (int x0, int y0, string prompt, size_t maxlen, string filename) {
 	int   key;
 	size_t l;
 	size_t boxlen;
@@ -161,14 +161,14 @@ InputFileName (int x0, int y0, const char *prompt, size_t maxlen, string filenam
 	else
 		boxlen = maxlen;
 	/* compute the width of the dialog box */
-	if (strlen (prompt) > boxlen)
-		l = strlen (prompt);
+	if (prompt.length() > boxlen)
+		l = prompt.length();
 	else
 		l = boxlen;
 
 	width = 2 * HOLLOW_BORDER + 2 * NARROW_HSPACING + boxlen * FONTW;
-	if ((int) (strlen (prompt) * FONTW) > width)
-		width = strlen (prompt) * FONTW;
+	if ((int) (prompt.length() * FONTW) > width)
+		width = prompt.length() * FONTW;
 	width += 2 * BOX_BORDER + 2 * WIDE_HSPACING;
 
 	if (x0 < 0)
@@ -191,7 +191,7 @@ InputFileName (int x0, int y0, const char *prompt, size_t maxlen, string filenam
 	DrawScreenBox3D (x0, y0, x0 + width - 1, entry_out_y1 + WIDE_VSPACING);
 	DrawScreenBoxHollow (entry_out_x0, entry_out_y0, entry_out_x1, entry_out_y1, BLACK);
 	set_colour (WINTITLE);
-	DrawScreenString (entry_out_x0, title_y0, prompt);
+	DrawScreenString (entry_out_x0, title_y0, prompt.c_str());
 	firstkey = true;
 	for (;;) {
 		l = filename.length();

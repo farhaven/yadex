@@ -208,7 +208,6 @@ int    al_saps      (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sapslower (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sapsupper (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_scpc      (al_as_t dest, char   source, size_t maxlen);
-int    al_scps      (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_scpslower (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_scpsupper (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sbegins   (al_acs_t mainstr, al_acs_t substr);

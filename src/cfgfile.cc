@@ -915,7 +915,7 @@ static int parse_config_file (const char *filename, cfg_parse_flags_t flags)
 
                 case OPT_STRINGBUF8:
                     if (o->data_ptr)
-                        al_scps ((char *) o->data_ptr, value, 8);
+                        strlcpy((char *) o->data_ptr, value, 8);
                     break;
 
                 case OPT_STRINGPTR:
@@ -1118,7 +1118,7 @@ int parse_command_line_options (int argc, const char *const *argv, int pass)
                         argv++;
                         argc--;
                         if (o->data_ptr && ! ignore)
-                            al_scps ((char *) o->data_ptr, argv[0], 8);
+                            strlcpy((char *) o->data_ptr, argv[0], 8);
                         break;
 
                     case OPT_STRINGPTR:

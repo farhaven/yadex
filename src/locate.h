@@ -23,22 +23,20 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #ifndef YH_LOCATE  /* DO NOT INSERT ANYTHING BEFORE THIS LINE */
 #define YH_LOCATE
 
+class Locate {
+	public :
+		Locate (const char *const *search_path, const char *name, bool backwards);
+		void rewind ();
+		const char *get_next ();
 
-class Locate
-{
-  public :
-    Locate (const char *const *search_path, const char *name, bool backwards);
-    void rewind ();
-    const char *get_next ();
-
-  private :
-    const char *const *search_path;
-    const char        *name;
-    bool               absolute;
-    bool               backwards;
-    const char *const *cursor;
-    bool               rewound;
-    char               pathname[1025];
+	private :
+		const char *const *search_path;
+		const char        *name;
+		bool               absolute;
+		bool               backwards;
+		const char *const *cursor;
+		bool               rewound;
+		char               pathname[1025];
 };
 
 

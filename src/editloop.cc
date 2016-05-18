@@ -2242,28 +2242,27 @@ done2:
  *
  *	Return 0 on success, non-zero on failure.
  */
-static int zoom_fit (edit_t& e)
-{
-    // Empty level, 100% will be fine.
-    if (NumVertices == 0)
-        return edit_set_zoom (&e, 1.0);
+static int zoom_fit (edit_t& e) {
+	// Empty level, 100% will be fine.
+	if (NumVertices == 0)
+		return edit_set_zoom (&e, 1.0);
 
-    update_level_bounds ();
-    double xzoom;
-    if (MapMaxX - MapMinX)
-        xzoom = .95 * ScrMaxX / (MapMaxX - MapMinX);
-    else
-        xzoom = 1;
-    double yzoom;
-    if (MapMaxY - MapMinY)
-        yzoom = .9 * ScrMaxY / (MapMaxY - MapMinY);
-    else
-        yzoom = 1;
-    int r = edit_set_zoom (&e, y_min (xzoom, yzoom));
-    if (r != 0)
-        return 1;
-    CenterMapAroundCoords ((MapMinX + MapMaxX) / 2, (MapMinY + MapMaxY) / 2);
-    return 0;
+	update_level_bounds ();
+	double xzoom;
+	if (MapMaxX - MapMinX)
+		xzoom = .95 * ScrMaxX / (MapMaxX - MapMinX);
+	else
+		xzoom = 1;
+	double yzoom;
+	if (MapMaxY - MapMinY)
+		yzoom = .9 * ScrMaxY / (MapMaxY - MapMinY);
+	else
+		yzoom = 1;
+	int r = edit_set_zoom (&e, y_min (xzoom, yzoom));
+	if (r != 0)
+		return 1;
+	CenterMapAroundCoords ((MapMinX + MapMaxX) / 2, (MapMinY + MapMaxY) / 2);
+	return 0;
 }
 
 /*

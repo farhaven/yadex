@@ -61,8 +61,7 @@ InputInteger (int x0, int y0, int *valp, int minv, int maxv) {
 	entry_text_y0 = entry_out_y0 + HOLLOW_BORDER + NARROW_VSPACING;
 	entry_text_y1 = entry_text_y0 + FONTH - 1;
 	entry_out_y1  = entry_text_y1 + HOLLOW_BORDER + NARROW_VSPACING;
-	DrawScreenBoxHollow (entry_out_x0, entry_out_y0, entry_out_x1, entry_out_y1,
-		BLACK);
+	DrawScreenBoxHollow (entry_out_x0, entry_out_y0, entry_out_x1, entry_out_y1, BLACK);
 	long val = *valp;
 	snprintf (buf, bufmaxlen + 1, "%d", *valp);    // FIXME what if we were in hex ?
 	for (bool firstkey = true; ; firstkey = false) {

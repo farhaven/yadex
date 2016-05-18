@@ -210,7 +210,6 @@ int    al_scpc      (al_as_t dest, char   source, size_t maxlen);
 int    al_scpslower (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_scpsupper (al_as_t dest, al_acs_t source, size_t maxlen);
 int    al_sbegins   (al_acs_t mainstr, al_acs_t substr);
-char  *al_sdup      (al_acs_t str);
 int    al_sends     (al_acs_t mainstr, al_acs_t substr);
 size_t al_sfirsts   (al_acs_t s1, al_acs_t s2, int flags);
 size_t al_sfirstw   (al_acs_t s1, al_acs_t s2, int flags);

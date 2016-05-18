@@ -185,7 +185,7 @@ MODULES_ATCLIB =							\
 	al_lreadl	al_lrewind	al_lseek	\
 	al_lstep	al_ltell	al_lwrite	al_lwritel	\
 	al_sapc		al_scpslower	\
-	al_sdup		al_sisnum	al_strolc
+	al_sisnum	al_strolc
 
 # The source files of Yadex and Atclib
 SRC_YADEX  = $(addprefix src/,     $(addsuffix .cc, $(MODULES_YADEX)))

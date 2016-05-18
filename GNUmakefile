@@ -83,8 +83,7 @@ endif
 #CXX =
 
 # Options used when compiling Atclib.
-CFLAGS = -fPIC
-CFLAGS += -pedantic
+CFLAGS  = -pedantic
 CFLAGS += -Wall
 CFLAGS += -Werror
 CFLAGS += -Wno-variadic-macros
@@ -93,13 +92,13 @@ CFLAGS += -Wno-variadic-macros
 # ld is invoked through the C++ compiler so
 # LDFLAGS should not contain options that mean
 # something to the C++ compiler.
-CXXFLAGS  = -fPIC -std=c++11
+CXXFLAGS  = -std=c++11
 CXXFLAGS += -pedantic
 CXXFLAGS += -Wall
 CXXFLAGS += -Werror
 CXXFLAGS += -Wno-variadic-macros
 #CXXFLAGS += -DWHITE_BACKGROUND
-LDFLAGS  = -g -fPIC
+LDFLAGS  = -g
 
 # Options used to compile and link the debugging
 # targets. Not used by normal end-user targets.

@@ -144,7 +144,7 @@ void Statistics ()
 /*
    display a message, then ask if the check should continue (prompt2 may be empty)
 */
-bool CheckFailed (int x0, int y0, char *prompt1, string prompt2, bool fatal,
+bool CheckFailed (int x0, int y0, string prompt1, string prompt2, bool fatal,
                   bool &first_time)
 {
     int key;
@@ -155,8 +155,8 @@ bool CheckFailed (int x0, int y0, char *prompt1, string prompt2, bool fatal,
     else
         maxlen = 27;
 
-    if (strlen (prompt1) > maxlen)
-        maxlen = strlen (prompt1);
+    if (prompt1.length() > maxlen)
+        maxlen = prompt1.length();
 
     if (prompt2.length() > maxlen)
         maxlen = prompt2.length();
@@ -182,8 +182,8 @@ bool CheckFailed (int x0, int y0, char *prompt1, string prompt2, bool fatal,
         Beep ();
 
     set_colour (WHITE);
-    DrawScreenText (text_x0, cur_y += FONTH, prompt1);
-    LogMessage ("\t%s\n", prompt1);
+    DrawScreenText (text_x0, cur_y += FONTH, prompt1.c_str());
+    LogMessage ("\t%s\n", prompt1.c_str());
 
     if (prompt2 != "") {
         DrawScreenText (text_x0, cur_y += FONTH, prompt2.c_str());
@@ -257,7 +257,7 @@ void CheckSectors ()
             {
                 snprintf (msg1, sizeof(msg1), "Sector #%d is not closed!", s);
                 snprintf (msg2, sizeof(msg2), "There is no sidedef ending at Vertex #%d", n);
-                if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+                if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
                 {
                     GoToObject (Objid (OBJ_VERTICES, n));
                     return;
@@ -267,7 +267,7 @@ void CheckSectors ()
             {
                 snprintf (msg1, sizeof(msg1), "Sector #%d is not closed!", s);
                 snprintf (msg2, sizeof(msg2), "There is no sidedef starting at Vertex #%d", n);
-                if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+                if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
                 {
                     GoToObject (Objid (OBJ_VERTICES, n));
                     return;
@@ -313,7 +313,7 @@ void CheckSectors ()
                     snprintf (msg2, sizeof(msg2), "Check linedef #%d (first sidedef: #%d)"
                                    " and the one facing it", n, sd);
                 }
-                if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+                if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
                 {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
@@ -337,7 +337,7 @@ void CheckSectors ()
                     snprintf (msg2, sizeof(msg2), "Check linedef #%d (second sidedef: #%d)"
                                    " and the one facing it", n, sd);
                 }
-                if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+                if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
                 {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
@@ -362,7 +362,7 @@ void CheckCrossReferences () /* SWAP! */
         /* Check for missing first sidedefs */
         if (LineDefs[n].sidedef1 < 0) {
             snprintf (msg, sizeof(msg), "ERROR: linedef #%d has no first sidedef!", n);
-            CheckFailed (-1, -1, msg, "", 1, first_time);
+            CheckFailed (-1, -1, string(msg), "", 1, first_time);
             GoToObject (Objid (OBJ_LINEDEFS, n));
             return;
         }
@@ -371,7 +371,7 @@ void CheckCrossReferences () /* SWAP! */
         if (LineDefs[n].start == LineDefs[n].end) {
             snprintf (msg, sizeof(msg), "ERROR: linedef #%d uses the same vertex twice (#%d)",
             n, LineDefs[n].start);
-            CheckFailed (-1, -1, msg, "", 1, first_time);
+            CheckFailed (-1, -1, string(msg), "", 1, first_time);
             GoToObject (Objid (OBJ_LINEDEFS, n));
             return;
         }
@@ -480,6 +480,10 @@ void CheckCrossReferences () /* SWAP! */
         if (cur && m >= 0)
             UnSelectObject (&cur, m);
     }
+	 for (SelPtr x = cur; x; x = x->next) {
+		 fprintf(stderr, "sd #%d\n", x->objnum);
+	 }
+
     /* check if there are any SideDefs left */
     if (cur && (Expert
             || Confirm (-1, -1, "Some sidedefs are not bound to any linedef",
@@ -531,7 +535,7 @@ void CheckTextures () /* SWAP! */
         {
             snprintf (msg1, sizeof(msg1), "Error: sector #%d has no ceiling texture", n);
             msg2 = "You probably used a brain-damaged editor to do that...";
-            CheckFailed (-1, -1, msg1, msg2, 1, first_time);
+            CheckFailed (-1, -1, string(msg1), msg2, 1, first_time);
             GoToObject (Objid (OBJ_SECTORS, n));
             return;
         }
@@ -541,7 +545,7 @@ void CheckTextures () /* SWAP! */
         {
             snprintf (msg1, sizeof(msg1), "Error: sector #%d has no floor texture", n);
             msg2 = "You probably used a brain-damaged editor to do that...";
-            CheckFailed (-1, -1, msg1, msg2, 1, first_time);
+            CheckFailed (-1, -1, string(msg1), msg2, 1, first_time);
             GoToObject (Objid (OBJ_SECTORS, n));
             return;
         }
@@ -550,7 +554,7 @@ void CheckTextures () /* SWAP! */
             snprintf (msg1, sizeof(msg1),
 					"Error: sector #%d has its ceiling lower than its floor", n);
             msg2 = "The textures will never be displayed if you cannot go there";
-            CheckFailed (-1, -1, msg1, msg2, 1, first_time);
+            CheckFailed (-1, -1, string(msg1), msg2, 1, first_time);
             GoToObject (Objid (OBJ_SECTORS, n));
             return;
         }
@@ -576,7 +580,7 @@ void CheckTextures () /* SWAP! */
                                " sidedef #%d has no middle texture", n, sd1);
 					 msg2 = "Do you want to set the texture to \"" + default_middle_texture + "\" and continue?";
 
-                if (CheckFailed (-1, -1, msg1, msg2, 0, first_time)) {
+                if (CheckFailed (-1, -1, string(msg1), msg2, 0, first_time)) {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
@@ -592,7 +596,7 @@ void CheckTextures () /* SWAP! */
                 snprintf (msg1, sizeof(msg1), "Error in first sidedef of linedef #%d:"
                                " sidedef #%d has no upper texture", n, sd1);
                 msg2 = "Do you want to set the texture to \"" + default_upper_texture + "\" and continue?";
-                if (CheckFailed (-1, -1, msg1, msg2, 0, first_time)) {
+                if (CheckFailed (-1, -1, string(msg1), msg2, 0, first_time)) {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
@@ -607,7 +611,7 @@ void CheckTextures () /* SWAP! */
                 snprintf (msg1, sizeof(msg1), "Error in first sidedef of linedef #%d:"
                                " sidedef #%d has no lower texture", n, sd1);
                 msg2 = "Do you want to set the texture to \"" + default_lower_texture + "\" and continue?";
-                if (CheckFailed (-1, -1, msg1, msg2, 0, first_time)) {
+                if (CheckFailed (-1, -1, string(msg1), msg2, 0, first_time)) {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
@@ -623,7 +627,7 @@ void CheckTextures () /* SWAP! */
                 snprintf (msg1, sizeof(msg1), "Error in second sidedef of linedef #%d:"
                                " sidedef #%d has no upper texture", n, sd2);
                 msg2 = "Do you want to set the texture to \"" + default_upper_texture + "\" and continue?";
-                if (CheckFailed (-1, -1, msg1, msg2, 0, first_time)) {
+                if (CheckFailed (-1, -1, string(msg1), msg2, 0, first_time)) {
                     GoToObject (Objid (OBJ_LINEDEFS, n));
                     return;
                 }
@@ -638,7 +642,7 @@ void CheckTextures () /* SWAP! */
             snprintf (msg1, sizeof(msg1), "Error in second sidedef of linedef #%d:"
 					" sidedef #%d has no lower texture", n, sd2);
             msg2 = "Do you want to set the texture to \"" + default_lower_texture + "\" and continue?";
-				if (CheckFailed (-1, -1, msg1, msg2, 0, first_time)) {
+				if (CheckFailed (-1, -1, string(msg1), msg2, 0, first_time)) {
 					GoToObject (Objid (OBJ_LINEDEFS, n));
 					return;
 				}
@@ -682,7 +686,7 @@ void CheckTextureNames () /* SWAP! */
             snprintf (msg1, sizeof(msg1), "Invalid ceiling texture in sector #%d", n);
             snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a floor/ceiling texture",
             (int) WAD_FLAT_NAME, Sectors[n].ceilt);
-            if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+            if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
             {
                 GoToObject (Objid (OBJ_SECTORS, n));
                 return;
@@ -693,7 +697,7 @@ void CheckTextureNames () /* SWAP! */
             snprintf (msg1, sizeof(msg1), "Invalid floor texture in sector #%d", n);
             snprintf (msg2, sizeof(msg2), "The name \"%.*s\" is not a floor/ceiling texture",
             (int) WAD_FLAT_NAME, Sectors[n].floort);
-            if (CheckFailed (-1, -1, msg1, string(msg2), 0, first_time))
+            if (CheckFailed (-1, -1, string(msg1), string(msg2), 0, first_time))
             {
                 GoToObject (Objid (OBJ_SECTORS, n));
                 return;
@@ -705,7 +709,7 @@ void CheckTextureNames () /* SWAP! */
 		 n++;
         if (!IsTextureNameInList(s.tex1, WTexture )) {
             snprintf(msg1, sizeof(msg1), "Invalid upper texture in sidedef #%d", n);
-            if (CheckFailed(-1, -1, msg1,
+            if (CheckFailed(-1, -1, string(msg1),
 							"The name \"" + s.tex1 + "\" is not a wall texture", 0, first_time)) {
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;
@@ -713,7 +717,7 @@ void CheckTextureNames () /* SWAP! */
         }
         if (!IsTextureNameInList(s.tex2, WTexture)) {
             snprintf (msg1, sizeof(msg1), "Invalid lower texture in sidedef #%d", n);
-            if (CheckFailed(-1, -1, msg1,
+            if (CheckFailed(-1, -1, string(msg1),
 							"The name \"" + s.tex2 + "\" is not a wall texture", 0, first_time)) {
                 GoToObject(Objid (OBJ_SIDEDEFS, n));
                 return;
@@ -721,7 +725,7 @@ void CheckTextureNames () /* SWAP! */
         }
         if (!IsTextureNameInList (s.tex3, WTexture)) {
             snprintf(msg1, sizeof(msg1), "Invalid middle texture in sidedef #%d", n);
-            if (CheckFailed(-1, -1, msg1,
+            if (CheckFailed(-1, -1, string(msg1),
 							"The name \"" + s.tex3 + "\" is not a wall texture", 0, first_time)) {
                 GoToObject (Objid (OBJ_SIDEDEFS, n));
                 return;

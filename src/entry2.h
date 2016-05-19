@@ -84,8 +84,6 @@ class Entry2
 
     // Geometry stuff
     bool geom_up_to_date;
-    int outer_width;
-    int outer_height;
     int vstep;
     int win_x0;
     int win_y0;

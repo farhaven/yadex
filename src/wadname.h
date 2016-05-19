@@ -51,8 +51,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
  *	  y_strnicmp(). This is very important for performance
  *	  reasons.
  */
-struct Wad_name
+class Wad_name
 {
+	public:
   inline Wad_name ();
   inline Wad_name (const Wad_name& source);
   inline Wad_name (const char *source);

@@ -95,7 +95,7 @@ int vmacro_expand (char *buf, size_t size, const char *fmt, va_list list)
     l = list;
 #endif
 
-    while (macro_name = va_arg (l, const char *))
+    while ((macro_name = va_arg (l, const char *)))
     {
       macro_value = va_arg (l, const char *);
       size_t len1 = strlen (fmt);

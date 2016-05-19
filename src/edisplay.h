@@ -21,8 +21,6 @@ class edisplay_c
 
    private :
       edit_t *e;		/* Parent editing window */
-      int requested_highlight;	/* No. of object that should be highlighted */
-      int actual_highlight;	/* No. of object that really is highlighted */
       int pointer_scnx;		/* Physical position of the pointer */
       int pointer_scny;
       int refresh_needed;	/* If true, the display needs to be refreshed */

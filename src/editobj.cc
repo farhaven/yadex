@@ -127,7 +127,7 @@ InputObjectXRef (int x0, int y0, int objtype, bool allownone, int curobj) {
 	snprintf (prompt, sizeof(prompt), "Enter a %s number between 0 and %d%c",
 		GetObjectTypeName(objtype).c_str(), GetMaxObjectNum (objtype), allownone ? ',' : ':');
 	maxlen = 40;				// Why 40 ? -- AYM 2002-04-17
-	if (strlen (prompt) > maxlen);
+	if (strlen (prompt) > maxlen)
 		maxlen = strlen (prompt);
 	if (strlen (msg1) > maxlen)
 		maxlen = strlen (msg1);

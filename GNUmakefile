@@ -223,13 +223,6 @@ YGD = $(addprefix ygd/,							\
 	strife.ygd	strife10.ygd	zdoom.ygd)
 
 # Files that are used with scripts/process to
-# generate files that are included in the
-# distribution archive.
-DOC1_SRC =				\
-	docsrc/README			\
-	docsrc/README.doc
-
-# Files that are used with scripts/process to
 # generate files that go in the doc/ directory
 # and are NOT included in the archive.
 DOC2_SRC_HTML =				\
@@ -264,7 +257,7 @@ DOC2_SRC_MISC =				\
 # Files that must be put in the distribution
 # archive. Most (but not all) are generated from
 # $(DOC1_SRC_*) into the base directory.
-DOC1 = FAQ README doc/README
+DOC1 = FAQ readme.md
 
 # Files that go in the doc/ directory and must
 # NOT be put in the distribution archive. Most
@@ -313,7 +306,7 @@ PATCHES = $(addprefix patches/,	\
 	1.5.0_gcc27.diff)
 
 # All files that must be put in the distribution archive.
-ARC_FILES = $(sort $(DOC1) $(DOC1_SRC) $(DOC2_SRC_HTML) $(DOC2_SRC_MISC)\
+ARC_FILES = $(sort $(DOC1) $(DOC2_SRC_HTML) $(DOC2_SRC_MISC)\
 	$(MISC_FILES) $(addprefix docsrc/, $(PIX)) $(SCRIPTS) $(SRC) $(YGD)\
 	$(PATCHES))
 
@@ -543,9 +536,6 @@ showconf:
 	@echo "ETCDIR             \"$(ETCDIR)\""
 	@echo "ETCDIRNV           \"$(ETCDIRNV)\""
 	@echo "HAVE_STRL          \"$(HAVE_STRL)\""
-	@echo "HAVE_GETTIMEOFDAY  \"$(HAVE_GETTIMEOFDAY)\""
-	@echo "HAVE_NANOSLEEP     \"$(HAVE_NANOSLEEP)\""
-	@echo "HAVE_USLEEP        \"$(HAVE_USLEEP)\""
 	@echo "LDFLAGS            \"$(LDFLAGS)\""
 	@echo "MANDIR             \"$(MANDIR)\""
 	@echo "OS                 \"$(OS)\""

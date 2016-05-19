@@ -21,8 +21,8 @@ You need:
 * a Doom/Doom II/Heretic/Strife iwad (shareware/demo is OK),
 * GNU make (BSD Make won't do),
 * a standard C compiler (ISO 9899:1990),
-* a standard C++ compiler,
-* `hypot()` and either `nanosleep()` or `usleep()`.
+* a standard C++ compiler which supports C++11,
+* `hypot()` and `nanosleep()`
 * the links web browser to build the FAQ
 
 BUILDING AND INSTALLING
@@ -42,7 +42,7 @@ To install somewhere else, for example in ~/yadex :
 
 To force the use of a particular C/C++ compiler :
 
-    ./configure --cc gcc-3.3 --cxx g++-3.3 
+    ./configure --cc egcc --cxx eg++
     make
     make install
 
@@ -54,9 +54,7 @@ you're installing in /usr/local) :
 
     /etc/yadex/1.7.1/yadex.cfg
     /usr/local/bin/yadex
-    /usr/local/bin/yadex-1.7.1
     /usr/local/man/man6/yadex.6
-    /usr/local/man/man6/yadex-1.7.0.6
     /usr/local/share/games/yadex/1.7.1/doom.ygd
     /usr/local/share/games/yadex/1.7.1/zdoom.ygd
     /usr/local/share/games/yadex/1.7.1/doom02.ygd
@@ -144,16 +142,6 @@ Atclib
 
     Atclib is copyright André Majorel 1995-1999 and distributed under
     the terms of version 2 of the GNU Library General Public License.
-
-Boost
-:
-    The Yadex distribution includes a subset of Boost 1.25.0. Boost
-    1.25.0 is copyright various authors and released under the following
-    terms : Permission to copy, use, modify, sell and distribute this
-    software is granted provided this copyright notice appears in all
-    copies.  This software is provided "as is" without express or
-    implied warranty, and with no claim as to its suitability for any
-    purpose.
 
 CONTACT
 -------

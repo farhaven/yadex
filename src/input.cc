@@ -126,17 +126,9 @@ void get_input_status ()
     if (XPending (dpy) == 0)
     {
         // No event ? Wait for <idle_sleep_ms> ms before polling again.
-#if defined Y_NANOSLEEP
         struct timespec treq = { 0, 1000000l * idle_sleep_ms };
         struct timespec trem;
         nanosleep (&treq, &trem);
-#elif defined Y_USLEEP
-        usleep (1000ul * idle_sleep_ms );
-#else
-        ;  // Neither nanosleep() no usleep() so be a CPU hog.
-        // FIXME: if autoscroll is turned off, could as well
-        // call XNextEvent and sleep for good.
-#endif
         return;
     }
 

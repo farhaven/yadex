@@ -925,14 +925,6 @@ Unix port
   size al_f* types does not scale on Unix. Should probably modify
   al_fana() to use dynamically allocated buffers.
 
-Platforms/Portability
-- Solaris 7: bad X11/Xlib.h. With GCC, need -fpermissive
-  and/or  -isystem /usr/openwin/include
-- Solaris 7: don't assume that having gcc implies that cc is
-  gcc. cc might be the native compiler in which case -Wall might
-  no be appreciated.
-- Solaris 9: nanosleep() needs -lrt. Best to use usleep() ?
-
 Prompt
 - Add access to the prompt from an editing window (":" like in vi).
 - Use readline.
@@ -1024,36 +1016,11 @@ To do soon
 - Add a parameter in the config file to choose between P3 and P6 for
   - screenshots
   - pictures saved
-- Test XK_*_ISO_* on SCO X11R5.
 - Test on Final Doom.
-- Add option to let Yadex tell you with which options it was compiled.
 - Fix any remaining problems that might remain in saving.
-- "create": Fix the problem with levelname being NULL in EditLoop().
-  Check [F3].
 - "create": every time you [F2], the wad name is reset to the default
   (E.G. "map01.wad").
 - Replace Patch_dir by Lump_dir.
-
-Web
-- Announce to cola automatically.
-- Generate LSM and upload to ftp.metalab.edu.
-- Upload to ftp.cdrom.com.
-- faq.html bears the wrong version number.
-- Bcc announcements to Oliver Kraus too.
-- Add patches/
-- patches/README: on the version included with the distribution archive,
-  mention that the latest patches can be found in
-  http://www.teaser.fr/~amajorel/yadex/patches/.
-- patches/README: mention the fate of the patches (some have already
-  made in into the dev version, some will have not because I haven't
-  decided yet or haven't even looked into them and some will never make
-  it).
-- Have an index page for patches/ ready, in case the web server does not
-  support automatic indexing. Use dldir for that.
-- Should all patches in the web page be also included in the
-  distribution, and vice-versa ?
-
-
 
 ----------------------------------------
 

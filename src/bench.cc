@@ -8,9 +8,9 @@
 This file is part of Yadex.
 
 Yadex incorporates code from DEU 5.21 that was put in the public domain in
-1994 by Raphaël Quinet and Brendon Wyber.
+1994 by RaphaÃ«l Quinet and Brendon Wyber.
 
-The rest of Yadex is Copyright © 1997-2003 André Majorel and others.
+The rest of Yadex is Copyright Â© 1997-2003 AndrÃ© Majorel and others.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -79,7 +79,7 @@ static void bench_LoadPicture ()
     double value = (double) (t1.tms_utime - t0.tms_utime) / CLOCKS_PER_SEC / iterations;
     if (value < 1E-3)
     {
-        unit = "µs";
+        unit = "Âµs";
         value *= 1000000;
     }else if (value < 1.0)
     {

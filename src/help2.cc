@@ -8,9 +8,9 @@
 This file is part of Yadex.
 
 Yadex incorporates code from DEU 5.21 that was put in the public domain in
-1994 by Raphaël Quinet and Brendon Wyber.
+1994 by RaphaÃ«l Quinet and Brendon Wyber.
 
-The rest of Yadex is Copyright © 1997-2003 André Majorel and others.
+The rest of Yadex is Copyright Â© 1997-2003 AndrÃ© Majorel and others.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -161,7 +161,7 @@ void about_yadex ()
   push_colour (WINFG_HL);
   DrawScreenText (-1, -1, "Maintainer :");
   pop_colour ();
-  DrawScreenText (-1, -1, "André Majorel (http://www.teaser.fr/~amajorel/)");
+  DrawScreenText (-1, -1, "AndrÃ© Majorel (http://www.teaser.fr/~amajorel/)");
   DrawScreenText (-1, -1, "Send all email to you-know-what@freelists.org, NOT to me.");
   DrawScreenText (-1, -1, "");
   DrawScreenText (-1, -1, "");

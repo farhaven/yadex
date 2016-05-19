@@ -9,9 +9,9 @@
 This file is part of Yadex.
 
 Yadex incorporates code from DEU 5.21 that was put in the public domain in
-1994 by Raphaël Quinet and Brendon Wyber.
+1994 by RaphaÃ«l Quinet and Brendon Wyber.
 
-The rest of Yadex is Copyright © 1997-2003 André Majorel and others.
+The rest of Yadex is Copyright Â© 1997-2003 AndrÃ© Majorel and others.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -652,7 +652,7 @@ switch (val)
 	 }
       if (objtype != OBJ_THINGS) {	angle = 0;
       	scale = 100;
-      	if (Input2Numbers (-1, -1, "rotation angle (°)", "scale (%)",
+      	if (Input2Numbers (-1, -1, "rotation angle (Â°)", "scale (%)",
        	  360, 1000, &angle, &scale))
 		 RotateAndScaleObjects (objtype, *list, (double) angle * 0.0174533,
        	     (double) scale * 0.01);
@@ -682,7 +682,7 @@ switch (val)
 	    MakeDoorFromSector ((*list)->objnum);
 	    }
 	 }
-      // Thing -> Spin 45° clockwise
+      // Thing -> Spin 45Â° clockwise
       else if (objtype == OBJ_THINGS)
 	 {
          spin_things (*list, -45);
@@ -723,7 +723,7 @@ switch (val)
 	    MakeLiftFromSector ((*list)->objnum);
 	    }
 	 }
-      // Thing -> Spin 45° counter-clockwise
+      // Thing -> Spin 45Â° counter-clockwise
       else if (objtype == OBJ_THINGS)
          spin_things (*list, 45);
       // Vertex -> Merge

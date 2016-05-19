@@ -8,9 +8,9 @@
 This file is part of Yadex.
 
 Yadex incorporates code from DEU 5.21 that was put in the public domain in
-1994 by Raphaël Quinet and Brendon Wyber.
+1994 by RaphaÃ«l Quinet and Brendon Wyber.
 
-The rest of Yadex is Copyright © 1997-2003 André Majorel and others.
+The rest of Yadex is Copyright Â© 1997-2003 AndrÃ© Majorel and others.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -345,8 +345,8 @@ void EditorLoop (string levelname) /* SWAP! */
             e.mb_menu[MBM_MISC_T] = new Menu ("Misc. operations",
                 "Find first free ~tag number",	 YK_, 0,
                 "~Rotate and scale things...",	 YK_, 0,
-                "~Spin things 45° clockwise",	 'x', 0,
-                "Spin things 45° ~counter-clockwise", 'w', 0,
+                "~Spin things 45Â° clockwise",	 'x', 0,
+                "Spin things 45Â° ~counter-clockwise", 'w', 0,
                 "~Mirror horizontally",		 YK_, 0,
                 "Mirror ~vertically",		 YK_, 0,
                 NULL);
@@ -355,8 +355,8 @@ void EditorLoop (string levelname) /* SWAP! */
             e.mb_menu[MBM_MISC_T] = new Menu ("Misc. operations",
                 "Find first free ~tag number",	 YK_, 0,
                 "Find first free T~ID",		 YK_, 0,
-                "~Spin things 45° clockwise",	 'x', 0,
-                "Spin things 45° ~counter-clockwise", 'w', 0,
+                "~Spin things 45Â° clockwise",	 'x', 0,
+                "Spin things 45Â° ~counter-clockwise", 'w', 0,
                 "~Mirror horizontally",		 YK_, 0,
                 "Mirror ~vertically",		 YK_, 0,
                 NULL);

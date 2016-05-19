@@ -1135,9 +1135,9 @@ void EditorLoop (string levelname) /* SWAP! */
                     char buf1[10];
                     char buf2[30];
                     char buf3[20];
-                    strcpy (buf1, "buf1");
-                    strcpy (buf2, "buf2");
-                    strcpy (buf3, "buf3");
+                    strlcpy (buf1, "buf1", sizeof(buf1));
+                    strlcpy (buf2, "buf2", sizeof(buf2));
+                    strlcpy (buf3, "buf3", sizeof(buf3));
                     Entry2 e ("Title of window", "Buf 1%*sBuf 2%*sBuf 3%*s",
                     sizeof buf1 - 1, buf1,
                     sizeof buf2 - 1, buf2,

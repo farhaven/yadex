@@ -160,7 +160,7 @@ Entry2::process_event (const input_status_t &is) {
 	// [BS]: Backspace
 	else if (key == YK_BACKSPACE) {
 		if (is_integer_entry (flags) && l == 1)
-			strcpy (s, "0");
+			strlcpy (s, "0", max_len);
 		else if (l > 0)
 			s[l-1] = '\0';
 		else
@@ -182,7 +182,7 @@ Entry2::process_event (const input_status_t &is) {
 	// ^U, [Ctrl][Home]: Del to SOL (readline, Doskey)
 	else if (key == YK_HOME + YK_CTRL || key == 21) {
 		if ((flags & FF_SUBTYPE) == FF_INTEGER)
-			strcpy (s, "0");
+			strlcpy (s, "0", max_len);
 		else
 			*s = '\0';
 		redraw = true;
@@ -192,7 +192,7 @@ Entry2::process_event (const input_status_t &is) {
 		while (l > 0 && isspace (s[l - 1])) l--;
 		while (l > 0 && ! isspace (s[l - 1])) l--;
 		if (is_integer_entry (flags) && l == 0)
-			strcpy (s, "0");
+			strlcpy (s, "0", max_len);
 		else
 			s[l] = '\0';
 		redraw = true;

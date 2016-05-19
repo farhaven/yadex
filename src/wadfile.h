@@ -110,8 +110,8 @@ class Wad_file
       directory (0),
       error_ (false)
     {
-      strcpy (type, "BUG");
-      strcpy (where_, "DEADBEEF");
+      strlcpy (type, "BUG", sizeof(type));
+      strlcpy (where_, "DEADBEEF", sizeof(where_));
     }
     ~Wad_file ();
     const char *pathname    () const;

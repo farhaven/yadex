@@ -805,12 +805,12 @@ flatname_done:
 					if (nflatnames && flatnames && index >= 0 && index < nflatnames)
 						memcpy (Sectors[n].floort, flatnames + WAD_FLAT_NAME * index, WAD_FLAT_NAME);
 					else
-						strcpy (Sectors[n].floort, "unknown");
+						strlcpy (Sectors[n].floort, "unknown", WAD_FLAT_NAME);
 					wf->read_int16_t (&index);
 					if (nflatnames && flatnames && index >= 0 && index < nflatnames)
 						memcpy (Sectors[n].ceilt, flatnames + WAD_FLAT_NAME * index, WAD_FLAT_NAME);
 					else
-						strcpy (Sectors[n].ceilt, "unknown");
+						strlcpy (Sectors[n].ceilt, "unknown", WAD_FLAT_NAME);
 					wf->read_int16_t (&Sectors[n].light);
 					wf->read_int16_t (&Sectors[n].special);
 					wf->read_int16_t (&Sectors[n].tag);

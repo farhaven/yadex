@@ -283,7 +283,7 @@ InputNameFromListWithFunc (
 				char size_buf[100];  // Slack
 				snprintf (size_buf, sizeof size_buf, "%dx%d", c.width, c.height);
 				if (strlen (size_buf) > size_chars)
-					strcpy (size_buf + size_chars - 1, ">");
+					strlcpy (size_buf + size_chars - 1, ">", sizeof(size_buf) - size_chars + 1);
 				DrawScreenString (size_x0, size_y0, size_buf);
 				picture_size_drawn = true;
 			}

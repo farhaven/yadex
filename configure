@@ -212,14 +212,14 @@ then
 	printf ' using user-supplied value:'
 else
 	CC=
-	for c in egcc gcc c89 c89; do
+	for c in clang egcc gcc c89 c89; do
 		if type $c >/dev/null 2>&1; then
 			CC=$c
 			break
 		fi
 	done
 	if [ "x$CC" == "x" ]; then
-		echo "error: none of (gcc, c89, cc) work, is your PATH set right?" 1>&2
+		echo "error: none of (clang, egcc, gcc, c89, cc) work, is your PATH set right?" 1>&2
 		exit 1
 	fi
 fi
@@ -276,14 +276,14 @@ then
   printf ' using user-supplied value:'
 else
 	CXX=
-	for c in eg++ g++ c++ cxx; do
+	for c in clang++ eg++ g++ c++ cxx; do
 		if type $c >/dev/null 2>&1; then
 			CXX=$c
 			break
 		fi
 	done
 	if [ "x$CXX" == "x" ]; then
-		echo "error: none of (eg++, g++, c++, cxx) work, is your PATH set right?" 1>&2
+		echo "error: none of (clang++, eg++, g++, c++, cxx) work, is your PATH set right?" 1>&2
 		exit 1
 	fi
 fi

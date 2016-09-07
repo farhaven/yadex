@@ -104,18 +104,7 @@ LDFLAGS  = -g
 # targets. Not used by normal end-user targets.
 # Unlike CFLAGS, CXXFLAGS and LDFLAGS, assume
 # GCC/EGCS.
-DCFLAGS		= -g
-DCFLAGS		+= -Wall			# GCC warnings
-DCFLAGS		+= -pedantic			# GCC warnings
-DCFLAGS		+= -Wno-parentheses		# GCC warnings
-DCFLAGS		+= -Wpointer-arith		# GCC warnings
-DCFLAGS		+= -Wcast-qual			# GCC warnings
-DCFLAGS		+= -Wcast-align			# GCC warnings
-DCFLAGS		+= -Wwrite-strings		# GCC warnings
-DCFLAGS		+= -Wmissing-declarations	# GCC warnings
-DCFLAGS		+= -Wmissing-prototypes		# GCC warnings
-DCFLAGS		+= -Winline			# GCC warnings
-
+DCFLAGS		= $(CFLAGS) -g
 DCXXFLAGS	= $(CXXFLAGS) -g
 
 DLDFLAGS	= -g

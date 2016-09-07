@@ -31,13 +31,13 @@ void        create_things_table ();
 void        delete_things_table ();
 bool        is_thing_type    (wad_ttype_t type);
 acolour_t   get_thing_colour (wad_ttype_t type);
-const char *get_thing_name   (wad_ttype_t type);
+const string get_thing_name   (wad_ttype_t type);
 const char *get_thing_sprite (wad_ttype_t type);
 char        get_thing_flags  (wad_ttype_t type);
 int         get_thing_radius (wad_ttype_t type);
 inline int  get_max_thing_radius () { return _max_radius; }
-const char *GetAngleName (int);
-const char *GetWhenName (int);
+const string GetAngleName (int);
+const string GetWhenName (int);
 
 
 /*

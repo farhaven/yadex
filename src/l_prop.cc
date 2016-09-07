@@ -30,6 +30,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <sstream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -180,7 +181,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 			}
 
 			if (yg_level_format == YGLF_HEXEN)
-				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(), 
+				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle,
 						menustr[0].c_str(), YK_, 0,
 						menustr[1].c_str(), YK_, 0,
 						menustr[2].c_str(), YK_, 0,
@@ -194,7 +195,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 						menustr[10].c_str(), YK_, 0,
 						NULL);
 			else
-				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(),
+				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle,
 						menustr[0].c_str(), YK_, 0,
 						menustr[1].c_str(), YK_, 0,
 						menustr[2].c_str(), YK_, 0,
@@ -457,7 +458,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 				"Change texture Y offset (Current: " + to_string(SideDefs[sdlist->objnum].yoff) + ")",
 				"Change sector ref.      (Current: #" + to_string(SideDefs[sdlist->objnum].sector) + ")"
 			};
-			val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(),
+			val = vDisplayMenu (x0 + 42, subwin_y0, menutitle,
 					menustr[0].c_str(), YK_, 0,
 					menustr[1].c_str(), YK_, 0,
 					menustr[2].c_str(), YK_, 0,
@@ -549,400 +550,388 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
  *	Thing properties dialog. Called by EditObjectsInfo. Was part of
  *	EditObjectsInfo in editobj.c
  */
-void ThingProperties (int x0, int y0, SelPtr obj)
-{
-char  *menustr[30];
-int    n, val;
-SelPtr cur;
-int    subwin_y0;
+void ThingProperties (int x0, int y0, SelPtr obj) {
+	vector<string> menustr;
+	string menutitle;
 
-for (n = 0; n < 14; n++)
-   menustr[n] = (char *) malloc (60);
-snprintf (menustr[13], 60,"Edit thing #%d", obj->objnum);
-snprintf (menustr[0], 60,"Change type          (Current: %s)",
-         get_thing_name (Things[obj->objnum].type));
-snprintf (menustr[1], 60,"Change angle         (Current: %s)",
-         GetAngleName (Things[obj->objnum].angle));
-snprintf (menustr[2], 60,"Change flags         (Current: %s)",
-         GetWhenName (Things[obj->objnum].when));
-snprintf (menustr[3], 60,"Change X position    (Current: %d)",
-         Things[obj->objnum].xpos);
-snprintf (menustr[4], 60,"Change Y position    (Current: %d)",
-         Things[obj->objnum].ypos);
-snprintf (menustr[5], 60,"Change Z position    (Current: %d)",
-         Things[obj->objnum].height);
-snprintf (menustr[6], 60,"Change TID           (Current: %d)",
-         Things[obj->objnum].tid);
-snprintf (menustr[7], 60,"Change special       (Current: %d)",
-         Things[obj->objnum].special);
-if (yg_level_format == YGLF_HEXEN) {
-	snprintf (menustr[8], 60,"Change %-14s(Current: %d)",
-        	GetLineDefArgumentName(Things[obj->objnum].special, 1).c_str(),Things[obj->objnum].arg1);
-	snprintf (menustr[9], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,2).c_str(),Things[obj->objnum].arg2);
-	snprintf (menustr[10], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,3).c_str(),Things[obj->objnum].arg3);
-	snprintf (menustr[11], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,4).c_str(),Things[obj->objnum].arg4);
-	snprintf (menustr[12], 60,"Change %-14s(Current: %d)",
-         	GetLineDefArgumentName(Things[obj->objnum].special,5).c_str(),Things[obj->objnum].arg5);
-}
-if (yg_level_format == YGLF_HEXEN)		// Hexen mode
-val = vDisplayMenu (x0, y0, menustr[13],
-   menustr[0], YK_, 0,
-   menustr[1], YK_, 0,
-   menustr[2], YK_, 0,
-   menustr[3], YK_, 0,
-   menustr[4], YK_, 0,
-   menustr[5], YK_, 0,
-   menustr[6], YK_, 0,
-   menustr[7], YK_, 0,
-   menustr[8], YK_, 0,
-   menustr[9], YK_, 0,
-   menustr[10], YK_, 0,
-   menustr[11], YK_, 0,
-   menustr[12], YK_, 0,
-   NULL);
-else
-val = vDisplayMenu (x0, y0, menustr[13],
-   menustr[0], YK_, 0,
-   menustr[1], YK_, 0,
-   menustr[2], YK_, 0,
-   menustr[3], YK_, 0,
-   menustr[4], YK_, 0,
-   NULL);
-for (n = 0; n < 14; n++)
-   free (menustr[n]);
-subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
-switch (val)
-  {
-  case 1:
-     if (! InputThingType (x0, subwin_y0, &val))
-	{
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].type = val;
-	things_types++;
-	MadeChanges = 1;
+	int    n, val;
+	SelPtr cur;
+	int    subwin_y0;
+
+	menutitle = "Edit thing #" + to_string(obj->objnum);
+
+	menustr.push_back("Change type          (Current: " + get_thing_name(Things[obj->objnum].type) + ")");
+	menustr.push_back("Change angle         (Current: " + GetAngleName(Things[obj->objnum].angle) + ")");
+	menustr.push_back("Change flags         (Current: " + GetWhenName(Things[obj->objnum].when) + ")");
+	menustr.push_back("Change X position    (Current: " + to_string(Things[obj->objnum].xpos) + ")");
+	menustr.push_back("Change Y position    (Current: " + to_string(Things[obj->objnum].ypos) + ")");
+	menustr.push_back("Change Z position    (Current: " + to_string(Things[obj->objnum].height) + ")");
+	menustr.push_back("Change TID           (Current: " + to_string(Things[obj->objnum].tid) + ")");
+	menustr.push_back("Change special       (Current: " + to_string(Things[obj->objnum].special) + ")");
+	if (yg_level_format == YGLF_HEXEN) {
+		stringstream s;
+		s.fill(' ');
+
+		s << "Change " << std::setw(14) << GetLineDefArgumentName(Things[obj->objnum].special, 1) << "(Current: " << to_string(Things[obj->objnum].arg1) << ")";
+		menustr.push_back(s.str());
+
+		s.str("");
+		s << "Change " << std::setw(14) << GetLineDefArgumentName(Things[obj->objnum].special, 2) << "(Current: " << to_string(Things[obj->objnum].arg2) << ")";
+		menustr.push_back(s.str());
+
+		s.str("");
+		s << "Change " << std::setw(14) << GetLineDefArgumentName(Things[obj->objnum].special, 3) << "(Current: " << to_string(Things[obj->objnum].arg3) << ")";
+		menustr.push_back(s.str());
+
+		s.str("");
+		s << "Change " << std::setw(14) << GetLineDefArgumentName(Things[obj->objnum].special, 4) << "(Current: " << to_string(Things[obj->objnum].arg4) << ")";
+		menustr.push_back(s.str());
+
+		s.str("");
+		s << "Change " << std::setw(14) << GetLineDefArgumentName(Things[obj->objnum].special, 5) << "(Current: " << to_string(Things[obj->objnum].arg5) << ")";
+		menustr.push_back(s.str());
 	}
-     break;
+	if (yg_level_format == YGLF_HEXEN)		// Hexen mode
+		val = vDisplayMenu (x0, y0, menutitle,
+				menustr[0].c_str(), YK_, 0,
+				menustr[1].c_str(), YK_, 0,
+				menustr[2].c_str(), YK_, 0,
+				menustr[3].c_str(), YK_, 0,
+				menustr[4].c_str(), YK_, 0,
+				menustr[5].c_str(), YK_, 0,
+				menustr[6].c_str(), YK_, 0,
+				menustr[7].c_str(), YK_, 0,
+				menustr[8].c_str(), YK_, 0,
+				menustr[9].c_str(), YK_, 0,
+				menustr[10].c_str(), YK_, 0,
+				menustr[11].c_str(), YK_, 0,
+				menustr[12].c_str(), YK_, 0,
+				NULL);
+	else
+		val = vDisplayMenu (x0, y0, menutitle,
+				menustr[0].c_str(), YK_, 0,
+				menustr[1].c_str(), YK_, 0,
+				menustr[2].c_str(), YK_, 0,
+				menustr[3].c_str(), YK_, 0,
+				menustr[4].c_str(), YK_, 0,
+				NULL);
 
-  case 2:
-     	if (yg_level_format == YGLF_HEXEN)
-	{	val = vDisplayMenu (x0 + 42, subwin_y0, "Select angle",
-			  "North",	YK_, 0,
-			  "NorthEast",	YK_, 0,
-			  "East",	YK_, 0,
-			  "SouthEast",	YK_, 0,
-			  "South",	YK_, 0,
-			  "SouthWest",	YK_, 0,
-			  "West",	YK_, 0,
-			  "NorthWest",	YK_, 0,
-			  "Input Number", YK_, 0,
-			  NULL);
-	}else
-	{	val = vDisplayMenu (x0 + 42, subwin_y0, "Select angle",
-			  "North",	YK_, 0,
-			  "NorthEast",	YK_, 0,
-			  "East",	YK_, 0,
-			  "SouthEast",	YK_, 0,
-			  "South",	YK_, 0,
-			  "SouthWest",	YK_, 0,
-			  "West",	YK_, 0,
-			  "NorthWest",	YK_, 0,
-			  NULL);
+	subwin_y0 = y0 + BOX_BORDER + (2 + val) * FONTH;
+	switch (val) {
+		case 1:
+			if (!InputThingType (x0, subwin_y0, &val)) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].type = val;
+				things_types++;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 2:
+			if (yg_level_format == YGLF_HEXEN) {
+				val = vDisplayMenu (x0 + 42, subwin_y0, "Select angle",
+					"North",	YK_, 0,
+					"NorthEast",	YK_, 0,
+					"East",	YK_, 0,
+					"SouthEast",	YK_, 0,
+					"South",	YK_, 0,
+					"SouthWest",	YK_, 0,
+					"West",	YK_, 0,
+					"NorthWest",	YK_, 0,
+					"Input Number", YK_, 0,
+					NULL);
+			} else {
+				val = vDisplayMenu (x0 + 42, subwin_y0, "Select angle",
+					"North",	YK_, 0,
+					"NorthEast",	YK_, 0,
+					"East",	YK_, 0,
+					"SouthEast",	YK_, 0,
+					"South",	YK_, 0,
+					"SouthWest",	YK_, 0,
+					"West",	YK_, 0,
+					"NorthWest",	YK_, 0,
+					NULL);
+			}
+			switch (val) {
+				case 1:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 90;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 2:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 45;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 3:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 0;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 4:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 315;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 5:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 270;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 6:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 225;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 7:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 180;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+
+				case 8:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].angle = 135;
+					things_angles++;
+					MadeChanges = 1;
+					break;
+				case 9:
+					if (yg_level_format == YGLF_HEXEN)
+					{	val = InputIntegerValue (x0 + 84,subwin_y0 + BOX_BORDER + (3 + val) * FONTH, 0, 255,Things[obj->objnum].angle);
+						if (val != IIV_CANCEL)
+						{	for (cur = obj; cur; cur = cur->next)
+							Things[cur->objnum].angle = val;
+							MadeChanges = 1;
+						}
+					}
+					break;
+			}
+			break;
+
+		case 3:
+			if (yg_level_format == YGLF_HEXEN)
+				val = vDisplayMenu(x0+42,subwin_y0,"Set Object Flags",
+						"D12        (Easy only)",		YK_,0,
+						"D3         (Medium only)",		YK_,0,
+						"D12,D3     (Easy and Medium)",		YK_,0,
+						"D45        (Hard only)",		YK_,0,
+						"D12,D45    (Easy and Hard)",		YK_,0,
+						"D3,D45     (Medium and Hard)",		YK_,0,
+						"D12,D3,D45 (Easy,Medium and Hard)",	YK_,0,
+						"Toggle \"Deaf/Ambush\" bit",		YK_,0,
+						"Toggle \"Asleep\" bit",		YK_,0,
+						"S          (Thing is in Single Player)",	YK_,0,
+						"C          (Thing is in Co-Op)",	YK_,0,
+						"D          (Thing is in Deathmatch)",	YK_,0,
+						"T          (Thing is translucent)",	YK_,0,
+						"I          (Thing is invisible)",	YK_,0,
+						"F          (Monster is friendly)",	YK_,0,
+						"(Enter number)",			YK_,0,
+						NULL);
+			else
+				val = vDisplayMenu (x0 + 42, subwin_y0, "Set Object Flags",
+						"D12          (Easy only)",		YK_, 0,
+						"D3           (Medium only)",		YK_, 0,
+						"D12, D3      (Easy and Medium)",	YK_, 0,
+						"D45          (Hard only)",		YK_, 0,
+						"D12, D45     (Easy and Hard)",		YK_, 0,
+						"D3, D45      (Medium and Hard)",	YK_, 0,
+						"D12, D3, D45 (Easy, Medium, Hard)",	YK_, 0,
+						"Toggle \"Deaf/Ambush\" bit",		YK_, 0,
+						"Toggle \"Multi-player only\" bit",	YK_, 0,
+						"(Enter number)",			YK_, 0,
+						NULL);
+			switch (val) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].when = (Things[cur->objnum].when & 0x18) | val;
+					MadeChanges = 1;
+					break;
+
+				case 8:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].when ^= 0x08;
+					MadeChanges = 1;
+					break;
+
+				case 9:
+					for (cur = obj; cur; cur = cur->next)
+						Things[cur->objnum].when ^= 0x10;
+					MadeChanges = 1;
+					break;
+
+				case 10:
+					if (yg_level_format != YGLF_HEXEN)
+					{	val = InputIntegerValue (x0 + 84,subwin_y0 + BOX_BORDER + (3 + val) * FONTH, 0, 65535,Things[obj->objnum].when);
+						if (val != IIV_CANCEL)
+						{	for (cur = obj; cur; cur = cur->next)
+							Things[cur->objnum].when = val;
+							MadeChanges = 1;
+						}
+					}else
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x100;
+						MadeChanges = 1;
+					}
+					break;
+				case 11:
+					if (yg_level_format == YGLF_HEXEN)
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x200;
+						MadeChanges = 1;
+					}
+					break;
+				case 12:
+					if (yg_level_format == YGLF_HEXEN)
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x400;
+						MadeChanges = 1;
+					}
+					break;
+				case 13:
+					if (yg_level_format == YGLF_HEXEN)
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x800;
+						MadeChanges = 1;
+					}
+					break;
+				case 14:
+					if (yg_level_format == YGLF_HEXEN)
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x1000;
+						MadeChanges = 1;
+					}
+					break;
+				case 15:
+					if (yg_level_format == YGLF_HEXEN)
+					{	for (cur = obj;cur;cur = cur->next)
+						Things[cur->objnum].when ^= 0x2000;
+						MadeChanges = 1;
+					}
+					break;
+
+			}
+			break;
+
+		case 4:
+			val = InputIntegerValue (x0 + 42, subwin_y0, MapMinX, MapMaxX,
+					Things[obj->objnum].xpos);
+			if (val != IIV_CANCEL) {
+				n = val - Things[obj->objnum].xpos;
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].xpos += n;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 5:
+			val = InputIntegerValue (x0 + 42, subwin_y0, MapMinY, MapMaxY,
+					Things[obj->objnum].ypos);
+			if (val != IIV_CANCEL) {
+				n = val - Things[obj->objnum].ypos;
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].ypos += n;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 6:
+			val = InputIntegerValue (x0 + 42, subwin_y0, -32768, 32767,
+					Things[obj->objnum].height);
+			if (val != IIV_CANCEL) {
+				n = val - Things[obj->objnum].height;
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].height += n;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 7:
+			val = InputIntegerValue (x0 + 42, subwin_y0, -32768, 32767,
+					Things[obj->objnum].tid);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].tid = val;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 8:
+			if (!InputLinedefType (x0 + 42, subwin_y0, &val)) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].special = val;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 9:
+			val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
+					Things[obj->objnum].arg1);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].arg1 = val;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 10:
+			val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
+					Things[obj->objnum].arg2);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].arg2 = val;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 11:
+			val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
+					Things[obj->objnum].arg3);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].arg3 = val;
+				MadeChanges = 1;
+			}
+			break;
+		case 12:
+			val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
+					Things[obj->objnum].arg4);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].arg4 = val;
+				MadeChanges = 1;
+			}
+			break;
+
+		case 13:
+			val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
+					Things[obj->objnum].arg5);
+			if (val != IIV_CANCEL) {
+				for (cur = obj; cur; cur = cur->next)
+					Things[cur->objnum].arg5 = val;
+				MadeChanges = 1;
+			}
+			break;
 	}
-	switch (val)
-	{
-	case 1:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 90;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 2:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 45;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 3:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 0;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 4:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 315;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 5:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 270;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 6:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 225;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 7:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 180;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-
-	case 8:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].angle = 135;
-	   things_angles++;
-	   MadeChanges = 1;
-	   break;
-        case 9:
-		if (yg_level_format == YGLF_HEXEN)
-		{	val = InputIntegerValue (x0 + 84,subwin_y0 + BOX_BORDER + (3 + val) * FONTH, 0, 255,Things[obj->objnum].angle);
-	   		if (val != IIV_CANCEL)
-	      		{	for (cur = obj; cur; cur = cur->next)
-		 		Things[cur->objnum].angle = val;
-	      			MadeChanges = 1;
-	      		}
-		}
-		break;
-	}
-     break;
-
-  case 3:
-     if (yg_level_format == YGLF_HEXEN)
-	     val = vDisplayMenu(x0+42,subwin_y0,"Set Object Flags",
-			"D12        (Easy only)",		YK_,0,
-			"D3         (Medium only)",		YK_,0,
-			"D12,D3     (Easy and Medium)",		YK_,0,
-			"D45        (Hard only)",		YK_,0,
-			"D12,D45    (Easy and Hard)",		YK_,0,
-			"D3,D45     (Medium and Hard)",		YK_,0,
-			"D12,D3,D45 (Easy,Medium and Hard)",	YK_,0,
-			"Toggle \"Deaf/Ambush\" bit",		YK_,0,
-			"Toggle \"Asleep\" bit",		YK_,0,
-			"S          (Thing is in Single Player)",	YK_,0,
-			"C          (Thing is in Co-Op)",	YK_,0,
-			"D          (Thing is in Deathmatch)",	YK_,0,
-			"T          (Thing is translucent)",	YK_,0,
-			"I          (Thing is invisible)",	YK_,0,
-			"F          (Monster is friendly)",	YK_,0,
-			"(Enter number)",			YK_,0,
-			NULL);
-     else
-     	val = vDisplayMenu (x0 + 42, subwin_y0, "Set Object Flags",
-			"D12          (Easy only)",		YK_, 0,
-			"D3           (Medium only)",		YK_, 0,
-			"D12, D3      (Easy and Medium)",	YK_, 0,
-			"D45          (Hard only)",		YK_, 0,
-			"D12, D45     (Easy and Hard)",		YK_, 0,
-			"D3, D45      (Medium and Hard)",	YK_, 0,
-			"D12, D3, D45 (Easy, Medium, Hard)",	YK_, 0,
-			"Toggle \"Deaf/Ambush\" bit",		YK_, 0,
-			"Toggle \"Multi-player only\" bit",	YK_, 0,
-			"(Enter number)",			YK_, 0,
-			NULL);
-     switch (val)
-	{
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].when = (Things[cur->objnum].when & 0x18) | val;
-	   MadeChanges = 1;
-	   break;
-
-	case 8:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].when ^= 0x08;
-	   MadeChanges = 1;
-	   break;
-
-	case 9:
-	   for (cur = obj; cur; cur = cur->next)
-	      Things[cur->objnum].when ^= 0x10;
-	   MadeChanges = 1;
-	   break;
-
-	case 10:
-	   if (yg_level_format != YGLF_HEXEN)
-	   {	val = InputIntegerValue (x0 + 84,subwin_y0 + BOX_BORDER + (3 + val) * FONTH, 0, 65535,Things[obj->objnum].when);
-	   	if (val != IIV_CANCEL)
-	      	{	for (cur = obj; cur; cur = cur->next)
-		 		Things[cur->objnum].when = val;
-	      		MadeChanges = 1;
-	      	}
-	   }else
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x100;
-		MadeChanges = 1;
-	   }
-	   break;
-	case 11:
-	   if (yg_level_format == YGLF_HEXEN)
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x200;
-		MadeChanges = 1;
-	   }
-	   break;
-	case 12:
-	   if (yg_level_format == YGLF_HEXEN)
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x400;
-		MadeChanges = 1;
-	   }
-	   break;
-	case 13:
-	   if (yg_level_format == YGLF_HEXEN)
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x800;
-		MadeChanges = 1;
-	   }
-	   break;
-	case 14:
-	   if (yg_level_format == YGLF_HEXEN)
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x1000;
-		MadeChanges = 1;
-	   }
-	   break;
-	case 15:
-	   if (yg_level_format == YGLF_HEXEN)
-	   {	for (cur = obj;cur;cur = cur->next)
-		   Things[cur->objnum].when ^= 0x2000;
-		MadeChanges = 1;
-	   }
-	   break;
-
-	}
-     break;
-
-  case 4:
-     val = InputIntegerValue (x0 + 42, subwin_y0, MapMinX, MapMaxX,
-                              Things[obj->objnum].xpos);
-     if (val != IIV_CANCEL)
-        {
-	n = val - Things[obj->objnum].xpos;
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].xpos += n;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 5:
-     val = InputIntegerValue (x0 + 42, subwin_y0, MapMinY, MapMaxY,
-                              Things[obj->objnum].ypos);
-     if (val != IIV_CANCEL)
-        {
-	n = val - Things[obj->objnum].ypos;
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].ypos += n;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 6:
-     val = InputIntegerValue (x0 + 42, subwin_y0, -32768, 32767,
-                              Things[obj->objnum].height);
-     if (val != IIV_CANCEL)
-        {
-	n = val - Things[obj->objnum].height;
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].height += n;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 7:
-     val = InputIntegerValue (x0 + 42, subwin_y0, -32768, 32767,
-                              Things[obj->objnum].tid);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].tid = val;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 8:
-     if (! InputLinedefType (x0 + 42, subwin_y0, &val))
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].special = val;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 9:
-     val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
-                              Things[obj->objnum].arg1);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].arg1 = val;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 10:
-     val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
-                              Things[obj->objnum].arg2);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].arg2 = val;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 11:
-     val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
-                              Things[obj->objnum].arg3);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].arg3 = val;
-	MadeChanges = 1;
-        }
-     break;
-  case 12:
-     val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
-                              Things[obj->objnum].arg4);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].arg4 = val;
-	MadeChanges = 1;
-        }
-     break;
-
-  case 13:
-     val = InputIntegerValue (x0 + 42, subwin_y0, 0, 255,
-                              Things[obj->objnum].arg5);
-     if (val != IIV_CANCEL)
-        {
-	for (cur = obj; cur; cur = cur->next)
-	   Things[cur->objnum].arg5 = val;
-	MadeChanges = 1;
-        }
-     break;
-  }
 }
 
 /*

@@ -32,6 +32,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "game.h"
 #include "things.h"
 
+using std::to_string;
+
 // This is the structure of a table of things attributes.
 // In this table, things are sorted by increasing number.
 // It is searched in a dichotomic fashion by get_thing_*().
@@ -196,16 +198,12 @@ acolour_t get_thing_colour (wad_ttype_t type)
 /*
  *	get_thing_name - return the description of the thing of given type.
  */
-const char *get_thing_name (wad_ttype_t type)
-{
-    size_t table_idx = lookup_thing (type);
-    if (table_idx == (size_t) -1)
-    {
-        static char buf[20];
-        snprintf (buf, sizeof(buf), "UNKNOWN (%d)", type);  // Not found.
-        return buf;
-    }
-    return things_table[table_idx].desc;
+const string get_thing_name (wad_ttype_t type) {
+	size_t table_idx = lookup_thing (type);
+	if (table_idx == (size_t) -1) {
+		return "UNKNOWN (" + to_string(type) + ")";
+	}
+	return string(things_table[table_idx].desc);
 }
 
 /*
@@ -255,59 +253,51 @@ int get_thing_radius (wad_ttype_t type)
  *	GetAngleName
  *	Get the name of the angle
  */
-const char *GetAngleName (int angle)
-{
-    static char buf[30];
+const string GetAngleName (int angle) {
+	switch (angle) {
+		case 0:
+			return "East";
+		case 45:
+			return "North-east";
+		case 90:
+			return "North";
+		case 135:
+			return "North-west";
+		case 180:
+			return "West";
+		case 225:
+			return "South-west";
+		case 270:
+			return "South";
+		case 315:
+			return "South-east";
+	}
 
-    switch (angle)
-    {
-        case 0:
-            return "East";
-        case 45:
-            return "North-east";
-        case 90:
-            return "North";
-        case 135:
-            return "North-west";
-        case 180:
-            return "West";
-        case 225:
-            return "South-west";
-        case 270:
-            return "South";
-        case 315:
-            return "South-east";
-    }
-    if (yg_level_format == YGLF_HEXEN)
-        snprintf(buf, sizeof(buf), "Unknown (%d)",angle);
-    else
-        snprintf(buf, sizeof(buf), "ILLEGAL (%d)", angle);
-    return buf;
+	if (yg_level_format == YGLF_HEXEN)
+		return "Unknown (" + to_string(angle) + ")";
+	return "ILLEGAL (" + to_string(angle) + ")";
 }
 
 /*
  *	GetWhenName
  *	get string of when something will appear
  */
-const char *GetWhenName (int when)
-{
-    static char buf[16+3+1];
-    // "N" is a Boom extension ("not in deathmatch")
-    // "C" is a Boom extension ("not in cooperative")
-    // "F" is an MBF extension ("friendly")
-    const char *flag_chars = "??FI" "TDCS" "FCNM" "D431";
-    int n;
+const string GetWhenName (int when) {
+	string buf;
+	// "N" is a Boom extension ("not in deathmatch")
+	// "C" is a Boom extension ("not in cooperative")
+	// "F" is an MBF extension ("friendly")
+	const char *flag_chars = "??FI" "TDCS" "FCNM" "D431";
+	int n;
 
-    char *b = buf;
-    for (n = 0; n < 16; n++)
-    {
-        if (n != 0 && n % 4 == 0)
-            *b++ = ' ';
-        if (when & (0x8000u >> n))
-            *b++ = flag_chars[n];
-        else
-            *b++ = '-';
-    }
-    *b = '\0';
-    return buf;
+	for (n = 0; n < 16; n++) {
+		if (n != 0 && n % 4 == 0) {
+			buf += ' ';
+		}
+		if (when & (0x8000u >> n)) {
+			buf += flag_chars[n];
+		} else
+			buf += '-';
+	}
+	return buf;
 }

@@ -169,13 +169,13 @@ void objinfo_c::draw () {
       DrawScreenString (-1, -1, "\1Desc:   ");
       if (invalid_type)
 	push_colour (CLR_ERROR);
-      DrawScreenText (-2, -2, "%.19s", get_thing_name (Things[obj_no].type));
+      DrawScreenText (-2, -2, "%.19s", get_thing_name(Things[obj_no].type).c_str());
       if (invalid_type)
 	pop_colour ();
       DrawScreenText (-1, -1, "\1Angle:\2  %s",
-	GetAngleName (Things[obj_no].angle));
+	GetAngleName (Things[obj_no].angle).c_str());
       DrawScreenText (-1, -1, "\1Flags:\2  %s",
-	GetWhenName (Things[obj_no].when));
+	GetWhenName (Things[obj_no].when).c_str());
 
 		if (yg_level_format == YGLF_HEXEN) {
 			x0 += width;

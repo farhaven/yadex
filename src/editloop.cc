@@ -245,7 +245,7 @@ void EditorLoop (string levelname) /* SWAP! */
     {
         e.menubar->compute_menubar_coords (0, 0, ScrMaxX, ScrMaxY);
 
-        e.mb_menu[MBM_FILE] = new Menu (NULL,
+        e.mb_menu[MBM_FILE] = new Menu ("",
             "~Save",       YK_F2, 0,
             "Save ~as...", YK_F3, 0,
             // "~Print",      YK_,   MIF_SACTIVE, false, 0,
@@ -254,7 +254,7 @@ void EditorLoop (string levelname) /* SWAP! */
 
 
         if (yg_level_format == YGLF_HEXEN)
-            e.mb_menu[MBM_EDIT] = new Menu (NULL,
+            e.mb_menu[MBM_EDIT] = new Menu ("",
                 "~Copy object(s)",          'o',    0,
                 "~Add object",              YK_INS, 0,
                 "~Delete object(s)",        YK_DEL, 0,
@@ -265,7 +265,7 @@ void EditorLoop (string levelname) /* SWAP! */
                 "Load ~BEHAVIOR lump",      'b',    0,
                 NULL);
         else
-            e.mb_menu[MBM_EDIT] = new Menu (NULL,
+            e.mb_menu[MBM_EDIT] = new Menu ("",
                 "~Copy object(s)",          'o',    0,
                 "~Add object",              YK_INS, 0,
                 "~Delete object(s)",        YK_DEL, 0,
@@ -277,7 +277,7 @@ void EditorLoop (string levelname) /* SWAP! */
 
         // If you change the order of modes here, don't forget
         // to modify the <modes> array.
-        e.mb_menu[MBM_VIEW] = new Menu (NULL,
+        e.mb_menu[MBM_VIEW] = new Menu ("",
             "~Things",              't',        MIF_FTICK,   mode_th, (micbarg_t) &e, 0,
             "~Linedefs & sidedefs", 'l',        MIF_FTICK,   mode_l,  (micbarg_t) &e, 0,
             "~Vertices",            'v',        MIF_FTICK,   mode_v,  (micbarg_t) &e, 0,
@@ -298,7 +298,7 @@ void EditorLoop (string levelname) /* SWAP! */
             "3D p~review",          'R',        0,
             NULL);
 
-        e.mb_menu[MBM_SEARCH] = new Menu (NULL,
+        e.mb_menu[MBM_SEARCH] = new Menu ("",
             // "~Find/change",       YK_F4, MIF_SACTIVE, false, 0,
             // "~Repeat last find",  -1,    MIF_SACTIVE, false, 0,
             "~Next object",       'n',   0,
@@ -388,7 +388,7 @@ void EditorLoop (string levelname) /* SWAP! */
             "Check ~texture names",		YK_, 0,
             NULL);
 
-        e.mb_menu[MBM_HELP] = new Menu (NULL,
+        e.mb_menu[MBM_HELP] = new Menu ("",
             "~Keyboard & mouse...", YK_F1,        0,
             "~About Yadex...",      YK_ALT + 'a', 0,
             NULL);
@@ -415,7 +415,7 @@ void EditorLoop (string levelname) /* SWAP! */
 
     // FIXME this should come from the .ygd
     // instead of being hard-coded.
-    Menu *menu_linedef_flags = new Menu (NULL,
+    Menu *menu_linedef_flags = new Menu ("",
         "~Impassable",		YK_, 0,
         "~Monsters cannot cross",	YK_, 0,
         "~Double-sided",		YK_, 0,
@@ -434,7 +434,7 @@ void EditorLoop (string levelname) /* SWAP! */
         "b1~5 8000h",		YK_, 0,  // Undefined
         NULL);
 
-    Menu *menu_thing_flags = new Menu (NULL,
+    Menu *menu_thing_flags = new Menu ("",
         "~Easy",			YK_, 0,
         "Medi~um",			YK_, 0,
         "~Hard",			YK_, 0,

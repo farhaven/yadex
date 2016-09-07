@@ -78,15 +78,15 @@ class Menu : public edwidget_c
 {
   public :
     // Ctors
-    Menu (const char *title, ...);
-    Menu (const char *title, va_list argp);
-    Menu (const char *title, al_llist_t *list, const char *(*getstr)(void *));
-    Menu (const char *title, const Menu_data& menudata);
+    Menu (const string title, ...);
+    Menu (const string title, va_list argp);
+    Menu (const string title, al_llist_t *list, const char *(*getstr)(void *));
+    Menu (const string title, const Menu_data& menudata);
     ~Menu ();
 
     // Configuration
     void set_coords (int x, int y);
-    void set_title (const char *title);
+    void set_title (const string title);
     void set_item_no (int item_no);
     void set_popup (bool popup);
     void set_force_numbers (bool force_numbers);

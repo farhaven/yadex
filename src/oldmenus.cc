@@ -52,15 +52,14 @@ static int loop (Menu *menu, int x, int y, int item_no);
  *
  *	Return the same thing as Menu::process_event().
  */
-int vDisplayMenu (int x0, int y0, const char *title, ...)
-{
-  va_list args;
+int vDisplayMenu (int x0, int y0, const string title, ...) {
+	va_list args;
 
-  va_start (args, title);
-  Menu menu (title, args);
-  va_end (args);
-  int r = loop (&menu, x0, y0, 0);
-  return r + 1;
+	va_start (args, title);
+	Menu menu (title, args);
+	va_end (args);
+	int r = loop (&menu, x0, y0, 0);
+	return r + 1;
 }
 
 
@@ -77,18 +76,17 @@ int vDisplayMenu (int x0, int y0, const char *title, ...)
  *	This function is deprecated.
  */
 int DisplayMenuList (
-  int		x0,
-  int		y0,
-  const char	*menutitle,
-  al_llist_t	*list,
-  const char	*(*getstr)(void *),
-  int		*item_no)
-{
-  Menu menu (menutitle, list, getstr);
-  int r = loop (&menu, x0, y0, item_no ? *item_no : 0);
-  if (item_no && r >= 0)
-    *item_no = r;
-  return r;
+		int		x0,
+		int		y0,
+		const string menutitle,
+		al_llist_t	*list,
+		const char	*(*getstr)(void *),
+		int		*item_no) {
+	Menu menu (menutitle, list, getstr);
+	int r = loop (&menu, x0, y0, item_no ? *item_no : 0);
+	if (item_no && r >= 0)
+		*item_no = r;
+	return r;
 }
 
 
@@ -103,17 +101,16 @@ int DisplayMenuList (
  *	This function is deprecated.
  */
 int DisplayMenuList (
-  int		x0,
-  int		y0,
-  const char	*menutitle,
-  Menu_data&    menudata,
-  int		*item_no)
-{
-  Menu menu (menutitle, menudata);
-  int r = loop (&menu, x0, y0, item_no ? *item_no : 0);
-  if (item_no && r >= 0)
-    *item_no = r;
-  return r;
+		int		x0,
+		int		y0,
+		const string menutitle,
+		Menu_data&    menudata,
+		int		*item_no) {
+	Menu menu (menutitle, menudata);
+	int r = loop (&menu, x0, y0, item_no ? *item_no : 0);
+	if (item_no && r >= 0)
+		*item_no = r;
+	return r;
 }
 
 

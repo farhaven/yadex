@@ -109,7 +109,7 @@ const char *Menu_data_ldt::operator[] (size_t n) const {
 /*
  *	Prototypes of private functions
  */
-static char *GetTaggedLineDefFlag (int linedefnum, int flagndx);
+static string GetTaggedLineDefFlag (int linedefnum, int flagndx);
 static int InputLinedefType (int x0, int y0, int *number);
 static const char *PrintLdtgroup (void *ptr);
 static int InputThingType (int x0, int y0, int *number);
@@ -196,7 +196,7 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 						menustr[10].c_str(), YK_, 0,
 						NULL);
 			else
-				val = vDisplayMenu (x0 + 42, subwin_y0, menustr[11].c_str(),
+				val = vDisplayMenu (x0 + 42, subwin_y0, menutitle.c_str(),
 						menustr[0].c_str(), YK_, 0,
 						menustr[1].c_str(), YK_, 0,
 						menustr[2].c_str(), YK_, 0,
@@ -210,22 +210,22 @@ void LinedefProperties (int x0, int y0, SelPtr obj) {
 			switch (val) {
 				case 1:
 					val = vDisplayMenu (x0 + 84, subsubwin_y0, "Toggle the flags:",
-							GetTaggedLineDefFlag (obj->objnum, 1),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 2),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 3),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 4),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 5),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 6),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 7),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 8),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 9),  YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 10), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 11), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 12), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 13), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 14), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 15), YK_, 0,
-							GetTaggedLineDefFlag (obj->objnum, 16), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 1).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 2).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 3).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 4).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 5).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 6).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 7).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 8).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 9).c_str(),  YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 10).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 11).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 12).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 13).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 14).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 15).c_str(), YK_, 0,
+							GetTaggedLineDefFlag(obj->objnum, 16).c_str(), YK_, 0,
 							"(Enter a decimal value)", YK_, 0,
 							NULL);
 					if (val >= 1 && val <= 16) {
@@ -1033,16 +1033,16 @@ return (*((thingdef_t **)ptr))->desc;
 /*
 */
 
-static char *GetTaggedLineDefFlag (int linedefnum, int flagndx)
-{
-  static char ldstr[16][50];
+static string GetTaggedLineDefFlag (int linedefnum, int flagndx) {
+	static char ldstr[16][50];
 
-  if ((LineDefs[linedefnum].flags & (0x01 << (flagndx - 1))) != 0)
-    strlcpy(ldstr[flagndx - 1], "* ", sizeof(ldstr[flagndx - 1]));
-  else
-    strlcpy(ldstr[flagndx - 1], "  ", sizeof(ldstr[flagndx - 1]));
-  strlcat(ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str(), sizeof(ldstr[flagndx - 1]));
-  return ldstr[flagndx - 1];
+	if ((LineDefs[linedefnum].flags & (0x01 << (flagndx - 1))) != 0)
+		strlcpy(ldstr[flagndx - 1], "* ", sizeof(ldstr[flagndx - 1]));
+	else
+		strlcpy(ldstr[flagndx - 1], "  ", sizeof(ldstr[flagndx - 1]));
+	strlcat(ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str(), sizeof(ldstr[flagndx - 1]));
+	printf("%s: %d, %d -> '%s'\n", __func__, linedefnum, flagndx, ldstr[flagndx - 1]);
+	return string(ldstr[flagndx - 1]);
 }
 
 

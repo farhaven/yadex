@@ -100,39 +100,36 @@ class Menu_item
 /*
  *	Menu_priv - Menu's private data
  */
-class Menu_priv
-{
-  public :
+class Menu_priv {
+	public :
+		Menu_priv () {
+			flags         = 0;
+			title         = "";
+			title_len     = 0;
+			items_ks_len  = 0;
+			items_len     = 0;
+			items.clear ();
+			user_ox0      = -1;
+			user_oy0      = -1;
+			ox0           = -1;
+			oy0           = -1;
+			need_geom     = true;
+			visible       = false;
+			visible_disp  = false;
+			line          = 0;
+			line_disp     = UINT_MAX;
+			item_height   = FONTH + VSPACE;
+		}
 
-    Menu_priv ()
-    {
-      flags         = 0;
-      title         = 0;
-      title_len     = 0;
-      items_ks_len  = 0;
-      items_len     = 0;
-      items.clear ();
-      user_ox0      = -1;
-      user_oy0      = -1;
-      ox0           = -1;
-      oy0           = -1;
-      need_geom     = true;
-      visible       = false;
-      visible_disp  = false;
-      line          = 0;
-      line_disp     = UINT_MAX;
-      item_height   = FONTH + VSPACE;
-    }
-
-    void vinit (Menu& m, const char *title, va_list argp);
-    void cook ();
-    void draw ();
-    void draw_one_line (size_t line, bool highlighted);
-    void geom ();
-    int process_event (const input_status_t *is);
+		void vinit (Menu& m, const string title, va_list argp);
+		void cook ();
+		void draw ();
+		void draw_one_line (size_t line, bool highlighted);
+		void geom ();
+		int process_event (const input_status_t *is);
 
     // Menu data
-    unsigned char flags;	// MF_MENUDATA
+		unsigned char flags;	// MF_MENUDATA
 				//          The strings come from a Menu_data.
 				// MF_POPUP Used as popup (not pull-down) menu
 				//          If set, the title is shown and
@@ -145,41 +142,41 @@ class Menu_priv
 				// MF_NUMS  Force the use of standard
 				//          shortcuts [0-9a-zA-Z] even if
 				//          index/key shortcuts exist.
-    const char *title;		// NULL if no title
-    size_t     title_len;	// Length of <title> (or 0 if none)
-    size_t     items_ks_len;	// Length of the longest item counting key sc.
-    size_t     items_len;	// Length of the longest item not counting k.s.
-    const Menu_data *menudata;
-    std::vector<Menu_item> items;
+		string title;		// empty if no title
+		size_t     title_len;	// Length of <title> (or 0 if none)
+		size_t     items_ks_len;	// Length of the longest item counting key sc.
+		size_t     items_len;	// Length of the longest item not counting k.s.
+		const Menu_data *menudata;
+		std::vector<Menu_item> items;
 
     // Geometry as the user would like it to be
-    int    user_ox0;		// Top left corner. < 0 means centered.
-    int    user_oy0;		// Top left corner. < 0 means centered.
+		int    user_ox0;		// Top left corner. < 0 means centered.
+		int    user_oy0;		// Top left corner. < 0 means centered.
 
-    // Geometry as it should be
-    int    ix0, iy0, ix1, iy1;	// Corners of inner edge of window
-    int    ox0, oy0, ox1, oy1;	// Corners of outer edge of window
-    int    width;		// Overall width of window
-    int    height;		// Overall height of window
-    int    ty0;			// Y-pos of title
-    int    ly0;			// Y-pos of first item
+		// Geometry as it should be
+		int    ix0, iy0, ix1, iy1;	// Corners of inner edge of window
+		int    ox0, oy0, ox1, oy1;	// Corners of outer edge of window
+		int    width;		// Overall width of window
+		int    height;		// Overall height of window
+		int    ty0;			// Y-pos of title
+		int    ly0;			// Y-pos of first item
 
-    // Geometry as it is displayed
-    int    ox0_disp;
-    int    oy0_disp;
-    int    width_disp;
-    int    height_disp;
+		// Geometry as it is displayed
+		int    ox0_disp;
+		int    oy0_disp;
+		int    width_disp;
+		int    height_disp;
 
-    // Status
-    bool   need_geom;		// Need to call geom() again
-    bool   visible;		// Should the menu be visible ?
-    bool   visible_disp;	// Is it really visible ?
-    size_t line;		// Which line should be highlighted ?
-    size_t line_disp;		// Which line is actually highlighted ?
-    inpev_t _last_shortcut_key;	// Shortcut key for last selected item.
+		// Status
+		bool   need_geom;		// Need to call geom() again
+		bool   visible;		// Should the menu be visible ?
+		bool   visible_disp;	// Is it really visible ?
+		size_t line;		// Which line should be highlighted ?
+		size_t line_disp;		// Which line is actually highlighted ?
+		inpev_t _last_shortcut_key;	// Shortcut key for last selected item.
 
-    // Misc
-    unsigned short item_height;
+		// Misc
+		unsigned short item_height;
 };
 
 
@@ -321,7 +318,7 @@ const unsigned char MF_MENUDATA = 0x20;
  *	but will not be reflected until the menu is redrawn from
  *	scratch.
  */
-Menu::Menu (const char *title, ...)
+Menu::Menu (const string title, ...)
 {
   priv = new Menu_priv;
   va_list argp;
@@ -339,7 +336,7 @@ Menu::Menu (const char *title, ...)
  *	*title, ...) except that it expects a pointer on the
  *	list of arguments.
  */
-Menu::Menu (const char *title, va_list argp)
+Menu::Menu (const string title, va_list argp)
 {
   priv = new Menu_priv;
   priv->vinit (*this, title, argp);
@@ -354,119 +351,99 @@ Menu::Menu (const char *title, va_list argp)
  *	menu from a list.
  */
 Menu::Menu (
-   const char   *title,
-   al_llist_t   *list,
-   const char   *(*getstr) (void *))
-{
-  priv = new Menu_priv;
-  set_title (title);
-  size_t nitems = y_min (al_lcount (list), 100);
-  priv->items.resize (nitems);
-  size_t line;
-  for (al_lrewind (list), line = 0;
-       ! al_leol (list) && line < nitems;
-       al_lstep (list), line++)
-    priv->items[line].str = getstr (al_lptr (list));
-  priv->cook ();
+		const string title,
+		al_llist_t   *list,
+		const char   *(*getstr) (void *)) {
+	priv = new Menu_priv;
+	set_title (title);
+	size_t nitems = y_min (al_lcount (list), 100);
+	priv->items.resize (nitems);
+	size_t line;
+	for (al_lrewind (list), line = 0;
+			! al_leol (list) && line < nitems;
+			al_lstep (list), line++)
+		priv->items[line].str = getstr (al_lptr (list));
+	priv->cook();
 }
 
 
 /*
  *	Menu::Menu - ctor from a Menu_data
  */
-Menu::Menu (const char *title, const Menu_data& menudata)
-{
-  priv = new Menu_priv;
-  priv->menudata = &menudata;
-  priv->flags |= MF_MENUDATA;
-  set_title (title);
-  size_t nitems = menudata.nitems ();
-  priv->items.resize (nitems);
-  priv->cook ();
+Menu::Menu (const string title, const Menu_data& menudata) {
+	priv = new Menu_priv;
+	priv->menudata = &menudata;
+	priv->flags |= MF_MENUDATA;
+	set_title (title);
+	size_t nitems = menudata.nitems ();
+	priv->items.resize (nitems);
+	priv->cook ();
 }
 
 
 /*
  *	Menu::~Menu - dtor
  */
-Menu::~Menu ()
-{
-  delete priv;
+Menu::~Menu () {
+	delete priv;
 }
 
 
 /*
  *	Menu_priv::vinit - initialize the menu from an argument list
  */
-void Menu_priv::vinit (Menu& m, const char *title, va_list argp)
-{
-  bool tick = false;
+void Menu_priv::vinit (Menu& m, const string title, va_list argp) {
+	bool tick = false;
 
-  m.set_title (title);
+	m.set_title (title);
 
-  while (items.size () < 100)
-  {
-    Menu_item i;
+	while (items.size () < 100) {
+		Menu_item i;
 
-    const char *str = va_arg (argp, const char *);
-    while (str == MI_SEPARATION)
-    {
-      i.flags |= MIF_SEPAR;
-      str = va_arg (argp, const char *);
-    }
-    if (str == 0)
-      break;
+		const char *str = va_arg (argp, const char *);
+		while (str == MI_SEPARATION) {
+			i.flags |= MIF_SEPAR;
+			str = va_arg (argp, const char *);
+		}
+		if (str == 0)
+			break;
 
-    i.str            = str;
-    i.shortcut_key   = (inpev_t) va_arg (argp, int);
-    unsigned char flag;
-    while ((flag = (unsigned char) va_arg (argp, int)) != 0)
-    {
-      if (flag == MIF_SACTIVE)
-      {
-	i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_SACTIVE;
-	i.active.s = (bool) va_arg (argp, int);
-      }
-      else if (flag == MIF_VACTIVE)
-      {
-	i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_VACTIVE;
-	i.active.v = va_arg (argp, bool *);
-      }
-      else if (flag == MIF_FACTIVE)
-      {
-	i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_FACTIVE;
-	i.active.f.f = va_arg (argp, micb_t);
-	i.active.f.a = va_arg (argp, micbarg_t);
-      }
-      else if (flag == MIF_STICK)
-      {
-	tick = true;
-	i.flags  = (i.flags & ~MIF_MTICK) | MIF_STICK;
-	i.tick.s = (bool) va_arg (argp, int);
-      }
-      else if (flag == MIF_VTICK)
-      {
-	tick = true;
-	i.flags  = (i.flags & ~MIF_MTICK) | MIF_VTICK;
-	i.tick.v = va_arg (argp, bool *);
-      }
-      else if (flag == MIF_FTICK)
-      {
-	tick = true;
-	i.flags  = (i.flags & ~MIF_MTICK) | MIF_FTICK;
-	i.tick.f.f = va_arg (argp, micb_t);
-	i.tick.f.a = va_arg (argp, micbarg_t);
-      }
-      else if (flag != 0)
-      {
-	nf_bug ("Menu::ctor: flag %d", (int) flag);
-      }
-    }
-    items.push_back (i);
-  }
+		i.str            = str;
+		i.shortcut_key   = (inpev_t) va_arg (argp, int);
+		unsigned char flag;
+		while ((flag = (unsigned char) va_arg (argp, int)) != 0) {
+			if (flag == MIF_SACTIVE) {
+				i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_SACTIVE;
+				i.active.s = (bool) va_arg (argp, int);
+			} else if (flag == MIF_VACTIVE) {
+				i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_VACTIVE;
+				i.active.v = va_arg (argp, bool *);
+			} else if (flag == MIF_FACTIVE) {
+				i.flags  = (i.flags & ~MIF_MACTIVE) | MIF_FACTIVE;
+				i.active.f.f = va_arg (argp, micb_t);
+				i.active.f.a = va_arg (argp, micbarg_t);
+			} else if (flag == MIF_STICK) {
+				tick = true;
+				i.flags  = (i.flags & ~MIF_MTICK) | MIF_STICK;
+				i.tick.s = (bool) va_arg (argp, int);
+			} else if (flag == MIF_VTICK) {
+				tick = true;
+				i.flags  = (i.flags & ~MIF_MTICK) | MIF_VTICK;
+				i.tick.v = va_arg (argp, bool *);
+			} else if (flag == MIF_FTICK) {
+				tick = true;
+				i.flags  = (i.flags & ~MIF_MTICK) | MIF_FTICK;
+				i.tick.f.f = va_arg (argp, micb_t);
+				i.tick.f.a = va_arg (argp, micbarg_t);
+			} else if (flag != 0) {
+				nf_bug ("Menu::ctor: flag %d", (int) flag);
+			}
+		}
+		items.push_back (i);
+	}
 
-  if (tick)
-    flags |= MF_TICK;
+	if (tick)
+		flags |= MF_TICK;
 }
 
 
@@ -542,17 +519,16 @@ void Menu_priv::cook ()
  *	Bug: changing the title does not take effect until the
  *	next display from scratch.
  */
-void Menu::set_title (const char *title)
-{
-  priv->title = title;
-  size_t title_len = title ? strlen (title) : 0;
+void Menu::set_title (const string title) {
+	priv->title = title;
+	size_t title_len = title.length();
 
-  /* If the length of the title has changed,
-     force geom() to be called again. */
-  if (title_len != priv->title_len)
-    priv->need_geom = true;
+	/* If the length of the title has changed,
+		force geom() to be called again. */
+	if (title_len != priv->title_len)
+		priv->need_geom = true;
 
-  priv->title_len = title_len;
+	priv->title_len = title_len;
 }
 
 
@@ -695,50 +671,48 @@ void Menu::set_active (size_t item_no, bool active)
 /*
  *	Menu_priv::geom - recalculate the screen coordinates etc.
  */
-void Menu_priv::geom ()
-{
-  size_t width_chars = 0;
-  if (title && (flags & MF_POPUP))
-    width_chars = y_max (width_chars, title_len);
-  if (flags & MF_NUMS)
-    width_chars = y_max (width_chars, items_len + 4);
-  else
-    width_chars = y_max (width_chars, items_ks_len);
-  int title_height = title && (flags & MF_POPUP) ? (int) (1.5 * FONTH) : 0;
+void Menu_priv::geom () {
+	size_t width_chars = 0;
+	if (!title.empty() && (flags & MF_POPUP))
+		width_chars = y_max (width_chars, title_len);
+	if (flags & MF_NUMS)
+		width_chars = y_max (width_chars, items_len + 4);
+	else
+		width_chars = y_max (width_chars, items_ks_len);
+	int title_height = !title.empty() && (flags & MF_POPUP) ? (int) (1.5 * FONTH) : 0;
 
-  width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + width_chars * FONTW;
-  height = 2 * BOX_BORDER + 2 * WIDE_VSPACING + title_height
-					      + items.back().y
-					      + item_height;
+	width  = 2 * BOX_BORDER + 2 * WIDE_HSPACING + width_chars * FONTW;
+	height = 2 * BOX_BORDER + 2 * WIDE_VSPACING + title_height
+		+ items.back().y
+		+ item_height;
 
-  if (user_ox0 < 0)
-    ox0 = (ScrMaxX - width) / 2;
-  else
-    ox0 = user_ox0;
-  ix0 = ox0 + BOX_BORDER;
-  ix1 = ix0 + 2 * WIDE_HSPACING + width_chars * FONTW - 1;
-  ox1 = ix1 + BOX_BORDER;
-  if (ox1 > ScrMaxX)
-  {
-    int overlap = ox1 - ScrMaxX;
-    ox0 -= overlap;
-    ix0 -= overlap;
-    ix1 -= overlap;
-    ox1 -= overlap;
-  }
+	if (user_ox0 < 0)
+		ox0 = (ScrMaxX - width) / 2;
+	else
+		ox0 = user_ox0;
+	ix0 = ox0 + BOX_BORDER;
+	ix1 = ix0 + 2 * WIDE_HSPACING + width_chars * FONTW - 1;
+	ox1 = ix1 + BOX_BORDER;
+	if (ox1 > ScrMaxX) {
+		int overlap = ox1 - ScrMaxX;
+		ox0 -= overlap;
+		ix0 -= overlap;
+		ix1 -= overlap;
+		ox1 -= overlap;
+	}
 
-  if (user_oy0 < 0)
-    oy0 = (ScrMaxY - height) / 2;
-  else
-    oy0 = user_oy0;
-  iy0 = oy0 + BOX_BORDER;
-  ty0 = iy0 + FONTH / 2;				// Title of menu
-  ly0 = ty0 + title_height;				// First item of menu
+	if (user_oy0 < 0)
+		oy0 = (ScrMaxY - height) / 2;
+	else
+		oy0 = user_oy0;
+	iy0 = oy0 + BOX_BORDER;
+	ty0 = iy0 + FONTH / 2;				// Title of menu
+	ly0 = ty0 + title_height;				// First item of menu
 
-  oy1 = oy0 + height - 1;
-  iy1 = oy1 - BOX_BORDER;
+	oy1 = oy0 + height - 1;
+	iy1 = oy1 - BOX_BORDER;
 
-  need_geom = false;
+	need_geom = false;
 }
 
 
@@ -985,56 +959,50 @@ inpev_t Menu::last_shortcut_key ()
  *	If necessary, redraw everything from scratch. Else, if
  *	<line> has changed, refresh the highlighted line.
  */
-void Menu::draw ()
-{
-  priv->draw ();
+void Menu::draw () {
+	priv->draw ();
 }
 
+void Menu_priv::draw () {
+	bool from_scratch = false;
 
-void Menu_priv::draw ()
-{
-  bool from_scratch = false;
+	if (need_geom)
+		geom ();
 
-  if (need_geom)
-    geom ();
+	// Do we need to redraw everything from scratch ?
+	if ((visible && ! visible_disp)
+			|| (ox0    != ox0_disp)
+			|| (oy0    != oy0_disp)
+			|| (width  != width_disp)
+			|| (height != height_disp))
+		from_scratch = true;
 
-  // Do we need to redraw everything from scratch ?
-  if ((visible && ! visible_disp)
-		  || (ox0    != ox0_disp)
-		  || (oy0    != oy0_disp)
-		  || (width  != width_disp)
-		  || (height != height_disp))
-	  from_scratch = true;
+	// Display the static part of the menu
+	if (from_scratch) {
+		DrawScreenBox3D (ox0, oy0, ox1, oy1);
+		set_colour (WINTITLE);
+		if ((flags & MF_POPUP) && !title.empty())
+			DrawScreenString (ix0 + WIDE_HSPACING, ty0, title.c_str());
 
-  // Display the static part of the menu
-  if (from_scratch)
-  {
-    DrawScreenBox3D (ox0, oy0, ox1, oy1);
-    set_colour (WINTITLE);
-    if ((flags & MF_POPUP) && title != 0)
-      DrawScreenString (ix0 + WIDE_HSPACING, ty0, title);
+		for (size_t l = 0; l < items.size (); l++) {
+			set_colour (WINFG);
+			draw_one_line (l, false);
+		}
+		visible_disp = true;
+		ox0_disp     = ox0;
+		oy0_disp     = oy0;
+		width_disp   = width;
+		height_disp  = height;
+	}
 
-    for (size_t l = 0; l < items.size (); l++)
-    {
-      set_colour (WINFG);
-      draw_one_line (l, false);
-    }
-    visible_disp = true;
-    ox0_disp     = ox0;
-    oy0_disp     = oy0;
-    width_disp   = width;
-    height_disp  = height;
-  }
-
-  // Display the "highlight" bar
-  if (from_scratch || line != line_disp)
-  {
-    if (line_disp < items.size ())
-      draw_one_line (line_disp, false);
-    if (line < items.size ())
-      draw_one_line (line, true);
-    line_disp = line;
-  }
+	// Display the "highlight" bar
+	if (from_scratch || line != line_disp) {
+		if (line_disp < items.size ())
+			draw_one_line (line_disp, false);
+		if (line < items.size ())
+			draw_one_line (line, true);
+		line_disp = line;
+	}
 }
 
 

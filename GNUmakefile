@@ -195,13 +195,14 @@ SRC_ATCLIB = $(addprefix atclib/,  $(addsuffix .c,  $(MODULES_ATCLIB)))
 
 # The headers of Yadex and Atclib
 HEADERS_YADEX  := $(wildcard src/*.h)
-HEADERS_ATCLIB =  atclib/atclib.h
+HEADERS_ATCLIB = atclib/atclib.h
+HEADERS_COMPAT = compat/compat.h
 
 # All the source files, including the headers.
 SRC = $(filter-out src/config.cc, $(SRC_YADEX))				\
       $(filter-out src/config.h, $(HEADERS_YADEX))			\
       $(SRC_ATCLIB) $(HEADERS_ATCLIB)	\
-      $(SRC_COMPAT)
+      $(SRC_COMPAT) $(HEADERS_COMPAT)
 
 # The files on which youngest is run.
 SRC_NON_GEN = $(filter-out src/credits.cc src/prefix.cc src/version.cc, $(SRC))

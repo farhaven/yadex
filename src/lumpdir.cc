@@ -156,7 +156,7 @@ void Lump_dir::refresh ()
       if (! dir)
       {
 	warn ("%.128s: no matching %s for %.*s\n",
-	    start_label->wadfile->pathname (),
+	    start_label->wadfile->pathname().c_str(),
 	    end_label,
 	    (int) WAD_NAME, start_label->dir.name);
 	break;
@@ -166,7 +166,7 @@ void Lump_dir::refresh ()
 				|| (end_label == xx_end.name && ! xx_end.cmp (dir->dir.name))) {
 	if (dir->dir.size != 0)
 	  warn ("%.128s: label %.*s has non-zero size %ld\n",
-	      dir->wadfile->pathname (),
+	      dir->wadfile->pathname().c_str(),
 	      (int) WAD_NAME, dir->dir.name,
 	      (long) dir->dir.size);
 	dir = dir->next;
@@ -183,7 +183,7 @@ void Lump_dir::refresh ()
 	    && (! y_strnicmp (dir->dir.name + 3, "START", WAD_NAME - 3)
 		|| ! y_strnicmp (dir->dir.name + 3, "END", WAD_NAME - 3))))
 	  warn ("%.128s: unexpected label \"%.*s\" in %s group\n",
-	      dir->wadfile->pathname (),
+	      dir->wadfile->pathname().c_str(),
 	      (int) WAD_NAME, dir->dir.name,
 	      start_label->dir.name);
 	continue;

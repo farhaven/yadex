@@ -178,7 +178,7 @@ void Patch_dir::refresh (MDirPtr master_dir)
 	if (! dir)
 	{
 	  warn ("%.128s: no matching %s for %.*s\n",
-	      start_label->wadfile->pathname (),
+	      start_label->wadfile->pathname().c_str(),
 	      end_label,
 	      (int) WAD_NAME, start_label->dir.name);
 	  break;
@@ -187,7 +187,7 @@ void Patch_dir::refresh (MDirPtr master_dir)
 	{
 	  if (dir->dir.size != 0)
 	    warn ("%.128s: label %.*s has non-zero size %ld\n",
-		dir->wadfile->pathname (),
+		dir->wadfile->pathname().c_str(),
 		(int) WAD_NAME, dir->dir.name,
 		(long) dir->dir.size);
 	  dir = dir->next;
@@ -204,7 +204,7 @@ void Patch_dir::refresh (MDirPtr master_dir)
 	      && (! y_strnicmp (dir->dir.name + 3, "START", WAD_NAME - 3)
 		  || ! y_strnicmp (dir->dir.name + 3, "END", WAD_NAME - 3))))
 	    warn ("%.128s: unexpected label \"%.*s\" among patches.\n",
-		dir->wadfile->pathname (), (int) WAD_NAME, dir->dir.name);
+		dir->wadfile->pathname().c_str(), (int) WAD_NAME, dir->dir.name);
 	  continue;
 	}
 	//printf ("%-9.8s ", dir->dir.name); fflush (stdout);  // DEBUG

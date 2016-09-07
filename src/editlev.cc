@@ -175,9 +175,8 @@ void EditLevel (string levelname, bool newlevel)
 	time (&t1);
 	LogMessage(string(": Finished editing " + (levelname != "" ? levelname : "new level") + "...\n").c_str());
 	if (Level && Level->wadfile) {
-		const char *const file_name =
-			Level->wadfile ? Level->wadfile->pathname () : "(New level)";
-		WriteYadexLog (file_name, levelname.c_str(), &t0, &t1);
+		const string file_name = Level->wadfile ? Level->wadfile->pathname () : "(New level)";
+		WriteYadexLog (file_name.c_str(), levelname.c_str(), &t0, &t1);
 	}
 
 done:

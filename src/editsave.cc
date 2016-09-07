@@ -38,12 +38,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadfile.h"
 #include "wadlist.h"
 
-#include "../compat/compat.h"
-
-#ifndef NEW_SAVE_METHOD
 extern int RedrawMap;
-#endif
-
 
 /*
  *	save_save_as
@@ -78,99 +73,11 @@ extern int RedrawMap;
  *	FIXME this should be a method of the Editwin class.
  */
 
-#ifdef NEW_SAVE_METHOD
-bool save_save_as (bool prompt)
-{
-  char l[WAD_NAME + 1];
-  y_file_name_t f;
- 
-  if (! CheckStartingPos ())
-    return;
-
-  // Fill in the level name
-  if (*Level_name)
-    al_scps (l, Level_name, sizeof l - 1);
-  else
-  {
-    prompt = true;
-    if (yg_level_name == YGLN_MAP01)
-      strlcpy (l, "map01", sizeof(l));
-    else
-    {
-      strlcpy (l, "e1m1", sizeof(l));
-      if (yg_level_name != YGLN_E1M1 && yg_level_name != YGLN_E1M10)
-	nf_bug ("Bad yg_level_name %d", (int) yg_level_name);
-    }
-  }
-
-  // Fill in the file name
-  if (*Level_file_name)
-    al_scps (f, file_name, sizeof f - 1);
-  else
-  {
-    prompt = true;
-    al_scpslower (f, l, sizeof f - 1);
-	 strlcat(f, ".wad", sizeof(f));
-  }
-
-  // Create the dialog
-  Entry2 e ("Save level as...",
-      "Level %*S\nFile %+*s\n", sizeof l - 1, l, sizeof f - 1, f);
-
-try_again :
-
-  // If necessary, prompt for new level name and file name
-  if (prompt || ! strcmp(level_name, MainWad))
-  {
-    int r = e.loop ();
-    if (! r)  // Cancelled by user
-      return false;  // Didn't save
-  }
-
-  printf ("Saving as \"%s\" into \"%s\"\n", l, f);
-  //if (! ok_to_use_weird_level_name (l))
-  //  goto try_again;
-  //if (! ok_to_overwrite (f))
-  //  goto try_again;
-
-  // If file already exists, ask for confirmation.
-  if (al_fnature (l) == 1)
-  {
-    bool ok = Confirm (-1, -1, "This file already exists. Saving to it will"
-	" overwrite _everything_",
-	"else it might contain, including other levels or lumps !");
-    if (! ok)
-    {
-      prompt = true;
-      goto try_again;
-    }
-  }
-
-  // Try to save
-  int r = SaveLevelData (...);
-  if (r)
-  {
-    Notify (-1, -1, "Could not save to file", strerror (errno));
-    prompt = true;
-    goto try_again;
-  }
-
-  // Successfully saved
-  Level = FindMasterDir (levelname);  // FIXME useless ?
-  al_scps (Level_name,            l, sizeof Level_name            - 1);
-  al_scps (Level_file_name,       f, sizeof Level_file_name       - 1);
-  al_scps (Level_file_name_saved, f, sizeof Level_file_name_saved - 1);
-  return true;  // Did save
-}
-#else  /* OLD_SAVE_METHOD */
-
-
 /*
    get the name of the new wad file (returns NULL on Esc)
 */
 
 string GetWadFileName (string levelname) {
-#define BUFSZ 79
 	string outfile;
 
 	/* get the file name */
@@ -187,8 +94,8 @@ string GetWadFileName (string levelname) {
 	}
 
 	if (! Level
-			|| ! Level->wadfile
-			|| ! strcmp(Level->wadfile->filename, MainWad)) {
+			|| !Level->wadfile
+			|| Level->wadfile->filename == string(MainWad)) {
 		outfile = levelname;
 		std::transform(outfile.begin(), outfile.end(), outfile.begin(), ::tolower);
 		outfile += ".wad";
@@ -197,7 +104,7 @@ string GetWadFileName (string levelname) {
 	}
 
 	do {
-		outfile = InputFileName (-1, -1, "Name of the new wad file:", BUFSZ, outfile);
+		outfile = InputFileName (-1, -1, "Name of the new wad file:", 80, outfile);
 	} while (outfile == MainWad);
 
 	/* escape */
@@ -208,53 +115,46 @@ string GetWadFileName (string levelname) {
 	/* if the wad file already exists, rename it to "*.bak" */
 	Wad_file *wf;
 	for (wad_list.rewind (); wad_list.get (wf);) {
-		if (strcmp(outfile.c_str(), wf->filename) == 0) {
-			verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
-			verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
-			verbmsg ("outfile       %s\n", outfile.c_str());		// DEBUG
-			al_fdrv_t drv;
-			al_fpath_t path;
-			al_fbase_t base;
+		if (outfile == string(wf->filename)) {
+			wf->filename += ".bak";
 
-			al_fana (wf->filename, drv, path, base, 0);
-			snprintf (wf->filename, strlen(wf->filename) + 1, "%s%s%s.bak", drv, path, base);
-			verbmsg ("setting wf->filename to %s\n", wf->filename);  // DEBUG
+			verbmsg ("setting wf->filename to %s\n", wf->filename.c_str());  // DEBUG
 			/* Need to close, then reopen: problems with SHARE.EXE */
 			verbmsg ("closing %p\n", wf->fp);				// DEBUG
 			fclose (wf->fp);
-			verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename);	// DEBUG
+			verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename.c_str());	// DEBUG
 
-			if (rename (outfile.c_str(), wf->filename) != 0) {
-				verbmsg ("removing %s\n", wf->filename);  // DEBUG
-				if (remove (wf->filename) != 0 && errno != ENOENT) {
+			if (rename (outfile.c_str(), wf->filename.c_str()) != 0) {
+				verbmsg ("removing %s\n", wf->filename.c_str());  // DEBUG
+				if (remove (wf->filename.c_str()) != 0 && errno != ENOENT) {
 					char buf1[81];
 					char buf2[81];
-					snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"", wf->filename);
+					snprintf (buf1, sizeof buf1, "Could not delete \"%.64s\"", wf->filename.c_str());
 					snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
 					Notify (-1, -1, buf1, buf2);
 					return 0;
 				}
-				verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename);  // DEBUG
-				if (rename (outfile.c_str(), wf->filename)) {
+				verbmsg ("renaming %s -> %s\n", outfile.c_str(), wf->filename.c_str());  // DEBUG
+				if (rename (outfile.c_str(), wf->filename.c_str())) {
 					char buf1[81];
 					char buf2[81];
 					snprintf (buf1, sizeof buf1, "Could not rename \"%.64s\"", outfile.c_str());
-					snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)", wf->filename, strerror (errno));
+					snprintf (buf2, sizeof buf2, "as \"%.64s\" (%.64s)", wf->filename.c_str(), strerror (errno));
 					Notify (-1, -1, buf1, buf2);
 					return 0;
 				}
 			}
-			verbmsg ("opening %s\n", wf->filename); // DEBUG
-			wf->fp = fopen (wf->filename, "rb");
+			verbmsg ("opening %s\n", wf->filename.c_str()); // DEBUG
+			wf->fp = fopen (wf->filename.c_str(), "rb");
 			if (wf->fp == 0) {
 				char buf1[81];
 				char buf2[81];
-				snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"", wf->filename);
+				snprintf (buf1, sizeof buf1, "Could not reopen \"%.64s\"", wf->filename.c_str());
 				snprintf (buf2, sizeof buf2, "(%.64s)", strerror (errno));
 				Notify (-1, -1, buf1, buf2);
 				return 0;
 			}
-			verbmsg ("wf->filename: %s\n", wf->filename);	// DEBUG
+			verbmsg ("wf->filename: %s\n", wf->filename.c_str());	// DEBUG
 			verbmsg ("wf->fp        %p\n", wf->fp);		// DEBUG
 			verbmsg ("outfile       %s\n", outfile.c_str());		// DEBUG
 			break;
@@ -263,5 +163,3 @@ string GetWadFileName (string levelname) {
 
 	return outfile;
 }
-#endif
-

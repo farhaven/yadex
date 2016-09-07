@@ -59,7 +59,7 @@ int OpenMainWad (const char *filename) {
 	wf = BasicWadOpen (filename, yg_picture_format);
 	if (wf == 0)
 		return 1;
-	if (strncmp (wf->type, "IWAD", 4))
+	if (wf->type != "IWAD")
 		warn ("%.128s: is a pwad, not an iwad. Will use it anyway.\n", filename);
 
 	/* create the master directory */
@@ -129,7 +129,7 @@ int OpenPatchWad (const char *filename) {
 	free(real_name);
 	if (! wad)
 		return 1;
-	if (strncmp (wad->type, "PWAD", 4))
+	if (wad->type != "PWAD")
 		warn ("%.128s: is an iwad, not a pwad. Will use it anyway.\n", filename);
 
 	/* alter the master directory */
@@ -391,10 +391,10 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 		sure how to avoid that, though. */
 	{
 		Wad_file *dummy;
-		wad_list.rewind ();
-		while (wad_list.get (dummy)) {
-			if (strcmp(filename, dummy->filename) == 0) {
-				wad_list.del ();
+		wad_list.rewind();
+		while (wad_list.get(dummy)) {
+			if (filename == dummy->filename) {
+				wad_list.del();
 				break;
 			}
 		}
@@ -404,8 +404,7 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 	Wad_file *wf = new Wad_file;
 	wf->pic_format_ = pic_format;
 	wf->directory   = 0;
-	wf->filename    = (char *) malloc(strlen (filename) + 1);
-	strlcpy (wf->filename, filename, strlen(filename) + 1);
+	wf->filename    = string(filename);
 
 	// Open the wad and read its header.
 	wf->fp = fopen (filename, "rb");
@@ -416,17 +415,19 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 	}
 
 	{
-		bool e = file_read_bytes (wf->fp, wf->type, 4);
+		char buf[5] = { 0 };
+		bool e = file_read_bytes (wf->fp, buf, 4);
+		wf->type = string(buf);
 		e     |= file_read_int32_t   (wf->fp, &wf->dirsize);
 		e     |= file_read_int32_t   (wf->fp, &wf->dirstart);
-		if (e || (memcmp (wf->type, "IWAD", 4) != 0 && memcmp (wf->type, "PWAD", 4) != 0)) {
-			printf ("%.128s: not a wad (bad header)\n", filename);
+		if (e || (wf->type != "IWAD" && wf->type != "PWAD")) {
+			printf("%.128s: not a wad (bad header)\n", filename);
 			fail = true;
 			goto byebye;
 		}
 	}
 	verbmsg ("  Type %.4s, directory has %ld entries at offset %08lXh\n",
-			wf->type, (long) wf->dirsize, (long) wf->dirstart);
+			wf->type.c_str(), (long) wf->dirsize, (long) wf->dirstart);
 
 	// Load the directory of the wad
 	wf->directory = (DirPtr) malloc((long) sizeof (struct Directory)
@@ -478,7 +479,7 @@ void ListMasterDirectory (FILE *file) {
 	for (dir = MasterDir; dir; dir = dir->next) {
 		strncpy (dataname, dir->dir.name, WAD_NAME);
 		fprintf (file, "%-*s  %-50s  %6d  x%08x\n",
-				(int)WAD_NAME, dataname, dir->wadfile->pathname (),
+				(int)WAD_NAME, dataname, dir->wadfile->pathname().c_str(),
 				dir->dir.size, dir->dir.start);
 		if (file == stdout && lines++ > screen_lines - 4) {
 			lines = 0;
@@ -506,7 +507,7 @@ void ListFileDirectory (FILE *file, const Wad_file *wad) {
 	dataname[WAD_NAME] = '\0';
 	fprintf (file, "Wad File Directory\n");
 	fprintf (file, "==================\n\n");
-	fprintf (file, "Wad File: %s\n\n", wad->pathname ());
+	fprintf (file, "Wad File: %s\n\n", wad->pathname().c_str());
 	fprintf (file, "NAME____  SIZE__  START____  END______\n");
 
 	for (n = 0; n < wad->dirsize; n++) {

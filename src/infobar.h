@@ -38,7 +38,7 @@ class infobar_c : public edwidget_c
 
       void set_visible (int visible) { this->visible = visible; }
 
-      void set_file_name (const char *file_name)
+      void set_file_name (const string file_name)
 	 { this->file_name = file_name; }
 
       void set_level_name (const char *level_name)
@@ -109,8 +109,8 @@ class infobar_c : public edwidget_c
 
       int visible;
       int visible_disp;
-      const char *file_name;
-      const char *file_name_disp;
+      string file_name;
+      string file_name_disp;
       const char *level_name;
       const char *level_name_disp;
       int obj_type;

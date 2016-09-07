@@ -50,7 +50,7 @@ lump_loc_string (char *buf, size_t buf_size, const Lump_loc& lump_loc) {
 		*buf = '\0';
 		return;
 	}
-	y_filename (buf, len + 1, lump_loc.wad->pathname ());
+	y_filename (buf, len + 1, lump_loc.wad->pathname().c_str());
 	snprintf (buf + strlen (buf), len, "(%08lXh)",
 	(unsigned long) lump_loc.ofs & 0xffffffff);
 }
@@ -427,7 +427,7 @@ InputNameFromListWithFunc (
 			name = list[n];
 		else if (key == YK_F1 && c.flags & HOOK_LOC_VALID) {	// [F1]: print location
 			printf ("%.8s: %s(%08lXh)\n",
-				name.c_str(), c.lump_loc.wad->pathname (), (unsigned long) c.lump_loc.ofs);
+				name.c_str(), c.lump_loc.wad->pathname().c_str(), (unsigned long) c.lump_loc.ofs);
 		} else if (key == YK_F1 + YK_SHIFT	// [Shift][F1] : dump image to file
 				&& hookfunc != NULL
 				&& (c.flags & HOOK_DRAWN)) {

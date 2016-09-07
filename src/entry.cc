@@ -211,7 +211,7 @@ InputFileName (int x0, int y0, string prompt, size_t maxlen, string filename) {
 		if (l < maxlen && is_ordinary (key)) {
 			filename += key;
 		} else if (l > 0 && key == YK_BACKSPACE) {
-			filename.erase(filename.end());
+			filename.pop_back();
 		} else if (key == YK_RETURN)
 			break;  /* return "filename" */
 		else if (key == YK_ESC) {

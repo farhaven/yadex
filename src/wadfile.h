@@ -103,19 +103,19 @@ class Wad_file
 
   public :
     Wad_file () :
-      filename (0),
+      filename (""),
       pic_format_ (YGPF_NORMAL),
-      fp (0),
+      fp (NULL),
+		type("BUG"),
       dirsize (0),
       dirstart (0),
       directory (0),
       error_ (false)
     {
-      strlcpy (type, "BUG", sizeof(type));
       strlcpy (where_, "DEADBEEF", sizeof(where_));
     }
     ~Wad_file ();
-    const char *pathname    () const;
+    const string pathname   () const;
     ygpf_t      pic_format  () const;
     bool        error       () const;
     const char *where       () const;
@@ -130,10 +130,10 @@ class Wad_file
     const char *what        () const;
 
   private :
-    char *filename;			// Name of the wad file
+    string filename;			// Name of the wad file
     ygpf_t pic_format_;			// Picture format (usually PF_NORMAL)
     FILE *fp;				// C file stream information
-    char type[4];			// Type of wad file ("IWAD" or "PWAD")
+    string type;			// Type of wad file ("IWAD" or "PWAD")
     int32_t  dirsize;			// Entries in directory
     int32_t  dirstart;			// Offset to start of directory
     DirPtr directory;			// Array of directory information
@@ -143,214 +143,4 @@ class Wad_file
     Wad_file (const Wad_file& rhs);		// Deliberately not implemented
     Wad_file& operator= (const Wad_file& rhs);	// Deliberately not implemented
 };
-
-
-/*
- *	Wad_file::pathname - return the pathname of the file
- */
-inline const char *Wad_file::pathname () const
-{
-  return filename;
-}
-
-
-/*
- *	Wad_file::pic_format - return the pic_format of the wad
- */
-inline ygpf_t Wad_file::pic_format () const
-{
-  return pic_format_;
-}
-
-
-/*
- *	Wad_file::error - tell whether any errors occurred
- *
- *	Reset the error indicator and call clearerr() on the
- *	underlying stdio stream. Thus calling Wad_file::error()
- *	again immediately after always returns false. Calling
- *	this function is the only way to clear the error flag of
- *	a Wad_file.
- *
- *	So short that it's a good candidate for inlining.
- *
- *	Return true if an error occurred, false otherwise.
- */
-inline bool Wad_file::error () const
-{
-  if (! error_)
-    return false;
-
-  clearerr (fp);
-  error_ = false;
-  return true;
-}
-
-
-/*
- *	Wad_file::seek - move the file pointer
- *
- *	If an error occurs, set the error flag.
- */
-inline void Wad_file::seek (long offset) const
-{
-  if (fseek (fp, offset, 0) != 0)
-  {
-    if (! error_)
-      err ("%s: can't seek to %lXh", filename, offset);
-    error_ = true;
-  }
-}
-
-
-/*
- *	Wad_file::read_uint8_t - read a byte
- *
- *	If an error occurs, set the error flag and the return
- *	value is undefined.
- */
-inline uint8_t Wad_file::read_uint8_t () const
-{
-  uint8_t v = uint8_t (getc (fp));
-
-  if (feof (fp) || ferror (fp))
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-  }
-  return v;
-}
-
-
-/*
- *	Wad_file::read_uint8_t - read a byte
- *
- *	If an error occurs, set the error flag and the contents
- *	of buf is undefined.
- */
-inline void Wad_file::read_uint8_t (uint8_t& buf) const
-{
-  buf = getc (fp);
-
-  if (feof (fp) || ferror (fp))
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-  }
-}
-
-
-/*
- *	Wad_file::read_int16_t - read a little-endian 16-bit signed integer
- *
- *	If an error occurs, set the error flag and the return
- *	value is undefined.
- */
-inline int16_t Wad_file::read_int16_t () const
-{
-  const size_t nbytes = 2;
-  uint8_t buf[nbytes];
-
-  if (fread (buf, 1, nbytes, fp) != nbytes)
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-    return EOF;  // Whatever
-  }
-  return buf[0] | buf[1] << 8;
-}
-
-
-/*
- *	Wad_file::read_int16_t - read a little-endian 16-bit signed integer
- *
- *	The value read is stored in *buf. If an error occurs,
- *	set the error flag and the contents of *buf is undefined.
- */
-inline void Wad_file::read_int16_t (int16_t *buf) const
-{
-	uint8_t c1 = getc(fp);
-	uint8_t c2 = getc(fp);
-	*buf = c1 | (c2 << 8);
-
-  if (feof (fp) || ferror (fp))
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-  }
-}
-
-
-/*
- *	Wad_file::read_int32_t - read little-endian 32-bit signed integers
- *
- *	Read <count> little-endian 32-bit signed integers from
- *	wad file <wadfile> into *buf. If an error occurs, set
- *	error_ and the contents of *buf is undefined.
- */
-inline void Wad_file::read_int32_t (int32_t *buf, long count) const
-{
-	while (count-- > 0)
-	{
-		uint8_t c[4];
-		*buf = 0;
-		for (uint i = 0; i < sizeof(c); i++) {
-			c[i] = getc(fp);
-			*buf |= (c[i] << (8 * i));
-		}
-		buf++;
-	}
-
-	if (feof (fp) || ferror (fp))
-	{
-		if (! error_)
-			err ("%s: read error", where ());
-		error_ = true;
-	}
-}
-
-
-/*
- *	Wad_file::read_bytes - read bytes from a wad file
- *
- *	Read <count> bytes and store them into buffer <buf>.
- *	<count> is _not_ limited to size_t. If an I/O error
- *	occurs or EOF is reached before the requested number of
- *	bytes is read, set the error flag.
- */
-inline void Wad_file::read_bytes (void *buf, long count) const
-{
-  long bytes_read;
-
-  bytes_read = read_vbytes (buf, count);
-  if (bytes_read != count)
-  {
-    if (! error_)
-      err ("%s: read error", where ());
-    error_ = true;
-  }
-}
-
-
-/*
- *	Wad_file::what - what a wad contains
- *
- *	Written for the sake of the "w" command. Return the
- *	name of the first lump in the wad, which gives an idea
- *	of what it contains. The string is *not* NUL-terminated.
- */
-inline const char *Wad_file::what () const
-{
-  if (directory == 0)
-    return "(nodir)";
-  if (dirsize < 1)
-    return "(empty)";
-  return directory[0].name;
-}
-
-
 #endif  /* DO NOT ADD ANYTHING AFTER THIS LINE */

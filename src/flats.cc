@@ -96,8 +96,7 @@ void DisplayFloorTexture (hookfunc_comm_t *c)
   wadfile->seek (flat->offset);
   if (wadfile->error ())
   {
-    warn ("%s: can't seek to %lXh\n",
-	wadfile->pathname (), (unsigned long) flat->offset);
+    warn ("%s: can't seek to %lXh\n", wadfile->pathname().c_str(), (unsigned long) flat->offset);
     warn ("%.8s: seek error\n", c->name);
   }
 

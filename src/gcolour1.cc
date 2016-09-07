@@ -78,8 +78,7 @@ pcolour_t *alloc_game_colours (int playpalnum)
     dir->wadfile->seek (dir->dir.start);
     if (dir->wadfile->error ())
     {
-        warn ("%s: can't seek to %lXh\n",
-        dir->wadfile->pathname (), (unsigned long) dir->dir.start);
+        warn ("%s: can't seek to %lXh\n", dir->wadfile->pathname().c_str(), (unsigned long) dir->dir.start);
         warn ("PLAYPAL: seek error\n");
     }
     for (int n = 0; n <= playpalnum; n++)

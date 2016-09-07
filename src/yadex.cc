@@ -165,7 +165,7 @@ static int   parse_environment_vars ();
 static void  MainLoop ();
 static void  print_error_message (const char *fmt, va_list args);
 static void  add_base_colours ();
-static const Wad_file *wad_by_name (const char *pathname);
+static const Wad_file *wad_by_name (string);
 static bool  wad_already_loaded (const char *pathname);
 
 /*
@@ -705,11 +705,11 @@ static void MainLoop ()
         {
             const Wad_file *wf;
             wad_list.rewind ();
-            if (wad_list.get (wf))
-                printf ("%-40s  Iwad\n", wf->pathname ());
-            while (wad_list.get (wf))
+            if (wad_list.get(wf))
+                printf ("%-40s  Iwad\n", wf->pathname().c_str());
+            while (wad_list.get(wf))
                 printf ("%-40s  Pwad (%.*s)\n",
-            wf->pathname (), (int) WAD_NAME, wf->what ());
+            wf->pathname().c_str(), (int) WAD_NAME, wf->what());
         }
         /* user asked to quit */
         else if (strcmp (com, "quit") == 0 || strcmp (com, "q") == 0)
@@ -823,7 +823,7 @@ static void MainLoop ()
             if (out)
             {
                 printf ("Outputting directory of \"%s\" to \"%s\".\n",
-                wf->pathname (), out);
+                wf->pathname().c_str(), out);
 
                 if ((file = fopen (out, "w")) == NULL)
                     fatal_error ("error opening output file \"%s\"", com);
@@ -1247,14 +1247,13 @@ static void add_base_colours ()
 }
 
 
-static const Wad_file *wad_by_name (const char *pathname)
-{
-    const Wad_file *wf;
+static const Wad_file *wad_by_name (string pathname) {
+	const Wad_file *wf;
 
-    for (wad_list.rewind (); wad_list.get (wf);)
-        if (strcmp(pathname, wf->pathname ()) == 0)
-            return wf;
-    return 0;
+	for (wad_list.rewind (); wad_list.get (wf);)
+		if (pathname == wf->pathname())
+			return wf;
+	return 0;
 }
 
 static bool wad_already_loaded (const char *pathname)

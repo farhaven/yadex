@@ -58,6 +58,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadres.h"
 #include "wads2.h"
 
+#include "../compat/compat.h"
+
 using std::string;
 using std::pair;
 using std::make_pair;

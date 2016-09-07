@@ -38,6 +38,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadfile.h"
 #include "wadlist.h"
 
+#include "../compat/compat.h"
 
 #ifndef NEW_SAVE_METHOD
 extern int RedrawMap;

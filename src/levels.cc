@@ -45,6 +45,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wads.h"
 #include "wads2.h"
 
+#include "../compat/compat.h"
+
 using std::sort;
 using std::string;
 using std::stringstream;

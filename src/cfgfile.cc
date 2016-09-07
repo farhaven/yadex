@@ -39,6 +39,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "trace.h"
 #include "windim.h"
 
+#include "../compat/compat.h"
+
 const char config_file_magic[] = "# Yadex configuration file version 4";
 
 /*

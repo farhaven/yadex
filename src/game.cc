@@ -36,6 +36,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "things.h"
 #include "trace.h"
 
+#include "../compat/compat.h"
+
 const char ygd_file_magic[] = "# Yadex game definition file version 4";
 
 /*

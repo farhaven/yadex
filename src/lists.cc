@@ -35,6 +35,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wadfile.h"
 #include "game.h"
 
+#include "../compat/compat.h"
+
 using std::string;
 using std::vector;
 

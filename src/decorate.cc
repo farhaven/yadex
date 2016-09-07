@@ -22,6 +22,8 @@
 
 #include "decorate.h"
 
+#include "../compat/compat.h"
+
 int         ntoks;
 char       *token[MAX_TOKENS];
 

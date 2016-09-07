@@ -77,6 +77,9 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include <X11/Xlib.h>
 
+#include "../compat/compat.h"
+
+
 using std::sort;
 using std::string;
 using std::vector;

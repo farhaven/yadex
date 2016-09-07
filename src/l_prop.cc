@@ -47,6 +47,8 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "textures.h"
 #include "things.h"
 
+#include "../compat/compat.h"
+
 using std::string;
 using std::stringstream;
 using std::to_string;

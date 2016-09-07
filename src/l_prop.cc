@@ -47,8 +47,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "textures.h"
 #include "things.h"
 
-#include "../compat/compat.h"
-
 using std::string;
 using std::stringstream;
 using std::to_string;
@@ -1034,15 +1032,15 @@ return (*((thingdef_t **)ptr))->desc;
 */
 
 static string GetTaggedLineDefFlag (int linedefnum, int flagndx) {
-	static char ldstr[16][50];
+	stringstream s;
 
 	if ((LineDefs[linedefnum].flags & (0x01 << (flagndx - 1))) != 0)
-		strlcpy(ldstr[flagndx - 1], "* ", sizeof(ldstr[flagndx - 1]));
+		s << "* ";
 	else
-		strlcpy(ldstr[flagndx - 1], "  ", sizeof(ldstr[flagndx - 1]));
-	strlcat(ldstr[flagndx - 1], GetLineDefFlagsLongName(0x01 << (flagndx - 1)).c_str(), sizeof(ldstr[flagndx - 1]));
-	printf("%s: %d, %d -> '%s'\n", __func__, linedefnum, flagndx, ldstr[flagndx - 1]);
-	return string(ldstr[flagndx - 1]);
+		s << "  ";
+	s 	<< GetLineDefFlagsLongName(0x01 << (flagndx - 1));
+
+	return s.str();
 }
 
 

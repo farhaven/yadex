@@ -36,8 +36,6 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 #include "wads.h"
 #include "wads2.h"
 
-#include "../compat/compat.h"
-
 static string locate_pwad (string);
 static int level_name_order (const void *p1, const void *p2);
 

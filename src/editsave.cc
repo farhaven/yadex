@@ -81,8 +81,8 @@ extern int RedrawMap;
 #ifdef NEW_SAVE_METHOD
 bool save_save_as (bool prompt)
 {
-  static char l[WAD_NAME + 1];  // "static" to avoid memory shortages
-  static y_file_name_t f;	// "static" to avoid memory shortages
+  char l[WAD_NAME + 1];
+  y_file_name_t f;
  
   if (! CheckStartingPos ())
     return;

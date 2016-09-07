@@ -38,7 +38,7 @@ Place, Suite 330, Boston, MA 02111-1307, USA.
 
 #include "../compat/compat.h"
 
-static char *locate_pwad (const char *filename);
+static string locate_pwad (string);
 static int level_name_order (const void *p1, const void *p2);
 
 /*
@@ -112,21 +112,20 @@ int OpenPatchWad (const char *filename) {
 	long n;
 	char entryname[WAD_NAME + 1];
 	const char *entry_type = 0;
-	char *real_name;
+	string real_name;
 	int nitems = 0;		// Number of items in group of flats/patches/sprites
 
 	// Look for the file and ignore it if it doesn't exist
 	real_name = locate_pwad (filename);
-	if (real_name == NULL) {
+	if (real_name == "") {
 		warn ("%.128s: not found.\n", filename);
 		return 1;
 	}
 
 	/* open the wad file */
-	printf ("Loading pwad: %s...\n", real_name);
+	printf ("Loading pwad: %s...\n", real_name.c_str());
 	// By default, assume pwads use the normal picture format.
 	wad = BasicWadOpen (real_name, YGPF_NORMAL);
-	free(real_name);
 	if (! wad)
 		return 1;
 	if (wad->type != "PWAD")
@@ -378,8 +377,10 @@ void CloseUnusedWadFiles () {
  *
  *	Return a null pointer on error.
  */
-Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
+Wad_file *BasicWadOpen (const string filename, ygpf_t pic_format) {
 	bool fail = false;
+	bool e = false;
+	char buf[5] = { 0 };
 
 	/* If this wad is already open, close it first (it's not always
 		possible to open the same file twice). Also position the
@@ -389,14 +390,12 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 
 		FIXME if reopening fails, we're left in the cold. I'm not
 		sure how to avoid that, though. */
-	{
-		Wad_file *dummy;
-		wad_list.rewind();
-		while (wad_list.get(dummy)) {
-			if (filename == dummy->filename) {
-				wad_list.del();
-				break;
-			}
+	Wad_file *dummy;
+	wad_list.rewind();
+	while (wad_list.get(dummy)) {
+		if (filename == dummy->filename) {
+			wad_list.del();
+			break;
 		}
 	}
 
@@ -407,25 +406,23 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 	wf->filename    = string(filename);
 
 	// Open the wad and read its header.
-	wf->fp = fopen (filename, "rb");
+	wf->fp = fopen (filename.c_str(), "rb");
 	if (wf->fp == 0) {
-		printf ("%.128s: %s\n", filename, strerror (errno));
+		printf ("%.128s: %s\n", filename.c_str(), strerror (errno));
 		fail = true;
 		goto byebye;
 	}
 
-	{
-		char buf[5] = { 0 };
-		bool e = file_read_bytes (wf->fp, buf, 4);
-		wf->type = string(buf);
-		e     |= file_read_int32_t   (wf->fp, &wf->dirsize);
-		e     |= file_read_int32_t   (wf->fp, &wf->dirstart);
-		if (e || (wf->type != "IWAD" && wf->type != "PWAD")) {
-			printf("%.128s: not a wad (bad header)\n", filename);
-			fail = true;
-			goto byebye;
-		}
+	e = file_read_bytes (wf->fp, buf, 4);
+	wf->type = string(buf);
+	e     |= file_read_int32_t   (wf->fp, &wf->dirsize);
+	e     |= file_read_int32_t   (wf->fp, &wf->dirstart);
+	if (e || (wf->type != "IWAD" && wf->type != "PWAD")) {
+		printf("%.128s: not a wad (bad header)\n", filename.c_str());
+		fail = true;
+		goto byebye;
 	}
+
 	verbmsg ("  Type %.4s, directory has %ld entries at offset %08lXh\n",
 			wf->type.c_str(), (long) wf->dirsize, (long) wf->dirstart);
 
@@ -434,7 +431,7 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 			* wf->dirsize);
 	if (fseek (wf->fp, wf->dirstart, SEEK_SET) != 0) {
 		printf ("%.128s: can't seek to directory at %08Xh\n",
-				filename, wf->dirstart);
+				filename.c_str(), wf->dirstart);
 		fail = true;
 		goto byebye;
 	}
@@ -444,7 +441,7 @@ Wad_file *BasicWadOpen (const char *filename, ygpf_t pic_format) {
 		e      |= file_read_int32_t   (wf->fp, &wf->directory[n].size);
 		e      |= file_read_bytes (wf->fp, wf->directory[n].name, WAD_NAME);
 		if (e) {
-			printf ("%.128s: read error on directory entry %ld\n", filename, (long)n);
+			printf ("%.128s: read error on directory entry %ld\n", filename.c_str(), (long)n);
 			fail = true;
 			goto byebye;
 		}
@@ -826,70 +823,57 @@ void SaveEntryFromRawFile (FILE *file, FILE *raw, const char *entryname) {
 
 
 /* Directories that are searched for PWADs */
-static const char *standard_directories[] = {
+static const string standard_directories[] = {
 	"",
 	"~/",                            // "~" means "the user's home directory"
 	"/usr/local/share/games/%s/",    // %s is replaced by <Game>
 	"/usr/share/games/%s/",          // %s is replaced by <Game>
 	"/usr/local/share/games/wads/",
-	"/usr/share/games/wads/",
-	NULL
+	"/usr/share/games/wads/"
 };
 
 
-static char *locate_pwad (const char *filename) {
-	al_fext_t ext;
-	const char **dirname;
-	char *real_basename;
-	char *real_name;
-	size_t len = strlen(filename) + 1 + (*ext? 0: 4);
-
-	// Get the extension in <ext>
-	al_fana (filename, NULL, NULL, NULL, ext);
+static string locate_pwad (const string filename) {
+	bool has_ext = filename.rfind(".wad") == filename.length() - 4;
 
 	// If it's an absolute name, stop there.
-	if (is_absolute (filename)) {
-		real_name = (char *) malloc(len);
-		strlcpy (real_name, filename, len);
-		if (!*ext)
-			strlcat (real_name, ".wad", len);
-		bool r = file_exists (real_name);
-		if (!r) {
-			free(real_name);
-			return 0;
-		}
+	if (is_absolute (filename.c_str())) {
+		string real_name = filename;
+		if (!has_ext)
+			real_name += ".wad";
+		if (!file_exists(real_name.c_str()))
+			return "";
 		return real_name;
 	}
 
 	// It's a relative name. If no extension given, append ".wad"
-	real_basename = (char *) malloc(len);
-	strlcpy (real_basename, filename, len);
-	if (!*ext)
-		strlcat(real_basename, ".wad", len);
+	string real_basename = filename;
+	if (!has_ext)
+		real_basename += ".wad";
 
 	// Then search for a file of that name in the standard directories.
-	real_name = (char *) malloc(Y_FILE_NAME + 1);
-	for (dirname = standard_directories; *dirname; dirname++) {
-		if (! strcmp (*dirname, "~/")) {
+	string real_name = "";
+	for (auto dirname: standard_directories) {
+		if (dirname.find("~/") == 0) {
 			if (getenv ("HOME")) {
-				strlcpy(real_name, getenv ("HOME"), Y_FILE_NAME);
-				al_sapc (real_name, '/', Y_FILE_NAME);
+				real_name = string(getenv("HOME")) + "/" + real_name;
 			} else
 				continue;
 		} else {
-			snprintf (real_name, Y_FILE_NAME + 1, *dirname, Game ? Game : "");
+			real_name = dirname;
+			auto it = real_name.find("%s");
+			if (it != string::npos) {
+				real_name.replace(it, it+2, Game ? string(Game) : "");
+			}
 		}
-		strlcat(real_name, real_basename, Y_FILE_NAME + 1);
-		verbmsg("  Trying \"%s\"... ", real_name);
-		if (file_exists(real_name)) {
+		real_name += real_basename;
+		verbmsg("  Trying \"%s\"... ", real_name.c_str());
+		if (file_exists(real_name.c_str())) {
 			verbmsg("right on !\n");
-			free(real_basename);
 			return real_name;
 		}
 		verbmsg("nuts\n");
 	}
-	free(real_name);
-	free(real_basename);
 	return NULL;
 }
 /* end of file */
